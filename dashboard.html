@@ -16,26 +16,32 @@
     }
 
     :root {
-      --bg: #f7f3ea;
+      --bg: #f7f2e9;
       --card: #ffffff;
-      --text: #111111;
-      --muted: #5f5a54;
-      --line: #eee5d7;
-      --orange: #f4a43a;
-      --orange-dark: #ee8f1f;
-      --coral-1: #ff8b6b;
-      --coral-2: #ff6d61;
-      --coral-3: #ff5d63;
-      --shadow: 0 18px 40px rgba(120, 96, 60, 0.08);
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f4ede2;
+      --gold: #f4a43a;
+      --gold-dark: #e78e18;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.22);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
     }
 
     html,
     body {
       margin: 0;
       padding: 0;
-      font-family: "Inter", sans-serif;
       background: var(--bg);
       color: var(--text);
+      font-family: "Inter", sans-serif;
     }
 
     body {
@@ -47,8 +53,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 22px 18px 110px;
-      position: relative;
+      padding: 20px 18px 112px;
     }
 
     .topbar {
@@ -58,28 +63,46 @@
       margin-bottom: 22px;
     }
 
-    .brand {
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+    .brand-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .top-icons {
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+    }
+
+    .brand {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .top-actions {
       display: flex;
       gap: 10px;
+      align-items: center;
     }
 
     .icon-btn {
-      width: 42px;
-      height: 42px;
-      border: 1px solid var(--line);
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
-      box-shadow: 0 8px 22px rgba(155, 126, 92, 0.04);
+      padding: 0;
     }
 
     .icon-btn svg {
@@ -88,99 +111,125 @@
     }
 
     .hero-card {
-      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 55%, var(--coral-3) 100%);
-      border-radius: 34px;
-      padding: 24px 22px;
-      color: #fff;
-      box-shadow: 0 22px 36px rgba(255, 107, 97, 0.24);
-      margin-bottom: 22px;
-      overflow: hidden;
       position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 24px 22px 24px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 26px;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      right: -70px;
+      top: -42px;
+      background: rgba(255, 255, 255, 0.12);
     }
 
     .hero-card::after {
       content: "";
       position: absolute;
-      right: -50px;
-      top: -30px;
-      width: 170px;
-      height: 170px;
+      width: 130px;
+      height: 130px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.12);
+      right: 24px;
+      bottom: -60px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 265px;
     }
 
     .hero-label {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      opacity: 0.92;
+      opacity: 0.94;
       margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
     }
 
     .hero-title {
-      font-size: 2rem;
-      line-height: 1.04;
-      letter-spacing: -0.05em;
-      font-weight: 800;
       margin: 0 0 12px;
-      max-width: 240px;
-      position: relative;
-      z-index: 1;
+      font-size: 2.15rem;
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+      font-weight: 800;
     }
 
     .hero-subtitle {
       margin: 0 0 18px;
       font-size: 0.96rem;
       line-height: 1.45;
-      color: rgba(255,255,255,0.95);
-      max-width: 260px;
-      position: relative;
-      z-index: 1;
+      color: rgba(255, 255, 255, 0.95);
     }
 
-    .hero-button {
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-btn,
+    .hero-btn-secondary {
+      min-height: 50px;
+      padding: 0 18px;
+      border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 52px;
-      padding: 0 20px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.18);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #fff;
       text-decoration: none;
-      font-weight: 600;
-      position: relative;
-      z-index: 1;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .hero-btn {
+      background: #fff;
+      color: #ff5f67;
+      box-shadow: 0 8px 20px rgba(169, 67, 62, 0.12);
+    }
+
+    .hero-btn-secondary {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
 
     .section {
-      margin-top: 26px;
+      margin-top: 28px;
     }
 
     .section-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 14px;
       margin-bottom: 16px;
     }
 
     .section-title {
-      font-size: 1.6rem;
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-      font-weight: 800;
       margin: 0;
+      font-size: 1.6rem;
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      font-weight: 800;
     }
 
     .section-link {
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: 0.93rem;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .quick-grid {
@@ -192,48 +241,49 @@
     .quick-card {
       background: var(--card);
       border-radius: 26px;
-      padding: 18px 16px;
+      padding: 16px;
       box-shadow: var(--shadow);
-      min-height: 142px;
+      text-decoration: none;
+      color: inherit;
+      min-height: 158px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      text-decoration: none;
-      color: inherit;
     }
 
     .quick-icon {
-      width: 54px;
-      height: 54px;
+      width: 56px;
+      height: 56px;
       border-radius: 18px;
-      background: #fff2df;
-      color: var(--orange-dark);
+      background: #fff1dc;
+      color: var(--gold-dark);
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     .quick-icon svg {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
     }
 
     .quick-card h3 {
       margin: 16px 0 6px;
-      font-size: 1.08rem;
-      line-height: 1.15;
+      font-size: 1.06rem;
+      line-height: 1.12;
       letter-spacing: -0.03em;
+      font-weight: 700;
     }
 
     .quick-card p {
       margin: 0;
-      color: var(--muted);
       font-size: 0.92rem;
-      line-height: 1.4;
+      line-height: 1.42;
+      color: var(--muted);
     }
 
     .event-card {
-      margin-top: 2px;
       background: var(--card);
       border-radius: 30px;
       padding: 18px;
@@ -247,39 +297,57 @@
     }
 
     .event-thumb {
-      width: 90px;
-      height: 90px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #ffd79d, #f4a43a);
+      width: 92px;
+      height: 92px;
+      border-radius: 24px;
       flex-shrink: 0;
-      position: relative;
       overflow: hidden;
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.1), rgba(0,0,0,0.04)),
+        linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
+      position: relative;
     }
 
     .event-thumb::before {
       content: "";
       position: absolute;
-      inset: 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.4);
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      height: 24px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    .event-thumb::after {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.26);
     }
 
     .event-meta {
       min-width: 0;
+      flex: 1;
     }
 
     .event-date {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--muted);
       margin-bottom: 6px;
+      font-weight: 600;
     }
 
     .event-name {
       margin: 0 0 8px;
-      font-size: 1.35rem;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      font-weight: 700;
+      font-size: 1.34rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
     }
 
     .event-status {
@@ -289,10 +357,10 @@
       min-height: 34px;
       padding: 0 12px;
       border-radius: 999px;
-      background: #fff3e0;
-      color: #a7650f;
-      font-size: 0.88rem;
-      font-weight: 600;
+      background: #fff4e2;
+      color: #a46a14;
+      font-size: 0.84rem;
+      font-weight: 700;
     }
 
     .event-status::before {
@@ -300,35 +368,66 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--orange);
+      background: var(--gold);
       display: inline-block;
+    }
+
+    .event-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat-box {
+      background: #faf5ee;
+      border: 1px solid #f2e7d8;
+      border-radius: 20px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: 1.02rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
     }
 
     .event-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 18px;
+      margin-top: 16px;
     }
 
     .btn {
       min-height: 54px;
       border-radius: 999px;
       border: none;
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 0.97rem;
+      font-weight: 700;
       cursor: pointer;
+      font-family: inherit;
     }
 
     .btn-primary {
       color: #fff;
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 55%, var(--coral-3) 100%);
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.2);
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
     }
 
     .btn-secondary {
-      background: #f3ecdf;
       color: #4a433d;
+      background: #f3ebde;
     }
 
     .vendor-list {
@@ -339,46 +438,87 @@
     .vendor-card {
       background: var(--card);
       border-radius: 24px;
-      padding: 16px;
+      padding: 14px;
       box-shadow: var(--shadow);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
     }
 
     .vendor-left {
       display: flex;
-      gap: 12px;
       align-items: center;
+      gap: 12px;
       min-width: 0;
+      flex: 1;
     }
 
     .vendor-avatar {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #ffe6bf, #f4a43a);
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
       flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+    }
+
+    .vendor-avatar::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vendor-info {
+      min-width: 0;
     }
 
     .vendor-info h3 {
       margin: 0 0 4px;
       font-size: 1rem;
-      line-height: 1.15;
+      line-height: 1.12;
       letter-spacing: -0.02em;
+      font-weight: 800;
     }
 
     .vendor-info p {
-      margin: 0;
+      margin: 0 0 5px;
+      font-size: 0.88rem;
       color: var(--muted);
-      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .vendor-rating {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #b37619;
+    }
+
+    .vendor-right {
+      text-align: right;
+      flex-shrink: 0;
     }
 
     .vendor-price {
       font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .mini-btn {
+      min-height: 36px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 999px;
+      background: #f7efe2;
+      color: #4c453e;
+      font-size: 0.82rem;
       font-weight: 700;
-      white-space: nowrap;
+      font-family: inherit;
     }
 
     .bottom-nav {
@@ -388,30 +528,30 @@
       bottom: 16px;
       width: calc(100% - 24px);
       max-width: 406px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(238, 229, 215, 0.9);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
       border-radius: 999px;
       padding: 10px 8px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 4px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .nav-item {
       min-height: 58px;
       border-radius: 999px;
-      color: #6b655f;
       text-decoration: none;
+      color: #6c655d;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 4px;
       font-size: 0.76rem;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .nav-item svg {
@@ -420,7 +560,7 @@
     }
 
     .nav-item.active {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 55%, var(--coral-3) 100%);
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
@@ -435,8 +575,8 @@
         padding: 28px 24px 120px;
       }
 
-      .hero-title {
-        max-width: 420px;
+      .hero-content {
+        max-width: 450px;
       }
 
       .quick-grid {
@@ -456,9 +596,12 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <div class="brand">RentEvent</div>
+      <div class="brand-wrap">
+        <div class="eyebrow">Dashboard</div>
+        <h1 class="brand">RentEvent</h1>
+      </div>
 
-      <div class="top-icons">
+      <div class="top-actions">
         <button class="icon-btn" type="button" aria-label="Search">
           <svg viewBox="0 0 24 24" fill="none">
             <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"></circle>
@@ -469,19 +612,25 @@
         <button class="icon-btn" type="button" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-            <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 20 13.7 19.2 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
           </svg>
         </button>
       </div>
     </header>
 
     <section class="hero-card">
-      <div class="hero-label">Welcome back</div>
-      <h1 class="hero-title">Plan your next event beautifully.</h1>
-      <p class="hero-subtitle">
-        Keep everything in one place. Vendors, rentals, ideas, and your event flow.
-      </p>
-      <a class="hero-button" href="#">Start New Event</a>
+      <div class="hero-content">
+        <div class="hero-label">Welcome back</div>
+        <h2 class="hero-title">Plan your next event beautifully.</h2>
+        <p class="hero-subtitle">
+          Keep rentals, vendors, ideas, and event details all in one place.
+        </p>
+
+        <div class="hero-actions">
+          <a class="hero-btn" href="#">Start New Event</a>
+          <a class="hero-btn-secondary" href="#">Browse Listings</a>
+        </div>
+      </div>
     </section>
 
     <section class="section">
@@ -499,7 +648,7 @@
           </div>
           <div>
             <h3>New Event</h3>
-            <p>Create a fresh event folder and start building.</p>
+            <p>Create a fresh event folder and start planning from scratch.</p>
           </div>
         </a>
 
@@ -513,7 +662,7 @@
           </div>
           <div>
             <h3>Listings</h3>
-            <p>Browse venues, decor, chefs, and event rentals.</p>
+            <p>Explore venues, décor, catering, rentals, and more.</p>
           </div>
         </a>
 
@@ -527,7 +676,7 @@
           </div>
           <div>
             <h3>Messages</h3>
-            <p>Talk with vendors and keep details organized.</p>
+            <p>Chat with vendors and keep every detail organized.</p>
           </div>
         </a>
 
@@ -540,7 +689,7 @@
           </div>
           <div>
             <h3>Profile</h3>
-            <p>View saved events, preferences, and account info.</p>
+            <p>View saved events, account settings, and favorites.</p>
           </div>
         </a>
       </div>
@@ -563,6 +712,21 @@
           </div>
         </div>
 
+        <div class="event-stats">
+          <div class="stat-box">
+            <span class="stat-number">8</span>
+            <span class="stat-label">Vendors</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Booked</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number">$1.2k</span>
+            <span class="stat-label">Budget</span>
+          </div>
+        </div>
+
         <div class="event-actions">
           <button class="btn btn-primary" type="button">Open Event</button>
           <button class="btn btn-secondary" type="button">Add Vendor</button>
@@ -582,10 +746,14 @@
             <div class="vendor-avatar"></div>
             <div class="vendor-info">
               <h3>Sunny Slides</h3>
-              <p>Bounce House Rentals</p>
+              <p>Bounce house rentals for birthdays and backyard parties.</p>
+              <div class="vendor-rating">★ 4.9</div>
             </div>
           </div>
-          <div class="vendor-price">$250+</div>
+          <div class="vendor-right">
+            <div class="vendor-price">$250+</div>
+            <button class="mini-btn" type="button">View</button>
+          </div>
         </article>
 
         <article class="vendor-card">
@@ -593,10 +761,14 @@
             <div class="vendor-avatar"></div>
             <div class="vendor-info">
               <h3>Golden Table Co.</h3>
-              <p>Luxury Tablescape Styling</p>
+              <p>Luxury tablescape styling and elevated place settings.</p>
+              <div class="vendor-rating">★ 4.8</div>
             </div>
           </div>
-          <div class="vendor-price">$180+</div>
+          <div class="vendor-right">
+            <div class="vendor-price">$180+</div>
+            <button class="mini-btn" type="button">View</button>
+          </div>
         </article>
 
         <article class="vendor-card">
@@ -604,10 +776,14 @@
             <div class="vendor-avatar"></div>
             <div class="vendor-info">
               <h3>Velvet Bloom</h3>
-              <p>Floral and Décor</p>
+              <p>Florals and décor installs for showers, dinners, and events.</p>
+              <div class="vendor-rating">★ 5.0</div>
             </div>
           </div>
-          <div class="vendor-price">$300+</div>
+          <div class="vendor-right">
+            <div class="vendor-price">$300+</div>
+            <button class="mini-btn" type="button">View</button>
+          </div>
         </article>
 
         <article class="vendor-card">
@@ -615,10 +791,14 @@
             <div class="vendor-avatar"></div>
             <div class="vendor-info">
               <h3>Frame & Flash</h3>
-              <p>Photo Booth Experiences</p>
+              <p>Modern photo booth experiences with clean luxe setups.</p>
+              <div class="vendor-rating">★ 4.7</div>
             </div>
           </div>
-          <div class="vendor-price">$225+</div>
+          <div class="vendor-right">
+            <div class="vendor-price">$225+</div>
+            <button class="mini-btn" type="button">View</button>
+          </div>
         </article>
       </div>
     </section>
