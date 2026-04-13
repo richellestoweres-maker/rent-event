@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f5ede2;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 112px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+    }
+
+    .title-wrap {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      color: #fff;
+      box-shadow: 0 18px 32px rgba(255, 108, 98, 0.18);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 250px;
+    }
+
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 1.9rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.94rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.4rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .notice-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .notice-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .notice-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: #fff1dc;
+      color: #d8831b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+
+    .notice-icon.green {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .notice-content {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .notice-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .notice-title {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .notice-time {
+      white-space: nowrap;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .notice-text {
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .notice-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: #4a433d;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-item {
+      min-height: 58px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0 4px;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="title-wrap">
+        <p class="eyebrow">Updates</p>
+        <h1 class="page-title">Notifications</h1>
+      </div>
+
+      <a href="index.html" class="icon-btn" aria-label="Log out">⎋</a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">Stay in the loop</div>
+        <h2 class="hero-title">Everything happening with your events.</h2>
+        <p class="hero-subtitle">
+          Booking confirmations, vendor replies, reminders, and updates all in one place.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Recent Activity</h2>
+
+      <div class="notice-list">
+        <article class="notice-card">
+          <div class="notice-icon">★</div>
+          <div class="notice-content">
+            <div class="notice-top">
+              <h3 class="notice-title">Vendor confirmed your booking</h3>
+              <span class="notice-time">2 min ago</span>
+            </div>
+            <p class="notice-text">
+              Sunny Slides confirmed availability for Amara’s Birthday Party on July 18.
+            </p>
+            <a href="event-builder.html" class="notice-link">View Event</a>
+          </div>
+        </article>
+
+        <article class="notice-card">
+          <div class="notice-icon green">✓</div>
+          <div class="notice-content">
+            <div class="notice-top">
+              <h3 class="notice-title">Payment reminder</h3>
+              <span class="notice-time">1 hr ago</span>
+            </div>
+            <p class="notice-text">
+              Your event checkout is still pending. Complete your booking to reserve your vendors.
+            </p>
+            <a href="checkout.html" class="notice-link">Go to Checkout</a>
+          </div>
+        </article>
+
+        <article class="notice-card">
+          <div class="notice-icon">✉</div>
+          <div class="notice-content">
+            <div class="notice-top">
+              <h3 class="notice-title">New message from Velvet Bloom</h3>
+              <span class="notice-time">Today</span>
+            </div>
+            <p class="notice-text">
+              Velvet Bloom replied with floral setup options for your dinner event.
+            </p>
+            <a href="messages.html" class="notice-link">Open Messages</a>
+          </div>
+        </article>
+
+        <article class="notice-card">
+          <div class="notice-icon green">✓</div>
+          <div class="notice-content">
+            <div class="notice-top">
+              <h3 class="notice-title">Listing approved</h3>
+              <span class="notice-time">Yesterday</span>
+            </div>
+            <p class="notice-text">
+              Your vendor listing “Luxury Dinner Setup” is now live and visible to customers.
+            </p>
+            <a href="vendor-dashboard.html" class="notice-link">Vendor Dashboard</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a class="nav-item" href="dashboard.html">Home</a>
+    <a class="nav-item" href="listings.html">Listings</a>
+    <a class="nav-item" href="messages.html">Inbox</a>
+    <a class="nav-item active" href="notifications.html">Alerts</a>
+  </nav>
+</body>
+</html>
