@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Event</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f7f2e9;
+}
+
+.container {
+  max-width: 430px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+/* EVENT CARD */
+.event-card {
+  background: white;
+  border-radius: 25px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.event-card h3 {
+  margin: 0 0 10px 0;
+}
+
+.status {
+  background: #fff3e0;
+  color: #a7650f;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  font-size: 13px;
+}
+
+/* LIST */
+.items {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  background: #f3ebde;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+/* BUTTONS */
+.button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  margin-top: 10px;
+}
+
+.primary {
+  background: linear-gradient(135deg, #ff7a5c, #ff5c5c);
+  color: white;
+}
+
+.secondary {
+  background: #eee;
+}
+
+/* NAV */
+.nav {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  background: white;
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h2>My Event</h2>
+    <a href="dashboard.html">←</a>
+  </div>
+
+  <div class="event-card">
+    <h3>Amara’s Birthday Party</h3>
+    <div class="status">Planning in Progress</div>
+
+    <div class="items">
+      <div class="item">Sunny Slides - $250</div>
+      <div class="item">Photo Booth - $225</div>
+    </div>
+
+    <button class="button primary">Add Vendor</button>
+    <button class="button secondary">Checkout</button>
+  </div>
+
+</div>
+
+<div class="nav">
+  <a href="dashboard.html">Home</a>
+  <a href="listings.html">Listings</a>
+  <a href="messages.html">Inbox</a>
+  <a href="profile.html">Profile</a>
+</div>
+
+</body>
+</html>
