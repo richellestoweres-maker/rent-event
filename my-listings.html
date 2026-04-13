@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Listings</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f7f2e9;
+}
+
+.container {
+  max-width: 430px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+/* CARD */
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.card h3 {
+  margin: 0;
+}
+
+.category {
+  font-size: 13px;
+  color: gray;
+}
+
+.price {
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+}
+
+.primary {
+  background: linear-gradient(135deg, #ff7a5c, #ff5c5c);
+  color: white;
+}
+
+.secondary {
+  background: #eee;
+  color: black;
+}
+
+/* NAV */
+.nav {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  background: white;
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h2>My Listings</h2>
+    <a href="vendor-dashboard.html">←</a>
+  </div>
+
+  <!-- LISTING 1 -->
+  <div class="card">
+    <h3>Sunny Slides</h3>
+    <div class="category">Bounce Houses</div>
+    <div class="price">$250+</div>
+
+    <div class="actions">
+      <a href="detail.html" class="button primary">View</a>
+      <a href="add-listing.html" class="button secondary">Edit</a>
+    </div>
+  </div>
+
+  <!-- LISTING 2 -->
+  <div class="card">
+    <h3>Luxury Dinner Setup</h3>
+    <div class="category">Decor</div>
+    <div class="price">$850+</div>
+
+    <div class="actions">
+      <a href="detail.html" class="button primary">View</a>
+      <a href="add-listing.html" class="button secondary">Edit</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <a href="vendor-dashboard.html">Home</a>
+  <a href="add-listing.html">Add</a>
+  <a href="messages.html">Inbox</a>
+  <a href="profile.html">Profile</a>
+</div>
+
+</body>
+</html>
