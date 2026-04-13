@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RentEvent Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f5ede2;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 120px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .summary-card {
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -40px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .summary-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .summary-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .summary-title {
+      margin: 0 0 10px;
+      font-size: 1.95rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+      max-width: 240px;
+    }
+
+    .summary-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+      max-width: 250px;
+    }
+
+    .section {
+      margin-top: 26px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.35rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .line-items {
+      display: grid;
+      gap: 12px;
+    }
+
+    .line-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .line-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .line-item:first-child {
+      padding-top: 0;
+    }
+
+    .item-left h3 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
+    .item-left p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .item-price {
+      font-size: 0.98rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .totals {
+      display: grid;
+      gap: 12px;
+    }
+
+    .total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.96rem;
+      color: var(--muted);
+    }
+
+    .total-row.grand {
+      margin-top: 4px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--text);
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .payment-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #fff;
+    }
+
+    .payment-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #d9c9b3;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .payment-option.active .payment-dot {
+      border-color: var(--coral-2);
+    }
+
+    .payment-option.active .payment-dot::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--coral-2);
+    }
+
+    .payment-info h3 {
+      margin: 0 0 3px;
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    .payment-info p {
+      margin: 0;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .details-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #574f47;
+    }
+
+    .input {
+      width: 100%;
+      min-height: 54px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 0 16px;
+      font-family: inherit;
+      font-size: 0.96rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input::placeholder {
+      color: #a49a8f;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .bottom-total {
+      flex: 1;
+      padding-left: 8px;
+    }
+
+    .bottom-total-label {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bottom-total-value {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .checkout-btn {
+      min-width: 170px;
+      min-height: 56px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      font-size: 0.98rem;
+      font-weight: 800;
+      font-family: inherit;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.2);
+      cursor: pointer;
+    }
+
+    @media (max-width: 360px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .checkout-btn {
+        min-width: 150px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .summary-title {
+        max-width: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="event-builder.html" class="back-link" aria-label="Go back">
+        ←
+      </a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Booking</div>
+        <h1 class="page-title">Checkout</h1>
+      </div>
+
+      <button class="icon-btn" type="button" aria-label="More options">
+        ⋯
+      </button>
+    </header>
+
+    <section class="summary-card">
+      <div class="summary-content">
+        <div class="summary-label">Almost there</div>
+        <h2 class="summary-title">Secure your event bookings.</h2>
+        <p class="summary-subtitle">
+          Review your selected vendors, choose a payment method, and confirm your event details.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Order Summary</h2>
+
+      <div class="card">
+        <div class="line-items">
+          <div class="line-item">
+            <div class="item-left">
+              <h3>Sunny Slides</h3>
+              <p>Bounce house rental with delivery and pickup included.</p>
+            </div>
+            <div class="item-price">$250</div>
+          </div>
+
+          <div class="line-item">
+            <div class="item-left">
+              <h3>Photo Booth Experience</h3>
+              <p>Modern booth setup for 3 hours with instant sharing.</p>
+            </div>
+            <div class="item-price">$225</div>
+          </div>
+
+          <div class="line-item">
+            <div class="item-left">
+              <h3>Luxury Dinner Setup</h3>
+              <p>Tablescape styling and premium event décor setup.</p>
+            </div>
+            <div class="item-price">$850</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Payment Summary</h2>
+
+      <div class="card">
+        <div class="totals">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <strong>$1,325</strong>
+          </div>
+
+          <div class="total-row">
+            <span>Service Fee</span>
+            <strong>$65</strong>
+          </div>
+
+          <div class="total-row">
+            <span>Estimated Tax</span>
+            <strong>$42</strong>
+          </div>
+
+          <div class="total-row grand">
+            <span>Total</span>
+            <strong>$1,432</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Payment Method</h2>
+
+      <div class="card">
+        <div class="payment-options">
+          <div class="payment-option active">
+            <div class="payment-dot"></div>
+            <div class="payment-info">
+              <h3>Credit or Debit Card</h3>
+              <p>Pay securely with your saved or new card.</p>
+            </div>
+          </div>
+
+          <div class="payment-option">
+            <div class="payment-dot"></div>
+            <div class="payment-info">
+              <h3>Pay Later Deposit</h3>
+              <p>Reserve now with a deposit and pay the rest later.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Billing Details</h2>
+
+      <div class="card">
+        <div class="details-grid">
+          <div class="field-group">
+            <label for="full-name">Full Name</label>
+            <input id="full-name" class="input" type="text" placeholder="Richelle T." />
+          </div>
+
+          <div class="field-group">
+            <label for="email">Email</label>
+            <input id="email" class="input" type="email" placeholder="you@example.com" />
+          </div>
+
+          <div class="field-group">
+            <label for="card-number">Card Number</label>
+            <input id="card-number" class="input" type="text" placeholder="1234 5678 9012 3456" />
+          </div>
+
+          <div class="row-2">
+            <div class="field-group">
+              <label for="exp-date">Expiration</label>
+              <input id="exp-date" class="input" type="text" placeholder="MM/YY" />
+            </div>
+
+            <div class="field-group">
+              <label for="cvv">CVV</label>
+              <input id="cvv" class="input" type="text" placeholder="123" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="notes">Event Notes</label>
+            <input id="notes" class="input" type="text" placeholder="Any special setup instructions?" />
+          </div>
+        </div>
+
+        <p class="note">
+          This is a front-end prototype right now, so payment is not yet processing for real users. Once we add Firebase and a payment provider later, this will become fully functional.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="bottom-bar">
+    <div class="bottom-total">
+      <span class="bottom-total-label">Total Due</span>
+      <span class="bottom-total-value">$1,432</span>
+    </div>
+
+    <button class="checkout-btn" type="button">Confirm Booking</button>
+  </div>
+</body>
+</html>
