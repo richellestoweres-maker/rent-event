@@ -21,14 +21,19 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f5ede2;
+      --soft: #f4ede2;
+      --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
       --gold: #f4a43a;
+      --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
       --radius-lg: 28px;
       --radius-md: 22px;
@@ -78,20 +83,21 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
+      font-weight: 700;
     }
 
-    .title-wrap {
+    .topbar-center {
       flex: 1;
       text-align: center;
     }
 
     .eyebrow {
-      margin: 0 0 4px;
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.16em;
       text-transform: uppercase;
       color: #7b7268;
+      margin-bottom: 4px;
     }
 
     .page-title {
@@ -103,14 +109,14 @@
     }
 
     .hero-card {
-      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      border-radius: var(--radius-xl);
-      padding: 22px 20px;
-      color: #fff;
-      box-shadow: 0 18px 32px rgba(255, 108, 98, 0.18);
-      margin-bottom: 24px;
       position: relative;
       overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
     }
 
     .hero-card::after {
@@ -127,7 +133,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 250px;
+      max-width: 280px;
     }
 
     .hero-label {
@@ -139,7 +145,7 @@
 
     .hero-title {
       margin: 0 0 10px;
-      font-size: 1.9rem;
+      font-size: 2rem;
       line-height: 0.98;
       letter-spacing: -0.05em;
       font-weight: 800;
@@ -147,25 +153,53 @@
 
     .hero-subtitle {
       margin: 0;
-      font-size: 0.94rem;
+      font-size: 0.95rem;
       line-height: 1.45;
       color: rgba(255, 255, 255, 0.95);
     }
 
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
     .section-title {
-      margin: 0 0 14px;
-      font-size: 1.4rem;
+      margin: 0;
+      font-size: 1.45rem;
       line-height: 1.02;
       letter-spacing: -0.04em;
       font-weight: 800;
     }
 
-    .notice-list {
+    .clear-link {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .notification-list {
       display: grid;
       gap: 14px;
     }
 
-    .notice-card {
+    .notification-card {
       background: var(--card);
       border-radius: 24px;
       padding: 16px;
@@ -175,71 +209,100 @@
       align-items: flex-start;
     }
 
-    .notice-icon {
-      width: 48px;
-      height: 48px;
+    .notification-icon {
+      width: 52px;
+      height: 52px;
       border-radius: 16px;
-      background: #fff1dc;
-      color: #d8831b;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0;
+      font-size: 1rem;
       font-weight: 800;
     }
 
-    .notice-icon.green {
+    .icon-coral {
+      background: #ffe0db;
+      color: #ff5f67;
+    }
+
+    .icon-gold {
+      background: #fff2dd;
+      color: #d88914;
+    }
+
+    .icon-green {
       background: var(--green-soft);
       color: var(--green-text);
     }
 
-    .notice-content {
+    .notification-content {
       min-width: 0;
       flex: 1;
     }
 
-    .notice-top {
+    .notification-top {
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
       align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 6px;
     }
 
-    .notice-title {
+    .notification-title {
       margin: 0;
       font-size: 1rem;
-      line-height: 1.12;
+      line-height: 1.18;
       letter-spacing: -0.02em;
       font-weight: 800;
     }
 
-    .notice-time {
-      white-space: nowrap;
-      font-size: 0.8rem;
-      color: var(--muted);
+    .notification-time {
+      font-size: 0.74rem;
       font-weight: 700;
+      color: #9a9084;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
-    .notice-text {
+    .notification-text {
       margin: 0 0 10px;
-      font-size: 0.88rem;
-      line-height: 1.45;
+      font-size: 0.9rem;
+      line-height: 1.48;
       color: var(--muted);
     }
 
-    .notice-link {
+    .notification-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
       display: inline-flex;
       align-items: center;
-      min-height: 36px;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: var(--soft);
-      color: #4a433d;
-      text-decoration: none;
-      font-size: 0.82rem;
+      justify-content: center;
+      font-size: 0.76rem;
       font-weight: 700;
+    }
+
+    .pill.new {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .pill.success {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.info {
+      background: #fff4df;
+      color: #aa6f12;
     }
 
     .bottom-nav {
@@ -271,10 +334,15 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       font-weight: 700;
       text-align: center;
       padding: 0 4px;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
     }
 
     .nav-item.active {
@@ -282,88 +350,137 @@
       color: #fff;
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .hero-content {
+        max-width: 420px;
+      }
+
+      .bottom-nav {
+        max-width: 520px;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+      <a href="dashboard.html" class="back-link" aria-label="Go back">
+        ←
+      </a>
 
-      <div class="title-wrap">
-        <p class="eyebrow">Updates</p>
+      <div class="topbar-center">
+        <div class="eyebrow">Updates</div>
         <h1 class="page-title">Notifications</h1>
       </div>
 
-      <a href="index.html" class="icon-btn" aria-label="Log out">⎋</a>
+      <a href="profile.html" class="icon-btn" aria-label="Profile">
+        ☺
+      </a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
         <div class="hero-label">Stay in the loop</div>
-        <h2 class="hero-title">Everything happening with your events.</h2>
+        <h2 class="hero-title">Everything important, all in one place.</h2>
         <p class="hero-subtitle">
-          Booking confirmations, vendor replies, reminders, and updates all in one place.
+          Keep track of booking updates, vendor replies, confirmations, and reminders for your events.
         </p>
       </div>
     </section>
 
-    <section>
-      <h2 class="section-title">Recent Activity</h2>
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Activity</h2>
+        <a class="clear-link" href="#">Clear All</a>
+      </div>
 
-      <div class="notice-list">
-        <article class="notice-card">
-          <div class="notice-icon">★</div>
-          <div class="notice-content">
-            <div class="notice-top">
-              <h3 class="notice-title">Vendor confirmed your booking</h3>
-              <span class="notice-time">2 min ago</span>
+      <div class="notification-list">
+        <article class="notification-card">
+          <div class="notification-icon icon-coral">✉</div>
+          <div class="notification-content">
+            <div class="notification-top">
+              <h3 class="notification-title">New message from Sunny Slides</h3>
+              <span class="notification-time">5 min ago</span>
             </div>
-            <p class="notice-text">
-              Sunny Slides confirmed availability for Amara’s Birthday Party on July 18.
+            <p class="notification-text">
+              They replied to your question about setup timing and included delivery details for your event.
             </p>
-            <a href="event-builder.html" class="notice-link">View Event</a>
+            <div class="notification-meta">
+              <span class="pill new">New Message</span>
+            </div>
           </div>
         </article>
 
-        <article class="notice-card">
-          <div class="notice-icon green">✓</div>
-          <div class="notice-content">
-            <div class="notice-top">
-              <h3 class="notice-title">Payment reminder</h3>
-              <span class="notice-time">1 hr ago</span>
+        <article class="notification-card">
+          <div class="notification-icon icon-green">✓</div>
+          <div class="notification-content">
+            <div class="notification-top">
+              <h3 class="notification-title">Booking request confirmed</h3>
+              <span class="notification-time">1 hr ago</span>
             </div>
-            <p class="notice-text">
-              Your event checkout is still pending. Complete your booking to reserve your vendors.
+            <p class="notification-text">
+              Your Photo Booth Experience request has been accepted for July 18 and is ready for checkout.
             </p>
-            <a href="checkout.html" class="notice-link">Go to Checkout</a>
+            <div class="notification-meta">
+              <span class="pill success">Confirmed</span>
+            </div>
           </div>
         </article>
 
-        <article class="notice-card">
-          <div class="notice-icon">✉</div>
-          <div class="notice-content">
-            <div class="notice-top">
-              <h3 class="notice-title">New message from Velvet Bloom</h3>
-              <span class="notice-time">Today</span>
+        <article class="notification-card">
+          <div class="notification-icon icon-gold">★</div>
+          <div class="notification-content">
+            <div class="notification-top">
+              <h3 class="notification-title">New vendor recommendation</h3>
+              <span class="notification-time">Today</span>
             </div>
-            <p class="notice-text">
-              Velvet Bloom replied with floral setup options for your dinner event.
+            <p class="notification-text">
+              Velvet Bloom was recommended for your event based on your saved vendors and décor style.
             </p>
-            <a href="messages.html" class="notice-link">Open Messages</a>
+            <div class="notification-meta">
+              <span class="pill info">Suggested Vendor</span>
+            </div>
           </div>
         </article>
 
-        <article class="notice-card">
-          <div class="notice-icon green">✓</div>
-          <div class="notice-content">
-            <div class="notice-top">
-              <h3 class="notice-title">Listing approved</h3>
-              <span class="notice-time">Yesterday</span>
+        <article class="notification-card">
+          <div class="notification-icon icon-coral">!</div>
+          <div class="notification-content">
+            <div class="notification-top">
+              <h3 class="notification-title">Payment reminder</h3>
+              <span class="notification-time">Yesterday</span>
             </div>
-            <p class="notice-text">
-              Your vendor listing “Luxury Dinner Setup” is now live and visible to customers.
+            <p class="notification-text">
+              Your event deposit is ready for checkout so you can secure your selected vendors before availability changes.
             </p>
-            <a href="vendor-dashboard.html" class="notice-link">Vendor Dashboard</a>
+            <div class="notification-meta">
+              <span class="pill new">Action Needed</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="notification-card">
+          <div class="notification-icon icon-green">✓</div>
+          <div class="notification-content">
+            <div class="notification-top">
+              <h3 class="notification-title">Profile updated</h3>
+              <span class="notification-time">Yesterday</span>
+            </div>
+            <p class="notification-text">
+              Your account details were successfully updated and saved to your profile section.
+            </p>
+            <div class="notification-meta">
+              <span class="pill success">Saved</span>
+            </div>
           </div>
         </article>
       </div>
@@ -371,10 +488,37 @@
   </main>
 
   <nav class="bottom-nav" aria-label="Bottom navigation">
-    <a class="nav-item" href="dashboard.html">Home</a>
-    <a class="nav-item" href="listings.html">Listings</a>
-    <a class="nav-item" href="messages.html">Inbox</a>
-    <a class="nav-item active" href="notifications.html">Alerts</a>
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" href="listings.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Listings</span>
+    </a>
+
+    <a class="nav-item active" href="notifications.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+        <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Alerts</span>
+    </a>
+
+    <a class="nav-item" href="profile.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Profile</span>
+    </a>
   </nav>
 </body>
 </html>
