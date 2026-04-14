@@ -1,154 +1,656 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Event</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Event | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f4ede2;
+      --soft-2: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: #f7f2e9;
-}
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
 
-.container {
-  max-width: 430px;
-  margin: auto;
-  padding: 20px;
-}
+    body {
+      min-height: 100vh;
+    }
 
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 118px;
+    }
 
-.header h2 {
-  margin: 0;
-}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
 
-/* EVENT CARD */
-.event-card {
-  background: white;
-  border-radius: 25px;
-  padding: 20px;
-  margin: 20px 0;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+    }
 
-.event-card h3 {
-  margin: 0 0 10px 0;
-}
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
 
-.status {
-  background: #fff3e0;
-  color: #a7650f;
-  padding: 6px 12px;
-  border-radius: 20px;
-  display: inline-block;
-  font-size: 13px;
-}
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
 
-/* LIST */
-.items {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
 
-.item {
-  background: #f3ebde;
-  padding: 12px;
-  border-radius: 15px;
-  display: flex;
-  justify-content: space-between;
-}
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
 
-/* BUTTONS */
-.button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 20px;
-  border: none;
-  margin-top: 12px;
-  text-decoration: none;
-  display: block;
-  text-align: center;
-  font-weight: 600;
-}
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
 
-.primary {
-  background: linear-gradient(135deg, #ff7a5c, #ff5c5c);
-  color: white;
-}
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 270px;
+    }
 
-.secondary {
-  background: #eee;
-  color: black;
-}
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
 
-/* NAV */
-.nav {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 400px;
-  background: white;
-  border-radius: 30px;
-  display: flex;
-  justify-content: space-around;
-  padding: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-</style>
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .section-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 14px 10px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .summary-number {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .summary-label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .vendor-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .vendor-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .vendor-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .vendor-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .vendor-thumb {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vendor-thumb::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vendor-info {
+      min-width: 0;
+    }
+
+    .vendor-name {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .vendor-type {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .vendor-price {
+      font-size: 1rem;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .vendor-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .pill.confirmed {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.pending {
+      background: #fff4df;
+      color: #aa6f12;
+    }
+
+    .pill.note {
+      background: #f6efe4;
+      color: #6a625a;
+    }
+
+    .vendor-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 46px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      flex: 1;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    .note-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .note-title {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .note-text {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .bottom-info {
+      flex: 1;
+      padding-left: 8px;
+    }
+
+    .bottom-label {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bottom-value {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .bottom-btn,
+    .bottom-btn-secondary {
+      min-height: 54px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      white-space: nowrap;
+    }
+
+    .bottom-btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
+    }
+
+    .bottom-btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    @media (max-width: 390px) {
+      .bottom-bar {
+        flex-wrap: wrap;
+        border-radius: 28px;
+      }
+
+      .bottom-info {
+        width: 100%;
+        padding-left: 2px;
+      }
+
+      .bottom-btn,
+      .bottom-btn-secondary {
+        flex: 1;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .vendor-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .bottom-bar {
+        max-width: 520px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="page">
+    <header class="topbar">
+      <a href="dashboard.html" class="back-link" aria-label="Go back">
+        ←
+      </a>
 
-<div class="container">
-
-  <div class="header">
-    <h2>My Event</h2>
-    <a href="dashboard.html">←</a>
-  </div>
-
-  <div class="event-card">
-    <h3>Amara’s Birthday Party</h3>
-    <div class="status">Planning in Progress</div>
-
-    <div class="items">
-      <div class="item">
-        <span>Sunny Slides</span>
-        <span>$250</span>
+      <div class="topbar-center">
+        <div class="eyebrow">Planning</div>
+        <h1 class="page-title">My Event</h1>
       </div>
-      <div class="item">
-        <span>Photo Booth</span>
-        <span>$225</span>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        🔔
+      </a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">Current Event</div>
+        <h2 class="hero-title">Amara’s Birthday Party</h2>
+        <p class="hero-subtitle">
+          Keep your vendors, budget, and planning details all in one beautifully organized place.
+        </p>
+
+        <div class="hero-meta">
+          <span class="hero-pill">Saturday, July 18</span>
+          <span class="hero-pill">League City, TX</span>
+          <span class="hero-pill">Planning in Progress</span>
+        </div>
       </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Event Summary</h2>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span class="summary-number">3</span>
+          <span class="summary-label">Vendors</span>
+        </div>
+
+        <div class="summary-card">
+          <span class="summary-number">$1,325</span>
+          <span class="summary-label">Subtotal</span>
+        </div>
+
+        <div class="summary-card">
+          <span class="summary-number">1</span>
+          <span class="summary-label">Pending</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Selected Vendors</h2>
+        <a class="section-link" href="listings.html">Add More</a>
+      </div>
+
+      <div class="vendor-list">
+        <article class="vendor-card">
+          <div class="vendor-top">
+            <div class="vendor-left">
+              <div class="vendor-thumb"></div>
+              <div class="vendor-info">
+                <h3 class="vendor-name">Sunny Slides</h3>
+                <p class="vendor-type">Bounce House Rentals</p>
+              </div>
+            </div>
+            <div class="vendor-price">$250</div>
+          </div>
+
+          <div class="vendor-meta">
+            <span class="pill confirmed">Confirmed</span>
+            <span class="pill note">Setup Included</span>
+          </div>
+
+          <div class="vendor-actions">
+            <a class="btn-secondary" href="messages.html">Message</a>
+            <a class="btn" href="detail.html">View</a>
+          </div>
+        </article>
+
+        <article class="vendor-card">
+          <div class="vendor-top">
+            <div class="vendor-left">
+              <div class="vendor-thumb"></div>
+              <div class="vendor-info">
+                <h3 class="vendor-name">Photo Booth Experience</h3>
+                <p class="vendor-type">Photo Booths</p>
+              </div>
+            </div>
+            <div class="vendor-price">$225</div>
+          </div>
+
+          <div class="vendor-meta">
+            <span class="pill confirmed">Confirmed</span>
+            <span class="pill note">3 Hours</span>
+          </div>
+
+          <div class="vendor-actions">
+            <a class="btn-secondary" href="messages.html">Message</a>
+            <a class="btn" href="detail.html">View</a>
+          </div>
+        </article>
+
+        <article class="vendor-card">
+          <div class="vendor-top">
+            <div class="vendor-left">
+              <div class="vendor-thumb"></div>
+              <div class="vendor-info">
+                <h3 class="vendor-name">Luxury Dinner Setup</h3>
+                <p class="vendor-type">Tablescape Styling</p>
+              </div>
+            </div>
+            <div class="vendor-price">$850</div>
+          </div>
+
+          <div class="vendor-meta">
+            <span class="pill pending">Pending</span>
+            <span class="pill note">Awaiting Reply</span>
+          </div>
+
+          <div class="vendor-actions">
+            <a class="btn-secondary" href="messages.html">Message</a>
+            <a class="btn" href="detail.html">View</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Planning Notes</h2>
+      </div>
+
+      <div class="note-card">
+        <h3 class="note-title">Event Reminder</h3>
+        <p class="note-text">
+          Finalize décor and confirm vendor arrival times before checkout. Once payment is completed, your bookings can be secured more smoothly.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="bottom-bar">
+    <div class="bottom-info">
+      <span class="bottom-label">Current Total</span>
+      <span class="bottom-value">$1,325</span>
     </div>
 
-    <!-- ADD VENDOR -->
-    <a href="listings.html" class="button primary">Add Vendor</a>
-
-    <!-- CHECKOUT -->
-    <a href="checkout.html" class="button secondary">Checkout</a>
+    <a href="listings.html" class="bottom-btn-secondary">Add Vendor</a>
+    <a href="checkout.html" class="bottom-btn">Checkout</a>
   </div>
-
-</div>
-
-<div class="nav">
-  <a href="dashboard.html">Home</a>
-  <a href="listings.html">Listings</a>
-  <a href="messages.html">Inbox</a>
-  <a href="profile.html">Profile</a>
-</div>
-
 </body>
 </html>
