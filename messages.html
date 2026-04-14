@@ -1,82 +1,506 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Messages</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f4ede2;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: #f7f2e9;
-}
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
 
-.container {
-  max-width: 430px;
-  margin: auto;
-  padding: 20px;
-}
+    body {
+      min-height: 100vh;
+    }
 
-.chat {
-  background: white;
-  padding: 15px;
-  border-radius: 20px;
-  margin-bottom: 10px;
-}
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 112px;
+    }
 
-.chat h4 {
-  margin: 0;
-}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
 
-.chat p {
-  margin: 5px 0 0;
-  font-size: 14px;
-  color: gray;
-}
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+    }
 
-.nav {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 400px;
-  background: white;
-  border-radius: 30px;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
-}
-</style>
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 270px;
+    }
+
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .search-wrap {
+      margin-bottom: 22px;
+    }
+
+    .search-input {
+      width: 100%;
+      min-height: 56px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      padding: 0 18px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.04);
+    }
+
+    .search-input::placeholder {
+      color: #9f9488;
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .message-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .message-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .avatar span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .message-content {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .message-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .message-name {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .message-time {
+      font-size: 0.76rem;
+      color: #9a9084;
+      font-weight: 700;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .message-preview {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .message-meta {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .pill.new {
+      background: #ffe7e2;
+      color: #c74f4d;
+    }
+
+    .pill.vendor {
+      background: #fff4df;
+      color: #aa6f12;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-item {
+      min-height: 58px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0 4px;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .hero-content {
+        max-width: 420px;
+      }
+
+      .bottom-nav {
+        max-width: 520px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="page">
+    <header class="topbar">
+      <a href="dashboard.html" class="back-link" aria-label="Go back">
+        ←
+      </a>
 
-<div class="container">
+      <div class="topbar-center">
+        <div class="eyebrow">Inbox</div>
+        <h1 class="page-title">Messages</h1>
+      </div>
 
-  <h2>Messages</h2>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        🔔
+      </a>
+    </header>
 
-  <div class="chat">
-    <h4>Sunny Slides</h4>
-    <p>Is setup included?</p>
-  </div>
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">Stay connected</div>
+        <h2 class="hero-title">Keep every vendor conversation organized.</h2>
+        <p class="hero-subtitle">
+          Ask questions, confirm details, and keep all your event communication in one place.
+        </p>
+      </div>
+    </section>
 
-  <div class="chat">
-    <h4>Photo Booth Co</h4>
-    <p>Available July 18?</p>
-  </div>
+    <div class="search-wrap">
+      <input class="search-input" type="text" placeholder="Search messages..." />
+    </div>
 
-</div>
+    <section class="section">
+      <h2 class="section-title">Recent Conversations</h2>
 
-<div class="nav">
-  <a href="dashboard.html">Home</a>
-  <a href="listings.html">Listings</a>
-  <b>Inbox</b>
-  <a href="profile.html">Profile</a>
-</div>
+      <div class="message-list">
+        <a class="message-card" href="#">
+          <div class="avatar"><span>SS</span></div>
+          <div class="message-content">
+            <div class="message-top">
+              <h3 class="message-name">Sunny Slides</h3>
+              <span class="message-time">5 min ago</span>
+            </div>
+            <p class="message-preview">
+              Yes, setup and pickup are both included. We usually arrive about 45 minutes before the event starts.
+            </p>
+            <div class="message-meta">
+              <span class="pill new">New</span>
+              <span class="pill vendor">Vendor</span>
+            </div>
+          </div>
+        </a>
 
+        <a class="message-card" href="#">
+          <div class="avatar"><span>PB</span></div>
+          <div class="message-content">
+            <div class="message-top">
+              <h3 class="message-name">Photo Booth Co.</h3>
+              <span class="message-time">1 hr ago</span>
+            </div>
+            <p class="message-preview">
+              We are available on July 18 and can offer a 3-hour package with instant sharing.
+            </p>
+            <div class="message-meta">
+              <span class="pill vendor">Vendor</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="message-card" href="#">
+          <div class="avatar"><span>GT</span></div>
+          <div class="message-content">
+            <div class="message-top">
+              <h3 class="message-name">Golden Table Co.</h3>
+              <span class="message-time">Today</span>
+            </div>
+            <p class="message-preview">
+              We would love to style your dinner setup. Do you have a color palette in mind for the tablescape?
+            </p>
+            <div class="message-meta">
+              <span class="pill vendor">Vendor</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="message-card" href="#">
+          <div class="avatar"><span>VB</span></div>
+          <div class="message-content">
+            <div class="message-top">
+              <h3 class="message-name">Velvet Bloom</h3>
+              <span class="message-time">Yesterday</span>
+            </div>
+            <p class="message-preview">
+              We can create floral centerpieces and a backdrop setup for your event. Let us know your guest count.
+            </p>
+            <div class="message-meta">
+              <span class="pill vendor">Vendor</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" href="listings.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Listings</span>
+    </a>
+
+    <a class="nav-item active" href="messages.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Inbox</span>
+    </a>
+
+    <a class="nav-item" href="profile.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Profile</span>
+    </a>
+  </nav>
 </body>
 </html>
