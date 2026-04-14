@@ -1,114 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sunny Slides</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listing Details | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f4ede2;
+      --soft-2: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: #f7f2e9;
-}
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
 
-.container {
-  max-width: 430px;
-  margin: auto;
-  padding-bottom: 100px;
-}
+    body {
+      min-height: 100vh;
+    }
 
-/* IMAGE */
-.hero-img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-}
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 112px;
+    }
 
-/* CONTENT */
-.content {
-  padding: 20px;
-  background: white;
-  border-radius: 30px 30px 0 0;
-  margin-top: -30px;
-}
+    .hero {
+      position: relative;
+      height: 300px;
+      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
+      overflow: hidden;
+    }
 
-h1 {
-  margin: 0;
-}
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 26px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.14);
+    }
 
-.price {
-  font-weight: bold;
-  margin: 10px 0;
-}
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      right: 18px;
+      top: 18px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+    }
 
-.rating {
-  color: #f4a43a;
-}
+    .hero-topbar {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 2;
+    }
 
-/* SECTION */
-.section {
-  margin-top: 20px;
-}
+    .hero-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.08);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
 
-/* BUTTON */
-.button {
-  position: fixed;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 400px;
-  padding: 15px;
-  border-radius: 25px;
-  border: none;
-  background: linear-gradient(135deg, #ff7a5c, #ff5c5c);
-  color: white;
-  font-size: 18px;
-}
-</style>
+    .hero-bottom {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      z-index: 2;
+      color: #fff;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .hero-title {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.94rem;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.94);
+    }
+
+    .content {
+      margin-top: -26px;
+      position: relative;
+      z-index: 3;
+      border-radius: 32px 32px 0 0;
+      background: var(--bg);
+      padding: 0 18px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .summary-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .summary-name {
+      margin: 0;
+      font-size: 1.25rem;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .summary-price {
+      font-size: 1.05rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .summary-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .pill.rating {
+      background: #fff4df;
+      color: #aa6f12;
+    }
+
+    .pill.location {
+      background: #f6efe4;
+      color: #6a625a;
+    }
+
+    .pill.available {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .summary-text {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .section {
+      margin-top: 26px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: #fff4df;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+
+    .feature-copy h3 {
+      margin: 0 0 4px;
+      font-size: 0.96rem;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .feature-copy p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .vendor-card {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .vendor-avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .vendor-avatar::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vendor-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .vendor-info h3 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .vendor-info p {
+      margin: 0 0 6px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .vendor-rating {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #b37619;
+    }
+
+    .detail-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .detail-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .detail-value {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .action-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .action-info {
+      flex: 1;
+      padding-left: 8px;
+    }
+
+    .action-label {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .action-value {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .action-btn,
+    .action-btn-secondary {
+      min-height: 54px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      white-space: nowrap;
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
+    }
+
+    .action-btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    @media (max-width: 390px) {
+      .action-bar {
+        flex-wrap: wrap;
+        border-radius: 28px;
+      }
+
+      .action-info {
+        width: 100%;
+        padding-left: 2px;
+      }
+
+      .action-btn,
+      .action-btn-secondary {
+        flex: 1;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .action-bar {
+        max-width: 520px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-topbar">
+        <a href="listings.html" class="hero-btn" aria-label="Go back">←</a>
+        <a href="notifications.html" class="hero-btn" aria-label="Notifications">🔔</a>
+      </div>
 
-<div class="container">
+      <div class="hero-bottom">
+        <div class="hero-pill">Featured Vendor</div>
+        <h1 class="hero-title">Sunny Slides</h1>
+        <p class="hero-subtitle">Modern bounce house rentals for birthdays and celebrations.</p>
+      </div>
+    </section>
 
-  <img class="hero-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c">
+    <section class="content">
+      <div class="summary-card">
+        <div class="summary-top">
+          <h2 class="summary-name">Sunny Slides</h2>
+          <div class="summary-price">$250+</div>
+        </div>
 
-  <div class="content">
+        <div class="summary-meta">
+          <span class="pill rating">★ 4.9</span>
+          <span class="pill location">League City, TX</span>
+          <span class="pill available">Available</span>
+        </div>
 
-    <h1>Sunny Slides</h1>
-    <div class="rating">★★★★★</div>
-    <div class="price">$250+</div>
+        <p class="summary-text">
+          Premium bounce house rentals designed for stylish backyard parties, birthdays, and family-friendly events. Clean setup, modern aesthetic, and easy booking flow.
+        </p>
+      </div>
 
-    <div class="section">
-      <p>
-        Premium bounce house rentals perfect for birthdays, backyard parties,
-        and celebrations. Clean, modern, and kid-friendly setups.
-      </p>
+      <section class="section">
+        <h2 class="section-title">What’s Included</h2>
+
+        <div class="card">
+          <div class="feature-list">
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <div class="feature-copy">
+                <h3>Delivery + Pickup</h3>
+                <p>Includes local delivery, setup, takedown, and pickup after your event.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">★</div>
+              <div class="feature-copy">
+                <h3>Clean Modern Setup</h3>
+                <p>Fresh, polished inflatables that fit the elevated party look you’re going for.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">⏱</div>
+              <div class="feature-copy">
+                <h3>Flexible Event Timing</h3>
+                <p>Setup is typically completed before guests arrive so everything is ready on time.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Vendor</h2>
+
+        <div class="card">
+          <div class="vendor-card">
+            <div class="vendor-avatar"></div>
+
+            <div class="vendor-info">
+              <h3>Sunny Slides</h3>
+              <p>Trusted local party rental vendor focused on clean, family-friendly event experiences.</p>
+              <div class="vendor-rating">★ 4.9 average rating</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Details</h2>
+
+        <div class="card">
+          <div class="detail-grid">
+            <div class="detail-row">
+              <div class="detail-label">Category</div>
+              <div class="detail-value">Bounce House Rentals</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Starting Price</div>
+              <div class="detail-value">$250+</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Service Area</div>
+              <div class="detail-value">League City, TX + nearby areas</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Best For</div>
+              <div class="detail-value">Birthdays, backyard parties, kids events</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="action-bar">
+    <div class="action-info">
+      <span class="action-label">Starting At</span>
+      <span class="action-value">$250+</span>
     </div>
 
-    <div class="section">
-      <h3>What’s Included</h3>
-      <ul>
-        <li>Bounce house setup</li>
-        <li>Delivery + pickup</li>
-        <li>Safety inspection</li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <h3>Location</h3>
-      <p>League City, TX</p>
-    </div>
-
+    <a href="messages.html" class="action-btn-secondary">Message</a>
+    <a href="event-builder.html" class="action-btn">Add to Event</a>
   </div>
-
-</div>
-
-<button class="button">Add to Event</button>
-
+</body>
+</html>
 </body>
 </html>
