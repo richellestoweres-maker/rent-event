@@ -1,90 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f4ede2;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: #f7f2e9;
-}
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
 
-.container {
-  max-width: 430px;
-  margin: auto;
-  padding: 20px;
-  text-align: center;
-}
+    body {
+      min-height: 100vh;
+    }
 
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #ddd;
-  margin: 20px auto;
-}
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 112px;
+    }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 20px;
-  margin-top: 20px;
-}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
 
-.button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 20px;
-  border: none;
-  background: linear-gradient(135deg, #ff7a5c, #ff5c5c);
-  color: white;
-  margin-top: 10px;
-}
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+    }
 
-.nav {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 400px;
-  background: white;
-  border-radius: 30px;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
-}
-</style>
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 24px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      border: 3px solid rgba(255, 255, 255, 0.38);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #fff;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .profile-name {
+      margin: 0 0 6px;
+      font-size: 1.8rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .profile-email {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-btn,
+    .hero-btn-secondary {
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .hero-btn {
+      background: #fff;
+      color: #ff5f67;
+      box-shadow: 0 8px 20px rgba(169, 67, 62, 0.12);
+    }
+
+    .hero-btn-secondary {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .info-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .info-value {
+      font-size: 0.92rem;
+      color: var(--text);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .menu-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu-item {
+      min-height: 62px;
+      border-radius: 20px;
+      background: #faf5ee;
+      border: 1px solid #f0e4d4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .menu-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .menu-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d88914;
+      flex-shrink: 0;
+    }
+
+    .menu-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .logout-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .logout-text {
+      margin: 0 0 16px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .logout-btn {
+      min-height: 54px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      font-size: 0.98rem;
+      font-weight: 800;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-item {
+      min-height: 58px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0 4px;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .bottom-nav {
+        max-width: 520px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="page">
+    <header class="topbar">
+      <a href="dashboard.html" class="back-link" aria-label="Go back">
+        ←
+      </a>
 
-<div class="container">
+      <div class="topbar-center">
+        <div class="eyebrow">Account</div>
+        <h1 class="page-title">Profile</h1>
+      </div>
 
-  <h2>Profile</h2>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        🔔
+      </a>
+    </header>
 
-  <div class="avatar"></div>
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="avatar">R</div>
+        <h2 class="profile-name">Richelle</h2>
+        <p class="profile-email">example@email.com</p>
 
-  <div class="card">
-    <p><b>Name:</b> Richelle</p>
-    <p><b>Email:</b> example@email.com</p>
+        <div class="hero-actions">
+          <a class="hero-btn" href="#">Edit Profile</a>
+          <a class="hero-btn-secondary" href="event-builder.html">My Events</a>
+        </div>
+      </div>
+    </section>
 
-    <button class="button">Edit Profile</button>
-  </div>
+    <section class="section">
+      <h2 class="section-title">Account Details</h2>
 
-</div>
+      <div class="card">
+        <div class="info-list">
+          <div class="info-row">
+            <div class="info-label">Account Type</div>
+            <div class="info-value">Event Planner / Customer</div>
+          </div>
 
-<div class="nav">
-  <a href="dashboard.html">Home</a>
-  <a href="listings.html">Listings</a>
-  <a href="messages.html">Inbox</a>
-  <b>Profile</b>
-</div>
+          <div class="info-row">
+            <div class="info-label">Location</div>
+            <div class="info-value">League City, TX</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">Saved Vendors</div>
+            <div class="info-value">12</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">Upcoming Events</div>
+            <div class="info-value">1 Active</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Quick Access</h2>
+
+      <div class="menu-list">
+        <a class="menu-item" href="event-builder.html">
+          <div class="menu-left">
+            <div class="menu-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+            </div>
+            <span>My Event Folder</span>
+          </div>
+          <span>›</span>
+        </a>
+
+        <a class="menu-item" href="listings.html">
+          <div class="menu-left">
+            <div class="menu-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+                <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+            </div>
+            <span>Browse Listings</span>
+          </div>
+          <span>›</span>
+        </a>
+
+        <a class="menu-item" href="messages.html">
+          <div class="menu-left">
+            <div class="menu-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+                <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+            </div>
+            <span>Messages</span>
+          </div>
+          <span>›</span>
+        </a>
+
+        <a class="menu-item" href="vendor-dashboard.html">
+          <div class="menu-left">
+            <div class="menu-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+              </svg>
+            </div>
+            <span>Vendor Dashboard</span>
+          </div>
+          <span>›</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Session</h2>
+
+      <div class="logout-card">
+        <p class="logout-text">
+          Since this is still the front-end version, logging out will simply send you back to the sign-in page for now.
+        </p>
+
+        <a class="logout-btn" href="index.html">Log Out</a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" href="listings.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Listings</span>
+    </a>
+
+    <a class="nav-item" href="notifications.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+        <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Alerts</span>
+    </a>
+
+    <a class="nav-item active" href="profile.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+</body>
+</html>
 
 </body>
 </html>
