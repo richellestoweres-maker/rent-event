@@ -28,10 +28,6 @@
       --gold: #f4a43a;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
-      --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -104,7 +100,7 @@
     .hero-card {
       position: relative;
       overflow: hidden;
-      border-radius: var(--radius-xl);
+      border-radius: 34px;
       padding: 22px 20px;
       background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
@@ -200,6 +196,12 @@
       align-items: center;
       text-decoration: none;
       color: inherit;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .message-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 42px rgba(123, 96, 58, 0.1);
     }
 
     .avatar {
@@ -211,7 +213,7 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-      color: #fff;
+      color: white;
       font-size: 1rem;
       font-weight: 800;
       position: relative;
@@ -400,7 +402,7 @@
       <h2 class="section-title">Recent Conversations</h2>
 
       <div class="message-list">
-        <a class="message-card" href="#">
+        <a class="message-card" href="chat-thread.html">
           <div class="avatar"><span>SS</span></div>
           <div class="message-content">
             <div class="message-top">
@@ -417,7 +419,7 @@
           </div>
         </a>
 
-        <a class="message-card" href="#">
+        <a class="message-card" href="chat-thread.html">
           <div class="avatar"><span>PB</span></div>
           <div class="message-content">
             <div class="message-top">
@@ -433,7 +435,7 @@
           </div>
         </a>
 
-        <a class="message-card" href="#">
+        <a class="message-card" href="chat-thread.html">
           <div class="avatar"><span>GT</span></div>
           <div class="message-content">
             <div class="message-top">
@@ -449,7 +451,7 @@
           </div>
         </a>
 
-        <a class="message-card" href="#">
+        <a class="message-card" href="chat-thread.html">
           <div class="avatar"><span>VB</span></div>
           <div class="message-content">
             <div class="message-top">
