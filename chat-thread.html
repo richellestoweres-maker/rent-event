@@ -31,8 +31,7 @@
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       background: var(--bg);
@@ -49,7 +48,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 108px;
+      padding: 20px 18px 110px;
     }
 
     .topbar {
@@ -158,6 +157,16 @@
     .thread {
       display: grid;
       gap: 12px;
+    }
+
+    .day-divider {
+      text-align: center;
+      margin: 8px 0 2px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #8f8579;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
 
     .message-row {
@@ -290,43 +299,45 @@
     <section class="banner">
       <h2>Event Conversation</h2>
       <p>
-        Keep questions, pricing, setup details, and booking notes organized in one place.
+        Keep pricing, setup times, and booking details organized in one place.
       </p>
     </section>
 
     <section class="thread">
+      <div class="day-divider">Today</div>
+
       <div class="message-row user">
         <div class="bubble">
           Hi! I wanted to ask if setup and pickup are included in the price for July 18.
-          <span class="time">Today · 10:12 AM</span>
+          <span class="time">10:12 AM</span>
         </div>
       </div>
 
       <div class="message-row vendor">
         <div class="bubble">
           Yes, setup and pickup are both included. We usually arrive about 45 minutes before the party starts.
-          <span class="time">Today · 10:18 AM</span>
+          <span class="time">10:18 AM</span>
         </div>
       </div>
 
       <div class="message-row user">
         <div class="bubble">
           Perfect. Do you have a white or more neutral style available?
-          <span class="time">Today · 10:21 AM</span>
+          <span class="time">10:21 AM</span>
         </div>
       </div>
 
-      <div class="message-row vendor">
+      <div class="message-row.vendor">
         <div class="bubble">
           We do. We have a modern neutral setup that photographs really well for birthdays and events.
-          <span class="time">Today · 10:26 AM</span>
+          <span class="time">10:26 AM</span>
         </div>
       </div>
 
       <div class="message-row user">
         <div class="bubble">
           That sounds exactly like what I’m looking for. I’m adding it to my event folder now.
-          <span class="time">Today · 10:28 AM</span>
+          <span class="time">10:28 AM</span>
         </div>
       </div>
     </section>
