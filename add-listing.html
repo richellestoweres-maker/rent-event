@@ -1,127 +1,500 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Listing</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Listing | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f4ede2;
+      --soft-2: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --gold-dark: #d88914;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: #f7f2e9;
-}
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
 
-.container {
-  max-width: 430px;
-  margin: auto;
-  padding: 20px;
-}
+    body {
+      min-height: 100vh;
+    }
 
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 112px;
+    }
 
-.header h2 {
-  margin: 0;
-}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
 
-/* FORM */
-.form {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+      font-weight: 700;
+    }
 
-.input, .textarea, .select {
-  width: 100%;
-  padding: 14px;
-  border-radius: 18px;
-  border: none;
-  background: white;
-  font-size: 15px;
-}
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
 
-.textarea {
-  min-height: 100px;
-}
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
 
-/* BUTTON */
-.button {
-  margin-top: 10px;
-  padding: 14px;
-  border-radius: 20px;
-  border: none;
-  background: linear-gradient(135deg, #ff7a5c, #ff5c5c);
-  color: white;
-  font-size: 16px;
-  text-align: center;
-  text-decoration: none;
-}
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
 
-/* NAV */
-.nav {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 400px;
-  background: white;
-  border-radius: 30px;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
-}
-</style>
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 280px;
+    }
+
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #574f47;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
+      font-family: inherit;
+      font-size: 0.96rem;
+      color: var(--text);
+      outline: none;
+      box-shadow: 0 4px 14px rgba(140, 111, 75, 0.02);
+    }
+
+    .input,
+    .select {
+      min-height: 54px;
+      padding: 0 16px;
+    }
+
+    .textarea {
+      min-height: 120px;
+      padding: 14px 16px;
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #a49a8f;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .upload-card {
+      background: var(--soft-2);
+      border: 1px dashed #d7c7b2;
+      border-radius: 22px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .upload-icon {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 12px;
+      border-radius: 18px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-dark);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .upload-title {
+      margin: 0 0 6px;
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .upload-text {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .helper-text {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .bottom-copy {
+      flex: 1;
+      padding-left: 8px;
+    }
+
+    .bottom-label {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bottom-value {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .bottom-btn,
+    .bottom-btn-secondary {
+      min-height: 54px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      white-space: nowrap;
+    }
+
+    .bottom-btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
+    }
+
+    .bottom-btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    @media (max-width: 390px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-bar {
+        flex-wrap: wrap;
+        border-radius: 28px;
+      }
+
+      .bottom-copy {
+        width: 100%;
+        padding-left: 2px;
+      }
+
+      .bottom-btn,
+      .bottom-btn-secondary {
+        flex: 1;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .bottom-bar {
+        max-width: 520px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="page">
+    <header class="topbar">
+      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">
+        ←
+      </a>
 
-<div class="container">
+      <div class="topbar-center">
+        <div class="eyebrow">Vendor Portal</div>
+        <h1 class="page-title">Add Listing</h1>
+      </div>
 
-  <div class="header">
-    <h2>Add Listing</h2>
-    <a href="vendor-dashboard.html">←</a>
+      <a href="messages.html" class="icon-btn" aria-label="Messages">
+        ✉
+      </a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">Create a new service</div>
+        <h2 class="hero-title">Showcase your business beautifully.</h2>
+        <p class="hero-subtitle">
+          Add a polished listing so clients can discover your services, pricing, and availability.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Listing Details</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="listing-name">Listing Name</label>
+            <input id="listing-name" class="input" type="text" placeholder="Sunny Slides" />
+          </div>
+
+          <div class="field-group">
+            <label for="category">Category</label>
+            <select id="category" class="select">
+              <option selected>Bounce House Rentals</option>
+              <option>Photo Booths</option>
+              <option>Décor</option>
+              <option>Catering</option>
+              <option>Venues</option>
+              <option>Tablescape Styling</option>
+            </select>
+          </div>
+
+          <div class="row-2">
+            <div class="field-group">
+              <label for="starting-price">Starting Price</label>
+              <input id="starting-price" class="input" type="text" placeholder="$250+" />
+            </div>
+
+            <div class="field-group">
+              <label for="location">Location</label>
+              <input id="location" class="input" type="text" placeholder="League City, TX" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="description">Description</label>
+            <textarea id="description" class="textarea" placeholder="Describe your service, what makes it special, and what clients can expect."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Service Details</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div class="row-2">
+            <div class="field-group">
+              <label for="availability">Availability</label>
+              <select id="availability" class="select">
+                <option selected>Currently Available</option>
+                <option>Limited Availability</option>
+                <option>Waitlist Only</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="service-area">Service Area</label>
+              <input id="service-area" class="input" type="text" placeholder="Nearby Cities" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="included">What’s Included</label>
+            <textarea id="included" class="textarea" placeholder="Delivery, setup, pickup, styling items, consultation, etc."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Images</h2>
+
+      <div class="card">
+        <div class="upload-card">
+          <div class="upload-icon">↑</div>
+          <h3 class="upload-title">Upload Listing Photos</h3>
+          <p class="upload-text">
+            Add clean, bright images that help clients picture your setup and style.
+          </p>
+        </div>
+
+        <p class="helper-text">
+          This is still your front-end version, so uploads are visual placeholders for now. Later, when we connect Firebase or storage, this section will accept real files.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="bottom-bar">
+    <div class="bottom-copy">
+      <span class="bottom-label">Vendor Action</span>
+      <span class="bottom-value">Publish Listing</span>
+    </div>
+
+    <a href="my-listings.html" class="bottom-btn-secondary">Save Draft</a>
+    <a href="my-listings.html" class="bottom-btn">Publish</a>
   </div>
-
-  <div class="form">
-
-    <input class="input" placeholder="Business / Listing Name">
-
-    <select class="select">
-      <option>Select Category</option>
-      <option>Bounce Houses</option>
-      <option>Photo Booth</option>
-      <option>Decor</option>
-      <option>Catering</option>
-      <option>Venue</option>
-    </select>
-
-    <input class="input" placeholder="Starting Price (ex: $250)">
-
-    <textarea class="textarea" placeholder="Describe your service..."></textarea>
-
-    <input class="input" placeholder="Location (City, TX)">
-
-    <a href="vendor-dashboard.html" class="button">Publish Listing</a>
-
-  </div>
-
-</div>
-
-<div class="nav">
-  <a href="vendor-dashboard.html">Home</a>
-  <b>Add</b>
-  <a href="messages.html">Inbox</a>
-  <a href="profile.html">Profile</a>
-</div>
-
 </body>
 </html>
