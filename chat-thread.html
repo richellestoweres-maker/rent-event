@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Thread | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #f4ede2;
+      --soft-2: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold: #f4a43a;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 108px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140,111,75,0.05);
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    .chat-head {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+    }
+
+    .avatar::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.22);
+    }
+
+    .avatar span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .chat-meta {
+      min-width: 0;
+    }
+
+    .chat-name {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .chat-sub {
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .banner {
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      border-radius: 28px;
+      padding: 16px 18px;
+      color: white;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 18px;
+    }
+
+    .banner h2 {
+      margin: 0 0 6px;
+      font-size: 1.2rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .banner p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.94);
+    }
+
+    .thread {
+      display: grid;
+      gap: 12px;
+    }
+
+    .message-row {
+      display: flex;
+    }
+
+    .message-row.vendor {
+      justify-content: flex-start;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 82%;
+      padding: 14px 16px;
+      border-radius: 22px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      box-shadow: var(--shadow);
+    }
+
+    .message-row.vendor .bubble {
+      background: white;
+      color: var(--text);
+      border-bottom-left-radius: 8px;
+    }
+
+    .message-row.user .bubble {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: white;
+      border-bottom-right-radius: 8px;
+    }
+
+    .time {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.72rem;
+      opacity: 0.75;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .composer {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(235,225,211,0.95);
+      border-radius: 28px;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 18px 38px rgba(120,96,60,0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .composer input {
+      flex: 1;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 16px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      background: white;
+      color: var(--text);
+    }
+
+    .composer input::placeholder {
+      color: #a49a8f;
+    }
+
+    .send-btn {
+      min-width: 98px;
+      min-height: 52px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 800;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 14px 28px rgba(255,107,97,0.18);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .composer {
+        max-width: 520px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="messages.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="chat-head">
+        <div class="avatar"><span>SS</span></div>
+        <div class="chat-meta">
+          <h1 class="chat-name">Sunny Slides</h1>
+          <p class="chat-sub">Bounce House Rentals · League City, TX</p>
+        </div>
+      </div>
+
+      <a href="detail.html" class="icon-btn" aria-label="View listing">★</a>
+    </header>
+
+    <section class="banner">
+      <h2>Event Conversation</h2>
+      <p>
+        Keep questions, pricing, setup details, and booking notes organized in one place.
+      </p>
+    </section>
+
+    <section class="thread">
+      <div class="message-row user">
+        <div class="bubble">
+          Hi! I wanted to ask if setup and pickup are included in the price for July 18.
+          <span class="time">Today · 10:12 AM</span>
+        </div>
+      </div>
+
+      <div class="message-row vendor">
+        <div class="bubble">
+          Yes, setup and pickup are both included. We usually arrive about 45 minutes before the party starts.
+          <span class="time">Today · 10:18 AM</span>
+        </div>
+      </div>
+
+      <div class="message-row user">
+        <div class="bubble">
+          Perfect. Do you have a white or more neutral style available?
+          <span class="time">Today · 10:21 AM</span>
+        </div>
+      </div>
+
+      <div class="message-row vendor">
+        <div class="bubble">
+          We do. We have a modern neutral setup that photographs really well for birthdays and events.
+          <span class="time">Today · 10:26 AM</span>
+        </div>
+      </div>
+
+      <div class="message-row user">
+        <div class="bubble">
+          That sounds exactly like what I’m looking for. I’m adding it to my event folder now.
+          <span class="time">Today · 10:28 AM</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="composer">
+    <input type="text" placeholder="Type your message..." />
+    <a href="#" class="send-btn">Send</a>
+  </div>
+</body>
+</html>
