@@ -1,246 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Account | RentEvent</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  />
-  <style>
-    * { box-sizing: border-box; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Account | RentEvent</title>
 
-    :root {
-      --coral-1: #ff9a73;
-      --coral-2: #ff7a63;
-      --coral-3: #ff5f67;
-      --white: #ffffff;
-      --white-soft: rgba(255, 255, 255, 0.9);
-      --glass: rgba(255, 255, 255, 0.14);
-      --shadow: 0 24px 48px rgba(167, 55, 61, 0.22);
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100%;
-      font-family: "Inter", sans-serif;
-    }
+<style>
+* { box-sizing: border-box; }
 
-    body {
-      min-height: 100vh;
-      background: linear-gradient(180deg, var(--coral-1) 0%, var(--coral-2) 48%, var(--coral-3) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--white);
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
+:root {
+  --coral-1: #ff9a73;
+  --coral-2: #ff7a63;
+  --coral-3: #ff5f67;
+  --white: #ffffff;
+  --white-soft: rgba(255,255,255,0.9);
+  --glass: rgba(255,255,255,0.14);
+}
 
-    body::before {
-      content: "";
-      position: fixed;
-      top: -110px;
-      right: -90px;
-      width: 250px;
-      height: 250px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.11);
-    }
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Inter", sans-serif;
+}
 
-    body::after {
-      content: "";
-      position: fixed;
-      bottom: -130px;
-      left: -80px;
-      width: 270px;
-      height: 270px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-    }
+body {
+  background: linear-gradient(180deg, var(--coral-1), var(--coral-2), var(--coral-3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: white;
+}
 
-    .container {
-      width: 100%;
-      max-width: 400px;
-      position: relative;
-      z-index: 1;
-    }
+/* container */
+.container {
+  width: 100%;
+  max-width: 400px;
+}
 
-    .top-link {
-      margin-bottom: 16px;
-    }
+/* back link */
+.top-link {
+  margin-bottom: 16px;
+}
+.top-link a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
 
-    .top-link a {
-      color: var(--white);
-      text-decoration: none;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
+/* card */
+.card {
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 32px;
+  padding: 30px 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 24px 48px rgba(167,55,61,0.25);
+  text-align: center;
+}
 
-    .card {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 34px;
-      padding: 30px 24px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-    }
+/* logo */
+.logo-box {
+  width: 70px;
+  height: 70px;
+  border: 3px solid white;
+  border-radius: 20px;
+  margin: 0 auto 20px;
+  transform: rotate(8deg);
+}
 
-    .logo-box {
-      width: 78px;
-      height: 78px;
-      margin: 0 auto 20px;
-      position: relative;
-      transform: rotate(8deg);
-    }
+/* text */
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+}
 
-    .logo-box::before,
-    .logo-box::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border: 3px solid rgba(255,255,255,0.96);
-      border-radius: 22px;
-    }
+.subtitle {
+  margin: 12px 0 24px;
+  font-size: 0.95rem;
+  color: var(--white-soft);
+}
 
-    .logo-box::after {
-      transform: rotate(18deg);
-      opacity: 0.88;
-    }
+/* form */
+.form-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    h1 {
-      margin: 0;
-      text-align: center;
-      font-size: 2rem;
-      line-height: 1;
-      letter-spacing: -0.05em;
-      font-weight: 800;
-    }
+/* inputs */
+.input, .select {
+  height: 58px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.18);
+  color: white;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+}
 
-    .subtitle {
-      margin: 12px 0 24px;
-      text-align: center;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: var(--white-soft);
-    }
+/* placeholder */
+.input::placeholder {
+  color: rgba(255,255,255,0.8);
+}
 
-    .form-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+/* autofill fix */
+.input:-webkit-autofill {
+  -webkit-text-fill-color: white;
+  box-shadow: 0 0 0 1000px rgba(255,255,255,0.18) inset;
+}
 
-    .input,
-    .select {
-      width: 100%;
-      min-height: 58px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: var(--glass);
-      color: var(--white);
-      font-size: 0.98rem;
-      font-family: inherit;
-      padding: 0 16px;
-      outline: none;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
+/* select styling */
+.select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, white 50%),
+    linear-gradient(135deg, white 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 25px,
+    calc(100% - 14px) 25px;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
 
-    .input::placeholder {
-      color: rgba(255,255,255,0.82);
-    }
+.select option {
+  color: #111;
+}
 
-    .select {
-      appearance: none;
-    }
+/* button */
+.button {
+  height: 60px;
+  border-radius: 16px;
+  border: none;
+  background: rgba(255,255,255,0.28);
+  color: white;
+  font-weight: 800;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
 
-    .select option {
-      color: #222;
-    }
+/* notes */
+.tiny-note {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.85);
+}
 
-    .button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      min-height: 60px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.22);
-      color: var(--white);
-      font-size: 1rem;
-      font-weight: 700;
-      margin-top: 8px;
-      text-decoration: none;
-      box-shadow: var(--shadow);
-    }
+.bottom-link {
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
 
-    .tiny-note {
-      margin-top: 16px;
-      text-align: center;
-      font-size: 0.82rem;
-      line-height: 1.5;
-      color: rgba(255,255,255,0.86);
-    }
-
-    .bottom-link {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 0.95rem;
-      color: var(--white-soft);
-    }
-
-    .bottom-link a {
-      color: var(--white);
-      text-decoration: none;
-      font-weight: 700;
-    }
-  </style>
+.bottom-link a {
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+</style>
 </head>
+
 <body>
-  <main class="container">
-    <div class="top-link">
-      <a href="index.html">← Back to Sign In</a>
+
+<main class="container">
+
+  <div class="top-link">
+    <a href="index.html">← Back to Sign In</a>
+  </div>
+
+  <section class="card">
+
+    <div class="logo-box"></div>
+
+    <h1>Create Account</h1>
+
+    <p class="subtitle">
+      Start planning events, save favorites, and keep everything beautifully organized.
+    </p>
+
+    <div class="form-wrap">
+
+      <input class="input" placeholder="Full Name">
+
+      <input class="input" placeholder="Email Address">
+
+      <input class="input" placeholder="Create Password">
+
+      <select class="select">
+        <option disabled selected>Select Account Type</option>
+        <option>Event Planner / Customer</option>
+        <option>Vendor / Business</option>
+      </select>
+
+      <!-- TEMP ROUTE -->
+      <a href="dashboard.html" class="button">Create My Account</a>
+
     </div>
 
-    <section class="card">
-      <div class="logo-box" aria-hidden="true"></div>
+    <div class="tiny-note">
+      Front-end only. Firebase coming next.
+    </div>
 
-      <h1>Create Account</h1>
-      <p class="subtitle">
-        Start planning events, save favorites, and keep everything beautifully organized in one place.
-      </p>
+    <div class="bottom-link">
+      Already have an account?
+      <a href="index.html">Sign In</a>
+    </div>
 
-      <div class="form-wrap">
-        <input class="input" type="text" placeholder="Full Name" />
-        <input class="input" type="email" placeholder="Email Address" />
-        <input class="input" type="password" placeholder="Create Password" />
+  </section>
 
-        <select class="select">
-          <option selected disabled>Select Account Type</option>
-          <option>Event Planner / Customer</option>
-          <option>Vendor / Business</option>
-        </select>
+</main>
 
-        <a href="dashboard.html" class="button">Create My Account</a>
-      </div>
-
-      <div class="tiny-note">
-        This is still the front-end version. Real account creation will be connected when we add Firebase.
-      </div>
-
-      <div class="bottom-link">
-        Already have an account?
-        <a href="index.html">Sign In</a>
-      </div>
-    </section>
-  </main>
 </body>
 </html>
