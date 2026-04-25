@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Profile | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --gold-soft: #fff4df;
+      --gold-text: #aa6f12;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 112px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140,111,75,0.05);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .vendor-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 26px;
+      background: rgba(255,255,255,0.18);
+      border: 2px solid rgba(255,255,255,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.95);
+      max-width: 310px;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #574f47;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
+      font-family: inherit;
+      font-size: 0.96rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input,
+    .select {
+      min-height: 54px;
+      padding: 0 16px;
+    }
+
+    .textarea {
+      min-height: 112px;
+      padding: 14px 16px;
+      resize: vertical;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .verify-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .verify-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .verify-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .verify-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    .done {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pending {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+    }
+
+    .verify-copy h3 {
+      margin: 0 0 4px;
+      font-size: 0.96rem;
+      line-height: 1.12;
+      font-weight: 800;
+    }
+
+    .verify-copy p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(235,225,211,0.95);
+      border-radius: 999px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 18px 38px rgba(120,96,60,0.14);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-item {
+      min-height: 58px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255,107,97,0.24);
+    }
+
+    .save-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 92px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      display: flex;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .save-btn,
+    .save-secondary {
+      min-height: 52px;
+      border-radius: 999px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.92rem;
+      flex: 1;
+      box-shadow: 0 14px 28px rgba(255,107,97,0.16);
+    }
+
+    .save-btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+    }
+
+    .save-secondary {
+      color: #4a433d;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 26px rgba(120,96,60,0.12);
+    }
+
+    @media (max-width: 390px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body { padding: 24px 0; }
+      .page { max-width: 960px; }
+      .bottom-nav, .save-bar { max-width: 520px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Vendor Settings</div>
+        <h1 class="page-title">Profile</h1>
+      </div>
+
+      <a href="messages.html" class="icon-btn" aria-label="Messages">✉</a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="vendor-avatar">SS</div>
+        <h2 class="hero-title">Sunny Slides</h2>
+        <p class="hero-subtitle">
+          Manage your business profile, service area, verification status, and future payout readiness.
+        </p>
+
+        <div class="hero-pills">
+          <span class="hero-pill">Vendor Account</span>
+          <span class="hero-pill">Pending Verification</span>
+          <span class="hero-pill">League City, TX</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Business Info</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div>
+            <label for="business-name">Business Name</label>
+            <input id="business-name" class="input" type="text" value="Sunny Slides" />
+          </div>
+
+          <div>
+            <label for="owner-name">Owner / Contact Name</label>
+            <input id="owner-name" class="input" type="text" value="Sarah Johnson" />
+          </div>
+
+          <div class="row-2">
+            <div>
+              <label for="email">Email</label>
+              <input id="email" class="input" type="email" value="hello@sunnyslides.com" />
+            </div>
+
+            <div>
+              <label for="phone">Phone</label>
+              <input id="phone" class="input" type="text" value="(281) 555-0198" />
+            </div>
+          </div>
+
+          <div>
+            <label for="category">Main Category</label>
+            <select id="category" class="select">
+              <option selected>Bounce House Rentals</option>
+              <option>Photo Booths</option>
+              <option>Décor</option>
+              <option>Catering</option>
+              <option>Venues</option>
+              <option>Tablescape Styling</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="bio">Business Bio</label>
+            <textarea id="bio" class="textarea">Clean, modern bounce house rentals for birthdays, backyard parties, and family-friendly events.</textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Service Area</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div>
+            <label for="base-city">Base City</label>
+            <input id="base-city" class="input" type="text" value="League City, TX" />
+          </div>
+
+          <div>
+            <label for="service-cities">Service Cities</label>
+            <textarea id="service-cities" class="textarea">League City, Friendswood, Pearland, Webster, Clear Lake, Dickinson, Kemah, Seabrook</textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Trust & Verification</h2>
+
+      <div class="card">
+        <div class="verify-list">
+          <div class="verify-item">
+            <div class="verify-icon done">✓</div>
+            <div class="verify-copy">
+              <h3>Email Verified</h3>
+              <p>Your vendor email has been confirmed.</p>
+            </div>
+          </div>
+
+          <div class="verify-item">
+            <div class="verify-icon pending">!</div>
+            <div class="verify-copy">
+              <h3>Identity Verification</h3>
+              <p>Later this will connect to Stripe Identity or a similar provider so RentEvent does not store raw ID images.</p>
+            </div>
+          </div>
+
+          <div class="verify-item">
+            <div class="verify-icon pending">!</div>
+            <div class="verify-copy">
+              <h3>TIN / EIN Verification</h3>
+              <p>Later this should be handled through Stripe Connect for tax and payout compliance.</p>
+            </div>
+          </div>
+
+          <div class="verify-item">
+            <div class="verify-icon pending">!</div>
+            <div class="verify-copy">
+              <h3>Payout Setup</h3>
+              <p>Vendor payouts will eventually connect to a secure payment provider instead of being stored manually.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="note">
+          Safety note: this front-end page shows the trust workflow only. Do not collect SSNs, ID photos, or bank details directly in plain HTML forms. Those should be handled by a secure provider later.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="save-bar">
+    <a href="vendor-dashboard.html" class="save-secondary">Cancel</a>
+    <a href="vendor-dashboard.html" class="save-btn">Save Profile</a>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Vendor navigation">
+    <a class="nav-item" href="vendor-dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" href="add-listing.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Add</span>
+    </a>
+
+    <a class="nav-item" href="my-listings.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Listings</span>
+    </a>
+
+    <a class="nav-item active" href="vendor-profile.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+</body>
+</html>
