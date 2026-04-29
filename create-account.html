@@ -36,23 +36,21 @@ body {
   color: white;
 }
 
-/* container */
 .container {
   width: 100%;
   max-width: 400px;
 }
 
-/* back link */
 .top-link {
   margin-bottom: 16px;
 }
+
 .top-link a {
   color: white;
   text-decoration: none;
   font-weight: 600;
 }
 
-/* card */
 .card {
   background: rgba(255,255,255,0.10);
   border: 1px solid rgba(255,255,255,0.16);
@@ -63,7 +61,6 @@ body {
   text-align: center;
 }
 
-/* logo */
 .logo-box {
   width: 70px;
   height: 70px;
@@ -73,7 +70,6 @@ body {
   transform: rotate(8deg);
 }
 
-/* text */
 h1 {
   margin: 0;
   font-size: 2rem;
@@ -86,14 +82,12 @@ h1 {
   color: var(--white-soft);
 }
 
-/* form */
 .form-wrap {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* inputs */
 .input, .select {
   height: 58px;
   border-radius: 16px;
@@ -106,18 +100,15 @@ h1 {
   outline: none;
 }
 
-/* placeholder */
 .input::placeholder {
   color: rgba(255,255,255,0.8);
 }
 
-/* autofill fix */
 .input:-webkit-autofill {
   -webkit-text-fill-color: white;
   box-shadow: 0 0 0 1000px rgba(255,255,255,0.18) inset;
 }
 
-/* select styling */
 .select {
   appearance: none;
   background-image:
@@ -134,7 +125,6 @@ h1 {
   color: #111;
 }
 
-/* button */
 .button {
   height: 60px;
   border-radius: 16px;
@@ -147,9 +137,22 @@ h1 {
   align-items: center;
   justify-content: center;
   margin-top: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
 }
 
-/* notes */
+.error-message {
+  display: none;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: #fff;
+  background: rgba(255,255,255,0.16);
+  border-radius: 14px;
+  padding: 10px 12px;
+  line-height: 1.4;
+}
+
 .tiny-note {
   margin-top: 16px;
   font-size: 0.8rem;
@@ -193,16 +196,19 @@ h1 {
 
       <input class="input" placeholder="Email Address">
 
-      <input class="input" placeholder="Create Password">
+      <input class="input" type="password" placeholder="Create Password">
 
-      <select class="select">
-        <option disabled selected>Select Account Type</option>
-        <option>Event Planner / Customer</option>
-        <option>Vendor / Business</option>
+      <select class="select" id="accountType">
+        <option disabled selected value="">Select Account Type</option>
+        <option value="customer">Event Planner / Customer</option>
+        <option value="vendor">Vendor / Business</option>
       </select>
 
-      <!-- TEMP ROUTE -->
-      <a href="dashboard.html" class="button">Create My Account</a>
+      <button class="button" onclick="routeAccount()">Create My Account</button>
+
+      <div class="error-message" id="errorMessage">
+        Please select an account type before continuing.
+      </div>
 
     </div>
 
@@ -218,6 +224,21 @@ h1 {
   </section>
 
 </main>
+
+<script>
+function routeAccount() {
+  const accountType = document.getElementById("accountType").value;
+  const errorMessage = document.getElementById("errorMessage");
+
+  if (accountType === "customer") {
+    window.location.href = "dashboard.html";
+  } else if (accountType === "vendor") {
+    window.location.href = "vendor-dashboard.html";
+  } else {
+    errorMessage.style.display = "block";
+  }
+}
+</script>
 
 </body>
 </html>
