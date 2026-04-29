@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Edit Profile | RentEvent</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #f7f2e9;
+  --card: #ffffff;
+  --text: #161616;
+  --muted: #6a625a;
+  --line: #ece2d3;
+  --soft: #faf5ee;
+  --coral-1: #ff9a73;
+  --coral-2: #ff7a63;
+  --coral-3: #ff5f67;
+  --green-soft: #eaf7ef;
+  --green-text: #2d7a49;
+  --shadow: 0 18px 40px rgba(123,96,58,0.08);
+  --shadow-strong: 0 18px 32px rgba(255,108,98,0.18);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+}
+
+.page {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 20px 18px 118px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.back-link,
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.88);
+  color: #222;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(140,111,75,0.05);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.topbar-center {
+  flex: 1;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7b7268;
+  margin-bottom: 4px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.55rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 34px;
+  padding: 24px 22px;
+  background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+  color: #fff;
+  box-shadow: var(--shadow-strong);
+  margin-bottom: 24px;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  right: -60px;
+  top: -45px;
+  background: rgba(255,255,255,0.12);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 26px;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.hero-title {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  font-weight: 800;
+}
+
+.hero-subtitle {
+  margin: 0;
+  max-width: 310px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.95);
+}
+
+.section {
+  margin-top: 28px;
+}
+
+.section-title {
+  margin: 0 0 14px;
+  font-size: 1.45rem;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 28px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #574f47;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 18px;
+  font-family: inherit;
+  font-size: 0.96rem;
+  color: var(--text);
+  outline: none;
+}
+
+.input,
+.select {
+  min-height: 54px;
+  padding: 0 16px;
+}
+
+.textarea {
+  min-height: 112px;
+  padding: 14px 16px;
+  resize: vertical;
+}
+
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.toggle-list {
+  display: grid;
+  gap: 12px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.toggle-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.toggle-copy h3 {
+  margin: 0 0 4px;
+  font-size: 0.96rem;
+  font-weight: 800;
+}
+
+.toggle-copy p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.switch {
+  width: 54px;
+  height: 32px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+  position: relative;
+  flex-shrink: 0;
+}
+
+.switch::after {
+  content: "";
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.switch.off {
+  background: #d8d4cc;
+}
+
+.switch.off::after {
+  right: auto;
+  left: 3px;
+}
+
+.note {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.save-bar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 16px;
+  width: calc(100% - 24px);
+  max-width: 406px;
+  background: rgba(255,255,255,0.94);
+  border: 1px solid rgba(235,225,211,0.95);
+  border-radius: 999px;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  box-shadow: 0 18px 38px rgba(120,96,60,0.14);
+  backdrop-filter: blur(10px);
+}
+
+.save-btn,
+.save-secondary {
+  min-height: 54px;
+  border-radius: 999px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.92rem;
+  flex: 1;
+}
+
+.save-btn {
+  color: #fff;
+  background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+}
+
+.save-secondary {
+  color: #4a433d;
+  background: var(--soft);
+}
+
+@media (max-width: 390px) {
+  .row-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .save-bar {
+    border-radius: 28px;
+  }
+}
+
+@media (min-width: 768px) {
+  body { padding: 24px 0; }
+  .page { max-width: 960px; }
+  .save-bar { max-width: 520px; }
+}
+</style>
+</head>
+
+<body>
+<main class="page">
+
+  <header class="topbar">
+    <a href="profile.html" class="back-link" aria-label="Go back">←</a>
+
+    <div class="topbar-center">
+      <div class="eyebrow">Account Settings</div>
+      <h1 class="page-title">Edit Profile</h1>
+    </div>
+
+    <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+  </header>
+
+  <section class="hero-card">
+    <div class="hero-content">
+      <div class="avatar">RT</div>
+      <h2 class="hero-title">Your Profile</h2>
+      <p class="hero-subtitle">
+        Keep your event planning details, contact info, and preferences up to date.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Personal Info</h2>
+
+    <div class="card">
+      <div class="form-grid">
+        <div>
+          <label for="full-name">Full Name</label>
+          <input id="full-name" class="input" type="text" value="Richelle T." />
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label for="email">Email</label>
+            <input id="email" class="input" type="email" value="richelle@example.com" />
+          </div>
+
+          <div>
+            <label for="phone">Phone</label>
+            <input id="phone" class="input" type="text" value="(281) 555-0123" />
+          </div>
+        </div>
+
+        <div>
+          <label for="location">Primary Event Area</label>
+          <input id="location" class="input" type="text" value="League City, TX" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Event Preferences</h2>
+
+    <div class="card">
+      <div class="form-grid">
+        <div>
+          <label for="favorite-events">Favorite Event Types</label>
+          <textarea id="favorite-events" class="textarea">Kids birthdays, backyard parties, baby showers, family celebrations</textarea>
+        </div>
+
+        <div>
+          <label for="style">Preferred Style</label>
+          <select id="style" class="select">
+            <option selected>Modern Neutral</option>
+            <option>Boho</option>
+            <option>Colorful + Playful</option>
+            <option>Luxury Dinner Party</option>
+            <option>Rustic Outdoor</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="budget">Typical Event Budget</label>
+          <select id="budget" class="select">
+            <option>$250 - $500</option>
+            <option selected>$500 - $1,500</option>
+            <option>$1,500 - $3,000</option>
+            <option>$3,000+</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="note">
+        Later, RentEvent Concierge AI can use these preferences to recommend vendors that match your vibe.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Notifications</h2>
+
+    <div class="card">
+      <div class="toggle-list">
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <h3>Vendor Messages</h3>
+            <p>Receive updates when vendors reply to your questions.</p>
+          </div>
+          <div class="switch"></div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <h3>Booking Reminders</h3>
+            <p>Get reminders about upcoming payments, confirmations, and deadlines.</p>
+          </div>
+          <div class="switch"></div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <h3>AI Suggestions</h3>
+            <p>Let RentEvent suggest matching vendors, décor, and packages.</p>
+          </div>
+          <div class="switch"></div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <h3>Promotions</h3>
+            <p>Receive occasional deals, featured vendors, and seasonal ideas.</p>
+          </div>
+          <div class="switch off"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="save-bar">
+  <a href="profile.html" class="save-secondary">Cancel</a>
+  <a href="profile.html" class="save-btn">Save Changes</a>
+</div>
+
+</body>
+</html>
