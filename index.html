@@ -24,23 +24,52 @@
 
 html, body {
   margin: 0;
+  padding: 0;
   min-height: 100%;
   font-family: "Inter", sans-serif;
 }
 
 body {
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--coral-1), var(--coral-2), var(--coral-3));
+  background: linear-gradient(180deg, var(--coral-1) 0%, var(--coral-2) 48%, var(--coral-3) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--white);
   padding: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: -100px;
+  right: -80px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  bottom: -120px;
+  left: -70px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 
 .container {
   width: 100%;
   max-width: 390px;
+  position: relative;
+  z-index: 1;
 }
 
 .card {
@@ -49,6 +78,7 @@ body {
   border-radius: 34px;
   padding: 30px 24px;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
   text-align: center;
 }
@@ -57,7 +87,7 @@ body {
   width: 84px;
   height: 84px;
   margin: 0 auto 20px;
-  border: 3px solid white;
+  border: 3px solid rgba(255, 255, 255, 0.96);
   border-radius: 22px;
   transform: rotate(8deg);
 }
@@ -65,13 +95,17 @@ body {
 h1 {
   margin: 0;
   font-size: 2.35rem;
+  line-height: 1;
+  letter-spacing: -0.05em;
   font-weight: 800;
 }
 
 .tagline {
-  margin: 10px 0 30px;
+  margin-top: 10px;
+  margin-bottom: 34px;
   font-size: 0.8rem;
-  letter-spacing: 0.3em;
+  font-weight: 700;
+  letter-spacing: 0.34em;
   text-transform: uppercase;
   color: var(--white-soft);
 }
@@ -82,108 +116,185 @@ h1 {
   gap: 12px;
 }
 
-.input, .select {
-  min-height: 58px;
+.input {
+  width: 100%;
+  min-height: 60px;
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.14);
   background: var(--glass);
-  color: white;
-  padding: 0 16px;
+  color: var(--white);
   font-size: 1rem;
+  font-family: inherit;
+  padding: 0 18px;
   outline: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .input::placeholder {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.82);
 }
 
-.select {
-  appearance: none;
-}
-
-.select option {
-  color: #111;
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-text-fill-color: white;
+  box-shadow: 0 0 0 1000px rgba(255,255,255,0.14) inset;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 .button {
-  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 62px;
+  padding: 0 18px;
   border-radius: 18px;
-  border: none;
-  background: rgba(255,255,255,0.25);
-  color: white;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.22);
+  color: var(--white);
+  font-size: 1.02rem;
   font-weight: 700;
+  margin-top: 8px;
+  text-decoration: none;
+  box-shadow: var(--shadow);
   cursor: pointer;
+  font-family: inherit;
 }
 
-.error {
+.message {
   display: none;
-  font-size: 0.85rem;
-  margin-top: 5px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.14);
+  color: white;
+  font-size: 0.84rem;
+  line-height: 1.4;
 }
 
 .link {
   margin-top: 18px;
+  font-size: 0.95rem;
+}
+
+.link a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
 }
 
 .bottom {
   margin-top: 24px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.95);
+}
+
+.bottom a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.divider {
+  margin: 0 8px;
+  opacity: 0.8;
 }
 </style>
 </head>
 
 <body>
+  <main class="container">
+    <section class="card">
+      <div class="logo-box" aria-hidden="true"></div>
 
-<div class="container">
-  <div class="card">
+      <h1>RentEvent</h1>
+      <div class="tagline">Plan. Rent. Celebrate.</div>
 
-    <div class="logo-box"></div>
+      <div class="form-wrap">
+        <input id="email" class="input" type="email" placeholder="Email" />
+        <input id="password" class="input" type="password" placeholder="Password" />
 
-    <h1>RentEvent</h1>
-    <div class="tagline">PLAN. RENT. CELEBRATE.</div>
+        <button class="button" onclick="login()">Sign In</button>
 
-    <div class="form-wrap">
-      <input class="input" placeholder="Email">
-      <input class="input" type="password" placeholder="Password">
+        <div id="message" class="message"></div>
+      </div>
 
-      <!-- NEW -->
-      <select class="select" id="loginType">
-        <option disabled selected value="">Select Login Type</option>
-        <option value="customer">Event Planner / Customer</option>
-        <option value="vendor">Vendor / Business</option>
-      </select>
+      <div class="link">
+        <a href="forgot-password.html">Forgot Password?</a>
+      </div>
 
-      <!-- UPDATED -->
-      <button class="button" onclick="login()">Sign In</button>
+      <div class="bottom">
+        <a href="create-account.html">Create Account</a>
+        <span class="divider">·</span>
+        <a href="dashboard.html">Continue as Guest</a>
+      </div>
+    </section>
+  </main>
 
-      <div class="error" id="error">Please select account type</div>
-    </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-    <div class="link">
-      <a href="forgot-password.html">Forgot Password?</a>
-    </div>
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
 
-    <div class="bottom">
-      <a href="create-account.html">Create Account</a>
-      ·
-      <a href="dashboard.html">Continue as Guest</a>
-    </div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  </div>
-</div>
-
-<script>
-function login() {
-  const type = document.getElementById("loginType").value;
-  const error = document.getElementById("error");
-
-  if (type === "customer") {
-    window.location.href = "dashboard.html";
-  } else if (type === "vendor") {
-    window.location.href = "vendor-dashboard.html";
-  } else {
-    error.style.display = "block";
-  }
+function showMessage(text) {
+  const message = document.getElementById("message");
+  message.textContent = text;
+  message.style.display = "block";
 }
+
+window.login = async function () {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!email || !password) {
+    showMessage("Please enter your email and password.");
+    return;
+  }
+
+  try {
+    showMessage("Signing you in...");
+
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      showMessage("Account found, but profile data is missing. Please contact support.");
+      return;
+    }
+
+    const userData = userSnap.data();
+
+    if (userData.role === "vendor") {
+      window.location.href = "vendor-dashboard.html";
+    } else {
+      window.location.href = "dashboard.html";
+    }
+
+  } catch (error) {
+    showMessage(error.message);
+  }
+};
 </script>
 
 </body>
