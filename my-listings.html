@@ -257,6 +257,17 @@
       background: rgba(255, 255, 255, 0.22);
     }
 
+    .listing-thumb.has-photo::before {
+      display: none;
+    }
+
+    .listing-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .listing-info {
       min-width: 0;
       flex: 1;
@@ -576,6 +587,15 @@ function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function formatPrice(value) {
   const raw = safeText(value, "");
 
@@ -636,6 +656,7 @@ function renderListings(listings) {
     const views = Number(listing.views || 0);
     const saves = Number(listing.saves || 0);
     const status = safeText(listing.status, "draft");
+    const imageUrl = safeText(listing.imageUrl, "");
 
     const listingId = encodeURIComponent(listing.id || "");
 
@@ -655,27 +676,31 @@ function renderListings(listings) {
 
     noteParts.push(description);
 
+    const thumbMarkup = imageUrl
+      ? `<div class="listing-thumb has-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}"></div>`
+      : `<div class="listing-thumb"></div>`;
+
     return `
       <article class="listing-card">
         <div class="listing-top">
-          <div class="listing-thumb"></div>
+          ${thumbMarkup}
 
           <div class="listing-info">
-            <h3 class="listing-name">${title}</h3>
-            <p class="listing-type">${typeLine}</p>
+            <h3 class="listing-name">${escapeHtml(title)}</h3>
+            <p class="listing-type">${escapeHtml(typeLine)}</p>
           </div>
 
-          <div class="listing-price">${price}</div>
+          <div class="listing-price">${escapeHtml(price)}</div>
         </div>
 
         <div class="listing-meta">
-          <span class="pill ${statusClass(status)}">${statusLabel(status)}</span>
+          <span class="pill ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>
           <span class="pill views">${views} Views</span>
           <span class="pill saves">${saves} Saves</span>
         </div>
 
         <p class="listing-note">
-          ${noteParts.join(" ")}
+          ${escapeHtml(noteParts.join(" "))}
         </p>
 
         <div class="listing-actions">
@@ -717,7 +742,7 @@ async function loadVendorListings(user) {
       <div class="empty-card">
         <div class="empty-icon">!</div>
         <h3>Could not load listings</h3>
-        <p>${error.message}</p>
+        <p>${escapeHtml(error.message)}</p>
         <a class="btn" href="vendor-dashboard.html">Back to Dashboard</a>
       </div>
     `;
