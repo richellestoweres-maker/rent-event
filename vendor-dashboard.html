@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vendor Dashboard | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -32,12 +34,11 @@
       --green-text: #2d7a49;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -129,6 +130,8 @@
       border-radius: 999px;
       font-size: 0.88rem;
       white-space: nowrap;
+      cursor: pointer;
+      font-family: inherit;
     }
 
     .hero-card {
@@ -347,6 +350,13 @@
       line-height: 1.35;
     }
 
+    .listing-price {
+      font-size: 0.96rem;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     .listing-meta {
       display: flex;
       flex-wrap: wrap;
@@ -363,11 +373,18 @@
       justify-content: center;
       font-size: 0.76rem;
       font-weight: 700;
+      text-transform: capitalize;
     }
 
     .pill.active {
       background: var(--green-soft);
       color: var(--green-text);
+    }
+
+    .pill.draft,
+    .pill.paused {
+      background: var(--red-soft);
+      color: var(--red-text);
     }
 
     .pill.views {
@@ -378,6 +395,13 @@
     .pill.saves {
       background: #fff4df;
       color: #aa6f12;
+    }
+
+    .listing-note {
+      margin: 0 0 12px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--muted);
     }
 
     .listing-actions {
@@ -411,6 +435,42 @@
       color: #4a433d;
     }
 
+    .empty-card {
+      background: var(--card);
+      border-radius: 26px;
+      padding: 22px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
     .request-list {
       display: grid;
       gap: 14px;
@@ -423,14 +483,6 @@
       box-shadow: var(--shadow);
     }
 
-    .request-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
     .request-name {
       margin: 0 0 4px;
       font-size: 1rem;
@@ -439,29 +491,11 @@
       letter-spacing: -0.02em;
     }
 
-    .request-date {
-      margin: 0;
-      font-size: 0.86rem;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .request-price {
-      font-size: 0.98rem;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
     .request-text {
       margin: 0 0 12px;
       font-size: 0.88rem;
       line-height: 1.45;
       color: var(--muted);
-    }
-
-    .request-actions {
-      display: flex;
-      gap: 10px;
     }
 
     .bottom-nav {
@@ -538,6 +572,7 @@
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
@@ -555,7 +590,7 @@
           </svg>
         </a>
 
-      <a class="icon-btn" href="vendor-profile.html" aria-label="Vendor profile">
+        <a class="icon-btn" href="vendor-profile.html" aria-label="Vendor profile">
           <svg viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
             <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -568,7 +603,7 @@
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Grow your bookings</div>
+        <div class="hero-label" id="heroLabel">Grow your bookings</div>
         <h2 class="hero-title">Manage your listings beautifully.</h2>
         <p class="hero-subtitle">
           Track performance, respond to requests, and keep your vendor profile polished and bookable.
@@ -588,27 +623,27 @@
 
       <div class="stats-grid">
         <div class="stat-card">
-          <p class="stat-label">Revenue</p>
-          <p class="stat-value">$2,450</p>
-          <p class="stat-note">Estimated this month</p>
+          <p class="stat-label">Published</p>
+          <p class="stat-value" id="publishedCount">0</p>
+          <p class="stat-note">Live listings</p>
         </div>
 
         <div class="stat-card">
-          <p class="stat-label">Bookings</p>
-          <p class="stat-value">12</p>
-          <p class="stat-note">Active + pending</p>
+          <p class="stat-label">Drafts</p>
+          <p class="stat-value" id="draftCount">0</p>
+          <p class="stat-note">Saved drafts</p>
         </div>
 
         <div class="stat-card">
-          <p class="stat-label">Rating</p>
-          <p class="stat-value">4.9</p>
-          <p class="stat-note">Average vendor score</p>
+          <p class="stat-label">Views</p>
+          <p class="stat-value" id="viewCount">0</p>
+          <p class="stat-note">Across listings</p>
         </div>
 
         <div class="stat-card">
           <p class="stat-label">Listings</p>
-          <p class="stat-value">3</p>
-          <p class="stat-note">Published services</p>
+          <p class="stat-value" id="listingCount">0</p>
+          <p class="stat-note">Total services</p>
         </div>
       </div>
     </section>
@@ -619,48 +654,12 @@
         <a class="section-link" href="my-listings.html">View All</a>
       </div>
 
-      <div class="listing-list">
-        <article class="listing-card">
-          <div class="listing-top">
-            <div class="listing-thumb"></div>
-            <div class="listing-info">
-              <h3 class="listing-name">Sunny Slides</h3>
-              <p class="listing-type">Bounce House Rentals</p>
-            </div>
-          </div>
-
-          <div class="listing-meta">
-            <span class="pill active">Active</span>
-            <span class="pill views">126 Views</span>
-            <span class="pill saves">24 Saves</span>
-          </div>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View</a>
-            <a class="btn-secondary" href="add-listing.html">Edit</a>
-          </div>
-        </article>
-
-        <article class="listing-card">
-          <div class="listing-top">
-            <div class="listing-thumb"></div>
-            <div class="listing-info">
-              <h3 class="listing-name">Luxury Dinner Setup</h3>
-              <p class="listing-type">Tablescape Styling</p>
-            </div>
-          </div>
-
-          <div class="listing-meta">
-            <span class="pill active">Active</span>
-            <span class="pill views">74 Views</span>
-            <span class="pill saves">16 Saves</span>
-          </div>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View</a>
-            <a class="btn-secondary" href="add-listing.html">Edit</a>
-          </div>
-        </article>
+      <div class="listing-list" id="featuredListings">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading listings</h3>
+          <p>We’re pulling your latest vendor listings now.</p>
+        </div>
       </div>
     </section>
 
@@ -672,40 +671,12 @@
 
       <div class="request-list">
         <article class="request-card">
-          <div class="request-top">
-            <div>
-              <h3 class="request-name">Amara’s Birthday Party</h3>
-              <p class="request-date">Saturday, July 18 · League City, TX</p>
-            </div>
-            <div class="request-price">$250</div>
-          </div>
-
+          <h3 class="request-name">Requests will appear here</h3>
           <p class="request-text">
-            Client wants to confirm setup timing and whether pickup is included after the event.
+            Once clients start messaging or requesting your services, you’ll see those inquiries on this dashboard.
           </p>
-
           <div class="request-actions">
-            <a class="btn" href="messages.html">Reply</a>
-            <a class="btn-secondary" href="detail.html">View Listing</a>
-          </div>
-        </article>
-
-        <article class="request-card">
-          <div class="request-top">
-            <div>
-              <h3 class="request-name">Garden Dinner Event</h3>
-              <p class="request-date">Friday, August 2 · Friendswood, TX</p>
-            </div>
-            <div class="request-price">$850</div>
-          </div>
-
-          <p class="request-text">
-            Client wants a luxury dinner setup with layered place settings and floral accents.
-          </p>
-
-          <div class="request-actions">
-            <a class="btn" href="messages.html">Reply</a>
-            <a class="btn-secondary" href="detail.html">View Listing</a>
+            <a class="btn" href="messages.html">Open Inbox</a>
           </div>
         </article>
       </div>
@@ -750,7 +721,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -765,6 +736,167 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function formatPrice(value) {
+  const raw = safeText(value, "");
+
+  if (!raw) return "$0+";
+
+  const numberMatch = raw.match(/\d+(\.\d+)?/);
+
+  if (!numberMatch) return raw;
+
+  const number = Number(numberMatch[0]);
+
+  if (Number.isNaN(number)) return raw;
+
+  return `$${Math.round(number)}+`;
+}
+
+function statusClass(status) {
+  if (status === "published") return "active";
+  if (status === "draft") return "draft";
+  return "paused";
+}
+
+function statusLabel(status) {
+  if (status === "published") return "Active";
+  if (status === "draft") return "Draft";
+  return safeText(status, "Paused");
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderEmptyListings() {
+  const container = document.getElementById("featuredListings");
+
+  container.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No listings yet</h3>
+      <p>Create your first listing so customers can discover and book your services.</p>
+      <a class="btn" href="add-listing.html">Add Listing</a>
+    </div>
+  `;
+}
+
+function renderFeaturedListings(listings) {
+  const container = document.getElementById("featuredListings");
+
+  if (!listings.length) {
+    renderEmptyListings();
+    return;
+  }
+
+  const featured = listings.slice(0, 2);
+
+  container.innerHTML = featured.map((listing) => {
+    const title = safeText(listing.title, "Untitled Listing");
+    const category = safeText(listing.category, "Event Service");
+    const customCategory = safeText(listing.customCategory, "");
+    const eventType = safeText(listing.eventType, "");
+    const description = safeText(listing.description, "No description has been added yet.");
+    const price = formatPrice(listing.startingPrice);
+    const views = Number(listing.views || 0);
+    const saves = Number(listing.saves || 0);
+    const status = safeText(listing.status, "draft");
+    const listingId = encodeURIComponent(listing.id || "");
+
+    const typeLine = customCategory
+      ? `${category} · ${customCategory}`
+      : category;
+
+    const noteParts = [];
+    if (eventType) noteParts.push(`Best for ${eventType.toLowerCase()}.`);
+    noteParts.push(description);
+
+    return `
+      <article class="listing-card">
+        <div class="listing-top">
+          <div class="listing-thumb"></div>
+
+          <div class="listing-info">
+            <h3 class="listing-name">${title}</h3>
+            <p class="listing-type">${typeLine}</p>
+          </div>
+
+          <div class="listing-price">${price}</div>
+        </div>
+
+        <div class="listing-meta">
+          <span class="pill ${statusClass(status)}">${statusLabel(status)}</span>
+          <span class="pill views">${views} Views</span>
+          <span class="pill saves">${saves} Saves</span>
+        </div>
+
+        <p class="listing-note">
+          ${noteParts.join(" ")}
+        </p>
+
+        <div class="listing-actions">
+          <a class="btn" href="detail.html?id=${listingId}">View</a>
+          <a class="btn-secondary" href="add-listing.html">Edit</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function updateStats(listings) {
+  const published = listings.filter((listing) => listing.status === "published").length;
+  const drafts = listings.filter((listing) => listing.status === "draft").length;
+  const views = listings.reduce((total, listing) => total + Number(listing.views || 0), 0);
+
+  setText("publishedCount", published);
+  setText("draftCount", drafts);
+  setText("viewCount", views);
+  setText("listingCount", listings.length);
+}
+
+async function loadVendorListings(user) {
+  try {
+    const listingsRef = collection(db, "listings");
+    const q = query(listingsRef, where("vendorId", "==", user.uid));
+    const snapshot = await getDocs(q);
+
+    const listings = [];
+
+    snapshot.forEach((docSnap) => {
+      listings.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    listings.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    updateStats(listings);
+    renderFeaturedListings(listings);
+
+  } catch (error) {
+    const container = document.getElementById("featuredListings");
+
+    container.innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load listings</h3>
+        <p>${error.message}</p>
+        <a class="btn" href="my-listings.html">Open My Listings</a>
+      </div>
+    `;
+  }
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -787,10 +919,11 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const heroLabel = document.querySelector(".hero-label");
-  if (heroLabel && userData.name) {
-    heroLabel.textContent = `Welcome back, ${userData.name.split(" ")[0]}`;
+  if (userData.name) {
+    setText("heroLabel", `Welcome back, ${userData.name.split(" ")[0]}`);
   }
+
+  loadVendorListings(user);
 });
 
 window.logout = async function () {
@@ -798,6 +931,6 @@ window.logout = async function () {
   window.location.href = "index.html";
 };
 </script>
-  
+
 </body>
 </html>
