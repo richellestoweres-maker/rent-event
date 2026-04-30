@@ -680,6 +680,22 @@ async function loadVendorListings(user) {
       return bTime - aTime;
     });
 
+function formatPrice(value) {
+  const raw = safeText(value, "");
+
+  if (!raw) return "$0+";
+
+  const numberMatch = raw.match(/\d+(\.\d+)?/);
+
+  if (!numberMatch) return raw;
+
+  const number = Number(numberMatch[0]);
+
+  if (Number.isNaN(number)) return raw;
+
+  return `$${Math.round(number)}+`;
+}
+    
     renderListings(listings);
 
   } catch (error) {
