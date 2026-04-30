@@ -31,9 +31,6 @@
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -54,7 +51,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 112px;
+      padding: 20px 18px 132px;
     }
 
     .topbar {
@@ -259,11 +256,21 @@
       color: var(--muted);
     }
 
-    .helper-text {
+    .helper-text,
+    .status-message {
       margin-top: 10px;
       font-size: 0.82rem;
       line-height: 1.45;
       color: var(--muted);
+    }
+
+    .status-message {
+      display: none;
+      background: #fff4df;
+      color: #8d5f11;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 700;
     }
 
     .bottom-bar {
@@ -283,6 +290,7 @@
       box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 20;
     }
 
     .bottom-copy {
@@ -321,6 +329,7 @@
       justify-content: center;
       padding: 0 16px;
       white-space: nowrap;
+      cursor: pointer;
     }
 
     .bottom-btn {
@@ -332,6 +341,12 @@
     .bottom-btn-secondary {
       background: var(--soft-2);
       color: #4a433d;
+    }
+
+    .bottom-btn:disabled,
+    .bottom-btn-secondary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
 
     @media (max-width: 390px) {
@@ -435,6 +450,8 @@
             <label for="description">Description</label>
             <textarea id="description" class="textarea" placeholder="Describe your service, what makes it special, and what clients can expect."></textarea>
           </div>
+
+          <div class="status-message" id="statusMessage"></div>
         </div>
       </div>
     </section>
@@ -476,12 +493,12 @@
           <div class="upload-icon">↑</div>
           <h3 class="upload-title">Upload Listing Photos</h3>
           <p class="upload-text">
-            Add clean, bright images that help clients picture your setup and style.
+            Photo upload will come next with Firebase Storage. For now, this listing saves all text details.
           </p>
         </div>
 
         <p class="helper-text">
-          This is still your front-end version, so uploads are visual placeholders for now. Later, when we connect Firebase or storage, this section will accept real files.
+          Next phase: we will add real image uploads, store them in Firebase Storage, and save image URLs to each listing.
         </p>
       </div>
     </section>
@@ -490,11 +507,128 @@
   <div class="bottom-bar">
     <div class="bottom-copy">
       <span class="bottom-label">Vendor Action</span>
-      <span class="bottom-value">Publish Listing</span>
+      <span class="bottom-value">Save Listing</span>
     </div>
 
-    <a href="my-listings.html" class="bottom-btn-secondary">Save Draft</a>
-    <a href="my-listings.html" class="bottom-btn">Publish</a>
+    <button class="bottom-btn-secondary" id="draftBtn" onclick="saveListing('draft')">Save Draft</button>
+    <button class="bottom-btn" id="publishBtn" onclick="saveListing('published')">Publish</button>
   </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+
+function showStatus(message) {
+  const status = document.getElementById("statusMessage");
+  status.textContent = message;
+  status.style.display = "block";
+}
+
+function setSaving(isSaving) {
+  document.getElementById("draftBtn").disabled = isSaving;
+  document.getElementById("publishBtn").disabled = isSaving;
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+
+  if (userData.role !== "vendor") {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  currentUser = user;
+  currentUserData = userData;
+});
+
+window.saveListing = async function(status) {
+  if (!currentUser || !currentUserData) {
+    showStatus("Still loading your vendor account. Please wait a second and try again.");
+    return;
+  }
+
+  const title = document.getElementById("listing-name").value.trim();
+  const category = document.getElementById("category").value.trim();
+  const startingPrice = document.getElementById("starting-price").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const availability = document.getElementById("availability").value.trim();
+  const serviceArea = document.getElementById("service-area").value.trim();
+  const included = document.getElementById("included").value.trim();
+
+  if (!title || !startingPrice || !location || !description) {
+    showStatus("Please fill in listing name, starting price, location, and description before saving.");
+    return;
+  }
+
+  try {
+    setSaving(true);
+    showStatus(status === "published" ? "Publishing your listing..." : "Saving your draft...");
+
+    await addDoc(collection(db, "listings"), {
+      title,
+      category,
+      startingPrice,
+      location,
+      description,
+      availability,
+      serviceArea,
+      included,
+      status,
+      vendorId: currentUser.uid,
+      vendorName: currentUserData.name || "",
+      vendorEmail: currentUserData.email || currentUser.email || "",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      views: 0,
+      saves: 0,
+      rating: null,
+      imageUrl: ""
+    });
+
+    showStatus(status === "published" ? "Listing published successfully." : "Draft saved successfully.");
+
+    setTimeout(() => {
+      window.location.href = "my-listings.html";
+    }, 900);
+
+  } catch (error) {
+    setSaving(false);
+    showStatus(error.message);
+  }
+};
+</script>
+
 </body>
 </html>
