@@ -62,13 +62,35 @@
 
     .hero {
       position: relative;
-      min-height: 310px;
+      min-height: 340px;
       background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       overflow: hidden;
       color: #fff;
     }
 
-    .hero::before {
+    .hero.has-photo {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .hero.has-photo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.38) 0%,
+        rgba(0, 0, 0, 0.12) 38%,
+        rgba(0, 0, 0, 0.62) 100%
+      );
+      z-index: 1;
+    }
+
+    .hero:not(.has-photo)::before {
       content: "";
       position: absolute;
       width: 220px;
@@ -79,7 +101,7 @@
       background: rgba(255, 255, 255, 0.13);
     }
 
-    .hero::after {
+    .hero:not(.has-photo)::after {
       content: "";
       position: absolute;
       width: 160px;
@@ -99,7 +121,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      z-index: 2;
+      z-index: 3;
     }
 
     .hero-btn {
@@ -116,6 +138,8 @@
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.08);
       font-weight: 800;
       flex-shrink: 0;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     .hero-bottom {
@@ -123,7 +147,7 @@
       left: 20px;
       right: 20px;
       bottom: 46px;
-      z-index: 2;
+      z-index: 3;
       color: #fff;
     }
 
@@ -156,12 +180,16 @@
       font-size: 0.94rem;
       line-height: 1.4;
       color: rgba(255, 255, 255, 0.94);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .content {
       margin-top: -26px;
       position: relative;
-      z-index: 3;
+      z-index: 4;
       border-radius: 32px 32px 0 0;
       background: var(--bg);
       padding: 0 18px;
@@ -242,6 +270,22 @@
       color: var(--muted);
     }
 
+    .photo-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .photo-card img {
+      display: block;
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      border-radius: 20px;
+    }
+
     .section {
       margin-top: 26px;
     }
@@ -320,6 +364,11 @@
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
     }
 
     .vendor-avatar::before {
@@ -328,6 +377,11 @@
       inset: 14px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vendor-avatar span {
+      position: relative;
+      z-index: 1;
     }
 
     .vendor-info {
@@ -479,6 +533,7 @@
       justify-content: center;
       padding: 0 16px;
       white-space: nowrap;
+      cursor: pointer;
     }
 
     .action-btn {
@@ -490,6 +545,12 @@
     .action-btn-secondary {
       background: var(--soft-2);
       color: #4a433d;
+    }
+
+    .action-btn:disabled,
+    .action-btn-secondary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
 
     @media (max-width: 390px) {
@@ -527,7 +588,7 @@
 
 <body>
   <main class="page" id="page">
-    <section class="hero">
+    <section class="hero" id="hero">
       <div class="hero-topbar">
         <a href="listings.html" class="hero-btn" aria-label="Go back">←</a>
         <a href="notifications.html" class="hero-btn" aria-label="Notifications">🔔</a>
@@ -557,6 +618,14 @@
           Please wait while we load this vendor listing.
         </p>
       </div>
+
+      <section class="section" id="photoSection" style="display: none;">
+        <h2 class="section-title">Photo</h2>
+
+        <div class="photo-card">
+          <img id="detailPhoto" src="" alt="Listing photo">
+        </div>
+      </section>
 
       <section class="section">
         <h2 class="section-title">What’s Included</h2>
@@ -595,7 +664,7 @@
 
         <div class="card">
           <div class="vendor-card">
-            <div class="vendor-avatar"></div>
+            <div class="vendor-avatar"><span id="vendorInitials">RE</span></div>
 
             <div class="vendor-info">
               <h3 id="vendorName">Vendor</h3>
@@ -652,13 +721,24 @@
       <span class="action-value" id="bottomPrice">$0+</span>
     </div>
 
-    <a href="messages.html" class="action-btn-secondary">Message</a>
+    <button class="action-btn-secondary" id="messageBtn" type="button">Message</button>
     <a href="event-builder.html" class="action-btn">Add to Event</a>
   </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -671,7 +751,13 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let currentListing = null;
+let currentListingId = null;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -699,6 +785,17 @@ function titleCase(value) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+function initialsFromName(name) {
+  const cleanName = safeText(name, "RE");
+  const parts = cleanName.split(" ").filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  return cleanName.slice(0, 2).toUpperCase();
+}
+
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
@@ -719,6 +816,26 @@ function renderMissingListing(message) {
   `;
 }
 
+function setHeroImage(imageUrl) {
+  const hero = document.getElementById("hero");
+  const photoSection = document.getElementById("photoSection");
+  const detailPhoto = document.getElementById("detailPhoto");
+
+  if (!imageUrl) {
+    hero.classList.remove("has-photo");
+    hero.style.backgroundImage = "";
+    photoSection.style.display = "none";
+    detailPhoto.src = "";
+    return;
+  }
+
+  hero.classList.add("has-photo");
+  hero.style.backgroundImage = `url("${imageUrl}")`;
+
+  detailPhoto.src = imageUrl;
+  photoSection.style.display = "block";
+}
+
 function renderListing(listing) {
   const title = safeText(listing.title, "Untitled Listing");
   const category = safeText(listing.category, "Event Service");
@@ -731,12 +848,17 @@ function renderListing(listing) {
   const included = safeText(listing.included, "Details will be confirmed with the vendor.");
   const vendorName = safeText(listing.vendorName, "RentEvent Vendor");
   const status = safeText(listing.status, "published");
+  const imageUrl = safeText(listing.imageUrl, "");
   const price = formatPrice(listing.startingPrice);
   const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
 
   const typeLine = customCategory ? `${category} · ${customCategory}` : category;
 
+  currentListing = listing;
+
   document.title = `${title} | RentEvent`;
+
+  setHeroImage(imageUrl);
 
   setText("heroPill", typeLine);
   setText("heroTitle", title);
@@ -753,6 +875,7 @@ function renderListing(listing) {
   setText("eventTypeText", eventType);
   setText("serviceAreaText", serviceArea);
 
+  setText("vendorInitials", initialsFromName(vendorName));
   setText("vendorName", vendorName);
   setText("vendorText", `${vendorName} offers ${typeLine.toLowerCase()} for ${eventType.toLowerCase()} and other event needs.`);
   setText("vendorRating", rating === "★ New" ? "★ New vendor listing" : `${rating} average rating`);
@@ -770,6 +893,7 @@ function renderListing(listing) {
 async function loadListing() {
   const params = new URLSearchParams(window.location.search);
   const listingId = params.get("id");
+  currentListingId = listingId;
 
   try {
     if (listingId) {
@@ -815,12 +939,147 @@ async function loadListing() {
       return;
     }
 
+    currentListingId = listings[0].id;
     renderListing(listings[0]);
 
   } catch (error) {
     renderMissingListing(error.message);
   }
 }
+
+async function findExistingConversation(customerId, vendorId, listingId) {
+  const conversationsRef = collection(db, "conversations");
+  const q = query(conversationsRef, where("conversationKey", "==", `${customerId}_${vendorId}_${listingId}`));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    return null;
+  }
+
+  let conversation = null;
+
+  snapshot.forEach((docSnap) => {
+    conversation = {
+      id: docSnap.id,
+      ...docSnap.data()
+    };
+  });
+
+  return conversation;
+}
+
+async function startConversation() {
+  const messageBtn = document.getElementById("messageBtn");
+
+  if (!currentUser) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  if (!currentListing || !currentListingId) {
+    alert("This listing is still loading. Please try again in a second.");
+    return;
+  }
+
+  const vendorId = safeText(currentListing.vendorId, "");
+
+  if (!vendorId) {
+    alert("This listing is missing vendor information, so messaging cannot start yet.");
+    return;
+  }
+
+  if (vendorId === currentUser.uid) {
+    alert("This is your own listing. Customers will be able to message you from this page.");
+    return;
+  }
+
+  try {
+    messageBtn.disabled = true;
+    messageBtn.textContent = "Opening...";
+
+    const customerId = currentUser.uid;
+    const listingId = currentListingId;
+    const conversationKey = `${customerId}_${vendorId}_${listingId}`;
+
+    const existingConversation = await findExistingConversation(customerId, vendorId, listingId);
+
+    if (existingConversation) {
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
+      return;
+    }
+
+    const customerName = currentUserData?.name || currentUser.displayName || currentUser.email || "Customer";
+    const vendorName = safeText(currentListing.vendorName, "Vendor");
+    const listingTitle = safeText(currentListing.title, "Event Listing");
+    const listingCategory = safeText(currentListing.category, "Event Service");
+    const listingLocation = safeText(currentListing.location, "");
+
+    const conversationRef = await addDoc(collection(db, "conversations"), {
+      conversationKey,
+      participantIds: [customerId, vendorId],
+      participantNames: {
+        [customerId]: customerName,
+        [vendorId]: vendorName
+      },
+      participantRoles: {
+        [customerId]: "customer",
+        [vendorId]: "vendor"
+      },
+      customerId,
+      vendorId,
+      listingId,
+      listingTitle,
+      listingCategory,
+      listingLocation,
+      title: vendorName,
+      contextType: "Vendor",
+      lastMessage: "Conversation started.",
+      lastSenderId: customerId,
+      unreadFor: {
+        [vendorId]: true
+      },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
+      text: `Hi! I’m interested in ${listingTitle}.`,
+      senderId: customerId,
+      senderName: customerName,
+      senderRole: "customer",
+      createdAt: serverTimestamp()
+    });
+
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
+
+  } catch (error) {
+    alert(error.message);
+    messageBtn.disabled = false;
+    messageBtn.textContent = "Message";
+  }
+}
+
+document.getElementById("messageBtn").addEventListener("click", startConversation);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    currentUser = null;
+    currentUserData = null;
+    loadListing();
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    currentUserData = userSnap.data();
+  }
+
+  loadListing();
+});
 
 loadListing();
 </script>
