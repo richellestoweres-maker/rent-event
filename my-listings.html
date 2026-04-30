@@ -610,7 +610,7 @@ function renderListings(listings) {
     const category = safeText(listing.category, "Event Service");
     const customCategory = safeText(listing.customCategory, "");
     const eventType = safeText(listing.eventType, "");
-    const price = safeText(listing.startingPrice, "$0+");
+    const price = formatPrice(listing.startingPrice);
     const location = safeText(listing.location, "");
     const description = safeText(listing.description, "No description has been added yet.");
     const views = Number(listing.views || 0);
