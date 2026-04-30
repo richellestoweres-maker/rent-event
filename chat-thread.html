@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chat Thread | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -27,11 +29,15 @@
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
       --gold: #f4a43a;
+      --gold-dark: #d88914;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       background: var(--bg);
@@ -48,7 +54,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 110px;
+      padding: 20px 18px 120px;
     }
 
     .topbar {
@@ -72,7 +78,7 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140,111,75,0.05);
       flex-shrink: 0;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .chat-head {
@@ -121,6 +127,9 @@
       line-height: 1.1;
       font-weight: 800;
       letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .chat-sub {
@@ -128,6 +137,9 @@
       font-size: 0.84rem;
       color: var(--muted);
       line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .banner {
@@ -173,11 +185,11 @@
       display: flex;
     }
 
-    .message-row.vendor {
+    .message-row.other {
       justify-content: flex-start;
     }
 
-    .message-row.user {
+    .message-row.me {
       justify-content: flex-end;
     }
 
@@ -188,15 +200,17 @@
       font-size: 0.92rem;
       line-height: 1.5;
       box-shadow: var(--shadow);
+      word-wrap: break-word;
+      white-space: pre-wrap;
     }
 
-    .message-row.vendor .bubble {
+    .message-row.other .bubble {
       background: white;
       color: var(--text);
       border-bottom-left-radius: 8px;
     }
 
-    .message-row.user .bubble {
+    .message-row.me .bubble {
       background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: white;
       border-bottom-right-radius: 8px;
@@ -210,6 +224,42 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+    }
+
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
     }
 
     .composer {
@@ -229,6 +279,7 @@
       box-shadow: 0 18px 38px rgba(120,96,60,0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 20;
     }
 
     .composer input {
@@ -263,6 +314,23 @@
       justify-content: center;
       text-decoration: none;
       box-shadow: 0 14px 28px rgba(255,107,97,0.18);
+      cursor: pointer;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 390px) {
+      .composer {
+        border-radius: 24px;
+      }
+
+      .send-btn {
+        min-width: 78px;
+        padding: 0 14px;
+      }
     }
 
     @media (min-width: 768px) {
@@ -271,81 +339,360 @@
       }
 
       .page {
-        max-width: 960px;
+        max-width: 430px;
       }
 
       .composer {
-        max-width: 520px;
+        max-width: 406px;
       }
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
       <a href="messages.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="chat-head">
-        <div class="avatar"><span>SS</span></div>
+        <div class="avatar"><span id="avatarInitials">RE</span></div>
+
         <div class="chat-meta">
-          <h1 class="chat-name">Sunny Slides</h1>
-          <p class="chat-sub">Bounce House Rentals · League City, TX</p>
+          <h1 class="chat-name" id="chatName">Loading conversation...</h1>
+          <p class="chat-sub" id="chatSub">Please wait while we load this thread.</p>
         </div>
       </div>
 
-      <a href="detail.html" class="icon-btn" aria-label="View listing">★</a>
+      <a href="listings.html" class="icon-btn" id="listingLink" aria-label="View listing">★</a>
     </header>
 
     <section class="banner">
       <h2>Event Conversation</h2>
-      <p>
+      <p id="bannerText">
         Keep pricing, setup times, and booking details organized in one place.
       </p>
     </section>
 
-    <section class="thread">
-      <div class="day-divider">Today</div>
-
-      <div class="message-row user">
-        <div class="bubble">
-          Hi! I wanted to ask if setup and pickup are included in the price for July 18.
-          <span class="time">10:12 AM</span>
-        </div>
-      </div>
-
-      <div class="message-row vendor">
-        <div class="bubble">
-          Yes, setup and pickup are both included. We usually arrive about 45 minutes before the party starts.
-          <span class="time">10:18 AM</span>
-        </div>
-      </div>
-
-      <div class="message-row user">
-        <div class="bubble">
-          Perfect. Do you have a white or more neutral style available?
-          <span class="time">10:21 AM</span>
-        </div>
-      </div>
-
-      <div class="message-row.vendor">
-        <div class="bubble">
-          We do. We have a modern neutral setup that photographs really well for birthdays and events.
-          <span class="time">10:26 AM</span>
-        </div>
-      </div>
-
-      <div class="message-row user">
-        <div class="bubble">
-          That sounds exactly like what I’m looking for. I’m adding it to my event folder now.
-          <span class="time">10:28 AM</span>
-        </div>
+    <section class="thread" id="thread">
+      <div class="empty-card">
+        <div class="empty-icon">…</div>
+        <h3>Loading messages</h3>
+        <p>We’re opening this conversation now.</p>
       </div>
     </section>
   </main>
 
-  <div class="composer">
-    <input type="text" placeholder="Type your message..." />
-    <a href="#" class="send-btn">Send</a>
-  </div>
+  <form class="composer" id="composer">
+    <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off" />
+    <button class="send-btn" id="sendBtn" type="submit">Send</button>
+  </form>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let conversationId = null;
+let conversationData = null;
+let unsubscribeMessages = null;
+
+const params = new URLSearchParams(window.location.search);
+conversationId = params.get("id");
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function initialsFromName(name) {
+  const cleanName = safeText(name, "RE");
+  const parts = cleanName.split(" ").filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  return cleanName.slice(0, 2).toUpperCase();
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function formatMessageTime(value) {
+  if (!value || !value.seconds) return "Sending";
+
+  const date = new Date(value.seconds * 1000);
+
+  return date.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+function renderError(title, message) {
+  const thread = document.getElementById("thread");
+  const composer = document.getElementById("composer");
+
+  composer.style.display = "none";
+
+  thread.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">!</div>
+      <h3>${title}</h3>
+      <p>${message}</p>
+    </div>
+  `;
+}
+
+function renderEmptyThread() {
+  const thread = document.getElementById("thread");
+
+  thread.innerHTML = `
+    <div class="day-divider">Start Conversation</div>
+
+    <div class="empty-card">
+      <div class="empty-icon">✉</div>
+      <h3>No messages yet</h3>
+      <p>Send the first message to start this event conversation.</p>
+    </div>
+  `;
+}
+
+function renderMessages(messages) {
+  const thread = document.getElementById("thread");
+
+  if (!messages.length) {
+    renderEmptyThread();
+    return;
+  }
+
+  thread.innerHTML = `
+    <div class="day-divider">Conversation</div>
+    ${messages.map((message) => {
+      const isMe = message.senderId === currentUser.uid;
+      const text = safeText(message.text, "");
+      const time = formatMessageTime(message.createdAt);
+
+      return `
+        <div class="message-row ${isMe ? "me" : "other"}">
+          <div class="bubble">
+            ${text}
+            <span class="time">${time}</span>
+          </div>
+        </div>
+      `;
+    }).join("")}
+  `;
+
+  setTimeout(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
+  }, 50);
+}
+
+function getOtherParticipantName() {
+  if (!conversationData || !currentUser) return "Conversation";
+
+  const participantNames = conversationData.participantNames || {};
+  const otherParticipantIds = (conversationData.participantIds || []).filter((id) => id !== currentUser.uid);
+  const otherId = otherParticipantIds[0];
+
+  if (otherId && participantNames[otherId]) {
+    return participantNames[otherId];
+  }
+
+  return safeText(conversationData.title, "Conversation");
+}
+
+function updateHeader() {
+  const otherName = getOtherParticipantName();
+  const listingTitle = safeText(conversationData.listingTitle, "Event listing");
+  const listingCategory = safeText(conversationData.listingCategory, "Event service");
+  const listingLocation = safeText(conversationData.listingLocation, "");
+
+  setText("avatarInitials", initialsFromName(otherName));
+  setText("chatName", otherName);
+
+  const subParts = [listingTitle, listingCategory];
+  if (listingLocation) subParts.push(listingLocation);
+
+  setText("chatSub", subParts.join(" · "));
+  setText("bannerText", `Use this thread to ask questions, confirm details, and keep communication organized for ${listingTitle}.`);
+
+  if (conversationData.listingId) {
+    document.getElementById("listingLink").href = `detail.html?id=${encodeURIComponent(conversationData.listingId)}`;
+  }
+}
+
+function watchMessages() {
+  if (unsubscribeMessages) {
+    unsubscribeMessages();
+  }
+
+  const messagesRef = collection(db, "conversations", conversationId, "messages");
+  const messagesQuery = query(messagesRef, orderBy("createdAt", "asc"));
+
+  unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+    const messages = [];
+
+    snapshot.forEach((docSnap) => {
+      messages.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    renderMessages(messages);
+  }, (error) => {
+    renderError("Could not load messages", error.message);
+  });
+}
+
+async function loadConversation() {
+  if (!conversationId) {
+    renderError("Conversation not found", "This chat link is missing a conversation ID.");
+    return;
+  }
+
+  try {
+    const conversationRef = doc(db, "conversations", conversationId);
+    const conversationSnap = await getDoc(conversationRef);
+
+    if (!conversationSnap.exists()) {
+      renderError("Conversation not found", "This conversation may have been removed or the link may be outdated.");
+      return;
+    }
+
+    conversationData = {
+      id: conversationSnap.id,
+      ...conversationSnap.data()
+    };
+
+    const participantIds = conversationData.participantIds || [];
+
+    if (!participantIds.includes(currentUser.uid)) {
+      renderError("Access denied", "You are not part of this conversation.");
+      return;
+    }
+
+    updateHeader();
+    watchMessages();
+
+  } catch (error) {
+    renderError("Could not open conversation", error.message);
+  }
+}
+
+async function sendMessage(text) {
+  const messageText = safeText(text, "");
+
+  if (!messageText || !conversationId || !currentUser || !conversationData) {
+    return;
+  }
+
+  const sendBtn = document.getElementById("sendBtn");
+  const messageInput = document.getElementById("messageInput");
+
+  sendBtn.disabled = true;
+
+  try {
+    const messagesRef = collection(db, "conversations", conversationId, "messages");
+
+    await addDoc(messagesRef, {
+      text: messageText,
+      senderId: currentUser.uid,
+      senderName: currentUserData.name || currentUser.displayName || currentUser.email || "RentEvent User",
+      senderRole: currentUserData.role || "customer",
+      createdAt: serverTimestamp()
+    });
+
+    const unreadFor = {};
+
+    (conversationData.participantIds || []).forEach((participantId) => {
+      if (participantId !== currentUser.uid) {
+        unreadFor[participantId] = true;
+      }
+    });
+
+    const conversationRef = doc(db, "conversations", conversationId);
+
+    await updateDoc(conversationRef, {
+      lastMessage: messageText,
+      lastSenderId: currentUser.uid,
+      updatedAt: serverTimestamp(),
+      unreadFor
+    });
+
+    messageInput.value = "";
+
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    sendBtn.disabled = false;
+    messageInput.focus();
+  }
+}
+
+document.getElementById("composer").addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const input = document.getElementById("messageInput");
+  const text = input.value.trim();
+
+  sendMessage(text);
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+
+  loadConversation();
+});
+</script>
+
 </body>
 </html>
