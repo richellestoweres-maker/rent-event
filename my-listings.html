@@ -37,9 +37,6 @@
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -301,6 +298,7 @@
       justify-content: center;
       font-size: 0.76rem;
       font-weight: 700;
+      text-transform: capitalize;
     }
 
     .pill.active {
@@ -318,7 +316,8 @@
       color: #aa6f12;
     }
 
-    .pill.paused {
+    .pill.paused,
+    .pill.draft {
       background: var(--red-soft);
       color: var(--red-text);
     }
@@ -361,6 +360,42 @@
     .btn-secondary {
       background: var(--soft-2);
       color: #4a433d;
+    }
+
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
     }
 
     .bottom-nav {
@@ -466,94 +501,16 @@
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title">Published Listings</h2>
+        <h2 class="section-title">Your Listings</h2>
         <a class="section-link" href="add-listing.html">New Listing</a>
       </div>
 
-      <div class="listing-list">
-        <article class="listing-card">
-          <div class="listing-top">
-            <div class="listing-thumb"></div>
-
-            <div class="listing-info">
-              <h3 class="listing-name">Sunny Slides</h3>
-              <p class="listing-type">Bounce House Rentals</p>
-            </div>
-
-            <div class="listing-price">$250+</div>
-          </div>
-
-          <div class="listing-meta">
-            <span class="pill active">Active</span>
-            <span class="pill views">126 Views</span>
-            <span class="pill saves">24 Saves</span>
-          </div>
-
-          <p class="listing-note">
-            Strong performer this month with repeat inquiries for birthday parties and weekend events.
-          </p>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View</a>
-            <a class="btn-secondary" href="add-listing.html">Edit</a>
-          </div>
-        </article>
-
-        <article class="listing-card">
-          <div class="listing-top">
-            <div class="listing-thumb"></div>
-
-            <div class="listing-info">
-              <h3 class="listing-name">Luxury Dinner Setup</h3>
-              <p class="listing-type">Tablescape Styling</p>
-            </div>
-
-            <div class="listing-price">$850+</div>
-          </div>
-
-          <div class="listing-meta">
-            <span class="pill active">Active</span>
-            <span class="pill views">74 Views</span>
-            <span class="pill saves">16 Saves</span>
-          </div>
-
-          <p class="listing-note">
-            Great for upscale dinners and intimate gatherings. Clients are engaging with the premium styling angle.
-          </p>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View</a>
-            <a class="btn-secondary" href="add-listing.html">Edit</a>
-          </div>
-        </article>
-
-        <article class="listing-card">
-          <div class="listing-top">
-            <div class="listing-thumb"></div>
-
-            <div class="listing-info">
-              <h3 class="listing-name">Photo Booth Experience</h3>
-              <p class="listing-type">Photo Booths</p>
-            </div>
-
-            <div class="listing-price">$225+</div>
-          </div>
-
-          <div class="listing-meta">
-            <span class="pill paused">Paused</span>
-            <span class="pill views">41 Views</span>
-            <span class="pill saves">9 Saves</span>
-          </div>
-
-          <p class="listing-note">
-            Temporarily paused while updating the package details and uploading a refreshed gallery.
-          </p>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View</a>
-            <a class="btn-secondary" href="add-listing.html">Edit</a>
-          </div>
-        </article>
+      <div class="listing-list" id="listingList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading listings</h3>
+          <p>We’re pulling your saved vendor listings now.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -592,5 +549,175 @@
       <span>Inbox</span>
     </a>
   </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function statusClass(status) {
+  if (status === "published") return "active";
+  if (status === "draft") return "draft";
+  return "paused";
+}
+
+function statusLabel(status) {
+  if (status === "published") return "Active";
+  if (status === "draft") return "Draft";
+  return safeText(status, "Paused");
+}
+
+function renderEmptyState() {
+  const listingList = document.getElementById("listingList");
+  listingList.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No listings yet</h3>
+      <p>Create your first vendor listing so customers can find and book your services.</p>
+      <a class="btn" href="add-listing.html">Add Your First Listing</a>
+    </div>
+  `;
+}
+
+function renderListings(listings) {
+  const listingList = document.getElementById("listingList");
+
+  if (!listings.length) {
+    renderEmptyState();
+    return;
+  }
+
+  listingList.innerHTML = listings.map((listing) => {
+    const title = safeText(listing.title, "Untitled Listing");
+    const category = safeText(listing.category, "Event Service");
+    const customCategory = safeText(listing.customCategory, "");
+    const eventType = safeText(listing.eventType, "");
+    const price = safeText(listing.startingPrice, "$0+");
+    const location = safeText(listing.location, "");
+    const description = safeText(listing.description, "No description has been added yet.");
+    const views = Number(listing.views || 0);
+    const saves = Number(listing.saves || 0);
+    const status = safeText(listing.status, "draft");
+
+    const typeLine = customCategory
+      ? `${category} · ${customCategory}`
+      : category;
+
+    const noteParts = [];
+    if (eventType) noteParts.push(`Best for ${eventType.toLowerCase()}.`);
+    if (location) noteParts.push(`Serving ${location}.`);
+    noteParts.push(description);
+
+    return `
+      <article class="listing-card">
+        <div class="listing-top">
+          <div class="listing-thumb"></div>
+
+          <div class="listing-info">
+            <h3 class="listing-name">${title}</h3>
+            <p class="listing-type">${typeLine}</p>
+          </div>
+
+          <div class="listing-price">${price}</div>
+        </div>
+
+        <div class="listing-meta">
+          <span class="pill ${statusClass(status)}">${statusLabel(status)}</span>
+          <span class="pill views">${views} Views</span>
+          <span class="pill saves">${saves} Saves</span>
+        </div>
+
+        <p class="listing-note">
+          ${noteParts.join(" ")}
+        </p>
+
+        <div class="listing-actions">
+          <a class="btn" href="detail.html">View</a>
+          <a class="btn-secondary" href="add-listing.html">Edit</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadVendorListings(user) {
+  const listingList = document.getElementById("listingList");
+
+  try {
+    const listingsRef = collection(db, "listings");
+    const q = query(listingsRef, where("vendorId", "==", user.uid));
+    const snapshot = await getDocs(q);
+
+    const listings = [];
+    snapshot.forEach((docSnap) => {
+      listings.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    listings.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    renderListings(listings);
+
+  } catch (error) {
+    listingList.innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load listings</h3>
+        <p>${error.message}</p>
+        <a class="btn" href="vendor-dashboard.html">Back to Dashboard</a>
+      </div>
+    `;
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+
+  if (userData.role !== "vendor") {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  loadVendorListings(user);
+});
+</script>
+
 </body>
 </html>
