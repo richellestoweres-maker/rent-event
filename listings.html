@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Listings | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -28,12 +30,13 @@
       --coral-3: #ff5f67;
       --gold: #f4a43a;
       --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -79,6 +82,7 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
+      font-weight: 700;
     }
 
     .topbar-center {
@@ -203,6 +207,8 @@
       justify-content: center;
       text-decoration: none;
       box-shadow: 0 6px 18px rgba(140, 111, 75, 0.04);
+      cursor: pointer;
+      font-family: inherit;
     }
 
     .filter-pill.active {
@@ -260,7 +266,7 @@
       border-radius: 20px;
       overflow: hidden;
       margin-bottom: 14px;
-      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
       position: relative;
     }
 
@@ -281,22 +287,6 @@
       right: 18px;
       top: 18px;
       background: rgba(255, 255, 255, 0.16);
-    }
-
-    .image-1 {
-      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
-    }
-
-    .image-2 {
-      background: linear-gradient(135deg, #ffe6d8, #f1b58f 48%, #d9867e 100%);
-    }
-
-    .image-3 {
-      background: linear-gradient(135deg, #ffe7dd, #f3b58d 48%, #b783ff 100%);
-    }
-
-    .image-4 {
-      background: linear-gradient(135deg, #e5f0ff, #c9ddff 48%, #95b6ff 100%);
     }
 
     .listing-top {
@@ -363,6 +353,16 @@
       color: #6a625a;
     }
 
+    .pill.type {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .pill.available {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
     .listing-actions {
       display: flex;
       gap: 10px;
@@ -392,6 +392,42 @@
     .btn-secondary {
       background: var(--soft-2);
       color: #4a433d;
+    }
+
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
     }
 
     .bottom-nav {
@@ -463,6 +499,7 @@
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
@@ -491,120 +528,32 @@
     </section>
 
     <div class="search-wrap">
-      <input class="search-input" type="text" placeholder="Search vendors, rentals, décor..." />
+      <input id="searchInput" class="search-input" type="text" placeholder="Search vendors, rentals, décor..." />
     </div>
 
     <div class="filters">
-      <a class="filter-pill active" href="#">All</a>
-      <a class="filter-pill" href="#">Bounce Houses</a>
-      <a class="filter-pill" href="#">Photo Booths</a>
-      <a class="filter-pill" href="#">Décor</a>
-      <a class="filter-pill" href="#">Catering</a>
-      <a class="filter-pill" href="#">Venues</a>
+      <button class="filter-pill active" data-filter="all">All</button>
+      <button class="filter-pill" data-filter="birthday">Birthdays</button>
+      <button class="filter-pill" data-filter="wedding">Weddings</button>
+      <button class="filter-pill" data-filter="shower">Showers</button>
+      <button class="filter-pill" data-filter="decor">Décor</button>
+      <button class="filter-pill" data-filter="catering">Catering</button>
+      <button class="filter-pill" data-filter="venue">Venues</button>
+      <button class="filter-pill" data-filter="kids">Kids</button>
     </div>
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title">Popular Listings</h2>
-        <a class="section-link" href="#">See All</a>
+        <h2 class="section-title" id="sectionTitle">Published Listings</h2>
+        <a class="section-link" href="event-builder.html">Plan Event</a>
       </div>
 
-      <div class="listing-list">
-        <article class="listing-card">
-          <div class="listing-image image-1"></div>
-
-          <div class="listing-top">
-            <h3 class="listing-name">Sunny Slides</h3>
-            <div class="listing-price">$250+</div>
-          </div>
-
-          <p class="listing-category">Bounce House Rentals</p>
-          <p class="listing-description">
-            Clean, modern bounce house rentals for birthdays, backyard parties, and celebrations.
-          </p>
-
-          <div class="listing-meta">
-            <span class="pill rating">★ 4.9</span>
-            <span class="pill location">League City, TX</span>
-          </div>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View Details</a>
-            <a class="btn-secondary" href="event-builder.html">Add to Event</a>
-          </div>
-        </article>
-
-        <article class="listing-card">
-          <div class="listing-image image-2"></div>
-
-          <div class="listing-top">
-            <h3 class="listing-name">Luxury Dinner Setup</h3>
-            <div class="listing-price">$850+</div>
-          </div>
-
-          <p class="listing-category">Tablescape Styling</p>
-          <p class="listing-description">
-            Elegant dinner styling with layered place settings, linens, candles, and décor.
-          </p>
-
-          <div class="listing-meta">
-            <span class="pill rating">★ 4.8</span>
-            <span class="pill location">Friendswood, TX</span>
-          </div>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View Details</a>
-            <a class="btn-secondary" href="event-builder.html">Add to Event</a>
-          </div>
-        </article>
-
-        <article class="listing-card">
-          <div class="listing-image image-3"></div>
-
-          <div class="listing-top">
-            <h3 class="listing-name">Photo Booth Experience</h3>
-            <div class="listing-price">$225+</div>
-          </div>
-
-          <p class="listing-category">Photo Booths</p>
-          <p class="listing-description">
-            Modern photo booth packages with instant sharing and sleek event-friendly setups.
-          </p>
-
-          <div class="listing-meta">
-            <span class="pill rating">★ 4.7</span>
-            <span class="pill location">Houston, TX</span>
-          </div>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View Details</a>
-            <a class="btn-secondary" href="event-builder.html">Add to Event</a>
-          </div>
-        </article>
-
-        <article class="listing-card">
-          <div class="listing-image image-4"></div>
-
-          <div class="listing-top">
-            <h3 class="listing-name">Velvet Bloom</h3>
-            <div class="listing-price">$300+</div>
-          </div>
-
-          <p class="listing-category">Floral & Décor</p>
-          <p class="listing-description">
-            Floral installs, backdrops, and event décor styling for showers, dinners, and parties.
-          </p>
-
-          <div class="listing-meta">
-            <span class="pill rating">★ 5.0</span>
-            <span class="pill location">Pearland, TX</span>
-          </div>
-
-          <div class="listing-actions">
-            <a class="btn" href="detail.html">View Details</a>
-            <a class="btn-secondary" href="event-builder.html">Add to Event</a>
-          </div>
-        </article>
+      <div class="listing-list" id="listingList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading listings</h3>
+          <p>We’re pulling published vendor listings now.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -643,7 +592,235 @@
       <span>Profile</span>
     </a>
   </nav>
-</body>
-</html>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let allListings = [];
+let activeFilter = "all";
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function formatPrice(value) {
+  const raw = safeText(value, "");
+
+  if (!raw) return "$0+";
+
+  const numberMatch = raw.match(/\d+(\.\d+)?/);
+
+  if (!numberMatch) return raw;
+
+  const number = Number(numberMatch[0]);
+
+  if (Number.isNaN(number)) return raw;
+
+  return `$${Math.round(number)}+`;
+}
+
+function renderEmptyState(title, message) {
+  const listingList = document.getElementById("listingList");
+
+  listingList.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>${title}</h3>
+      <p>${message}</p>
+      <a class="btn" href="dashboard.html">Back to Dashboard</a>
+    </div>
+  `;
+}
+
+function listingMatchesFilter(listing, filter) {
+  if (filter === "all") return true;
+
+  const searchable = [
+    listing.title,
+    listing.category,
+    listing.customCategory,
+    listing.eventType,
+    listing.location,
+    listing.description
+  ].join(" ").toLowerCase();
+
+  if (filter === "birthday") {
+    return searchable.includes("birthday") || searchable.includes("party");
+  }
+
+  if (filter === "wedding") {
+    return searchable.includes("wedding") || searchable.includes("bridal") || searchable.includes("engagement");
+  }
+
+  if (filter === "shower") {
+    return searchable.includes("shower") || searchable.includes("baby") || searchable.includes("bridal");
+  }
+
+  if (filter === "decor") {
+    return searchable.includes("decor") || searchable.includes("décor") || searchable.includes("balloon") || searchable.includes("floral") || searchable.includes("styling");
+  }
+
+  if (filter === "catering") {
+    return searchable.includes("catering") || searchable.includes("food") || searchable.includes("cake") || searchable.includes("dessert") || searchable.includes("bar") || searchable.includes("coffee");
+  }
+
+  if (filter === "venue") {
+    return searchable.includes("venue") || searchable.includes("space") || searchable.includes("hall");
+  }
+
+  if (filter === "kids") {
+    return searchable.includes("kids") || searchable.includes("children") || searchable.includes("toddler") || searchable.includes("soft play") || searchable.includes("bounce");
+  }
+
+  return true;
+}
+
+function renderListings(listings) {
+  const listingList = document.getElementById("listingList");
+  const sectionTitle = document.getElementById("sectionTitle");
+
+  if (!listings.length) {
+    sectionTitle.textContent = "No Listings Found";
+    renderEmptyState("No listings found", "Try a different search or filter. New vendors will appear here as they publish services.");
+    return;
+  }
+
+  sectionTitle.textContent = `${listings.length} Published Listing${listings.length === 1 ? "" : "s"}`;
+
+  listingList.innerHTML = listings.map((listing, index) => {
+    const title = safeText(listing.title, "Untitled Listing");
+    const category = safeText(listing.category, "Event Service");
+    const customCategory = safeText(listing.customCategory, "");
+    const eventType = safeText(listing.eventType, "");
+    const location = safeText(listing.location, "Location not listed");
+    const description = safeText(listing.description, "No description has been added yet.");
+    const availability = safeText(listing.availability, "Available");
+    const price = formatPrice(listing.startingPrice);
+    const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
+    const listingId = encodeURIComponent(listing.id || "");
+
+    const typeLine = customCategory
+      ? `${category} · ${customCategory}`
+      : category;
+
+    const imageClass = `image-${(index % 4) + 1}`;
+
+    return `
+      <article class="listing-card">
+        <div class="listing-image ${imageClass}"></div>
+
+        <div class="listing-top">
+          <h3 class="listing-name">${title}</h3>
+          <div class="listing-price">${price}</div>
+        </div>
+
+        <p class="listing-category">${typeLine}</p>
+
+        <p class="listing-description">
+          ${description}
+        </p>
+
+        <div class="listing-meta">
+          <span class="pill rating">${rating}</span>
+          <span class="pill location">${location}</span>
+          ${eventType ? `<span class="pill type">${eventType}</span>` : ""}
+          <span class="pill available">${availability}</span>
+        </div>
+
+        <div class="listing-actions">
+          <a class="btn" href="detail.html?id=${listingId}">View Details</a>
+          <a class="btn-secondary" href="event-builder.html">Add to Event</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function applySearchAndFilter() {
+  const searchInput = document.getElementById("searchInput");
+  const query = searchInput.value.trim().toLowerCase();
+
+  let filtered = allListings.filter((listing) => listingMatchesFilter(listing, activeFilter));
+
+  if (query) {
+    filtered = filtered.filter((listing) => {
+      const searchable = [
+        listing.title,
+        listing.category,
+        listing.customCategory,
+        listing.eventType,
+        listing.location,
+        listing.description,
+        listing.vendorName
+      ].join(" ").toLowerCase();
+
+      return searchable.includes(query);
+    });
+  }
+
+  renderListings(filtered);
+}
+
+async function loadListings() {
+  try {
+    const listingsRef = collection(db, "listings");
+    const snapshot = await getDocs(listingsRef);
+
+    const listings = [];
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (data.status === "published") {
+        listings.push({
+          id: docSnap.id,
+          ...data
+        });
+      }
+    });
+
+    listings.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    allListings = listings;
+
+    renderListings(allListings);
+
+  } catch (error) {
+    renderEmptyState("Could not load listings", error.message);
+  }
+}
+
+document.getElementById("searchInput").addEventListener("input", applySearchAndFilter);
+
+document.querySelectorAll(".filter-pill").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".filter-pill").forEach((pill) => pill.classList.remove("active"));
+    button.classList.add("active");
+    activeFilter = button.dataset.filter;
+    applySearchAndFilter();
+  });
+});
+
+loadListings();
+</script>
+
 </body>
 </html>
