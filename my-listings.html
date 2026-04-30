@@ -637,6 +637,8 @@ function renderListings(listings) {
     const saves = Number(listing.saves || 0);
     const status = safeText(listing.status, "draft");
 
+    const listingId = encodeURIComponent(listing.id || "");
+
     const typeLine = customCategory
       ? `${category} · ${customCategory}`
       : category;
@@ -677,7 +679,7 @@ function renderListings(listings) {
         </p>
 
         <div class="listing-actions">
-          <a class="btn" href="detail.html">View</a>
+          <a class="btn" href="detail.html?id=${listingId}">View</a>
           <a class="btn-secondary" href="add-listing.html">Edit</a>
         </div>
       </article>
