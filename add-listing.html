@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Listing | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -220,6 +222,22 @@
       gap: 12px;
     }
 
+    .image-preview-wrap {
+      display: none;
+      margin-top: 12px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--soft-2);
+      border: 1px solid var(--line);
+    }
+
+    .image-preview-wrap img {
+      display: block;
+      width: 100%;
+      height: 210px;
+      object-fit: cover;
+    }
+
     .upload-card {
       background: var(--soft-2);
       border: 1px dashed #d7c7b2;
@@ -385,6 +403,7 @@
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
@@ -751,20 +770,30 @@
     </section>
 
     <section class="section">
-      <h2 class="section-title">Images</h2>
+      <h2 class="section-title">Listing Photo</h2>
 
       <div class="card">
-        <div class="upload-card">
-          <div class="upload-icon">↑</div>
-          <h3 class="upload-title">Upload Listing Photos</h3>
-          <p class="upload-text">
-            Photo upload will come next with Firebase Storage. For now, this listing saves all text details.
-          </p>
-        </div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="image-url">Main Photo URL</label>
+            <input id="image-url" class="input" type="url" placeholder="Paste a public image link here" />
+            <p class="helper-text">
+              For now, paste a public image link. Later, this will become a real upload button when storage is added.
+            </p>
 
-        <p class="helper-text">
-          Next phase: we will add real image uploads, store them in Firebase Storage, and save image URLs to each listing.
-        </p>
+            <div class="image-preview-wrap" id="imagePreviewWrap">
+              <img id="imagePreview" src="" alt="Listing photo preview">
+            </div>
+          </div>
+
+          <div class="upload-card">
+            <div class="upload-icon">◎</div>
+            <h3 class="upload-title">Photo Display Preview</h3>
+            <p class="upload-text">
+              This image will appear on the marketplace, listing detail page, vendor dashboard, and My Listings once those pages are updated to display it.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -812,6 +841,38 @@ function setSaving(isSaving) {
   document.getElementById("publishBtn").disabled = isSaving;
 }
 
+function isValidImageUrl(url) {
+  if (!url) return true;
+
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+const imageUrlInput = document.getElementById("image-url");
+const imagePreviewWrap = document.getElementById("imagePreviewWrap");
+const imagePreview = document.getElementById("imagePreview");
+
+imageUrlInput.addEventListener("input", () => {
+  const url = imageUrlInput.value.trim();
+
+  if (!url || !isValidImageUrl(url)) {
+    imagePreviewWrap.style.display = "none";
+    imagePreview.src = "";
+    return;
+  }
+
+  imagePreview.src = url;
+  imagePreviewWrap.style.display = "block";
+});
+
+imagePreview.addEventListener("error", () => {
+  imagePreviewWrap.style.display = "none";
+});
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -853,9 +914,15 @@ window.saveListing = async function(status) {
   const availability = document.getElementById("availability").value.trim();
   const serviceArea = document.getElementById("service-area").value.trim();
   const included = document.getElementById("included").value.trim();
+  const imageUrl = document.getElementById("image-url").value.trim();
 
   if (!title || !category || !eventType || !startingPrice || !location || !description) {
     showStatus("Please fill in listing name, service category, event type, starting price, location, and description before saving.");
+    return;
+  }
+
+  if (!isValidImageUrl(imageUrl)) {
+    showStatus("Please enter a valid image URL that starts with http:// or https://, or leave the photo field blank.");
     return;
   }
 
@@ -883,7 +950,7 @@ window.saveListing = async function(status) {
       views: 0,
       saves: 0,
       rating: null,
-      imageUrl: ""
+      imageUrl
     });
 
     showStatus(status === "published" ? "Listing published successfully." : "Draft saved successfully.");
