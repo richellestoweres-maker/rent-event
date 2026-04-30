@@ -31,9 +31,6 @@
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.22);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -125,13 +122,15 @@
       border-radius: 999px;
       font-size: 0.88rem;
       white-space: nowrap;
+      cursor: pointer;
+      font-family: inherit;
     }
 
     .hero-card {
       position: relative;
       overflow: hidden;
       border-radius: var(--radius-xl);
-      padding: 24px 22px 24px;
+      padding: 24px 22px;
       background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
       box-shadow: var(--shadow-strong);
@@ -147,17 +146,6 @@
       right: -70px;
       top: -42px;
       background: rgba(255, 255, 255, 0.12);
-    }
-
-    .hero-card::after {
-      content: "";
-      position: absolute;
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      right: 24px;
-      bottom: -60px;
-      background: rgba(255, 255, 255, 0.08);
     }
 
     .hero-content {
@@ -277,7 +265,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     .quick-icon svg {
@@ -318,22 +305,8 @@
       height: 92px;
       border-radius: 24px;
       flex-shrink: 0;
-      overflow: hidden;
-      background:
-        linear-gradient(to top, rgba(0,0,0,0.1), rgba(0,0,0,0.04)),
-        linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
+      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
       position: relative;
-    }
-
-    .event-thumb::before {
-      content: "";
-      position: absolute;
-      left: 14px;
-      right: 14px;
-      bottom: 14px;
-      height: 24px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.28);
     }
 
     .event-thumb::after {
@@ -380,15 +353,6 @@
       font-weight: 700;
     }
 
-    .event-status::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--gold);
-      display: inline-block;
-    }
-
     .event-stats {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -408,7 +372,6 @@
       display: block;
       font-size: 1.02rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
       margin-bottom: 4px;
     }
 
@@ -481,21 +444,7 @@
       height: 62px;
       border-radius: 20px;
       flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
       background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-    }
-
-    .vendor-avatar::before {
-      content: "";
-      position: absolute;
-      inset: 14px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.22);
-    }
-
-    .vendor-info {
-      min-width: 0;
     }
 
     .vendor-info h3 {
@@ -527,20 +476,17 @@
     .vendor-price {
       font-size: 1rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
       margin-bottom: 6px;
     }
 
     .mini-btn {
       min-height: 36px;
       padding: 0 12px;
-      border: none;
       border-radius: 999px;
       background: #f7efe2;
       color: #4c453e;
       font-size: 0.82rem;
       font-weight: 700;
-      font-family: inherit;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
@@ -644,13 +590,13 @@
           </svg>
         </a>
 
-        <a class="logout-btn" href="index.html">Log Out</a>
+        <button class="logout-btn" onclick="logout()">Log Out</button>
       </div>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Welcome back</div>
+        <div class="hero-label" id="welcomeText">Welcome back</div>
         <h2 class="hero-title">Plan your next event beautifully.</h2>
         <p class="hero-subtitle">
           Keep rentals, vendors, ideas, and event details all in one place.
@@ -800,36 +746,6 @@
             <a class="mini-btn" href="detail.html">View</a>
           </div>
         </article>
-
-        <article class="vendor-card">
-          <div class="vendor-left">
-            <div class="vendor-avatar"></div>
-            <div class="vendor-info">
-              <h3>Velvet Bloom</h3>
-              <p>Florals and décor installs for showers, dinners, and events.</p>
-              <div class="vendor-rating">★ 5.0</div>
-            </div>
-          </div>
-          <div class="vendor-right">
-            <div class="vendor-price">$300+</div>
-            <a class="mini-btn" href="detail.html">View</a>
-          </div>
-        </article>
-
-        <article class="vendor-card">
-          <div class="vendor-left">
-            <div class="vendor-avatar"></div>
-            <div class="vendor-info">
-              <h3>Frame & Flash</h3>
-              <p>Modern photo booth experiences with clean luxe setups.</p>
-              <div class="vendor-rating">★ 4.7</div>
-            </div>
-          </div>
-          <div class="vendor-right">
-            <div class="vendor-price">$225+</div>
-            <a class="mini-btn" href="detail.html">View</a>
-          </div>
-        </article>
       </div>
     </section>
   </main>
@@ -868,5 +784,57 @@
       <span>Profile</span>
     </a>
   </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+
+  if (userData.role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
+    return;
+  }
+
+  if (userData.name) {
+    document.getElementById("welcomeText").textContent = `Welcome back, ${userData.name.split(" ")[0]}`;
+  }
+});
+
+window.logout = async function () {
+  await signOut(auth);
+  window.location.href = "index.html";
+};
+</script>
+
 </body>
 </html>
