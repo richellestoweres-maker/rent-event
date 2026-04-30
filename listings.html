@@ -289,6 +289,34 @@
       background: rgba(255, 255, 255, 0.16);
     }
 
+    .listing-image.has-photo::before,
+    .listing-image.has-photo::after {
+      display: none;
+    }
+
+    .listing-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-1 {
+      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
+    }
+
+    .image-2 {
+      background: linear-gradient(135deg, #ffe6d8, #f1b58f 48%, #d9867e 100%);
+    }
+
+    .image-3 {
+      background: linear-gradient(135deg, #ffe7dd, #f3b58d 48%, #b783ff 100%);
+    }
+
+    .image-4 {
+      background: linear-gradient(135deg, #e5f0ff, #c9ddff 48%, #95b6ff 100%);
+    }
+
     .listing-top {
       display: flex;
       align-items: flex-start;
@@ -633,14 +661,23 @@ function formatPrice(value) {
   return `$${Math.round(number)}+`;
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function renderEmptyState(title, message) {
   const listingList = document.getElementById("listingList");
 
   listingList.innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">+</div>
-      <h3>${title}</h3>
-      <p>${message}</p>
+      <h3>${escapeHtml(title)}</h3>
+      <p>${escapeHtml(message)}</p>
       <a class="btn" href="dashboard.html">Back to Dashboard</a>
     </div>
   `;
@@ -711,6 +748,7 @@ function renderListings(listings) {
     const availability = safeText(listing.availability, "Available");
     const price = formatPrice(listing.startingPrice);
     const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
+    const imageUrl = safeText(listing.imageUrl, "");
     const listingId = encodeURIComponent(listing.id || "");
 
     const typeLine = customCategory
@@ -719,26 +757,30 @@ function renderListings(listings) {
 
     const imageClass = `image-${(index % 4) + 1}`;
 
+    const imageMarkup = imageUrl
+      ? `<div class="listing-image has-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}"></div>`
+      : `<div class="listing-image ${imageClass}"></div>`;
+
     return `
       <article class="listing-card">
-        <div class="listing-image ${imageClass}"></div>
+        ${imageMarkup}
 
         <div class="listing-top">
-          <h3 class="listing-name">${title}</h3>
-          <div class="listing-price">${price}</div>
+          <h3 class="listing-name">${escapeHtml(title)}</h3>
+          <div class="listing-price">${escapeHtml(price)}</div>
         </div>
 
-        <p class="listing-category">${typeLine}</p>
+        <p class="listing-category">${escapeHtml(typeLine)}</p>
 
         <p class="listing-description">
-          ${description}
+          ${escapeHtml(description)}
         </p>
 
         <div class="listing-meta">
-          <span class="pill rating">${rating}</span>
-          <span class="pill location">${location}</span>
-          ${eventType ? `<span class="pill type">${eventType}</span>` : ""}
-          <span class="pill available">${availability}</span>
+          <span class="pill rating">${escapeHtml(rating)}</span>
+          <span class="pill location">${escapeHtml(location)}</span>
+          ${eventType ? `<span class="pill type">${escapeHtml(eventType)}</span>` : ""}
+          <span class="pill available">${escapeHtml(availability)}</span>
         </div>
 
         <div class="listing-actions">
