@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -22,10 +24,18 @@
       --muted: #6a625a;
       --line: #ece2d3;
       --soft: #f4ede2;
+      --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
       --gold: #f4a43a;
+      --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
     }
@@ -73,6 +83,7 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
+      font-weight: 800;
     }
 
     .topbar-center {
@@ -122,7 +133,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 270px;
+      max-width: 280px;
     }
 
     .hero-label {
@@ -293,13 +304,92 @@
     }
 
     .pill.new {
-      background: #ffe7e2;
-      color: #c74f4d;
+      background: var(--red-soft);
+      color: var(--red-text);
     }
 
     .pill.vendor {
       background: #fff4df;
       color: #aa6f12;
+    }
+
+    .pill.customer {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .pill.system {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .empty-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 46px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      padding: 0 18px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
     }
 
     .bottom-nav {
@@ -361,21 +451,26 @@
         max-width: 420px;
       }
 
+      .message-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .bottom-nav {
         max-width: 520px;
       }
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">
+      <a id="backLink" href="dashboard.html" class="back-link" aria-label="Go back">
         ←
       </a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Inbox</div>
+        <div class="eyebrow" id="roleEyebrow">Inbox</div>
         <h1 class="page-title">Messages</h1>
       </div>
 
@@ -386,91 +481,139 @@
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Stay connected</div>
-        <h2 class="hero-title">Keep every vendor conversation organized.</h2>
-        <p class="hero-subtitle">
+        <div class="hero-label" id="heroLabel">Stay connected</div>
+        <h2 class="hero-title">Keep every conversation organized.</h2>
+        <p class="hero-subtitle" id="heroSubtitle">
           Ask questions, confirm details, and keep all your event communication in one place.
         </p>
       </div>
     </section>
 
     <div class="search-wrap">
-      <input class="search-input" type="text" placeholder="Search messages..." />
+      <input id="searchInput" class="search-input" type="text" placeholder="Search messages..." />
     </div>
 
     <section class="section">
-      <h2 class="section-title">Recent Conversations</h2>
+      <h2 class="section-title" id="sectionTitle">Recent Conversations</h2>
 
-      <div class="message-list">
-        <a class="message-card" href="chat-thread.html">
-          <div class="avatar"><span>SS</span></div>
-          <div class="message-content">
-            <div class="message-top">
-              <h3 class="message-name">Sunny Slides</h3>
-              <span class="message-time">5 min ago</span>
-            </div>
-            <p class="message-preview">
-              Yes, setup and pickup are both included. We usually arrive about 45 minutes before the event starts.
-            </p>
-            <div class="message-meta">
-              <span class="pill new">New</span>
-              <span class="pill vendor">Vendor</span>
-            </div>
-          </div>
-        </a>
-
-        <a class="message-card" href="chat-thread.html">
-          <div class="avatar"><span>PB</span></div>
-          <div class="message-content">
-            <div class="message-top">
-              <h3 class="message-name">Photo Booth Co.</h3>
-              <span class="message-time">1 hr ago</span>
-            </div>
-            <p class="message-preview">
-              We are available on July 18 and can offer a 3-hour package with instant sharing.
-            </p>
-            <div class="message-meta">
-              <span class="pill vendor">Vendor</span>
-            </div>
-          </div>
-        </a>
-
-        <a class="message-card" href="chat-thread.html">
-          <div class="avatar"><span>GT</span></div>
-          <div class="message-content">
-            <div class="message-top">
-              <h3 class="message-name">Golden Table Co.</h3>
-              <span class="message-time">Today</span>
-            </div>
-            <p class="message-preview">
-              We would love to style your dinner setup. Do you have a color palette in mind for the tablescape?
-            </p>
-            <div class="message-meta">
-              <span class="pill vendor">Vendor</span>
-            </div>
-          </div>
-        </a>
-
-        <a class="message-card" href="chat-thread.html">
-          <div class="avatar"><span>VB</span></div>
-          <div class="message-content">
-            <div class="message-top">
-              <h3 class="message-name">Velvet Bloom</h3>
-              <span class="message-time">Yesterday</span>
-            </div>
-            <p class="message-preview">
-              We can create floral centerpieces and a backdrop setup for your event. Let us know your guest count.
-            </p>
-            <div class="message-meta">
-              <span class="pill vendor">Vendor</span>
-            </div>
-          </div>
-        </a>
+      <div class="message-list" id="messageList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading messages</h3>
+          <p>We’re checking your inbox now.</p>
+        </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Bottom navigation">
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation">
+    <!-- Navigation renders here based on user role -->
+  </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let allConversations = [];
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function initialsFromName(name) {
+  const cleanName = safeText(name, "RE");
+  const parts = cleanName.split(" ").filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  return cleanName.slice(0, 2).toUpperCase();
+}
+
+function formatTime(value) {
+  if (!value || !value.seconds) return "New";
+
+  const date = new Date(value.seconds * 1000);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return "Now";
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+  if (diffHours < 24) return `${diffHours} hr ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  return date.toLocaleDateString();
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderBottomNav(role) {
+  const bottomNav = document.getElementById("bottomNav");
+
+  if (role === "vendor") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="vendor-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+        </svg>
+        <span>Home</span>
+      </a>
+
+      <a class="nav-item" href="add-listing.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Add Listing</span>
+      </a>
+
+      <a class="nav-item" href="my-listings.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+          <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Listings</span>
+      </a>
+
+      <a class="nav-item active" href="messages.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Inbox</span>
+      </a>
+    `;
+    return;
+  }
+
+  bottomNav.innerHTML = `
     <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
@@ -503,6 +646,175 @@
       </svg>
       <span>Profile</span>
     </a>
-  </nav>
+  `;
+}
+
+function applyRoleLayout(role) {
+  const backLink = document.getElementById("backLink");
+
+  if (role === "vendor") {
+    backLink.href = "vendor-dashboard.html";
+    setText("roleEyebrow", "Vendor Inbox");
+    setText("heroLabel", "Stay bookable");
+    setText("heroSubtitle", "Reply to client questions, confirm details, and keep your booking conversations organized.");
+  } else {
+    backLink.href = "dashboard.html";
+    setText("roleEyebrow", "Inbox");
+    setText("heroLabel", "Stay connected");
+    setText("heroSubtitle", "Ask questions, confirm details, and keep all your event communication in one place.");
+  }
+
+  renderBottomNav(role);
+}
+
+function renderEmptyState() {
+  const messageList = document.getElementById("messageList");
+  const role = currentUserData?.role || "customer";
+
+  const primaryHref = role === "vendor" ? "my-listings.html" : "listings.html";
+  const primaryText = role === "vendor" ? "View My Listings" : "Browse Listings";
+  const copy = role === "vendor"
+    ? "When customers message you about a listing, those conversations will appear here."
+    : "When you message vendors about listings, those conversations will appear here.";
+
+  messageList.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">✉</div>
+      <h3>No messages yet</h3>
+      <p>${copy}</p>
+      <div class="empty-actions">
+        <a class="btn" href="${primaryHref}">${primaryText}</a>
+        <a class="btn-secondary" href="${role === "vendor" ? "vendor-dashboard.html" : "dashboard.html"}">Back Home</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderConversations(conversations) {
+  const messageList = document.getElementById("messageList");
+
+  if (!conversations.length) {
+    renderEmptyState();
+    return;
+  }
+
+  messageList.innerHTML = conversations.map((conversation) => {
+    const title = safeText(conversation.title, "Conversation");
+    const lastMessage = safeText(conversation.lastMessage, "No messages yet.");
+    const time = formatTime(conversation.updatedAt || conversation.createdAt);
+    const roleLabel = safeText(conversation.contextType, currentUserData?.role === "vendor" ? "Customer" : "Vendor");
+    const initials = initialsFromName(title);
+    const unreadFor = conversation.unreadFor || {};
+    const isUnread = currentUser && unreadFor[currentUser.uid];
+
+    return `
+      <a class="message-card" href="chat-thread.html?id=${encodeURIComponent(conversation.id || "")}">
+        <div class="avatar"><span>${initials}</span></div>
+
+        <div class="message-content">
+          <div class="message-top">
+            <h3 class="message-name">${title}</h3>
+            <span class="message-time">${time}</span>
+          </div>
+
+          <p class="message-preview">${lastMessage}</p>
+
+          <div class="message-meta">
+            ${isUnread ? `<span class="pill new">New</span>` : ""}
+            <span class="pill ${roleLabel.toLowerCase().includes("customer") ? "customer" : "vendor"}">${roleLabel}</span>
+          </div>
+        </div>
+      </a>
+    `;
+  }).join("");
+}
+
+function applySearch() {
+  const searchInput = document.getElementById("searchInput");
+  const queryText = searchInput.value.trim().toLowerCase();
+
+  if (!queryText) {
+    renderConversations(allConversations);
+    return;
+  }
+
+  const filtered = allConversations.filter((conversation) => {
+    const searchable = [
+      conversation.title,
+      conversation.lastMessage,
+      conversation.contextType,
+      conversation.listingTitle
+    ].join(" ").toLowerCase();
+
+    return searchable.includes(queryText);
+  });
+
+  renderConversations(filtered);
+}
+
+async function loadConversations(user) {
+  const messageList = document.getElementById("messageList");
+
+  try {
+    const conversationsRef = collection(db, "conversations");
+    const conversationsQuery = query(conversationsRef, where("participantIds", "array-contains", user.uid));
+    const snapshot = await getDocs(conversationsQuery);
+
+    const conversations = [];
+
+    snapshot.forEach((docSnap) => {
+      conversations.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    conversations.sort((a, b) => {
+      const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : 0;
+      const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    allConversations = conversations;
+    renderConversations(allConversations);
+
+  } catch (error) {
+    messageList.innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load messages</h3>
+        <p>${error.message}</p>
+        <div class="empty-actions">
+          <a class="btn" href="${currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "dashboard.html"}">Back Home</a>
+        </div>
+      </div>
+    `;
+  }
+}
+
+document.getElementById("searchInput").addEventListener("input", applySearch);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+  currentUserData = userSnap.data();
+
+  applyRoleLayout(currentUserData.role);
+  loadConversations(user);
+});
+</script>
+
 </body>
 </html>
