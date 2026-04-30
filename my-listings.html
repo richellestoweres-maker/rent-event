@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Listings | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -467,6 +469,7 @@
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
@@ -573,6 +576,22 @@ function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
 
+function formatPrice(value) {
+  const raw = safeText(value, "");
+
+  if (!raw) return "$0+";
+
+  const numberMatch = raw.match(/\d+(\.\d+)?/);
+
+  if (!numberMatch) return raw;
+
+  const number = Number(numberMatch[0]);
+
+  if (Number.isNaN(number)) return raw;
+
+  return `$${Math.round(number)}+`;
+}
+
 function statusClass(status) {
   if (status === "published") return "active";
   if (status === "draft") return "draft";
@@ -587,6 +606,7 @@ function statusLabel(status) {
 
 function renderEmptyState() {
   const listingList = document.getElementById("listingList");
+
   listingList.innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">+</div>
@@ -622,8 +642,15 @@ function renderListings(listings) {
       : category;
 
     const noteParts = [];
-    if (eventType) noteParts.push(`Best for ${eventType.toLowerCase()}.`);
-    if (location) noteParts.push(`Serving ${location}.`);
+
+    if (eventType) {
+      noteParts.push(`Best for ${eventType.toLowerCase()}.`);
+    }
+
+    if (location) {
+      noteParts.push(`Serving ${location}.`);
+    }
+
     noteParts.push(description);
 
     return `
@@ -667,6 +694,7 @@ async function loadVendorListings(user) {
     const snapshot = await getDocs(q);
 
     const listings = [];
+
     snapshot.forEach((docSnap) => {
       listings.push({
         id: docSnap.id,
@@ -680,22 +708,6 @@ async function loadVendorListings(user) {
       return bTime - aTime;
     });
 
-function formatPrice(value) {
-  const raw = safeText(value, "");
-
-  if (!raw) return "$0+";
-
-  const numberMatch = raw.match(/\d+(\.\d+)?/);
-
-  if (!numberMatch) return raw;
-
-  const number = Number(numberMatch[0]);
-
-  if (Number.isNaN(number)) return raw;
-
-  return `$${Math.round(number)}+`;
-}
-    
     renderListings(listings);
 
   } catch (error) {
