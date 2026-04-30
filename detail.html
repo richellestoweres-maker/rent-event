@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Listing Details | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -30,12 +32,11 @@
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -61,28 +62,32 @@
 
     .hero {
       position: relative;
-      height: 300px;
-      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
+      min-height: 310px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       overflow: hidden;
+      color: #fff;
     }
 
     .hero::before {
       content: "";
       position: absolute;
-      inset: 26px;
-      border-radius: 28px;
-      background: rgba(255, 255, 255, 0.14);
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      right: -72px;
+      top: -50px;
+      background: rgba(255, 255, 255, 0.13);
     }
 
     .hero::after {
       content: "";
       position: absolute;
-      width: 120px;
-      height: 120px;
-      right: 18px;
-      top: 18px;
+      width: 160px;
+      height: 160px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.16);
+      left: -62px;
+      bottom: 40px;
+      background: rgba(255, 255, 255, 0.08);
     }
 
     .hero-topbar {
@@ -101,7 +106,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.7);
       color: #222;
       text-decoration: none;
@@ -117,7 +122,7 @@
       position: absolute;
       left: 20px;
       right: 20px;
-      bottom: 20px;
+      bottom: 46px;
       z-index: 2;
       color: #fff;
     }
@@ -223,6 +228,11 @@
     .pill.available {
       background: var(--green-soft);
       color: var(--green-text);
+    }
+
+    .pill.type {
+      background: var(--blue-soft);
+      color: var(--blue-text);
     }
 
     .summary-text {
@@ -377,6 +387,42 @@
       text-align: right;
     }
 
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
     .action-bar {
       position: fixed;
       left: 50%;
@@ -394,6 +440,7 @@
       box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 20;
     }
 
     .action-info {
@@ -468,17 +515,18 @@
       }
 
       .page {
-        max-width: 960px;
+        max-width: 430px;
       }
 
       .action-bar {
-        max-width: 520px;
+        max-width: 406px;
       }
     }
   </style>
 </head>
+
 <body>
-  <main class="page">
+  <main class="page" id="page">
     <section class="hero">
       <div class="hero-topbar">
         <a href="listings.html" class="hero-btn" aria-label="Go back">←</a>
@@ -486,27 +534,27 @@
       </div>
 
       <div class="hero-bottom">
-        <div class="hero-pill">Featured Vendor</div>
-        <h1 class="hero-title">Sunny Slides</h1>
-        <p class="hero-subtitle">Modern bounce house rentals for birthdays and celebrations.</p>
+        <div class="hero-pill" id="heroPill">Loading Listing</div>
+        <h1 class="hero-title" id="heroTitle">Loading...</h1>
+        <p class="hero-subtitle" id="heroSubtitle">Pulling the listing details now.</p>
       </div>
     </section>
 
-    <section class="content">
+    <section class="content" id="content">
       <div class="summary-card">
         <div class="summary-top">
-          <h2 class="summary-name">Sunny Slides</h2>
-          <div class="summary-price">$250+</div>
+          <h2 class="summary-name" id="summaryName">Loading listing...</h2>
+          <div class="summary-price" id="summaryPrice">$0+</div>
         </div>
 
         <div class="summary-meta">
-          <span class="pill rating">★ 4.9</span>
-          <span class="pill location">League City, TX</span>
-          <span class="pill available">Available</span>
+          <span class="pill rating" id="ratingPill">★ New</span>
+          <span class="pill location" id="locationPill">Location</span>
+          <span class="pill available" id="availabilityPill">Availability</span>
         </div>
 
-        <p class="summary-text">
-          Premium bounce house rentals designed for stylish backyard parties, birthdays, and family-friendly events. Clean setup, modern aesthetic, and easy booking flow.
+        <p class="summary-text" id="summaryText">
+          Please wait while we load this vendor listing.
         </p>
       </div>
 
@@ -518,24 +566,24 @@
             <div class="feature-item">
               <div class="feature-icon">✓</div>
               <div class="feature-copy">
-                <h3>Delivery + Pickup</h3>
-                <p>Includes local delivery, setup, takedown, and pickup after your event.</p>
+                <h3>Included Details</h3>
+                <p id="includedText">Loading included details...</p>
               </div>
             </div>
 
             <div class="feature-item">
               <div class="feature-icon">★</div>
               <div class="feature-copy">
-                <h3>Clean Modern Setup</h3>
-                <p>Fresh, polished inflatables that fit the elevated party look you’re going for.</p>
+                <h3>Best For</h3>
+                <p id="eventTypeText">Loading event type...</p>
               </div>
             </div>
 
             <div class="feature-item">
-              <div class="feature-icon">⏱</div>
+              <div class="feature-icon">⌂</div>
               <div class="feature-copy">
-                <h3>Flexible Event Timing</h3>
-                <p>Setup is typically completed before guests arrive so everything is ready on time.</p>
+                <h3>Service Area</h3>
+                <p id="serviceAreaText">Loading service area...</p>
               </div>
             </div>
           </div>
@@ -550,9 +598,9 @@
             <div class="vendor-avatar"></div>
 
             <div class="vendor-info">
-              <h3>Sunny Slides</h3>
-              <p>Trusted local party rental vendor focused on clean, family-friendly event experiences.</p>
-              <div class="vendor-rating">★ 4.9 average rating</div>
+              <h3 id="vendorName">Vendor</h3>
+              <p id="vendorText">This vendor offers event services through RentEvent.</p>
+              <div class="vendor-rating" id="vendorRating">★ New vendor listing</div>
             </div>
           </div>
         </div>
@@ -565,22 +613,32 @@
           <div class="detail-grid">
             <div class="detail-row">
               <div class="detail-label">Category</div>
-              <div class="detail-value">Bounce House Rentals</div>
+              <div class="detail-value" id="categoryValue">Loading</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Event Type</div>
+              <div class="detail-value" id="eventTypeValue">Loading</div>
             </div>
 
             <div class="detail-row">
               <div class="detail-label">Starting Price</div>
-              <div class="detail-value">$250+</div>
+              <div class="detail-value" id="priceValue">Loading</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Location</div>
+              <div class="detail-value" id="locationValue">Loading</div>
             </div>
 
             <div class="detail-row">
               <div class="detail-label">Service Area</div>
-              <div class="detail-value">League City, TX + nearby areas</div>
+              <div class="detail-value" id="serviceAreaValue">Loading</div>
             </div>
 
             <div class="detail-row">
-              <div class="detail-label">Best For</div>
-              <div class="detail-value">Birthdays, backyard parties, kids events</div>
+              <div class="detail-label">Status</div>
+              <div class="detail-value" id="statusValue">Loading</div>
             </div>
           </div>
         </div>
@@ -591,11 +649,181 @@
   <div class="action-bar">
     <div class="action-info">
       <span class="action-label">Starting At</span>
-      <span class="action-value">$250+</span>
+      <span class="action-value" id="bottomPrice">$0+</span>
     </div>
 
     <a href="messages.html" class="action-btn-secondary">Message</a>
     <a href="event-builder.html" class="action-btn">Add to Event</a>
   </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function formatPrice(value) {
+  const raw = safeText(value, "");
+
+  if (!raw) return "$0+";
+
+  const numberMatch = raw.match(/\d+(\.\d+)?/);
+
+  if (!numberMatch) return raw;
+
+  const number = Number(numberMatch[0]);
+
+  if (Number.isNaN(number)) return raw;
+
+  return `$${Math.round(number)}+`;
+}
+
+function titleCase(value) {
+  const text = safeText(value, "");
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderMissingListing(message) {
+  const page = document.getElementById("page");
+
+  page.innerHTML = `
+    <section class="content" style="margin-top: 0; padding-top: 20px;">
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h2>Listing not found</h2>
+        <p>${message}</p>
+        <a class="action-btn" href="listings.html">Back to Listings</a>
+      </div>
+    </section>
+  `;
+}
+
+function renderListing(listing) {
+  const title = safeText(listing.title, "Untitled Listing");
+  const category = safeText(listing.category, "Event Service");
+  const customCategory = safeText(listing.customCategory, "");
+  const eventType = safeText(listing.eventType, "Events");
+  const location = safeText(listing.location, "Location not listed");
+  const serviceArea = safeText(listing.serviceArea, location);
+  const availability = safeText(listing.availability, "Availability not listed");
+  const description = safeText(listing.description, "No description has been added yet.");
+  const included = safeText(listing.included, "Details will be confirmed with the vendor.");
+  const vendorName = safeText(listing.vendorName, "RentEvent Vendor");
+  const status = safeText(listing.status, "published");
+  const price = formatPrice(listing.startingPrice);
+  const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
+
+  const typeLine = customCategory ? `${category} · ${customCategory}` : category;
+
+  document.title = `${title} | RentEvent`;
+
+  setText("heroPill", typeLine);
+  setText("heroTitle", title);
+  setText("heroSubtitle", description);
+
+  setText("summaryName", title);
+  setText("summaryPrice", price);
+  setText("ratingPill", rating);
+  setText("locationPill", location);
+  setText("availabilityPill", availability);
+  setText("summaryText", description);
+
+  setText("includedText", included);
+  setText("eventTypeText", eventType);
+  setText("serviceAreaText", serviceArea);
+
+  setText("vendorName", vendorName);
+  setText("vendorText", `${vendorName} offers ${typeLine.toLowerCase()} for ${eventType.toLowerCase()} and other event needs.`);
+  setText("vendorRating", rating === "★ New" ? "★ New vendor listing" : `${rating} average rating`);
+
+  setText("categoryValue", typeLine);
+  setText("eventTypeValue", eventType);
+  setText("priceValue", price);
+  setText("locationValue", location);
+  setText("serviceAreaValue", serviceArea);
+  setText("statusValue", titleCase(status));
+
+  setText("bottomPrice", price);
+}
+
+async function loadListing() {
+  const params = new URLSearchParams(window.location.search);
+  const listingId = params.get("id");
+
+  try {
+    if (listingId) {
+      const listingRef = doc(db, "listings", listingId);
+      const listingSnap = await getDoc(listingRef);
+
+      if (!listingSnap.exists()) {
+        renderMissingListing("This listing may have been removed or the link may be outdated.");
+        return;
+      }
+
+      renderListing({
+        id: listingSnap.id,
+        ...listingSnap.data()
+      });
+
+      return;
+    }
+
+    const listingsRef = collection(db, "listings");
+    const snapshot = await getDocs(listingsRef);
+
+    const listings = [];
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (data.status === "published") {
+        listings.push({
+          id: docSnap.id,
+          ...data
+        });
+      }
+    });
+
+    listings.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    if (!listings.length) {
+      renderMissingListing("No published listings are available yet.");
+      return;
+    }
+
+    renderListing(listings[0]);
+
+  } catch (error) {
+    renderMissingListing(error.message);
+  }
+}
+
+loadListing();
+</script>
+
 </body>
 </html>
