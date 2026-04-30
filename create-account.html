@@ -132,7 +132,6 @@ h1 {
   background: rgba(255,255,255,0.28);
   color: white;
   font-weight: 800;
-  text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -192,11 +191,11 @@ h1 {
 
     <div class="form-wrap">
 
-      <input class="input" placeholder="Full Name">
+      <input id="fullName" class="input" type="text" placeholder="Full Name">
 
-      <input class="input" placeholder="Email Address">
+      <input id="email" class="input" type="email" placeholder="Email Address">
 
-      <input class="input" type="password" placeholder="Create Password">
+      <input id="password" class="input" type="password" placeholder="Create Password">
 
       <select class="select" id="accountType">
         <option disabled selected value="">Select Account Type</option>
@@ -204,16 +203,14 @@ h1 {
         <option value="vendor">Vendor / Business</option>
       </select>
 
-      <button class="button" onclick="routeAccount()">Create My Account</button>
+      <button class="button" onclick="createAccount()">Create My Account</button>
 
-      <div class="error-message" id="errorMessage">
-        Please select an account type before continuing.
-      </div>
+      <div class="error-message" id="errorMessage"></div>
 
     </div>
 
     <div class="tiny-note">
-      Front-end only. Firebase coming next.
+      Real account creation is now connected to Firebase.
     </div>
 
     <div class="bottom-link">
@@ -225,19 +222,77 @@ h1 {
 
 </main>
 
-<script>
-function routeAccount() {
-  const accountType = document.getElementById("accountType").value;
-  const errorMessage = document.getElementById("errorMessage");
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-  if (accountType === "customer") {
-    window.location.href = "dashboard.html";
-  } else if (accountType === "vendor") {
-    window.location.href = "vendor-dashboard.html";
-  } else {
-    errorMessage.style.display = "block";
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+function showMessage(text) {
+  const errorMessage = document.getElementById("errorMessage");
+  errorMessage.textContent = text;
+  errorMessage.style.display = "block";
 }
+
+window.createAccount = async function () {
+  const fullName = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const accountType = document.getElementById("accountType").value;
+
+  if (!fullName || !email || !password || !accountType) {
+    showMessage("Please fill out every field before continuing.");
+    return;
+  }
+
+  if (password.length < 6) {
+    showMessage("Password must be at least 6 characters.");
+    return;
+  }
+
+  try {
+    showMessage("Creating your account...");
+
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    await updateProfile(user, {
+      displayName: fullName
+    });
+
+    await setDoc(doc(db, "users", user.uid), {
+      uid: user.uid,
+      name: fullName,
+      email: email,
+      role: accountType,
+      location: "",
+      phone: "",
+      createdAt: serverTimestamp()
+    });
+
+    if (accountType === "vendor") {
+      window.location.href = "vendor-dashboard.html";
+    } else {
+      window.location.href = "dashboard.html";
+    }
+
+  } catch (error) {
+    showMessage(error.message);
+  }
+};
 </script>
 
 </body>
