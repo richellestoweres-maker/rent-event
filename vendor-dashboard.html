@@ -562,7 +562,7 @@
           </svg>
         </a>
 
-        <a class="logout-btn" href="index.html">Log Out</a>
+        <button class="logout-btn" onclick="logout()">Log Out</button>
       </div>
     </header>
 
@@ -746,5 +746,58 @@
       <span>Inbox</span>
     </a>
   </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+
+  if (userData.role !== "vendor") {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  const heroLabel = document.querySelector(".hero-label");
+  if (heroLabel && userData.name) {
+    heroLabel.textContent = `Welcome back, ${userData.name.split(" ")[0]}`;
+  }
+});
+
+window.logout = async function () {
+  await signOut(auth);
+  window.location.href = "index.html";
+};
+</script>
+  
 </body>
 </html>
