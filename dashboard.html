@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RentEvent Dashboard</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -28,6 +30,12 @@
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.22);
       --radius-xl: 34px;
@@ -102,6 +110,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
+      position: relative;
     }
 
     .icon-btn {
@@ -124,6 +133,43 @@
       white-space: nowrap;
       cursor: pointer;
       font-family: inherit;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.7rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
+      border: 2px solid #fff;
+      display: none;
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: 6px;
+      right: 16px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.66rem;
+      line-height: 18px;
+      font-weight: 800;
+      text-align: center;
+      border: 2px solid #fff;
+      display: none;
     }
 
     .hero-card {
@@ -151,7 +197,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 280px;
+      max-width: 300px;
     }
 
     .hero-label {
@@ -254,6 +300,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      position: relative;
     }
 
     .quick-icon {
@@ -265,6 +312,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
     .quick-icon svg {
@@ -445,6 +493,27 @@
       border-radius: 20px;
       flex-shrink: 0;
       background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .vendor-avatar::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vendor-avatar.has-photo::before {
+      display: none;
+    }
+
+    .vendor-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .vendor-info h3 {
@@ -493,6 +562,42 @@
       justify-content: center;
     }
 
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -526,6 +631,7 @@
       font-weight: 700;
       text-align: center;
       padding: 0 4px;
+      position: relative;
     }
 
     .nav-item svg {
@@ -550,7 +656,7 @@
       }
 
       .hero-content {
-        max-width: 450px;
+        max-width: 470px;
       }
 
       .quick-grid {
@@ -567,6 +673,7 @@
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
@@ -577,6 +684,7 @@
 
       <div class="top-actions">
         <a class="icon-btn" href="notifications.html" aria-label="Notifications">
+          <span class="notification-badge" id="topNotificationBadge">0</span>
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
             <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -605,6 +713,7 @@
         <div class="hero-actions">
           <a class="hero-btn" href="event-builder.html">Start New Event</a>
           <a class="hero-btn-secondary" href="listings.html">Browse Listings</a>
+          <a class="hero-btn-secondary" href="notifications.html" id="alertHeroBtn">View Alerts</a>
         </div>
       </div>
     </section>
@@ -643,6 +752,7 @@
         </a>
 
         <a class="quick-card" href="messages.html">
+          <span class="notification-badge" id="messageQuickBadge">0</span>
           <div class="quick-icon">
             <svg viewBox="0 0 24 24" fill="none">
               <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
@@ -682,24 +792,26 @@
           <div class="event-thumb"></div>
 
           <div class="event-meta">
-            <div class="event-date">Saturday, July 18</div>
-            <h3 class="event-name">Amara’s Birthday Party</h3>
+            <div class="event-date">Start planning today</div>
+            <h3 class="event-name">Your Event Board</h3>
             <div class="event-status">Planning in Progress</div>
           </div>
         </div>
 
         <div class="event-stats">
           <div class="stat-box">
-            <span class="stat-number">8</span>
+            <span class="stat-number" id="suggestedCount">0</span>
             <span class="stat-label">Vendors</span>
           </div>
+
           <div class="stat-box">
-            <span class="stat-number">3</span>
-            <span class="stat-label">Booked</span>
+            <span class="stat-number" id="unreadStat">0</span>
+            <span class="stat-label">Alerts</span>
           </div>
+
           <div class="stat-box">
-            <span class="stat-number">$1.2k</span>
-            <span class="stat-label">Budget</span>
+            <span class="stat-number">New</span>
+            <span class="stat-label">Board</span>
           </div>
         </div>
 
@@ -716,36 +828,12 @@
         <a class="section-link" href="listings.html">See More</a>
       </div>
 
-      <div class="vendor-list">
-        <article class="vendor-card">
-          <div class="vendor-left">
-            <div class="vendor-avatar"></div>
-            <div class="vendor-info">
-              <h3>Sunny Slides</h3>
-              <p>Bounce house rentals for birthdays and backyard parties.</p>
-              <div class="vendor-rating">★ 4.9</div>
-            </div>
-          </div>
-          <div class="vendor-right">
-            <div class="vendor-price">$250+</div>
-            <a class="mini-btn" href="detail.html">View</a>
-          </div>
-        </article>
-
-        <article class="vendor-card">
-          <div class="vendor-left">
-            <div class="vendor-avatar"></div>
-            <div class="vendor-info">
-              <h3>Golden Table Co.</h3>
-              <p>Luxury tablescape styling and elevated place settings.</p>
-              <div class="vendor-rating">★ 4.8</div>
-            </div>
-          </div>
-          <div class="vendor-right">
-            <div class="vendor-price">$180+</div>
-            <a class="mini-btn" href="detail.html">View</a>
-          </div>
-        </article>
+      <div class="vendor-list" id="vendorList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading vendors</h3>
+          <p>We’re pulling published listings now.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -768,6 +856,7 @@
     </a>
 
     <a class="nav-item" href="messages.html">
+      <span class="nav-badge" id="bottomInboxBadge">0</span>
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -788,7 +877,15 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -803,6 +900,199 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatPrice(value) {
+  const raw = safeText(value, "");
+
+  if (!raw) return "$0+";
+
+  const numberMatch = raw.match(/\d+(\.\d+)?/);
+
+  if (!numberMatch) return raw;
+
+  const number = Number(numberMatch[0]);
+
+  if (Number.isNaN(number)) return raw;
+
+  return `$${Math.round(number)}+`;
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+    badge.style.alignItems = "center";
+    badge.style.justifyContent = "center";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+function updateNotificationBadges(count) {
+  setBadge("topNotificationBadge", count);
+  setBadge("bottomInboxBadge", count);
+  setBadge("messageQuickBadge", count);
+  setText("unreadStat", count);
+
+  const alertHeroBtn = document.getElementById("alertHeroBtn");
+
+  if (count > 0) {
+    alertHeroBtn.textContent = `${count} Alert${count === 1 ? "" : "s"}`;
+  } else {
+    alertHeroBtn.textContent = "View Alerts";
+  }
+}
+
+async function loadUnreadCount(user) {
+  try {
+    const conversationsRef = collection(db, "conversations");
+    const conversationsQuery = query(conversationsRef, where("participantIds", "array-contains", user.uid));
+    const snapshot = await getDocs(conversationsQuery);
+
+    let unreadCount = 0;
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const unreadFor = data.unreadFor || {};
+
+      if (unreadFor[user.uid]) {
+        unreadCount += 1;
+      }
+    });
+
+    updateNotificationBadges(unreadCount);
+
+  } catch (error) {
+    updateNotificationBadges(0);
+  }
+}
+
+function renderEmptyVendors() {
+  const vendorList = document.getElementById("vendorList");
+
+  vendorList.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No vendors yet</h3>
+      <p>Published vendor listings will appear here as the marketplace grows.</p>
+      <a class="btn" href="listings.html">Browse Listings</a>
+    </div>
+  `;
+}
+
+function renderVendors(listings) {
+  const vendorList = document.getElementById("vendorList");
+
+  if (!listings.length) {
+    setText("suggestedCount", 0);
+    renderEmptyVendors();
+    return;
+  }
+
+  setText("suggestedCount", listings.length);
+
+  const suggested = listings.slice(0, 4);
+
+  vendorList.innerHTML = suggested.map((listing) => {
+    const title = safeText(listing.title, "Untitled Listing");
+    const category = safeText(listing.category, "Event Service");
+    const customCategory = safeText(listing.customCategory, "");
+    const description = safeText(listing.description, "No description has been added yet.");
+    const price = formatPrice(listing.startingPrice);
+    const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
+    const imageUrl = safeText(listing.imageUrl, "");
+    const listingId = encodeURIComponent(listing.id || "");
+
+    const typeLine = customCategory
+      ? `${category} · ${customCategory}`
+      : category;
+
+    const avatarMarkup = imageUrl
+      ? `<div class="vendor-avatar has-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}"></div>`
+      : `<div class="vendor-avatar"></div>`;
+
+    return `
+      <article class="vendor-card">
+        <div class="vendor-left">
+          ${avatarMarkup}
+
+          <div class="vendor-info">
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(typeLine)}. ${escapeHtml(description)}</p>
+            <div class="vendor-rating">${escapeHtml(rating)}</div>
+          </div>
+        </div>
+
+        <div class="vendor-right">
+          <div class="vendor-price">${escapeHtml(price)}</div>
+          <a class="mini-btn" href="detail.html?id=${listingId}">View</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadSuggestedVendors() {
+  try {
+    const listingsRef = collection(db, "listings");
+    const snapshot = await getDocs(listingsRef);
+
+    const listings = [];
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (data.status === "published") {
+        listings.push({
+          id: docSnap.id,
+          ...data
+        });
+      }
+    });
+
+    listings.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    renderVendors(listings);
+
+  } catch (error) {
+    const vendorList = document.getElementById("vendorList");
+
+    vendorList.innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load vendors</h3>
+        <p>${escapeHtml(error.message)}</p>
+        <a class="btn" href="listings.html">Open Listings</a>
+      </div>
+    `;
+  }
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -828,6 +1118,9 @@ onAuthStateChanged(auth, async (user) => {
   if (userData.name) {
     document.getElementById("welcomeText").textContent = `Welcome back, ${userData.name.split(" ")[0]}`;
   }
+
+  loadUnreadCount(user);
+  loadSuggestedVendors();
 });
 
 window.logout = async function () {
