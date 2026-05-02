@@ -226,6 +226,25 @@
       letter-spacing: 0.05em;
     }
 
+    .preview-note {
+      display: inline-flex;
+      margin-top: 8px;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      align-items: center;
+    }
+
+    .message-row.other .preview-note {
+      background: #fff4df;
+      color: #aa6f12;
+    }
+
     .empty-card {
       background: var(--card);
       border-radius: 28px;
@@ -421,7 +440,10 @@ let currentUser = null;
 let currentUserData = null;
 let conversationId = null;
 let conversationData = null;
+
 let unsubscribeMessages = null;
+let unsubscribeConversation = null;
+let latestMessages = [];
 
 const params = new URLSearchParams(window.location.search);
 conversationId = params.get("id");
@@ -495,8 +517,54 @@ function renderEmptyThread() {
   `;
 }
 
-function renderMessages(messages) {
+function getConversationPreviewMessage() {
+  if (!conversationData || !currentUser) return null;
+
+  const lastMessage = safeText(conversationData.lastMessage, "");
+  const lastSenderId = safeText(conversationData.lastSenderId, "");
+
+  if (!lastMessage || !lastSenderId) return null;
+
+  const alreadyExists = latestMessages.some((message) => {
+    const messageText = safeText(message.text, "");
+    const messageSenderId = safeText(message.senderId, "");
+
+    return messageText === lastMessage && messageSenderId === lastSenderId;
+  });
+
+  if (alreadyExists) return null;
+
+  return {
+    id: "parent-preview-message",
+    text: lastMessage,
+    senderId: lastSenderId,
+    senderName: conversationData.participantNames?.[lastSenderId] || "RentEvent User",
+    senderRole: conversationData.participantRoles?.[lastSenderId] || "user",
+    createdAt: conversationData.updatedAt || conversationData.createdAt,
+    isPreviewFallback: true
+  };
+}
+
+function getDisplayMessages() {
+  const messages = [...latestMessages];
+  const previewMessage = getConversationPreviewMessage();
+
+  if (previewMessage) {
+    messages.push(previewMessage);
+  }
+
+  messages.sort((a, b) => {
+    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+    return aTime - bTime;
+  });
+
+  return messages;
+}
+
+function renderMessages() {
   const thread = document.getElementById("thread");
+  const messages = getDisplayMessages();
 
   if (!messages.length) {
     renderEmptyThread();
@@ -509,12 +577,14 @@ function renderMessages(messages) {
       const isMe = message.senderId === currentUser.uid;
       const text = safeText(message.text, "");
       const time = formatMessageTime(message.createdAt);
+      const previewNote = message.isPreviewFallback ? `<span class="preview-note">Preview message</span>` : "";
 
       return `
         <div class="message-row ${isMe ? "me" : "other"}">
           <div class="bubble">
             ${escapeHtml(text)}
             <span class="time">${escapeHtml(time)}</span>
+            ${previewNote}
           </div>
         </div>
       `;
@@ -544,6 +614,8 @@ function getOtherParticipantName() {
 }
 
 function updateHeader() {
+  if (!conversationData) return;
+
   const otherName = getOtherParticipantName();
   const listingTitle = safeText(conversationData.listingTitle, "Event listing");
   const listingCategory = safeText(conversationData.listingCategory, "Event service");
@@ -587,6 +659,40 @@ async function markConversationAsRead() {
   }
 }
 
+function watchConversation() {
+  if (unsubscribeConversation) {
+    unsubscribeConversation();
+  }
+
+  const conversationRef = doc(db, "conversations", conversationId);
+
+  unsubscribeConversation = onSnapshot(conversationRef, async (conversationSnap) => {
+    if (!conversationSnap.exists()) {
+      renderError("Conversation not found", "This conversation may have been removed or the link may be outdated.");
+      return;
+    }
+
+    conversationData = {
+      id: conversationSnap.id,
+      ...conversationSnap.data()
+    };
+
+    const participantIds = conversationData.participantIds || [];
+
+    if (!participantIds.includes(currentUser.uid)) {
+      renderError("Access denied", "You are not part of this conversation.");
+      return;
+    }
+
+    updateHeader();
+    renderMessages();
+
+    await markConversationAsRead();
+  }, (error) => {
+    renderError("Could not watch conversation", error.message);
+  });
+}
+
 function watchMessages() {
   if (unsubscribeMessages) {
     unsubscribeMessages();
@@ -596,16 +702,16 @@ function watchMessages() {
   const messagesQuery = query(messagesRef, orderBy("createdAt", "asc"));
 
   unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
-    const messages = [];
+    latestMessages = [];
 
     snapshot.forEach((docSnap) => {
-      messages.push({
+      latestMessages.push({
         id: docSnap.id,
         ...docSnap.data()
       });
     });
 
-    renderMessages(messages);
+    renderMessages();
   }, (error) => {
     renderError("Could not load messages", error.message);
   });
@@ -642,6 +748,7 @@ async function loadConversation() {
 
     await markConversationAsRead();
 
+    watchConversation();
     watchMessages();
 
   } catch (error) {
@@ -664,10 +771,18 @@ async function sendMessage(text) {
   try {
     const messagesRef = collection(db, "conversations", conversationId, "messages");
 
+    const senderName =
+      currentUserData.businessName ||
+      currentUserData.vendorName ||
+      currentUserData.name ||
+      currentUser.displayName ||
+      currentUser.email ||
+      "RentEvent User";
+
     await addDoc(messagesRef, {
       text: messageText,
       senderId: currentUser.uid,
-      senderName: currentUserData.name || currentUser.displayName || currentUser.email || "RentEvent User",
+      senderName,
       senderRole: currentUserData.role || "customer",
       createdAt: serverTimestamp()
     });
@@ -689,10 +804,6 @@ async function sendMessage(text) {
       unreadFor
     });
 
-    conversationData.unreadFor = unreadFor;
-    conversationData.lastMessage = messageText;
-    conversationData.lastSenderId = currentUser.uid;
-
     messageInput.value = "";
 
   } catch (error) {
@@ -710,6 +821,11 @@ document.getElementById("composer").addEventListener("submit", (event) => {
   const text = input.value.trim();
 
   sendMessage(text);
+});
+
+window.addEventListener("beforeunload", () => {
+  if (unsubscribeMessages) unsubscribeMessages();
+  if (unsubscribeConversation) unsubscribeConversation();
 });
 
 onAuthStateChanged(auth, async (user) => {
