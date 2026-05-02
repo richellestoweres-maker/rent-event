@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RentEvent Checkout</title>
+  <title>Checkout | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -21,17 +23,22 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f5ede2;
+      --soft: #f4ede2;
+      --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
       --gold: #f4a43a;
+      --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -52,7 +59,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 120px;
+      padding: 20px 18px 132px;
     }
 
     .topbar {
@@ -77,6 +84,7 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
+      font-weight: 800;
     }
 
     .topbar-center {
@@ -101,232 +109,418 @@
       font-weight: 800;
     }
 
-    .summary-card {
-      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      border-radius: var(--radius-xl);
-      padding: 22px 20px;
-      color: #fff;
-      box-shadow: var(--shadow-strong);
-      margin-bottom: 22px;
+    .hero-card {
       position: relative;
       overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
     }
 
-    .summary-card::after {
+    .hero-card::after {
       content: "";
       position: absolute;
       width: 170px;
       height: 170px;
       border-radius: 50%;
       right: -60px;
-      top: -40px;
+      top: -45px;
       background: rgba(255, 255, 255, 0.12);
     }
 
-    .summary-content {
+    .hero-content {
       position: relative;
       z-index: 1;
+      max-width: 300px;
     }
 
-    .summary-label {
+    .hero-label {
       font-size: 0.88rem;
       font-weight: 600;
       opacity: 0.95;
       margin-bottom: 8px;
     }
 
-    .summary-title {
+    .hero-title {
       margin: 0 0 10px;
-      font-size: 1.95rem;
+      font-size: 2rem;
       line-height: 0.98;
       letter-spacing: -0.05em;
       font-weight: 800;
-      max-width: 240px;
     }
 
-    .summary-subtitle {
-      margin: 0;
+    .hero-subtitle {
+      margin: 0 0 16px;
       font-size: 0.95rem;
       line-height: 1.45;
       color: rgba(255, 255, 255, 0.95);
-      max-width: 250px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .section {
-      margin-top: 26px;
+      margin-top: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .section-title {
-      margin: 0 0 14px;
-      font-size: 1.35rem;
-      line-height: 1.05;
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.02;
       letter-spacing: -0.04em;
       font-weight: 800;
     }
 
-    .card {
+    .section-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .checkout-card,
+    .empty-card,
+    .note-card {
       background: var(--card);
       border-radius: 28px;
       padding: 18px;
       box-shadow: var(--shadow);
     }
 
-    .line-items {
+    .vendor-list {
       display: grid;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .line-item {
+    .vendor-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .vendor-top {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--line);
+      margin-bottom: 12px;
     }
 
-    .line-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
+    .vendor-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+      flex: 1;
     }
 
-    .line-item:first-child {
-      padding-top: 0;
+    .vendor-thumb {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      position: relative;
+      overflow: hidden;
     }
 
-    .item-left h3 {
+    .vendor-thumb::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vendor-thumb.has-photo::before {
+      display: none;
+    }
+
+    .vendor-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .vendor-info {
+      min-width: 0;
+    }
+
+    .vendor-name {
       margin: 0 0 4px;
       font-size: 1rem;
-      line-height: 1.15;
+      line-height: 1.12;
+      font-weight: 800;
       letter-spacing: -0.02em;
-      font-weight: 700;
     }
 
-    .item-left p {
+    .vendor-type {
       margin: 0;
       font-size: 0.88rem;
       line-height: 1.4;
       color: var(--muted);
     }
 
-    .item-price {
-      font-size: 0.98rem;
+    .vendor-price {
+      font-size: 1rem;
       font-weight: 800;
       white-space: nowrap;
-    }
-
-    .totals {
-      display: grid;
-      gap: 12px;
-    }
-
-    .total-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 0.96rem;
-      color: var(--muted);
-    }
-
-    .total-row.grand {
-      margin-top: 4px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-      color: var(--text);
-      font-size: 1.08rem;
-      font-weight: 800;
-    }
-
-    .payment-options {
-      display: grid;
-      gap: 12px;
-    }
-
-    .payment-option {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: #fff;
-    }
-
-    .payment-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid #d9c9b3;
-      position: relative;
       flex-shrink: 0;
     }
 
-    .payment-option.active .payment-dot {
-      border-color: var(--coral-2);
+    .vendor-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .payment-option.active .payment-dot::after {
-      content: "";
-      position: absolute;
-      inset: 3px;
-      border-radius: 50%;
-      background: var(--coral-2);
-    }
-
-    .payment-info h3 {
-      margin: 0 0 3px;
-      font-size: 0.98rem;
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
       font-weight: 700;
     }
 
-    .payment-info p {
+    .pill.pending {
+      background: #fff4df;
+      color: #aa6f12;
+    }
+
+    .pill.info {
+      background: #f6efe4;
+      color: #6a625a;
+    }
+
+    .pill.safe {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .price-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .price-row:first-child {
+      padding-top: 0;
+    }
+
+    .price-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .price-copy {
+      min-width: 0;
+    }
+
+    .price-label {
+      margin: 0 0 4px;
+      font-size: 0.94rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .price-note {
       margin: 0;
-      font-size: 0.86rem;
+      font-size: 0.82rem;
       color: var(--muted);
+      line-height: 1.42;
     }
 
-    .details-grid {
-      display: grid;
-      gap: 12px;
+    .price-value {
+      font-size: 0.98rem;
+      font-weight: 800;
+      white-space: nowrap;
+      text-align: right;
     }
 
-    .field-group label {
-      display: block;
-      margin-bottom: 7px;
-      font-size: 0.86rem;
-      font-weight: 700;
-      color: #574f47;
-    }
-
-    .input {
-      width: 100%;
-      min-height: 54px;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: #fff;
-      padding: 0 16px;
-      font-family: inherit;
-      font-size: 0.96rem;
-      color: var(--text);
-      outline: none;
-    }
-
-    .input::placeholder {
-      color: #a49a8f;
-    }
-
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .note {
+    .total-row {
       margin-top: 12px;
-      font-size: 0.84rem;
-      line-height: 1.45;
+      padding: 16px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #fff5ec, #fff);
+      border: 1px solid #f1dfcd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .total-label {
+      margin: 0 0 4px;
+      font-size: 0.82rem;
       color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .total-note {
+      margin: 0;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .total-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
+
+    .payment-placeholder {
+      border: 1px dashed #d7c7b2;
+      background: var(--soft-2);
+      border-radius: 24px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .payment-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      border-radius: 20px;
+      background: #fff;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .payment-placeholder h3,
+    .empty-card h3,
+    .note-title {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .payment-placeholder p,
+    .empty-card p,
+    .note-text {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .empty-card {
+      text-align: center;
+      padding: 24px 18px;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card p {
+      margin-bottom: 16px;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 46px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      padding: 0 18px;
+      cursor: pointer;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
     }
 
     .bottom-bar {
@@ -346,14 +540,15 @@
       box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 10;
     }
 
-    .bottom-total {
+    .bottom-info {
       flex: 1;
       padding-left: 8px;
     }
 
-    .bottom-total-label {
+    .bottom-label {
       display: block;
       font-size: 0.74rem;
       color: var(--muted);
@@ -363,34 +558,60 @@
       letter-spacing: 0.08em;
     }
 
-    .bottom-total-value {
+    .bottom-value {
       display: block;
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
 
-    .checkout-btn {
-      min-width: 170px;
-      min-height: 56px;
-      border: none;
+    .bottom-btn,
+    .bottom-btn-secondary {
+      min-height: 54px;
       border-radius: 999px;
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      font-size: 0.98rem;
+      border: none;
+      font-size: 0.92rem;
       font-weight: 800;
       font-family: inherit;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.2);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      white-space: nowrap;
       cursor: pointer;
     }
 
-    @media (max-width: 360px) {
-      .row-2 {
-        grid-template-columns: 1fr;
+    .bottom-btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
+    }
+
+    .bottom-btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    .bottom-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 390px) {
+      .bottom-bar {
+        flex-wrap: wrap;
+        border-radius: 28px;
       }
 
-      .checkout-btn {
-        min-width: 150px;
+      .bottom-info {
+        width: 100%;
+        padding-left: 2px;
+      }
+
+      .bottom-btn,
+      .bottom-btn-secondary {
+        flex: 1;
       }
     }
 
@@ -403,175 +624,407 @@
         max-width: 960px;
       }
 
-      .summary-title {
-        max-width: 360px;
+      .vendor-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .checkout-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .bottom-bar {
+        max-width: 520px;
       }
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="event-builder.html" class="back-link" aria-label="Go back">
-        ←
-      </a>
+      <a href="event-builder.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Booking</div>
+        <div class="eyebrow">Secure Checkout</div>
         <h1 class="page-title">Checkout</h1>
       </div>
 
-      <button class="icon-btn" type="button" aria-label="More options">
-        ⋯
-      </button>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
     </header>
 
-    <section class="summary-card">
-      <div class="summary-content">
-        <div class="summary-label">Almost there</div>
-        <h2 class="summary-title">Secure your event bookings.</h2>
-        <p class="summary-subtitle">
-          Review your selected vendors, choose a payment method, and confirm your event details.
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">RentEvent Checkout</div>
+        <h2 class="hero-title">Review your event total.</h2>
+        <p class="hero-subtitle">
+          Confirm your selected vendors, service fee, and estimated payment total before moving forward.
+        </p>
+
+        <div class="hero-meta">
+          <span class="hero-pill" id="heroVendorCount">0 Vendors</span>
+          <span class="hero-pill" id="heroTotal">$0 Total</span>
+          <span class="hero-pill">Payment Setup Pending</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="checkout-grid">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Selected Vendors</h2>
+          <a class="section-link" href="event-builder.html">Edit Board</a>
+        </div>
+
+        <div class="vendor-list" id="vendorList">
+          <div class="empty-card">
+            <div class="empty-icon">…</div>
+            <h3>Loading checkout</h3>
+            <p>We’re pulling your selected vendors now.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Order Summary</h2>
+        </div>
+
+        <div class="checkout-card">
+          <div class="price-row">
+            <div class="price-copy">
+              <p class="price-label">Vendor Subtotal</p>
+              <p class="price-note">Total of selected vendor starting prices.</p>
+            </div>
+            <div class="price-value" id="vendorSubtotal">$0</div>
+          </div>
+
+          <div class="price-row">
+            <div class="price-copy">
+              <p class="price-label">RentEvent Service Fee</p>
+              <p class="price-note">Estimated 10% platform fee for booking support and marketplace operations.</p>
+            </div>
+            <div class="price-value" id="serviceFee">$0</div>
+          </div>
+
+          <div class="price-row">
+            <div class="price-copy">
+              <p class="price-label">Processing Estimate</p>
+              <p class="price-note">Estimated card processing placeholder. Final amount may change when Stripe is connected.</p>
+            </div>
+            <div class="price-value" id="processingFee">$0</div>
+          </div>
+
+          <div class="total-row">
+            <div>
+              <p class="total-label">Total Due</p>
+              <p class="total-note">This is an estimate until live Stripe checkout is connected.</p>
+            </div>
+
+            <div class="total-value" id="totalDue">$0</div>
+          </div>
+
+          <div class="status-message info" id="checkoutStatus">
+            Stripe is not connected yet. This page is ready for embedded payment setup once we add the secure backend.
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Payment</h2>
+      </div>
+
+      <div class="payment-placeholder" id="paymentMount">
+        <div class="payment-icon">◎</div>
+        <h3>Embedded payment will live here</h3>
+        <p>
+          When Stripe is connected, this area can become the embedded card/payment form so customers can pay inside RentEvent instead of being redirected away.
         </p>
       </div>
     </section>
 
     <section class="section">
-      <h2 class="section-title">Order Summary</h2>
-
-      <div class="card">
-        <div class="line-items">
-          <div class="line-item">
-            <div class="item-left">
-              <h3>Sunny Slides</h3>
-              <p>Bounce house rental with delivery and pickup included.</p>
-            </div>
-            <div class="item-price">$250</div>
-          </div>
-
-          <div class="line-item">
-            <div class="item-left">
-              <h3>Photo Booth Experience</h3>
-              <p>Modern booth setup for 3 hours with instant sharing.</p>
-            </div>
-            <div class="item-price">$225</div>
-          </div>
-
-          <div class="line-item">
-            <div class="item-left">
-              <h3>Luxury Dinner Setup</h3>
-              <p>Tablescape styling and premium event décor setup.</p>
-            </div>
-            <div class="item-price">$850</div>
-          </div>
-        </div>
+      <div class="section-header">
+        <h2 class="section-title">Checkout Notes</h2>
       </div>
-    </section>
 
-    <section class="section">
-      <h2 class="section-title">Payment Summary</h2>
-
-      <div class="card">
-        <div class="totals">
-          <div class="total-row">
-            <span>Subtotal</span>
-            <strong>$1,325</strong>
-          </div>
-
-          <div class="total-row">
-            <span>Service Fee</span>
-            <strong>$65</strong>
-          </div>
-
-          <div class="total-row">
-            <span>Estimated Tax</span>
-            <strong>$42</strong>
-          </div>
-
-          <div class="total-row grand">
-            <span>Total</span>
-            <strong>$1,432</strong>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2 class="section-title">Payment Method</h2>
-
-      <div class="card">
-        <div class="payment-options">
-          <div class="payment-option active">
-            <div class="payment-dot"></div>
-            <div class="payment-info">
-              <h3>Credit or Debit Card</h3>
-              <p>Pay securely with your saved or new card.</p>
-            </div>
-          </div>
-
-          <div class="payment-option">
-            <div class="payment-dot"></div>
-            <div class="payment-info">
-              <h3>Pay Later Deposit</h3>
-              <p>Reserve now with a deposit and pay the rest later.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2 class="section-title">Billing Details</h2>
-
-      <div class="card">
-        <div class="details-grid">
-          <div class="field-group">
-            <label for="full-name">Full Name</label>
-            <input id="full-name" class="input" type="text" placeholder="Richelle T." />
-          </div>
-
-          <div class="field-group">
-            <label for="email">Email</label>
-            <input id="email" class="input" type="email" placeholder="you@example.com" />
-          </div>
-
-          <div class="field-group">
-            <label for="card-number">Card Number</label>
-            <input id="card-number" class="input" type="text" placeholder="1234 5678 9012 3456" />
-          </div>
-
-          <div class="row-2">
-            <div class="field-group">
-              <label for="exp-date">Expiration</label>
-              <input id="exp-date" class="input" type="text" placeholder="MM/YY" />
-            </div>
-
-            <div class="field-group">
-              <label for="cvv">CVV</label>
-              <input id="cvv" class="input" type="text" placeholder="123" />
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label for="notes">Event Notes</label>
-            <input id="notes" class="input" type="text" placeholder="Any special setup instructions?" />
-          </div>
-        </div>
-
-        <p class="note">
-          This is a front-end prototype right now, so payment is not yet processing for real users. Once we add Firebase and a payment provider later, this will become fully functional.
+      <div class="note-card">
+        <h3 class="note-title">Important MVP Note</h3>
+        <p class="note-text">
+          This checkout currently calculates totals from the event board. The final payment flow will need Stripe Embedded Checkout or Stripe Connect through a secure backend before real money can be collected.
         </p>
       </div>
     </section>
   </main>
 
   <div class="bottom-bar">
-    <div class="bottom-total">
-      <span class="bottom-total-label">Total Due</span>
-      <span class="bottom-total-value">$1,432</span>
+    <div class="bottom-info">
+      <span class="bottom-label">Total Due</span>
+      <span class="bottom-value" id="bottomTotal">$0</span>
     </div>
 
-    <button class="checkout-btn" type="button">Confirm Booking</button>
+    <a href="event-builder.html" class="bottom-btn-secondary">Edit</a>
+    <button class="bottom-btn" id="continuePaymentBtn" type="button">Continue</button>
   </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let selectedVendors = [];
+
+const SERVICE_FEE_PERCENT = 0.10;
+const PROCESSING_PERCENT = 0.029;
+const PROCESSING_FIXED = 0.30;
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatMoney(value) {
+  const number = Number(value || 0);
+  return `$${number.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })}`;
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderThumb(imageUrl, title) {
+  if (imageUrl) {
+    return `
+      <div class="vendor-thumb has-photo">
+        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}">
+      </div>
+    `;
+  }
+
+  return `<div class="vendor-thumb"></div>`;
+}
+
+function calculateTotals() {
+  const vendorSubtotal = selectedVendors.reduce((total, vendor) => {
+    return total + Number(vendor.priceNumber || 0);
+  }, 0);
+
+  const serviceFee = vendorSubtotal * SERVICE_FEE_PERCENT;
+
+  const baseBeforeProcessing = vendorSubtotal + serviceFee;
+  const processingFee = baseBeforeProcessing > 0
+    ? (baseBeforeProcessing * PROCESSING_PERCENT) + PROCESSING_FIXED
+    : 0;
+
+  const totalDue = baseBeforeProcessing + processingFee;
+
+  return {
+    vendorSubtotal,
+    serviceFee,
+    processingFee,
+    totalDue
+  };
+}
+
+function updateTotals() {
+  const totals = calculateTotals();
+  const vendorCount = selectedVendors.length;
+
+  setText("vendorSubtotal", formatMoney(totals.vendorSubtotal));
+  setText("serviceFee", formatMoney(totals.serviceFee));
+  setText("processingFee", formatMoney(totals.processingFee));
+  setText("totalDue", formatMoney(totals.totalDue));
+  setText("bottomTotal", formatMoney(totals.totalDue));
+  setText("heroVendorCount", `${vendorCount} Vendor${vendorCount === 1 ? "" : "s"}`);
+  setText("heroTotal", `${formatMoney(totals.totalDue)} Total`);
+
+  const continueBtn = document.getElementById("continuePaymentBtn");
+
+  if (vendorCount === 0) {
+    continueBtn.disabled = true;
+    continueBtn.textContent = "Add Vendor";
+  } else {
+    continueBtn.disabled = false;
+    continueBtn.textContent = "Continue";
+  }
+}
+
+function renderEmptyCheckout() {
+  const container = document.getElementById("vendorList");
+
+  container.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No vendors selected</h3>
+      <p>Add vendors to your event board before checking out.</p>
+      <a class="btn" href="event-builder.html">Back to Event Board</a>
+    </div>
+  `;
+
+  updateTotals();
+}
+
+function renderVendors() {
+  const container = document.getElementById("vendorList");
+
+  if (!selectedVendors.length) {
+    renderEmptyCheckout();
+    return;
+  }
+
+  container.innerHTML = selectedVendors.map((vendor) => {
+    const listingId = encodeURIComponent(vendor.listingId || "");
+    const title = safeText(vendor.listingTitle, "Untitled Listing");
+    const category = safeText(vendor.listingCategory, "Event Service");
+    const vendorName = safeText(vendor.vendorName, "Vendor");
+    const price = formatMoney(vendor.priceNumber || 0);
+    const imageUrl = safeText(vendor.imageUrl, "");
+    const status = safeText(vendor.status, "pending");
+
+    return `
+      <article class="vendor-card">
+        <div class="vendor-top">
+          <div class="vendor-left">
+            ${renderThumb(imageUrl, title)}
+
+            <div class="vendor-info">
+              <h3 class="vendor-name">${escapeHtml(title)}</h3>
+              <p class="vendor-type">${escapeHtml(category)}</p>
+            </div>
+          </div>
+
+          <div class="vendor-price">${escapeHtml(price)}</div>
+        </div>
+
+        <div class="vendor-meta">
+          <span class="pill pending">${escapeHtml(status)}</span>
+          <span class="pill info">${escapeHtml(vendorName)}</span>
+          <span class="pill safe">Review</span>
+        </div>
+
+        <div style="margin-top: 12px;">
+          <a class="btn-secondary" href="detail.html?id=${listingId}">View Listing</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  updateTotals();
+}
+
+async function loadSelectedVendors() {
+  const q = query(
+    collection(db, "eventBoardItems"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(q);
+
+  const items = [];
+
+  snapshot.forEach((docSnap) => {
+    items.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+  });
+
+  items.sort((a, b) => {
+    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+    return bTime - aTime;
+  });
+
+  selectedVendors = items;
+  renderVendors();
+}
+
+function showCheckoutNotice() {
+  const status = document.getElementById("checkoutStatus");
+
+  if (!selectedVendors.length) {
+    window.location.href = "event-builder.html";
+    return;
+  }
+
+  status.className = "status-message info";
+  status.textContent = "Next step: connect Stripe Embedded Checkout through a secure backend. This button is ready, but live payment is not active yet.";
+  status.style.display = "block";
+
+  document.getElementById("paymentMount").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
+document.getElementById("continuePaymentBtn").addEventListener("click", showCheckoutNotice);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+
+  if (currentUserData.role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
+    return;
+  }
+
+  loadSelectedVendors();
+});
+</script>
+
 </body>
 </html>
