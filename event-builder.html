@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Event | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -30,6 +32,10 @@
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
@@ -81,6 +87,7 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
+      font-weight: 800;
     }
 
     .topbar-center {
@@ -130,7 +137,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 270px;
+      max-width: 290px;
     }
 
     .hero-label {
@@ -280,6 +287,17 @@
       background: rgba(255, 255, 255, 0.22);
     }
 
+    .vendor-thumb.has-photo::before {
+      display: none;
+    }
+
+    .vendor-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .vendor-info {
       min-width: 0;
     }
@@ -339,13 +357,20 @@
       color: #6a625a;
     }
 
+    .pill.available {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
     .vendor-actions {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .btn,
-    .btn-secondary {
+    .btn-secondary,
+    .btn-danger {
       min-height: 46px;
       border-radius: 999px;
       display: inline-flex;
@@ -357,6 +382,8 @@
       font-family: inherit;
       border: none;
       flex: 1;
+      cursor: pointer;
+      min-width: 92px;
     }
 
     .btn {
@@ -370,13 +397,46 @@
       color: #4a433d;
     }
 
-    .note-card {
+    .btn-danger {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .btn:disabled,
+    .btn-secondary:disabled,
+    .btn-danger:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .note-card,
+    .empty-card {
       background: var(--card);
       border-radius: 28px;
       padding: 18px;
       box-shadow: var(--shadow);
     }
 
+    .empty-card {
+      text-align: center;
+      padding: 24px 18px;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3,
     .note-title {
       margin: 0 0 8px;
       font-size: 1rem;
@@ -384,11 +444,40 @@
       letter-spacing: -0.02em;
     }
 
+    .empty-card p,
     .note-text {
       margin: 0;
       font-size: 0.9rem;
       line-height: 1.5;
       color: var(--muted);
+    }
+
+    .empty-card p {
+      margin-bottom: 16px;
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 14px;
+      background: #fff4df;
+      color: #8d5f11;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
     }
 
     .bottom-bar {
@@ -408,6 +497,7 @@
       box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 10;
     }
 
     .bottom-info {
@@ -495,35 +585,32 @@
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">
-        ←
-      </a>
+      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Planning</div>
         <h1 class="page-title">My Event</h1>
       </div>
 
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
-        🔔
-      </a>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
         <div class="hero-label">Current Event</div>
-        <h2 class="hero-title">Amara’s Birthday Party</h2>
+        <h2 class="hero-title" id="eventTitle">Your Event Board</h2>
         <p class="hero-subtitle">
           Keep your vendors, budget, and planning details all in one beautifully organized place.
         </p>
 
         <div class="hero-meta">
-          <span class="hero-pill">Saturday, July 18</span>
-          <span class="hero-pill">League City, TX</span>
           <span class="hero-pill">Planning in Progress</span>
+          <span class="hero-pill" id="heroVendorCount">0 Vendors</span>
+          <span class="hero-pill" id="heroSubtotal">$0 Total</span>
         </div>
       </div>
     </section>
@@ -535,20 +622,22 @@
 
       <div class="summary-grid">
         <div class="summary-card">
-          <span class="summary-number">3</span>
+          <span class="summary-number" id="summaryVendorCount">0</span>
           <span class="summary-label">Vendors</span>
         </div>
 
         <div class="summary-card">
-          <span class="summary-number">$1,325</span>
+          <span class="summary-number" id="summarySubtotal">$0</span>
           <span class="summary-label">Subtotal</span>
         </div>
 
         <div class="summary-card">
-          <span class="summary-number">1</span>
+          <span class="summary-number" id="summaryPending">0</span>
           <span class="summary-label">Pending</span>
         </div>
       </div>
+
+      <div class="status-message" id="statusMessage"></div>
     </section>
 
     <section class="section">
@@ -557,75 +646,27 @@
         <a class="section-link" href="listings.html">Add More</a>
       </div>
 
-      <div class="vendor-list">
-        <article class="vendor-card">
-          <div class="vendor-top">
-            <div class="vendor-left">
-              <div class="vendor-thumb"></div>
-              <div class="vendor-info">
-                <h3 class="vendor-name">Sunny Slides</h3>
-                <p class="vendor-type">Bounce House Rentals</p>
-              </div>
-            </div>
-            <div class="vendor-price">$250</div>
-          </div>
+      <div class="vendor-list" id="selectedVendorList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading event board</h3>
+          <p>We’re pulling your selected vendors now.</p>
+        </div>
+      </div>
+    </section>
 
-          <div class="vendor-meta">
-            <span class="pill confirmed">Confirmed</span>
-            <span class="pill note">Setup Included</span>
-          </div>
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Available Vendors</h2>
+        <a class="section-link" href="listings.html">Browse All</a>
+      </div>
 
-          <div class="vendor-actions">
-            <a class="btn-secondary" href="messages.html">Message</a>
-            <a class="btn" href="detail.html">View</a>
-          </div>
-        </article>
-
-        <article class="vendor-card">
-          <div class="vendor-top">
-            <div class="vendor-left">
-              <div class="vendor-thumb"></div>
-              <div class="vendor-info">
-                <h3 class="vendor-name">Photo Booth Experience</h3>
-                <p class="vendor-type">Photo Booths</p>
-              </div>
-            </div>
-            <div class="vendor-price">$225</div>
-          </div>
-
-          <div class="vendor-meta">
-            <span class="pill confirmed">Confirmed</span>
-            <span class="pill note">3 Hours</span>
-          </div>
-
-          <div class="vendor-actions">
-            <a class="btn-secondary" href="messages.html">Message</a>
-            <a class="btn" href="detail.html">View</a>
-          </div>
-        </article>
-
-        <article class="vendor-card">
-          <div class="vendor-top">
-            <div class="vendor-left">
-              <div class="vendor-thumb"></div>
-              <div class="vendor-info">
-                <h3 class="vendor-name">Luxury Dinner Setup</h3>
-                <p class="vendor-type">Tablescape Styling</p>
-              </div>
-            </div>
-            <div class="vendor-price">$850</div>
-          </div>
-
-          <div class="vendor-meta">
-            <span class="pill pending">Pending</span>
-            <span class="pill note">Awaiting Reply</span>
-          </div>
-
-          <div class="vendor-actions">
-            <a class="btn-secondary" href="messages.html">Message</a>
-            <a class="btn" href="detail.html">View</a>
-          </div>
-        </article>
+      <div class="vendor-list" id="availableVendorList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading vendors</h3>
+          <p>We’re pulling published listings now.</p>
+        </div>
       </div>
     </section>
 
@@ -637,7 +678,7 @@
       <div class="note-card">
         <h3 class="note-title">Event Reminder</h3>
         <p class="note-text">
-          Finalize décor and confirm vendor arrival times before checkout. Once payment is completed, your bookings can be secured more smoothly.
+          Add vendors to your board, message them for availability, and keep your planning decisions in one place. Checkout can come later once booking and payment features are fully built.
         </p>
       </div>
     </section>
@@ -646,11 +687,580 @@
   <div class="bottom-bar">
     <div class="bottom-info">
       <span class="bottom-label">Current Total</span>
-      <span class="bottom-value">$1,325</span>
+      <span class="bottom-value" id="bottomTotal">$0</span>
     </div>
 
     <a href="listings.html" class="bottom-btn-secondary">Add Vendor</a>
     <a href="checkout.html" class="bottom-btn">Checkout</a>
   </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let publishedListings = [];
+let selectedVendors = [];
+let isBusy = false;
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function extractNumber(value) {
+  const raw = safeText(value, "");
+  const match = raw.match(/\d+(\.\d+)?/);
+
+  if (!match) return 0;
+
+  const number = Number(match[0]);
+  return Number.isNaN(number) ? 0 : number;
+}
+
+function formatMoney(value) {
+  const number = Number(value || 0);
+  return `$${Math.round(number).toLocaleString()}`;
+}
+
+function formatPrice(value) {
+  const raw = safeText(value, "");
+
+  if (!raw) return "$0+";
+
+  const number = extractNumber(raw);
+
+  if (!number) return raw;
+
+  return `${formatMoney(number)}+`;
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function showStatus(message, type = "success") {
+  const status = document.getElementById("statusMessage");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
+
+  setTimeout(() => {
+    status.style.display = "none";
+  }, 2600);
+}
+
+function isSelected(listingId) {
+  return selectedVendors.some((vendor) => vendor.listingId === listingId);
+}
+
+function renderThumb(imageUrl, title) {
+  if (imageUrl) {
+    return `
+      <div class="vendor-thumb has-photo">
+        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}">
+      </div>
+    `;
+  }
+
+  return `<div class="vendor-thumb"></div>`;
+}
+
+function updateSummary() {
+  const subtotal = selectedVendors.reduce((total, vendor) => {
+    return total + Number(vendor.priceNumber || 0);
+  }, 0);
+
+  const pending = selectedVendors.filter((vendor) => vendor.status === "pending").length;
+  const count = selectedVendors.length;
+
+  setText("summaryVendorCount", count);
+  setText("summarySubtotal", formatMoney(subtotal));
+  setText("summaryPending", pending);
+  setText("bottomTotal", formatMoney(subtotal));
+  setText("heroVendorCount", `${count} Vendor${count === 1 ? "" : "s"}`);
+  setText("heroSubtotal", `${formatMoney(subtotal)} Total`);
+}
+
+function renderSelectedVendors() {
+  const container = document.getElementById("selectedVendorList");
+
+  if (!selectedVendors.length) {
+    container.innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">+</div>
+        <h3>No vendors added yet</h3>
+        <p>Add vendors from the marketplace below to start building your event board.</p>
+        <a class="btn" href="#availableVendorList">View Available Vendors</a>
+      </div>
+    `;
+
+    updateSummary();
+    return;
+  }
+
+  container.innerHTML = selectedVendors.map((vendor) => {
+    const boardId = encodeURIComponent(vendor.id || "");
+    const listingId = encodeURIComponent(vendor.listingId || "");
+
+    return `
+      <article class="vendor-card">
+        <div class="vendor-top">
+          <div class="vendor-left">
+            ${renderThumb(vendor.imageUrl, vendor.listingTitle)}
+
+            <div class="vendor-info">
+              <h3 class="vendor-name">${escapeHtml(vendor.listingTitle)}</h3>
+              <p class="vendor-type">${escapeHtml(vendor.listingCategory)}</p>
+            </div>
+          </div>
+
+          <div class="vendor-price">${escapeHtml(formatMoney(vendor.priceNumber || 0))}</div>
+        </div>
+
+        <div class="vendor-meta">
+          <span class="pill pending">${escapeHtml(vendor.status || "pending")}</span>
+          <span class="pill note">${escapeHtml(vendor.vendorName || "Vendor")}</span>
+        </div>
+
+        <div class="vendor-actions">
+          <button class="btn-secondary" type="button" data-message-id="${listingId}">Message</button>
+          <a class="btn" href="detail.html?id=${listingId}">View</a>
+          <button class="btn-danger" type="button" data-remove-id="${boardId}">Remove</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  document.querySelectorAll("[data-remove-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      removeVendorFromBoard(button.dataset.removeId);
+    });
+  });
+
+  document.querySelectorAll("[data-message-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openMessageForListing(button.dataset.messageId);
+    });
+  });
+
+  updateSummary();
+}
+
+function renderAvailableVendors() {
+  const container = document.getElementById("availableVendorList");
+
+  const available = publishedListings.filter((listing) => !isSelected(listing.id));
+
+  if (!available.length) {
+    container.innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">✓</div>
+        <h3>No more vendors to add</h3>
+        <p>All currently published listings have already been added to your event board.</p>
+        <a class="btn" href="listings.html">Browse Marketplace</a>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = available.slice(0, 8).map((listing) => {
+    const listingId = encodeURIComponent(listing.id || "");
+    const title = safeText(listing.title, "Untitled Listing");
+    const category = safeText(listing.category, "Event Service");
+    const customCategory = safeText(listing.customCategory, "");
+    const eventType = safeText(listing.eventType, "");
+    const vendorName = safeText(listing.vendorName, "Vendor");
+    const imageUrl = safeText(listing.imageUrl, "");
+    const price = formatPrice(listing.startingPrice);
+    const typeLine = customCategory ? `${category} · ${customCategory}` : category;
+
+    return `
+      <article class="vendor-card">
+        <div class="vendor-top">
+          <div class="vendor-left">
+            ${renderThumb(imageUrl, title)}
+
+            <div class="vendor-info">
+              <h3 class="vendor-name">${escapeHtml(title)}</h3>
+              <p class="vendor-type">${escapeHtml(typeLine)}</p>
+            </div>
+          </div>
+
+          <div class="vendor-price">${escapeHtml(price)}</div>
+        </div>
+
+        <div class="vendor-meta">
+          <span class="pill available">Available</span>
+          ${eventType ? `<span class="pill note">${escapeHtml(eventType)}</span>` : ""}
+          <span class="pill note">${escapeHtml(vendorName)}</span>
+        </div>
+
+        <div class="vendor-actions">
+          <button class="btn" type="button" data-add-id="${listingId}">Add Vendor</button>
+          <a class="btn-secondary" href="detail.html?id=${listingId}">View</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  document.querySelectorAll("[data-add-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      addVendorToBoard(button.dataset.addId);
+    });
+  });
+}
+
+function renderAll() {
+  renderSelectedVendors();
+  renderAvailableVendors();
+}
+
+async function loadPublishedListings() {
+  const snapshot = await getDocs(collection(db, "listings"));
+
+  const listings = [];
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    if (data.status === "published") {
+      listings.push({
+        id: docSnap.id,
+        ...data
+      });
+    }
+  });
+
+  listings.sort((a, b) => {
+    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+    return bTime - aTime;
+  });
+
+  publishedListings = listings;
+}
+
+async function loadSelectedVendors() {
+  const q = query(
+    collection(db, "eventBoardItems"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(q);
+
+  const items = [];
+
+  snapshot.forEach((docSnap) => {
+    items.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+  });
+
+  items.sort((a, b) => {
+    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+    return bTime - aTime;
+  });
+
+  selectedVendors = items;
+}
+
+async function addVendorToBoard(listingId) {
+  if (isBusy) return;
+
+  const cleanListingId = decodeURIComponent(listingId);
+  const listing = publishedListings.find((item) => item.id === cleanListingId);
+
+  if (!listing) {
+    showStatus("Could not find that listing. Please refresh and try again.", "error");
+    return;
+  }
+
+  if (isSelected(cleanListingId)) {
+    showStatus("This vendor is already on your event board.", "error");
+    return;
+  }
+
+  try {
+    isBusy = true;
+
+    const priceNumber = extractNumber(listing.startingPrice);
+
+    const newItem = {
+      userId: currentUser.uid,
+      listingId: cleanListingId,
+      listingTitle: safeText(listing.title, "Untitled Listing"),
+      listingCategory: safeText(listing.category, "Event Service"),
+      customCategory: safeText(listing.customCategory, ""),
+      eventType: safeText(listing.eventType, ""),
+      startingPrice: safeText(listing.startingPrice, ""),
+      priceNumber,
+      vendorId: safeText(listing.vendorId, ""),
+      vendorName: safeText(listing.vendorName, "Vendor"),
+      vendorEmail: safeText(listing.vendorEmail, ""),
+      imageUrl: safeText(listing.imageUrl, ""),
+      location: safeText(listing.location, ""),
+      status: "pending",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+
+    const docRef = await addDoc(collection(db, "eventBoardItems"), newItem);
+
+    selectedVendors.unshift({
+      id: docRef.id,
+      ...newItem,
+      createdAt: null,
+      updatedAt: null
+    });
+
+    renderAll();
+    showStatus("Vendor added to your event board.", "success");
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
+}
+
+async function removeVendorFromBoard(boardId) {
+  if (isBusy) return;
+
+  const cleanBoardId = decodeURIComponent(boardId);
+
+  try {
+    isBusy = true;
+
+    await deleteDoc(doc(db, "eventBoardItems", cleanBoardId));
+
+    selectedVendors = selectedVendors.filter((vendor) => vendor.id !== cleanBoardId);
+
+    renderAll();
+    showStatus("Vendor removed from your event board.", "success");
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
+}
+
+async function findExistingConversation(customerId, vendorId, listingId) {
+  const conversationKey = `${customerId}_${vendorId}_${listingId}`;
+  const q = query(
+    collection(db, "conversations"),
+    where("conversationKey", "==", conversationKey)
+  );
+
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) return null;
+
+  let conversation = null;
+
+  snapshot.forEach((docSnap) => {
+    conversation = {
+      id: docSnap.id,
+      ...docSnap.data()
+    };
+  });
+
+  return conversation;
+}
+
+async function openMessageForListing(listingId) {
+  const cleanListingId = decodeURIComponent(listingId);
+  const vendor = selectedVendors.find((item) => item.listingId === cleanListingId);
+
+  if (!vendor) {
+    showStatus("Could not find that selected vendor.", "error");
+    return;
+  }
+
+  if (!vendor.vendorId) {
+    showStatus("This vendor listing is missing vendor information.", "error");
+    return;
+  }
+
+  try {
+    const existingConversation = await findExistingConversation(
+      currentUser.uid,
+      vendor.vendorId,
+      cleanListingId
+    );
+
+    if (existingConversation) {
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
+      return;
+    }
+
+    const customerName =
+      currentUserData.name ||
+      currentUser.displayName ||
+      currentUser.email ||
+      "Customer";
+
+    const conversationKey = `${currentUser.uid}_${vendor.vendorId}_${cleanListingId}`;
+
+    const conversationRef = await addDoc(collection(db, "conversations"), {
+      conversationKey,
+      participantIds: [currentUser.uid, vendor.vendorId],
+      participantNames: {
+        [currentUser.uid]: customerName,
+        [vendor.vendorId]: vendor.vendorName || "Vendor"
+      },
+      participantRoles: {
+        [currentUser.uid]: "customer",
+        [vendor.vendorId]: "vendor"
+      },
+      customerId: currentUser.uid,
+      vendorId: vendor.vendorId,
+      listingId: cleanListingId,
+      listingTitle: vendor.listingTitle || "Event Listing",
+      listingCategory: vendor.listingCategory || "Event Service",
+      listingLocation: vendor.location || "",
+      title: vendor.vendorName || "Vendor",
+      contextType: "Vendor",
+      lastMessage: `Hi! I added ${vendor.listingTitle || "your listing"} to my event board and would like to ask about availability.`,
+      lastSenderId: currentUser.uid,
+      unreadFor: {
+        [vendor.vendorId]: true
+      },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
+      text: `Hi! I added ${vendor.listingTitle || "your listing"} to my event board and would like to ask about availability.`,
+      senderId: currentUser.uid,
+      senderName: customerName,
+      senderRole: "customer",
+      createdAt: serverTimestamp()
+    });
+
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  }
+}
+
+async function handleUrlAddParam() {
+  const params = new URLSearchParams(window.location.search);
+  const addId = params.get("add") || params.get("listingId") || params.get("id");
+
+  if (!addId) return;
+
+  const cleanAddId = decodeURIComponent(addId);
+
+  if (isSelected(cleanAddId)) {
+    showStatus("That vendor is already on your event board.", "success");
+    window.history.replaceState({}, document.title, "event-builder.html");
+    return;
+  }
+
+  await addVendorToBoard(cleanAddId);
+
+  window.history.replaceState({}, document.title, "event-builder.html");
+}
+
+async function loadPage() {
+  try {
+    await loadPublishedListings();
+    await loadSelectedVendors();
+
+    renderAll();
+
+    await handleUrlAddParam();
+
+  } catch (error) {
+    document.getElementById("selectedVendorList").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load event board</h3>
+        <p>${escapeHtml(error.message)}</p>
+      </div>
+    `;
+
+    document.getElementById("availableVendorList").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load vendors</h3>
+        <p>${escapeHtml(error.message)}</p>
+      </div>
+    `;
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+
+  if (currentUserData.role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
+    return;
+  }
+
+  if (currentUserData.name) {
+    setText("eventTitle", `${currentUserData.name.split(" ")[0]}'s Event Board`);
+  }
+
+  loadPage();
+});
+</script>
+
 </body>
 </html>
