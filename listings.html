@@ -132,7 +132,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 280px;
+      max-width: 310px;
     }
 
     .hero-label {
@@ -157,26 +157,55 @@
       color: rgba(255, 255, 255, 0.95);
     }
 
-    .search-wrap {
+    .search-panel {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 14px;
+      box-shadow: var(--shadow);
       margin-bottom: 16px;
     }
 
-    .search-input {
+    .search-wrap {
+      display: grid;
+      gap: 10px;
+    }
+
+    .search-input,
+    .select-input {
       width: 100%;
-      min-height: 56px;
+      min-height: 54px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 0 18px;
+      background: #fff;
+      padding: 0 16px;
       font-family: inherit;
       font-size: 0.95rem;
       color: var(--text);
       outline: none;
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.04);
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.03);
     }
 
     .search-input::placeholder {
       color: #9f9488;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 0.8fr;
+      gap: 10px;
+    }
+
+    .clear-btn {
+      min-height: 44px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      color: #4a433d;
+      font-size: 0.86rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
     }
 
     .filters {
@@ -504,6 +533,12 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
+    @media (max-width: 390px) {
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (min-width: 768px) {
       body {
         padding: 24px 0;
@@ -514,7 +549,11 @@
       }
 
       .hero-content {
-        max-width: 420px;
+        max-width: 460px;
+      }
+
+      .search-wrap {
+        grid-template-columns: 1fr 0.7fr 0.7fr;
       }
 
       .listing-list {
@@ -531,33 +570,114 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">
-        ←
-      </a>
+      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Marketplace</div>
         <h1 class="page-title">Listings</h1>
       </div>
 
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
-        🔔
-      </a>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
         <div class="hero-label">Find your perfect match</div>
-        <h2 class="hero-title">Browse event vendors beautifully.</h2>
+        <h2 class="hero-title">Browse event vendors near your event.</h2>
         <p class="hero-subtitle">
-          Explore venues, décor, rentals, catering, and more for your next event.
+          Search by city, ZIP, category, and event type so RentEvent can grow from local to national.
         </p>
       </div>
     </section>
 
-    <div class="search-wrap">
-      <input id="searchInput" class="search-input" type="text" placeholder="Search vendors, rentals, décor..." />
-    </div>
+    <section class="search-panel">
+      <div class="search-wrap">
+        <input id="searchInput" class="search-input" type="text" placeholder="Search vendors, rentals, décor..." />
+
+        <input id="locationInput" class="search-input" type="text" placeholder="City, ZIP, or service area" />
+
+        <div class="filter-row">
+          <select id="stateInput" class="select-input">
+            <option value="">State</option>
+            <option>TX</option>
+            <option>AL</option>
+            <option>AK</option>
+            <option>AZ</option>
+            <option>AR</option>
+            <option>CA</option>
+            <option>CO</option>
+            <option>CT</option>
+            <option>DE</option>
+            <option>FL</option>
+            <option>GA</option>
+            <option>HI</option>
+            <option>ID</option>
+            <option>IL</option>
+            <option>IN</option>
+            <option>IA</option>
+            <option>KS</option>
+            <option>KY</option>
+            <option>LA</option>
+            <option>ME</option>
+            <option>MD</option>
+            <option>MA</option>
+            <option>MI</option>
+            <option>MN</option>
+            <option>MS</option>
+            <option>MO</option>
+            <option>MT</option>
+            <option>NE</option>
+            <option>NV</option>
+            <option>NH</option>
+            <option>NJ</option>
+            <option>NM</option>
+            <option>NY</option>
+            <option>NC</option>
+            <option>ND</option>
+            <option>OH</option>
+            <option>OK</option>
+            <option>OR</option>
+            <option>PA</option>
+            <option>RI</option>
+            <option>SC</option>
+            <option>SD</option>
+            <option>TN</option>
+            <option>UT</option>
+            <option>VT</option>
+            <option>VA</option>
+            <option>WA</option>
+            <option>WV</option>
+            <option>WI</option>
+            <option>WY</option>
+          </select>
+
+          <button id="clearFiltersBtn" class="clear-btn" type="button">Clear</button>
+        </div>
+
+        <select id="categoryInput" class="select-input">
+          <option value="">All Categories</option>
+          <option>Balloon Décor</option>
+          <option>Bounce House Rentals</option>
+          <option>Soft Play Rentals</option>
+          <option>Event Décor</option>
+          <option>Full Event Styling</option>
+          <option>Floral Design</option>
+          <option>Catering</option>
+          <option>Desserts / Cakes</option>
+          <option>Mobile Bar</option>
+          <option>Venues</option>
+          <option>Tables + Chairs</option>
+          <option>Party Rentals</option>
+          <option>Photo Booth</option>
+          <option>Photography</option>
+          <option>Videography</option>
+          <option>Hair + Makeup</option>
+          <option>DJ / Entertainment</option>
+          <option>Event Planner</option>
+          <option>Other Event Service</option>
+        </select>
+      </div>
+    </section>
 
     <div class="filters">
       <button class="filter-pill active" data-filter="all">All</button>
@@ -568,6 +688,8 @@
       <button class="filter-pill" data-filter="catering">Catering</button>
       <button class="filter-pill" data-filter="venue">Venues</button>
       <button class="filter-pill" data-filter="kids">Kids</button>
+      <button class="filter-pill" data-filter="travel">Travels</button>
+      <button class="filter-pill" data-filter="virtual">Virtual/National</button>
     </div>
 
     <section class="section">
@@ -645,6 +767,10 @@ function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
 
+function normalize(value) {
+  return safeText(value, "").toLowerCase().trim();
+}
+
 function formatPrice(value) {
   const raw = safeText(value, "");
 
@@ -683,17 +809,50 @@ function renderEmptyState(title, message) {
   `;
 }
 
-function listingMatchesFilter(listing, filter) {
-  if (filter === "all") return true;
+function getLocationDisplay(listing) {
+  return (
+    safeText(listing.location, "") ||
+    safeText(listing.baseCity, "") ||
+    safeText(listing.serviceArea, "") ||
+    "Location not listed"
+  );
+}
 
-  const searchable = [
+function getSearchBlob(listing) {
+  const serviceCities = Array.isArray(listing.serviceCities)
+    ? listing.serviceCities.join(" ")
+    : safeText(listing.serviceCities, "");
+
+  const serviceZipCodes = Array.isArray(listing.serviceZipCodes)
+    ? listing.serviceZipCodes.join(" ")
+    : safeText(listing.serviceZipCodes, "");
+
+  return [
     listing.title,
     listing.category,
     listing.customCategory,
     listing.eventType,
     listing.location,
-    listing.description
+    listing.baseCity,
+    listing.baseState,
+    listing.state,
+    listing.zipCode,
+    listing.serviceArea,
+    serviceCities,
+    serviceZipCodes,
+    listing.description,
+    listing.vendorName,
+    listing.mainCategory,
+    listing.availability
   ].join(" ").toLowerCase();
+}
+
+function listingMatchesFilter(listing, filter) {
+  if (filter === "all") return true;
+
+  const searchable = getSearchBlob(listing);
+  const travelAvailable = listing.travelAvailable === true || normalize(listing.travelAvailable) === "true" || normalize(listing.travelAvailable).includes("yes");
+  const nationalService = listing.nationalShipping === true || listing.virtualService === true || normalize(listing.nationalShipping).includes("yes") || normalize(listing.virtualService).includes("yes");
 
   if (filter === "birthday") {
     return searchable.includes("birthday") || searchable.includes("party");
@@ -723,6 +882,14 @@ function listingMatchesFilter(listing, filter) {
     return searchable.includes("kids") || searchable.includes("children") || searchable.includes("toddler") || searchable.includes("soft play") || searchable.includes("bounce");
   }
 
+  if (filter === "travel") {
+    return travelAvailable || searchable.includes("travel available") || searchable.includes("travels");
+  }
+
+  if (filter === "virtual") {
+    return nationalService || searchable.includes("virtual") || searchable.includes("national") || searchable.includes("ships");
+  }
+
   return true;
 }
 
@@ -732,18 +899,21 @@ function renderListings(listings) {
 
   if (!listings.length) {
     sectionTitle.textContent = "No Listings Found";
-    renderEmptyState("No listings found", "Try a different search or filter. New vendors will appear here as they publish services.");
+    renderEmptyState("No listings found", "Try a different city, ZIP, state, category, or event type.");
     return;
   }
 
-  sectionTitle.textContent = `${listings.length} Published Listing${listings.length === 1 ? "" : "s"}`;
+  sectionTitle.textContent = `${listings.length} Matching Listing${listings.length === 1 ? "" : "s"}`;
 
   listingList.innerHTML = listings.map((listing, index) => {
     const title = safeText(listing.title, "Untitled Listing");
     const category = safeText(listing.category, "Event Service");
     const customCategory = safeText(listing.customCategory, "");
     const eventType = safeText(listing.eventType, "");
-    const location = safeText(listing.location, "Location not listed");
+    const location = getLocationDisplay(listing);
+    const serviceArea = safeText(listing.serviceArea, "");
+    const baseState = safeText(listing.baseState, "") || safeText(listing.state, "");
+    const zipCode = safeText(listing.zipCode, "");
     const description = safeText(listing.description, "No description has been added yet.");
     const availability = safeText(listing.availability, "Available");
     const price = formatPrice(listing.startingPrice);
@@ -755,6 +925,7 @@ function renderListings(listings) {
       ? `${category} · ${customCategory}`
       : category;
 
+    const locationLine = [location, baseState, zipCode].filter(Boolean).join(" ");
     const imageClass = `image-${(index % 4) + 1}`;
 
     const imageMarkup = imageUrl
@@ -778,14 +949,15 @@ function renderListings(listings) {
 
         <div class="listing-meta">
           <span class="pill rating">${escapeHtml(rating)}</span>
-          <span class="pill location">${escapeHtml(location)}</span>
+          <span class="pill location">${escapeHtml(locationLine || "Location not listed")}</span>
           ${eventType ? `<span class="pill type">${escapeHtml(eventType)}</span>` : ""}
+          ${serviceArea ? `<span class="pill location">${escapeHtml(serviceArea)}</span>` : ""}
           <span class="pill available">${escapeHtml(availability)}</span>
         </div>
 
         <div class="listing-actions">
           <a class="btn" href="detail.html?id=${listingId}">View Details</a>
-          <a class="btn-secondary" href="event-builder.html">Add to Event</a>
+          <a class="btn-secondary" href="event-builder.html?add=${listingId}">Add to Event</a>
         </div>
       </article>
     `;
@@ -793,24 +965,50 @@ function renderListings(listings) {
 }
 
 function applySearchAndFilter() {
-  const searchInput = document.getElementById("searchInput");
-  const query = searchInput.value.trim().toLowerCase();
+  const searchQuery = normalize(document.getElementById("searchInput").value);
+  const locationQuery = normalize(document.getElementById("locationInput").value);
+  const stateQuery = normalize(document.getElementById("stateInput").value);
+  const categoryQuery = normalize(document.getElementById("categoryInput").value);
 
   let filtered = allListings.filter((listing) => listingMatchesFilter(listing, activeFilter));
 
-  if (query) {
+  if (searchQuery) {
     filtered = filtered.filter((listing) => {
-      const searchable = [
-        listing.title,
-        listing.category,
-        listing.customCategory,
-        listing.eventType,
+      return getSearchBlob(listing).includes(searchQuery);
+    });
+  }
+
+  if (locationQuery) {
+    filtered = filtered.filter((listing) => {
+      const searchableLocation = [
         listing.location,
-        listing.description,
-        listing.vendorName
+        listing.baseCity,
+        listing.zipCode,
+        listing.serviceArea,
+        Array.isArray(listing.serviceCities) ? listing.serviceCities.join(" ") : listing.serviceCities,
+        Array.isArray(listing.serviceZipCodes) ? listing.serviceZipCodes.join(" ") : listing.serviceZipCodes
       ].join(" ").toLowerCase();
 
-      return searchable.includes(query);
+      return searchableLocation.includes(locationQuery);
+    });
+  }
+
+  if (stateQuery) {
+    filtered = filtered.filter((listing) => {
+      const listingState = normalize(listing.baseState || listing.state);
+      return listingState === stateQuery;
+    });
+  }
+
+  if (categoryQuery) {
+    filtered = filtered.filter((listing) => {
+      const listingCategory = [
+        listing.category,
+        listing.customCategory,
+        listing.mainCategory
+      ].join(" ").toLowerCase();
+
+      return listingCategory.includes(categoryQuery);
     });
   }
 
@@ -850,7 +1048,25 @@ async function loadListings() {
   }
 }
 
+function clearFilters() {
+  document.getElementById("searchInput").value = "";
+  document.getElementById("locationInput").value = "";
+  document.getElementById("stateInput").value = "";
+  document.getElementById("categoryInput").value = "";
+
+  activeFilter = "all";
+
+  document.querySelectorAll(".filter-pill").forEach((pill) => pill.classList.remove("active"));
+  document.querySelector('[data-filter="all"]').classList.add("active");
+
+  renderListings(allListings);
+}
+
 document.getElementById("searchInput").addEventListener("input", applySearchAndFilter);
+document.getElementById("locationInput").addEventListener("input", applySearchAndFilter);
+document.getElementById("stateInput").addEventListener("change", applySearchAndFilter);
+document.getElementById("categoryInput").addEventListener("change", applySearchAndFilter);
+document.getElementById("clearFiltersBtn").addEventListener("click", clearFilters);
 
 document.querySelectorAll(".filter-pill").forEach((button) => {
   button.addEventListener("click", () => {
