@@ -30,6 +30,10 @@
       --coral-3: #ff5f67;
       --gold: #f4a43a;
       --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
@@ -78,7 +82,7 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .topbar-center {
@@ -128,7 +132,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 280px;
+      max-width: 310px;
     }
 
     .hero-label {
@@ -222,6 +226,45 @@
       gap: 12px;
     }
 
+    .row-3 {
+      display: grid;
+      grid-template-columns: 1fr 0.7fr 0.8fr;
+      gap: 12px;
+    }
+
+    .helper-text,
+    .status-message {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .status-message {
+      display: none;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 700;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
     .image-preview-wrap {
       display: none;
       margin-top: 12px;
@@ -272,23 +315,6 @@
       font-size: 0.86rem;
       line-height: 1.45;
       color: var(--muted);
-    }
-
-    .helper-text,
-    .status-message {
-      margin-top: 10px;
-      font-size: 0.82rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .status-message {
-      display: none;
-      background: #fff4df;
-      color: #8d5f11;
-      border-radius: 16px;
-      padding: 12px 14px;
-      font-weight: 700;
     }
 
     .bottom-bar {
@@ -367,8 +393,9 @@
       cursor: not-allowed;
     }
 
-    @media (max-width: 390px) {
-      .row-2 {
+    @media (max-width: 430px) {
+      .row-2,
+      .row-3 {
         grid-template-columns: 1fr;
       }
 
@@ -407,18 +434,14 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">
-        ←
-      </a>
+      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Vendor Portal</div>
         <h1 class="page-title">Add Listing</h1>
       </div>
 
-      <a href="messages.html" class="icon-btn" aria-label="Messages">
-        ✉
-      </a>
+      <a href="messages.html" class="icon-btn" aria-label="Messages">✉</a>
     </header>
 
     <section class="hero-card">
@@ -426,7 +449,7 @@
         <div class="hero-label">Create a new service</div>
         <h2 class="hero-title">Showcase your business beautifully.</h2>
         <p class="hero-subtitle">
-          Add a polished listing so clients can discover your services, pricing, and availability.
+          Add a polished listing with location details so clients can find you by city, ZIP, event type, and service area.
         </p>
       </div>
     </section>
@@ -462,7 +485,6 @@
               <option>Custom Signage</option>
               <option>Welcome Signs</option>
               <option>Seating Charts</option>
-              <option>Table Numbers + Place Cards</option>
               <option>Invitations + Stationery</option>
               <option>Party Favors</option>
               <option>Event Décor</option>
@@ -499,15 +521,12 @@
               <option>Chair Rentals</option>
               <option>Table Rentals</option>
               <option>Linen Rentals</option>
-              <option>Napkin Rentals</option>
-              <option>Chair Cover Rentals</option>
               <option>Tent Rentals</option>
               <option>Canopy Rentals</option>
               <option>Lounge Furniture Rentals</option>
               <option>Cocktail Table Rentals</option>
               <option>Bar Rentals</option>
               <option>Dinnerware Rentals</option>
-              <option>Charger Plate Rentals</option>
               <option>Glassware Rentals</option>
               <option>Flatware Rentals</option>
               <option>Dance Floor Rentals</option>
@@ -517,7 +536,6 @@
               <option>Generator Rentals</option>
               <option>Portable Restroom Rentals</option>
               <option>Luxury Restroom Trailer Rentals</option>
-              <option>Display Shelf Rentals</option>
               <option>Luxury Picnic Setup</option>
               <option>Luxury Sleepover Setup</option>
               <option>Teepee Party Setup</option>
@@ -532,7 +550,6 @@
               <option>Banquet Halls</option>
               <option>Barn Venues</option>
               <option>Garden Venues</option>
-              <option>Church / Fellowship Hall</option>
               <option>Community Centers</option>
               <option>Studio Rentals</option>
               <option>Photo Studios</option>
@@ -571,8 +588,6 @@
               <option>Ice Cream Cart</option>
               <option>Cotton Candy Cart</option>
               <option>Popcorn Cart</option>
-              <option>Hot Chocolate Bar</option>
-              <option>Tea Bar</option>
 
               <option>Photography</option>
               <option>Wedding Photography</option>
@@ -586,7 +601,6 @@
               <option>360 Photo Booth</option>
               <option>Mirror Photo Booth</option>
               <option>Audio Guestbook</option>
-              <option>Guestbook Services</option>
 
               <option>DJ</option>
               <option>Wedding DJ</option>
@@ -614,10 +628,7 @@
               <option>Setup Crew</option>
               <option>Breakdown Crew</option>
               <option>Cleanup Crew</option>
-              <option>Valet / Parking</option>
               <option>Security</option>
-              <option>Coat Check</option>
-              <option>Restroom Attendant</option>
 
               <option>Hair + Makeup</option>
               <option>Bridal Hair</option>
@@ -626,9 +637,7 @@
               <option>Spray Tanning</option>
               <option>Glam Services</option>
               <option>Nail Services</option>
-              <option>Bridal Alterations</option>
               <option>Tuxedo / Suit Rentals</option>
-              <option>Wedding Dress Services</option>
               <option>Wedding Officiant</option>
 
               <option>Transportation</option>
@@ -636,7 +645,6 @@
               <option>Limo Service</option>
               <option>Shuttle Service</option>
               <option>Luxury Car Rental</option>
-              <option>Horse Carriage</option>
               <option>Golf Cart Rentals</option>
 
               <option>Paint Party</option>
@@ -665,7 +673,6 @@
             <label for="event-type">Best For / Event Type</label>
             <select id="event-type" class="select">
               <option selected disabled value="">Select an Event Type</option>
-
               <option>Kids Birthday Parties</option>
               <option>First Birthday Parties</option>
               <option>Toddler Parties</option>
@@ -674,39 +681,33 @@
               <option>Backyard Parties</option>
               <option>Pool Parties</option>
               <option>Sleepovers / Slumber Parties</option>
-
               <option>Weddings</option>
               <option>Bridal Showers</option>
               <option>Engagement Parties</option>
               <option>Bachelorette Parties</option>
               <option>Rehearsal Dinners</option>
               <option>Wedding Receptions</option>
-
               <option>Baby Showers</option>
               <option>Gender Reveals</option>
               <option>Sip and See Events</option>
               <option>Christenings / Baptisms</option>
-
               <option>Graduation Parties</option>
               <option>Prom / School Events</option>
               <option>Homecoming Events</option>
               <option>Quinceañeras</option>
               <option>Sweet Sixteens</option>
-
               <option>Corporate Events</option>
               <option>Networking Events</option>
               <option>Grand Openings</option>
               <option>Brand Launches</option>
               <option>Fundraisers</option>
               <option>Galas</option>
-
               <option>Holiday Parties</option>
               <option>Christmas Events</option>
               <option>Halloween Parties</option>
               <option>Easter Events</option>
               <option>Fourth of July Events</option>
               <option>New Year’s Eve Events</option>
-
               <option>Church Events</option>
               <option>Community Events</option>
               <option>Family Reunions</option>
@@ -725,8 +726,12 @@
             </div>
 
             <div class="field-group">
-              <label for="location">Location</label>
-              <input id="location" class="input" type="text" placeholder="League City, TX" />
+              <label for="availability">Availability</label>
+              <select id="availability" class="select">
+                <option selected>Currently Available</option>
+                <option>Limited Availability</option>
+                <option>Waitlist Only</option>
+              </select>
             </div>
           </div>
 
@@ -741,26 +746,115 @@
     </section>
 
     <section class="section">
-      <h2 class="section-title">Service Details</h2>
+      <h2 class="section-title">Location & Service Area</h2>
 
       <div class="card">
         <div class="form-grid">
-          <div class="row-2">
+          <div class="row-3">
             <div class="field-group">
-              <label for="availability">Availability</label>
-              <select id="availability" class="select">
-                <option selected>Currently Available</option>
-                <option>Limited Availability</option>
-                <option>Waitlist Only</option>
+              <label for="base-city">Base City</label>
+              <input id="base-city" class="input" type="text" placeholder="League City" />
+            </div>
+
+            <div class="field-group">
+              <label for="base-state">State</label>
+              <select id="base-state" class="select">
+                <option value="">State</option>
+                <option selected>TX</option>
+                <option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option>
+                <option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option>
+                <option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option>
+                <option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                <option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option>
+                <option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option>
+                <option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option>
+                <option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                <option>SD</option><option>TN</option><option>UT</option><option>VT</option><option>VA</option>
+                <option>WA</option><option>WV</option><option>WI</option><option>WY</option>
               </select>
             </div>
 
             <div class="field-group">
-              <label for="service-area">Service Area</label>
-              <input id="service-area" class="input" type="text" placeholder="League City, Friendswood, Pearland" />
+              <label for="zip-code">ZIP Code</label>
+              <input id="zip-code" class="input" type="text" placeholder="77573" />
             </div>
           </div>
 
+          <div class="row-2">
+            <div class="field-group">
+              <label for="service-radius">Service Radius</label>
+              <select id="service-radius" class="select">
+                <option value="">Select Radius</option>
+                <option value="10">Up to 10 miles</option>
+                <option value="20">Up to 20 miles</option>
+                <option value="30" selected>Up to 30 miles</option>
+                <option value="50">Up to 50 miles</option>
+                <option value="75">Up to 75 miles</option>
+                <option value="100">Up to 100 miles</option>
+                <option value="custom">Custom / Varies</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="travel-available">Travel Available?</label>
+              <select id="travel-available" class="select">
+                <option value="yes" selected>Yes, within service area</option>
+                <option value="limited">Limited travel</option>
+                <option value="no">No travel</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="service-cities">Cities / Areas Served</label>
+            <textarea id="service-cities" class="textarea" placeholder="League City, Friendswood, Pearland, Webster, Clear Lake, Galveston..."></textarea>
+            <p class="helper-text">
+              Separate cities with commas. This helps customers search by where their event is happening.
+            </p>
+          </div>
+
+          <div class="field-group">
+            <label for="service-zip-codes">ZIP Codes Served</label>
+            <input id="service-zip-codes" class="input" type="text" placeholder="77573, 77546, 77581, 77058" />
+            <p class="helper-text">
+              Optional, but helpful for stronger local search later.
+            </p>
+          </div>
+
+          <div class="row-2">
+            <div class="field-group">
+              <label for="virtual-service">Virtual / Digital Service?</label>
+              <select id="virtual-service" class="select">
+                <option value="no" selected>No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="national-service">National / Shipping Available?</label>
+              <select id="national-service" class="select">
+                <option value="no" selected>No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="service-area">Short Service Area Summary</label>
+            <input id="service-area" class="input" type="text" placeholder="Greater Houston, Galveston County, surrounding areas" />
+            <p class="helper-text">
+              This is the simple service area label customers will see on listing cards.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Service Details</h2>
+
+      <div class="card">
+        <div class="form-grid">
           <div class="field-group">
             <label for="included">What’s Included</label>
             <textarea id="included" class="textarea" placeholder="Delivery, setup, pickup, styling items, consultation, etc."></textarea>
@@ -790,7 +884,7 @@
             <div class="upload-icon">◎</div>
             <h3 class="upload-title">Photo Display Preview</h3>
             <p class="upload-text">
-              This image will appear on the marketplace, listing detail page, vendor dashboard, and My Listings once those pages are updated to display it.
+              This image will appear on the marketplace, listing detail page, vendor dashboard, My Listings, and the event board.
             </p>
           </div>
         </div>
@@ -830,9 +924,21 @@ const db = getFirestore(app);
 let currentUser = null;
 let currentUserData = null;
 
-function showStatus(message) {
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function splitCommaList(value) {
+  return safeText(value, "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function showStatus(message, type = "info") {
   const status = document.getElementById("statusMessage");
   status.textContent = message;
+  status.className = `status-message ${type}`;
   status.style.display = "block";
 }
 
@@ -850,6 +956,17 @@ function isValidImageUrl(url) {
   } catch {
     return false;
   }
+}
+
+function buildLocationLabel(baseCity, baseState) {
+  const city = safeText(baseCity, "");
+  const state = safeText(baseState, "");
+
+  if (city && state) return `${city}, ${state}`;
+  if (city) return city;
+  if (state) return state;
+
+  return "";
 }
 
 const imageUrlInput = document.getElementById("image-url");
@@ -896,11 +1013,27 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
   currentUserData = userData;
+
+  const businessCity = safeText(userData.baseCity, "") || safeText(userData.location, "");
+  const businessState = safeText(userData.baseState, "") || "TX";
+  const businessServiceArea = safeText(userData.serviceArea, "");
+
+  if (businessCity) {
+    document.getElementById("base-city").value = businessCity;
+  }
+
+  if (businessState) {
+    document.getElementById("base-state").value = businessState;
+  }
+
+  if (businessServiceArea) {
+    document.getElementById("service-area").value = businessServiceArea;
+  }
 });
 
 window.saveListing = async function(status) {
   if (!currentUser || !currentUserData) {
-    showStatus("Still loading your vendor account. Please wait a second and try again.");
+    showStatus("Still loading your vendor account. Please wait a second and try again.", "error");
     return;
   }
 
@@ -909,26 +1042,50 @@ window.saveListing = async function(status) {
   const customCategory = document.getElementById("custom-category").value.trim();
   const eventType = document.getElementById("event-type").value.trim();
   const startingPrice = document.getElementById("starting-price").value.trim();
-  const location = document.getElementById("location").value.trim();
-  const description = document.getElementById("description").value.trim();
   const availability = document.getElementById("availability").value.trim();
+  const description = document.getElementById("description").value.trim();
+
+  const baseCity = document.getElementById("base-city").value.trim();
+  const baseState = document.getElementById("base-state").value.trim();
+  const zipCode = document.getElementById("zip-code").value.trim();
+  const serviceRadiusMiles = document.getElementById("service-radius").value.trim();
+  const travelAvailableValue = document.getElementById("travel-available").value.trim();
+  const serviceCitiesText = document.getElementById("service-cities").value.trim();
+  const serviceZipCodesText = document.getElementById("service-zip-codes").value.trim();
+  const virtualServiceValue = document.getElementById("virtual-service").value.trim();
+  const nationalServiceValue = document.getElementById("national-service").value.trim();
   const serviceArea = document.getElementById("service-area").value.trim();
+
   const included = document.getElementById("included").value.trim();
   const imageUrl = document.getElementById("image-url").value.trim();
 
-  if (!title || !category || !eventType || !startingPrice || !location || !description) {
-    showStatus("Please fill in listing name, service category, event type, starting price, location, and description before saving.");
+  const location = buildLocationLabel(baseCity, baseState);
+  const serviceCities = splitCommaList(serviceCitiesText);
+  const serviceZipCodes = splitCommaList(serviceZipCodesText);
+
+  const travelAvailable = travelAvailableValue === "yes" || travelAvailableValue === "limited";
+  const virtualService = virtualServiceValue === "yes";
+  const nationalShipping = nationalServiceValue === "yes";
+
+  if (!title || !category || !eventType || !startingPrice || !baseCity || !baseState || !description) {
+    showStatus("Please fill in listing name, service category, event type, starting price, base city, state, and description before saving.", "error");
     return;
   }
 
   if (!isValidImageUrl(imageUrl)) {
-    showStatus("Please enter a valid image URL that starts with http:// or https://, or leave the photo field blank.");
+    showStatus("Please enter a valid image URL that starts with http:// or https://, or leave the photo field blank.", "error");
     return;
   }
 
   try {
     setSaving(true);
-    showStatus(status === "published" ? "Publishing your listing..." : "Saving your draft...");
+    showStatus(status === "published" ? "Publishing your listing..." : "Saving your draft...", "info");
+
+    const vendorName =
+      currentUserData.businessName ||
+      currentUserData.vendorName ||
+      currentUserData.name ||
+      "";
 
     await addDoc(collection(db, "listings"), {
       title,
@@ -936,15 +1093,31 @@ window.saveListing = async function(status) {
       customCategory,
       eventType,
       startingPrice,
-      location,
       description,
       availability,
-      serviceArea,
       included,
       status,
+
+      location,
+      baseCity,
+      baseState,
+      state: baseState,
+      zipCode,
+      serviceArea,
+      serviceCities,
+      serviceCitiesText,
+      serviceZipCodes,
+      serviceZipCodesText,
+      serviceRadiusMiles,
+      travelAvailable,
+      travelAvailableValue,
+      virtualService,
+      nationalShipping,
+
       vendorId: currentUser.uid,
-      vendorName: currentUserData.name || "",
+      vendorName,
       vendorEmail: currentUserData.email || currentUser.email || "",
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       views: 0,
@@ -953,7 +1126,7 @@ window.saveListing = async function(status) {
       imageUrl
     });
 
-    showStatus(status === "published" ? "Listing published successfully." : "Draft saved successfully.");
+    showStatus(status === "published" ? "Listing published successfully." : "Draft saved successfully.", "success");
 
     setTimeout(() => {
       window.location.href = "my-listings.html";
@@ -961,7 +1134,7 @@ window.saveListing = async function(status) {
 
   } catch (error) {
     setSaving(false);
-    showStatus(error.message);
+    showStatus(error.message, "error");
   }
 };
 </script>
