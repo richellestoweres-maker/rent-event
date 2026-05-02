@@ -430,6 +430,15 @@ function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function initialsFromName(name) {
   const cleanName = safeText(name, "RE");
   const parts = cleanName.split(" ").filter(Boolean);
@@ -466,8 +475,8 @@ function renderError(title, message) {
   thread.innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">!</div>
-      <h3>${title}</h3>
-      <p>${message}</p>
+      <h3>${escapeHtml(title)}</h3>
+      <p>${escapeHtml(message)}</p>
     </div>
   `;
 }
@@ -504,8 +513,8 @@ function renderMessages(messages) {
       return `
         <div class="message-row ${isMe ? "me" : "other"}">
           <div class="bubble">
-            ${text}
-            <span class="time">${time}</span>
+            ${escapeHtml(text)}
+            <span class="time">${escapeHtml(time)}</span>
           </div>
         </div>
       `;
@@ -551,6 +560,30 @@ function updateHeader() {
 
   if (conversationData.listingId) {
     document.getElementById("listingLink").href = `detail.html?id=${encodeURIComponent(conversationData.listingId)}`;
+  }
+}
+
+async function markConversationAsRead() {
+  if (!conversationData || !currentUser || !conversationId) return;
+
+  const unreadFor = {
+    ...(conversationData.unreadFor || {})
+  };
+
+  if (!unreadFor[currentUser.uid]) return;
+
+  delete unreadFor[currentUser.uid];
+
+  try {
+    const conversationRef = doc(db, "conversations", conversationId);
+
+    await updateDoc(conversationRef, {
+      unreadFor
+    });
+
+    conversationData.unreadFor = unreadFor;
+  } catch (error) {
+    console.log("Could not mark conversation as read:", error.message);
   }
 }
 
@@ -606,6 +639,9 @@ async function loadConversation() {
     }
 
     updateHeader();
+
+    await markConversationAsRead();
+
     watchMessages();
 
   } catch (error) {
@@ -652,6 +688,10 @@ async function sendMessage(text) {
       updatedAt: serverTimestamp(),
       unreadFor
     });
+
+    conversationData.unreadFor = unreadFor;
+    conversationData.lastMessage = messageText;
+    conversationData.lastSenderId = currentUser.uid;
 
     messageInput.value = "";
 
