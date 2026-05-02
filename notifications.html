@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notifications | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
+
   <style>
     * {
       box-sizing: border-box;
@@ -32,12 +34,11 @@
       --green-text: #2d7a49;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -83,7 +84,7 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .topbar-center {
@@ -133,7 +134,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 280px;
+      max-width: 300px;
     }
 
     .hero-label {
@@ -192,6 +193,8 @@
       font-size: 0.82rem;
       font-weight: 700;
       white-space: nowrap;
+      font-family: inherit;
+      cursor: pointer;
     }
 
     .notification-list {
@@ -207,6 +210,21 @@
       display: flex;
       gap: 14px;
       align-items: flex-start;
+      text-decoration: none;
+      color: inherit;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .notification-card:hover {
+      transform: translateY(-1px);
+    }
+
+    .notification-card.unread {
+      border: 1px solid rgba(255, 95, 103, 0.24);
     }
 
     .notification-icon {
@@ -234,6 +252,11 @@
     .icon-green {
       background: var(--green-soft);
       color: var(--green-text);
+    }
+
+    .icon-blue {
+      background: var(--blue-soft);
+      color: var(--blue-text);
     }
 
     .notification-content {
@@ -305,6 +328,80 @@
       color: #aa6f12;
     }
 
+    .pill.message {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .empty-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 46px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      padding: 0 18px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -361,7 +458,11 @@
       }
 
       .hero-content {
-        max-width: 420px;
+        max-width: 460px;
+      }
+
+      .notification-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .bottom-nav {
@@ -370,124 +471,170 @@
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">
+      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">
         ←
       </a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Updates</div>
+        <div class="eyebrow" id="roleEyebrow">Updates</div>
         <h1 class="page-title">Notifications</h1>
       </div>
 
-      <a href="profile.html" class="icon-btn" aria-label="Profile">
+      <a href="profile.html" class="icon-btn" id="profileLink" aria-label="Profile">
         ☺
       </a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Stay in the loop</div>
+        <div class="hero-label" id="heroLabel">Stay in the loop</div>
         <h2 class="hero-title">Everything important, all in one place.</h2>
-        <p class="hero-subtitle">
-          Keep track of booking updates, vendor replies, confirmations, and reminders for your events.
+        <p class="hero-subtitle" id="heroSubtitle">
+          Keep track of message replies, booking updates, confirmations, and reminders.
         </p>
       </div>
     </section>
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title">Recent Activity</h2>
-        <a class="clear-link" href="#">Clear All</a>
+        <h2 class="section-title" id="sectionTitle">Recent Activity</h2>
+        <button class="clear-link" id="clearUnreadBtn" type="button">Clear Unread</button>
       </div>
 
-      <div class="notification-list">
-        <article class="notification-card">
-          <div class="notification-icon icon-coral">✉</div>
-          <div class="notification-content">
-            <div class="notification-top">
-              <h3 class="notification-title">New message from Sunny Slides</h3>
-              <span class="notification-time">5 min ago</span>
-            </div>
-            <p class="notification-text">
-              They replied to your question about setup timing and included delivery details for your event.
-            </p>
-            <div class="notification-meta">
-              <span class="pill new">New Message</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="notification-card">
-          <div class="notification-icon icon-green">✓</div>
-          <div class="notification-content">
-            <div class="notification-top">
-              <h3 class="notification-title">Booking request confirmed</h3>
-              <span class="notification-time">1 hr ago</span>
-            </div>
-            <p class="notification-text">
-              Your Photo Booth Experience request has been accepted for July 18 and is ready for checkout.
-            </p>
-            <div class="notification-meta">
-              <span class="pill success">Confirmed</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="notification-card">
-          <div class="notification-icon icon-gold">★</div>
-          <div class="notification-content">
-            <div class="notification-top">
-              <h3 class="notification-title">New vendor recommendation</h3>
-              <span class="notification-time">Today</span>
-            </div>
-            <p class="notification-text">
-              Velvet Bloom was recommended for your event based on your saved vendors and décor style.
-            </p>
-            <div class="notification-meta">
-              <span class="pill info">Suggested Vendor</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="notification-card">
-          <div class="notification-icon icon-coral">!</div>
-          <div class="notification-content">
-            <div class="notification-top">
-              <h3 class="notification-title">Payment reminder</h3>
-              <span class="notification-time">Yesterday</span>
-            </div>
-            <p class="notification-text">
-              Your event deposit is ready for checkout so you can secure your selected vendors before availability changes.
-            </p>
-            <div class="notification-meta">
-              <span class="pill new">Action Needed</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="notification-card">
-          <div class="notification-icon icon-green">✓</div>
-          <div class="notification-content">
-            <div class="notification-top">
-              <h3 class="notification-title">Profile updated</h3>
-              <span class="notification-time">Yesterday</span>
-            </div>
-            <p class="notification-text">
-              Your account details were successfully updated and saved to your profile section.
-            </p>
-            <div class="notification-meta">
-              <span class="pill success">Saved</span>
-            </div>
-          </div>
-        </article>
+      <div class="notification-list" id="notificationList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading notifications</h3>
+          <p>We’re checking for message updates now.</p>
+        </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Bottom navigation">
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation">
+    <!-- Role navigation renders here -->
+  </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let allConversations = [];
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatTime(value) {
+  if (!value || !value.seconds) return "New";
+
+  const date = new Date(value.seconds * 1000);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return "Now";
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+  if (diffHours < 24) return `${diffHours} hr ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  return date.toLocaleDateString();
+}
+
+function getOtherParticipantName(conversation) {
+  const participantNames = conversation.participantNames || {};
+  const otherIds = (conversation.participantIds || []).filter((id) => id !== currentUser.uid);
+  const otherId = otherIds[0];
+
+  if (otherId && participantNames[otherId]) {
+    return participantNames[otherId];
+  }
+
+  return safeText(conversation.title, "Conversation");
+}
+
+function renderBottomNav(role) {
+  const bottomNav = document.getElementById("bottomNav");
+
+  if (role === "vendor") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="vendor-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+        </svg>
+        <span>Home</span>
+      </a>
+
+      <a class="nav-item" href="add-listing.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Add Listing</span>
+      </a>
+
+      <a class="nav-item active" href="notifications.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Alerts</span>
+      </a>
+
+      <a class="nav-item" href="vendor-profile.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+          <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Profile</span>
+      </a>
+    `;
+    return;
+  }
+
+  bottomNav.innerHTML = `
     <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
@@ -519,6 +666,213 @@
       </svg>
       <span>Profile</span>
     </a>
-  </nav>
+  `;
+}
+
+function applyRoleLayout(role) {
+  const backLink = document.getElementById("backLink");
+  const profileLink = document.getElementById("profileLink");
+
+  if (role === "vendor") {
+    backLink.href = "vendor-dashboard.html";
+    profileLink.href = "vendor-profile.html";
+    document.getElementById("roleEyebrow").textContent = "Vendor Updates";
+    document.getElementById("heroLabel").textContent = "Stay bookable";
+    document.getElementById("heroSubtitle").textContent = "Keep track of customer inquiries, message replies, and booking-related updates.";
+  } else {
+    backLink.href = "dashboard.html";
+    profileLink.href = "profile.html";
+    document.getElementById("roleEyebrow").textContent = "Updates";
+    document.getElementById("heroLabel").textContent = "Stay in the loop";
+    document.getElementById("heroSubtitle").textContent = "Keep track of vendor replies, booking updates, confirmations, and reminders.";
+  }
+
+  renderBottomNav(role);
+}
+
+function renderEmptyState() {
+  const list = document.getElementById("notificationList");
+  const role = currentUserData?.role || "customer";
+  const href = role === "vendor" ? "vendor-dashboard.html" : "listings.html";
+  const label = role === "vendor" ? "Back to Dashboard" : "Browse Listings";
+
+  list.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">✓</div>
+      <h3>No notifications yet</h3>
+      <p>You’re all caught up. New messages and updates will appear here.</p>
+      <div class="empty-actions">
+        <a class="btn" href="${href}">${label}</a>
+        <a class="btn-secondary" href="messages.html">Open Inbox</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderNotifications(conversations) {
+  const list = document.getElementById("notificationList");
+  const sectionTitle = document.getElementById("sectionTitle");
+
+  if (!conversations.length) {
+    sectionTitle.textContent = "Recent Activity";
+    renderEmptyState();
+    return;
+  }
+
+  const unreadCount = conversations.filter((conversation) => {
+    const unreadFor = conversation.unreadFor || {};
+    return !!unreadFor[currentUser.uid];
+  }).length;
+
+  sectionTitle.textContent = unreadCount
+    ? `${unreadCount} Unread Alert${unreadCount === 1 ? "" : "s"}`
+    : "Recent Activity";
+
+  list.innerHTML = conversations.map((conversation) => {
+    const unreadFor = conversation.unreadFor || {};
+    const isUnread = !!unreadFor[currentUser.uid];
+
+    const otherName = getOtherParticipantName(conversation);
+    const listingTitle = safeText(conversation.listingTitle, "Event listing");
+    const lastMessage = safeText(conversation.lastMessage, "Conversation updated.");
+    const updatedAt = conversation.updatedAt || conversation.createdAt;
+    const time = formatTime(updatedAt);
+    const conversationId = encodeURIComponent(conversation.id || "");
+
+    const title = isUnread
+      ? `New message from ${otherName}`
+      : `Message thread with ${otherName}`;
+
+    const text = `${lastMessage} Related to ${listingTitle}.`;
+
+    return `
+      <a class="notification-card ${isUnread ? "unread" : ""}" href="chat-thread.html?id=${conversationId}">
+        <div class="notification-icon ${isUnread ? "icon-coral" : "icon-blue"}">✉</div>
+
+        <div class="notification-content">
+          <div class="notification-top">
+            <h3 class="notification-title">${escapeHtml(title)}</h3>
+            <span class="notification-time">${escapeHtml(time)}</span>
+          </div>
+
+          <p class="notification-text">
+            ${escapeHtml(text)}
+          </p>
+
+          <div class="notification-meta">
+            ${isUnread ? `<span class="pill new">Unread</span>` : `<span class="pill message">Message</span>`}
+            <span class="pill info">${escapeHtml(listingTitle)}</span>
+          </div>
+        </div>
+      </a>
+    `;
+  }).join("");
+}
+
+async function loadNotifications(user) {
+  try {
+    const conversationsRef = collection(db, "conversations");
+    const conversationsQuery = query(conversationsRef, where("participantIds", "array-contains", user.uid));
+    const snapshot = await getDocs(conversationsQuery);
+
+    const conversations = [];
+
+    snapshot.forEach((docSnap) => {
+      conversations.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    conversations.sort((a, b) => {
+      const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
+      const bUnread = b.unreadFor && b.unreadFor[user.uid] ? 1 : 0;
+
+      if (aUnread !== bUnread) {
+        return bUnread - aUnread;
+      }
+
+      const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : 0;
+      const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    allConversations = conversations;
+    renderNotifications(allConversations);
+
+  } catch (error) {
+    document.getElementById("notificationList").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load notifications</h3>
+        <p>${escapeHtml(error.message)}</p>
+        <div class="empty-actions">
+          <a class="btn" href="messages.html">Open Inbox</a>
+        </div>
+      </div>
+    `;
+  }
+}
+
+async function clearUnread() {
+  if (!currentUser || !allConversations.length) return;
+
+  const clearBtn = document.getElementById("clearUnreadBtn");
+  clearBtn.disabled = true;
+  clearBtn.textContent = "Clearing...";
+
+  try {
+    const unreadConversations = allConversations.filter((conversation) => {
+      const unreadFor = conversation.unreadFor || {};
+      return !!unreadFor[currentUser.uid];
+    });
+
+    for (const conversation of unreadConversations) {
+      const updatedUnreadFor = {
+        ...(conversation.unreadFor || {})
+      };
+
+      delete updatedUnreadFor[currentUser.uid];
+
+      await updateDoc(doc(db, "conversations", conversation.id), {
+        unreadFor: updatedUnreadFor
+      });
+    }
+
+    await loadNotifications(currentUser);
+
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    clearBtn.disabled = false;
+    clearBtn.textContent = "Clear Unread";
+  }
+}
+
+document.getElementById("clearUnreadBtn").addEventListener("click", clearUnread);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+
+  applyRoleLayout(currentUserData.role);
+  loadNotifications(user);
+});
+</script>
+
 </body>
 </html>
