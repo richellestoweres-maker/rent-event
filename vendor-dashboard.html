@@ -110,6 +110,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
+      position: relative;
     }
 
     .icon-btn {
@@ -117,7 +118,7 @@
       height: 44px;
       border-radius: 50%;
       flex-shrink: 0;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .icon-btn svg {
@@ -130,6 +131,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      border-radius: 50%;
     }
 
     .profile-initials-small {
@@ -145,6 +147,45 @@
       white-space: nowrap;
       cursor: pointer;
       font-family: inherit;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.7rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
+      border: 2px solid #fff;
+      display: none;
+      z-index: 3;
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: 6px;
+      right: 16px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.66rem;
+      line-height: 18px;
+      font-weight: 800;
+      text-align: center;
+      border: 2px solid #fff;
+      display: none;
+      z-index: 3;
     }
 
     .hero-card {
@@ -183,7 +224,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 315px;
+      max-width: 330px;
     }
 
     .hero-profile {
@@ -458,6 +499,16 @@
       color: #aa6f12;
     }
 
+    .pill.unread {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .pill.message {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
     .listing-note {
       margin: 0 0 12px;
       font-size: 0.88rem;
@@ -542,14 +593,39 @@
       border-radius: 24px;
       padding: 16px;
       box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      border: 1px solid transparent;
+    }
+
+    .request-card.unread {
+      border-color: rgba(255, 95, 103, 0.24);
+    }
+
+    .request-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+      align-items: flex-start;
     }
 
     .request-name {
-      margin: 0 0 4px;
+      margin: 0;
       font-size: 1rem;
       line-height: 1.12;
       font-weight: 800;
       letter-spacing: -0.02em;
+    }
+
+    .request-time {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #9a9084;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
     .request-text {
@@ -557,6 +633,12 @@
       font-size: 0.88rem;
       line-height: 1.45;
       color: var(--muted);
+    }
+
+    .request-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .profile-card {
@@ -642,6 +724,7 @@
       font-weight: 700;
       text-align: center;
       padding: 0 4px;
+      position: relative;
     }
 
     .nav-item svg {
@@ -665,11 +748,11 @@
       }
 
       .hero-content {
-        max-width: 475px;
+        max-width: 500px;
       }
 
       .stats-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
       }
 
       .listing-list,
@@ -694,10 +777,19 @@
 
       <div class="top-actions">
         <a class="icon-btn" href="messages.html" aria-label="Messages">
+          <span class="notification-badge" id="topMessageBadge">0</span>
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
             <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
             <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+        </a>
+
+        <a class="icon-btn" href="notifications.html" aria-label="Notifications">
+          <span class="notification-badge" id="topNotificationBadge">0</span>
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+            <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
           </svg>
         </a>
 
@@ -728,6 +820,7 @@
         <div class="hero-actions">
           <a class="hero-btn" href="add-listing.html">Add Listing</a>
           <a class="hero-btn-secondary" href="my-listings.html">My Listings</a>
+          <a class="hero-btn-secondary" href="messages.html" id="heroInboxBtn">Inbox</a>
           <a class="hero-btn-secondary" href="vendor-profile.html">Edit Profile</a>
         </div>
       </div>
@@ -761,6 +854,12 @@
           <p class="stat-label">Listings</p>
           <p class="stat-value" id="listingCount">0</p>
           <p class="stat-note">Total services</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Unread</p>
+          <p class="stat-value" id="unreadCount">0</p>
+          <p class="stat-note">New inquiries</p>
         </div>
       </div>
     </section>
@@ -802,16 +901,12 @@
         <a class="section-link" href="messages.html">See All</a>
       </div>
 
-      <div class="request-list">
-        <article class="request-card">
-          <h3 class="request-name">Requests will appear here</h3>
-          <p class="request-text">
-            Once clients start messaging or requesting your services, you’ll see those inquiries on this dashboard.
-          </p>
-          <div class="request-actions">
-            <a class="btn" href="messages.html">Open Inbox</a>
-          </div>
-        </article>
+      <div class="request-list" id="recentRequests">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading requests</h3>
+          <p>We’re checking your latest customer inquiries now.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -842,6 +937,7 @@
     </a>
 
     <a class="nav-item" href="messages.html">
+      <span class="nav-badge" id="bottomInboxBadge">0</span>
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -854,7 +950,15 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -921,6 +1025,25 @@ function formatPrice(value) {
   return `$${Math.round(number)}+`;
 }
 
+function formatTime(value) {
+  if (!value || !value.seconds) return "New";
+
+  const date = new Date(value.seconds * 1000);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return "Now";
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+  if (diffHours < 24) return `${diffHours} hr ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  return date.toLocaleDateString();
+}
+
 function statusClass(status) {
   if (status === "published") return "active";
   if (status === "draft") return "draft";
@@ -938,6 +1061,36 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+    badge.style.alignItems = "center";
+    badge.style.justifyContent = "center";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+function updateNotificationBadges(count) {
+  setBadge("topMessageBadge", count);
+  setBadge("topNotificationBadge", count);
+  setBadge("bottomInboxBadge", count);
+  setText("unreadCount", count);
+
+  const heroInboxBtn = document.getElementById("heroInboxBtn");
+
+  if (count > 0) {
+    heroInboxBtn.textContent = `${count} New Inquir${count === 1 ? "y" : "ies"}`;
+  } else {
+    heroInboxBtn.textContent = "Inbox";
+  }
+}
+
 function setProfileImage(containerId, imageUrl, fallbackName, small = false) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -947,6 +1100,18 @@ function setProfileImage(containerId, imageUrl, fallbackName, small = false) {
   } else {
     el.textContent = initialsFromName(fallbackName);
   }
+}
+
+function getOtherParticipantName(conversation, user) {
+  const participantNames = conversation.participantNames || {};
+  const otherIds = (conversation.participantIds || []).filter((id) => id !== user.uid);
+  const otherId = otherIds[0];
+
+  if (otherId && participantNames[otherId]) {
+    return participantNames[otherId];
+  }
+
+  return safeText(conversation.title, "Customer");
 }
 
 function renderEmptyListings() {
@@ -1040,7 +1205,7 @@ function updateStats(listings) {
   setText("listingCount", listings.length);
 }
 
-function updateProfileSnapshot(userData, user) {
+function updateProfileSnapshot(userData) {
   const businessName =
     safeText(userData.businessName, "") ||
     safeText(userData.vendorName, "") ||
@@ -1064,6 +1229,59 @@ function updateProfileSnapshot(userData, user) {
   if (!logoUrl || !isValidUrl(logoUrl)) {
     document.getElementById("topProfileButton").innerHTML = `<span class="profile-initials-small">${initialsFromName(businessName)}</span>`;
   }
+}
+
+function renderEmptyRequests() {
+  const requestList = document.getElementById("recentRequests");
+
+  requestList.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">✉</div>
+      <h3>No requests yet</h3>
+      <p>Once clients start messaging or requesting your services, you’ll see those inquiries here.</p>
+      <a class="btn" href="messages.html">Open Inbox</a>
+    </div>
+  `;
+}
+
+function renderRecentRequests(conversations, user) {
+  const requestList = document.getElementById("recentRequests");
+
+  if (!conversations.length) {
+    renderEmptyRequests();
+    return;
+  }
+
+  const recent = conversations.slice(0, 4);
+
+  requestList.innerHTML = recent.map((conversation) => {
+    const unreadFor = conversation.unreadFor || {};
+    const isUnread = !!unreadFor[user.uid];
+
+    const otherName = getOtherParticipantName(conversation, user);
+    const listingTitle = safeText(conversation.listingTitle, "Event listing");
+    const lastMessage = safeText(conversation.lastMessage, "Conversation updated.");
+    const time = formatTime(conversation.updatedAt || conversation.createdAt);
+    const conversationId = encodeURIComponent(conversation.id || "");
+
+    return `
+      <a class="request-card ${isUnread ? "unread" : ""}" href="chat-thread.html?id=${conversationId}">
+        <div class="request-top">
+          <h3 class="request-name">${escapeHtml(otherName)}</h3>
+          <span class="request-time">${escapeHtml(time)}</span>
+        </div>
+
+        <p class="request-text">
+          ${escapeHtml(lastMessage)} Related to ${escapeHtml(listingTitle)}.
+        </p>
+
+        <div class="request-meta">
+          ${isUnread ? `<span class="pill unread">Unread</span>` : `<span class="pill message">Message</span>`}
+          <span class="pill saves">${escapeHtml(listingTitle)}</span>
+        </div>
+      </a>
+    `;
+  }).join("");
 }
 
 async function loadVendorListings(user) {
@@ -1104,6 +1322,59 @@ async function loadVendorListings(user) {
   }
 }
 
+async function loadVendorConversations(user) {
+  try {
+    const conversationsRef = collection(db, "conversations");
+    const q = query(conversationsRef, where("participantIds", "array-contains", user.uid));
+    const snapshot = await getDocs(q);
+
+    const conversations = [];
+    let unreadCount = 0;
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const unreadFor = data.unreadFor || {};
+
+      if (unreadFor[user.uid]) {
+        unreadCount += 1;
+      }
+
+      conversations.push({
+        id: docSnap.id,
+        ...data
+      });
+    });
+
+    conversations.sort((a, b) => {
+      const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
+      const bUnread = b.unreadFor && b.unreadFor[user.uid] ? 1 : 0;
+
+      if (aUnread !== bUnread) {
+        return bUnread - aUnread;
+      }
+
+      const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : 0;
+      const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    updateNotificationBadges(unreadCount);
+    renderRecentRequests(conversations, user);
+
+  } catch (error) {
+    updateNotificationBadges(0);
+
+    document.getElementById("recentRequests").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load requests</h3>
+        <p>${escapeHtml(error.message)}</p>
+        <a class="btn" href="messages.html">Open Inbox</a>
+      </div>
+    `;
+  }
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -1125,8 +1396,9 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  updateProfileSnapshot(userData, user);
+  updateProfileSnapshot(userData);
   loadVendorListings(user);
+  loadVendorConversations(user);
 });
 
 window.logout = async function () {
