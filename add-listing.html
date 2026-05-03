@@ -232,6 +232,43 @@
       gap: 12px;
     }
 
+    .checkbox-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+      margin-top: 4px;
+    }
+
+    .checkbox-chip {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #4f473f;
+      user-select: none;
+    }
+
+    .checkbox-chip input {
+      width: 18px;
+      height: 18px;
+      accent-color: #ff7a63;
+      flex-shrink: 0;
+    }
+
+    .checkbox-chip:has(input:checked) {
+      border-color: rgba(255, 122, 99, 0.42);
+      background: #fff4ef;
+      color: #c65248;
+    }
+
     .helper-text,
     .status-message {
       margin-top: 10px;
@@ -424,6 +461,10 @@
         max-width: 960px;
       }
 
+      .checkbox-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .bottom-bar {
         max-width: 520px;
       }
@@ -449,7 +490,7 @@
         <div class="hero-label">Create a new service</div>
         <h2 class="hero-title">Showcase your business beautifully.</h2>
         <p class="hero-subtitle">
-          Add a polished listing with clean categories and location details so clients can find you faster.
+          Add a polished listing with clean categories, location details, and every event type your service fits.
         </p>
       </div>
     </section>
@@ -499,53 +540,59 @@
           </div>
 
           <div class="field-group">
-            <label for="event-type">Best For / Event Type</label>
-            <select id="event-type" class="select">
-              <option selected disabled value="">Select an Event Type</option>
-              <option>Kids Birthday Parties</option>
-              <option>First Birthday Parties</option>
-              <option>Toddler Parties</option>
-              <option>Teen Birthday Parties</option>
-              <option>Adult Birthday Parties</option>
-              <option>Backyard Parties</option>
-              <option>Pool Parties</option>
-              <option>Sleepovers / Slumber Parties</option>
-              <option>Weddings</option>
-              <option>Bridal Showers</option>
-              <option>Engagement Parties</option>
-              <option>Bachelorette Parties</option>
-              <option>Rehearsal Dinners</option>
-              <option>Wedding Receptions</option>
-              <option>Baby Showers</option>
-              <option>Gender Reveals</option>
-              <option>Sip and See Events</option>
-              <option>Christenings / Baptisms</option>
-              <option>Graduation Parties</option>
-              <option>Prom / School Events</option>
-              <option>Homecoming Events</option>
-              <option>Quinceañeras</option>
-              <option>Sweet Sixteens</option>
-              <option>Corporate Events</option>
-              <option>Networking Events</option>
-              <option>Grand Openings</option>
-              <option>Brand Launches</option>
-              <option>Fundraisers</option>
-              <option>Galas</option>
-              <option>Holiday Parties</option>
-              <option>Christmas Events</option>
-              <option>Halloween Parties</option>
-              <option>Easter Events</option>
-              <option>Fourth of July Events</option>
-              <option>New Year’s Eve Events</option>
-              <option>Church Events</option>
-              <option>Community Events</option>
-              <option>Family Reunions</option>
-              <option>Anniversary Parties</option>
-              <option>Retirement Parties</option>
-              <option>Celebration of Life / Memorial Events</option>
-              <option>Luxury Dinner Parties</option>
-              <option>Other Event Type</option>
-            </select>
+            <label>Best For / Event Types</label>
+
+            <div class="checkbox-grid" id="eventTypesGrid">
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Kids Birthday Parties">Kids Birthday Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="First Birthday Parties">First Birthday Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Toddler Parties">Toddler Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Teen Birthday Parties">Teen Birthday Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Adult Birthday Parties">Adult Birthday Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Backyard Parties">Backyard Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Pool Parties">Pool Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Sleepovers / Slumber Parties">Sleepovers / Slumber Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Weddings">Weddings</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Bridal Showers">Bridal Showers</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Engagement Parties">Engagement Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Bachelorette Parties">Bachelorette Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Rehearsal Dinners">Rehearsal Dinners</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Wedding Receptions">Wedding Receptions</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Baby Showers">Baby Showers</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Gender Reveals">Gender Reveals</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Sip and See Events">Sip and See Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Christenings / Baptisms">Christenings / Baptisms</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Graduation Parties">Graduation Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Prom / School Events">Prom / School Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Homecoming Events">Homecoming Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Quinceañeras">Quinceañeras</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Sweet Sixteens">Sweet Sixteens</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Corporate Events">Corporate Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Networking Events">Networking Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Grand Openings">Grand Openings</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Brand Launches">Brand Launches</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Fundraisers">Fundraisers</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Galas">Galas</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Holiday Parties">Holiday Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Christmas Events">Christmas Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Halloween Parties">Halloween Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Easter Events">Easter Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Fourth of July Events">Fourth of July Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="New Year’s Eve Events">New Year’s Eve Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Church Events">Church Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Community Events">Community Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Family Reunions">Family Reunions</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Anniversary Parties">Anniversary Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Retirement Parties">Retirement Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Celebration of Life / Memorial Events">Celebration of Life / Memorial Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Luxury Dinner Parties">Luxury Dinner Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Open Houses">Open Houses</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Girls’ Night / Private Parties">Girls’ Night / Private Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Other Event Type">Other Event Type</label>
+            </div>
+
+            <p class="helper-text">
+              Select every event type this listing works for. This helps customers find you in more searches.
+            </p>
           </div>
 
           <div class="row-2">
@@ -987,6 +1034,12 @@ function splitCommaList(value) {
     .filter(Boolean);
 }
 
+function getSelectedEventTypes() {
+  return Array.from(document.querySelectorAll('input[name="event-type"]:checked'))
+    .map((input) => input.value.trim())
+    .filter(Boolean);
+}
+
 function showStatus(message, type = "info") {
   const status = document.getElementById("statusMessage");
   status.textContent = message;
@@ -1120,7 +1173,8 @@ window.saveListing = async function(status) {
   const mainCategory = document.getElementById("main-category").value.trim();
   const category = document.getElementById("category").value.trim();
   const customCategory = document.getElementById("custom-category").value.trim();
-  const eventType = document.getElementById("event-type").value.trim();
+  const eventTypes = getSelectedEventTypes();
+  const eventType = eventTypes.join(", ");
   const startingPrice = document.getElementById("starting-price").value.trim();
   const availability = document.getElementById("availability").value.trim();
   const description = document.getElementById("description").value.trim();
@@ -1147,8 +1201,8 @@ window.saveListing = async function(status) {
   const virtualService = virtualServiceValue === "yes";
   const nationalShipping = nationalServiceValue === "yes";
 
-  if (!title || !mainCategory || !category || !eventType || !startingPrice || !baseCity || !baseState || !description) {
-    showStatus("Please fill in listing name, main category, specific service, event type, starting price, base city, state, and description before saving.", "error");
+  if (!title || !mainCategory || !category || !eventTypes.length || !startingPrice || !baseCity || !baseState || !description) {
+    showStatus("Please fill in listing name, main category, specific service, at least one event type, starting price, base city, state, and description before saving.", "error");
     return;
   }
 
@@ -1172,6 +1226,7 @@ window.saveListing = async function(status) {
       mainCategory,
       category,
       customCategory,
+      eventTypes,
       eventType,
       startingPrice,
       description,
