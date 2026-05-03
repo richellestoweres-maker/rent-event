@@ -656,23 +656,26 @@
 
         <select id="categoryInput" class="select-input">
           <option value="">All Categories</option>
+          <option>Décor & Styling</option>
+          <option>Kids Parties & Activities</option>
+          <option>Rentals</option>
+          <option>Venues</option>
+          <option>Food & Beverage</option>
+          <option>Photo, Video & Content</option>
+          <option>Music & Entertainment</option>
+          <option>Planning & Staffing</option>
+          <option>Beauty & Formalwear</option>
+          <option>Transportation</option>
+          <option>Specialty Services</option>
           <option>Balloon Décor</option>
           <option>Bounce House Rentals</option>
-          <option>Soft Play Rentals</option>
-          <option>Event Décor</option>
-          <option>Full Event Styling</option>
-          <option>Floral Design</option>
+          <option>Charcuterie Boards</option>
           <option>Catering</option>
-          <option>Desserts / Cakes</option>
-          <option>Mobile Bar</option>
-          <option>Venues</option>
-          <option>Tables + Chairs</option>
-          <option>Party Rentals</option>
           <option>Photo Booth</option>
           <option>Photography</option>
           <option>Videography</option>
           <option>Hair + Makeup</option>
-          <option>DJ / Entertainment</option>
+          <option>DJ</option>
           <option>Event Planner</option>
           <option>Other Event Service</option>
         </select>
@@ -684,8 +687,10 @@
       <button class="filter-pill" data-filter="birthday">Birthdays</button>
       <button class="filter-pill" data-filter="wedding">Weddings</button>
       <button class="filter-pill" data-filter="shower">Showers</button>
+      <button class="filter-pill" data-filter="corporate">Corporate</button>
+      <button class="filter-pill" data-filter="holiday">Holiday</button>
       <button class="filter-pill" data-filter="decor">Décor</button>
-      <button class="filter-pill" data-filter="catering">Catering</button>
+      <button class="filter-pill" data-filter="catering">Food</button>
       <button class="filter-pill" data-filter="venue">Venues</button>
       <button class="filter-pill" data-filter="kids">Kids</button>
       <button class="filter-pill" data-filter="travel">Travels</button>
@@ -796,6 +801,27 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function getEventTypes(listing) {
+  if (Array.isArray(listing.eventTypes) && listing.eventTypes.length) {
+    return listing.eventTypes.map((item) => safeText(item, "")).filter(Boolean);
+  }
+
+  const eventType = safeText(listing.eventType, "");
+
+  if (!eventType) return [];
+
+  if (eventType.includes(",")) {
+    return eventType.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+
+  return [eventType];
+}
+
+function getEventTypesText(listing) {
+  const eventTypes = getEventTypes(listing);
+  return eventTypes.length ? eventTypes.join(", ") : "";
+}
+
 function renderEmptyState(title, message) {
   const listingList = document.getElementById("listingList");
 
@@ -810,27 +836,36 @@ function renderEmptyState(title, message) {
 }
 
 function getLocationDisplay(listing) {
-  return (
-    safeText(listing.location, "") ||
-    safeText(listing.baseCity, "") ||
-    safeText(listing.serviceArea, "") ||
-    "Location not listed"
-  );
+  const baseCity = safeText(listing.baseCity, "");
+  const baseState = safeText(listing.baseState || listing.state, "");
+  const location = safeText(listing.location, "");
+  const serviceArea = safeText(listing.serviceArea, "");
+
+  if (baseCity && baseState) return `${baseCity}, ${baseState}`;
+  if (baseCity) return baseCity;
+  if (location) return location;
+  if (serviceArea) return serviceArea;
+
+  return "Location not listed";
 }
 
 function getSearchBlob(listing) {
   const serviceCities = Array.isArray(listing.serviceCities)
     ? listing.serviceCities.join(" ")
-    : safeText(listing.serviceCities, "");
+    : safeText(listing.serviceCities || listing.serviceCitiesText, "");
 
   const serviceZipCodes = Array.isArray(listing.serviceZipCodes)
     ? listing.serviceZipCodes.join(" ")
-    : safeText(listing.serviceZipCodes, "");
+    : safeText(listing.serviceZipCodes || listing.serviceZipCodesText, "");
+
+  const eventTypesText = getEventTypesText(listing);
 
   return [
     listing.title,
+    listing.mainCategory,
     listing.category,
     listing.customCategory,
+    eventTypesText,
     listing.eventType,
     listing.location,
     listing.baseCity,
@@ -842,7 +877,6 @@ function getSearchBlob(listing) {
     serviceZipCodes,
     listing.description,
     listing.vendorName,
-    listing.mainCategory,
     listing.availability
   ].join(" ").toLowerCase();
 }
@@ -851,7 +885,7 @@ function listingMatchesFilter(listing, filter) {
   if (filter === "all") return true;
 
   const searchable = getSearchBlob(listing);
-  const travelAvailable = listing.travelAvailable === true || normalize(listing.travelAvailable) === "true" || normalize(listing.travelAvailable).includes("yes");
+  const travelAvailable = listing.travelAvailable === true || normalize(listing.travelAvailableValue).includes("yes") || normalize(listing.travelAvailableValue).includes("limited");
   const nationalService = listing.nationalShipping === true || listing.virtualService === true || normalize(listing.nationalShipping).includes("yes") || normalize(listing.virtualService).includes("yes");
 
   if (filter === "birthday") {
@@ -859,19 +893,27 @@ function listingMatchesFilter(listing, filter) {
   }
 
   if (filter === "wedding") {
-    return searchable.includes("wedding") || searchable.includes("bridal") || searchable.includes("engagement");
+    return searchable.includes("wedding") || searchable.includes("bridal") || searchable.includes("engagement") || searchable.includes("rehearsal");
   }
 
   if (filter === "shower") {
-    return searchable.includes("shower") || searchable.includes("baby") || searchable.includes("bridal");
+    return searchable.includes("shower") || searchable.includes("baby") || searchable.includes("bridal") || searchable.includes("sip and see");
+  }
+
+  if (filter === "corporate") {
+    return searchable.includes("corporate") || searchable.includes("networking") || searchable.includes("brand launch") || searchable.includes("grand opening");
+  }
+
+  if (filter === "holiday") {
+    return searchable.includes("holiday") || searchable.includes("christmas") || searchable.includes("halloween") || searchable.includes("easter") || searchable.includes("new year") || searchable.includes("fourth of july");
   }
 
   if (filter === "decor") {
-    return searchable.includes("decor") || searchable.includes("décor") || searchable.includes("balloon") || searchable.includes("floral") || searchable.includes("styling");
+    return searchable.includes("decor") || searchable.includes("décor") || searchable.includes("balloon") || searchable.includes("floral") || searchable.includes("styling") || searchable.includes("backdrop");
   }
 
   if (filter === "catering") {
-    return searchable.includes("catering") || searchable.includes("food") || searchable.includes("cake") || searchable.includes("dessert") || searchable.includes("bar") || searchable.includes("coffee");
+    return searchable.includes("catering") || searchable.includes("food") || searchable.includes("cake") || searchable.includes("dessert") || searchable.includes("charcuterie") || searchable.includes("bar") || searchable.includes("coffee");
   }
 
   if (filter === "venue") {
@@ -879,7 +921,7 @@ function listingMatchesFilter(listing, filter) {
   }
 
   if (filter === "kids") {
-    return searchable.includes("kids") || searchable.includes("children") || searchable.includes("toddler") || searchable.includes("soft play") || searchable.includes("bounce");
+    return searchable.includes("kids") || searchable.includes("children") || searchable.includes("toddler") || searchable.includes("soft play") || searchable.includes("bounce") || searchable.includes("character");
   }
 
   if (filter === "travel") {
@@ -887,10 +929,29 @@ function listingMatchesFilter(listing, filter) {
   }
 
   if (filter === "virtual") {
-    return nationalService || searchable.includes("virtual") || searchable.includes("national") || searchable.includes("ships");
+    return nationalService || searchable.includes("virtual") || searchable.includes("national") || searchable.includes("ships") || searchable.includes("shipping");
   }
 
   return true;
+}
+
+function renderEventTypePills(listing) {
+  const eventTypes = getEventTypes(listing);
+
+  if (!eventTypes.length) return "";
+
+  const visibleTypes = eventTypes.slice(0, 3);
+  const remainingCount = eventTypes.length - visibleTypes.length;
+
+  const pills = visibleTypes.map((eventType) => {
+    return `<span class="pill type">${escapeHtml(eventType)}</span>`;
+  }).join("");
+
+  const morePill = remainingCount > 0
+    ? `<span class="pill type">+${remainingCount} more</span>`
+    : "";
+
+  return `${pills}${morePill}`;
 }
 
 function renderListings(listings) {
@@ -907,12 +968,11 @@ function renderListings(listings) {
 
   listingList.innerHTML = listings.map((listing, index) => {
     const title = safeText(listing.title, "Untitled Listing");
+    const mainCategory = safeText(listing.mainCategory, "");
     const category = safeText(listing.category, "Event Service");
     const customCategory = safeText(listing.customCategory, "");
-    const eventType = safeText(listing.eventType, "");
     const location = getLocationDisplay(listing);
     const serviceArea = safeText(listing.serviceArea, "");
-    const baseState = safeText(listing.baseState, "") || safeText(listing.state, "");
     const zipCode = safeText(listing.zipCode, "");
     const description = safeText(listing.description, "No description has been added yet.");
     const availability = safeText(listing.availability, "Available");
@@ -925,7 +985,11 @@ function renderListings(listings) {
       ? `${category} · ${customCategory}`
       : category;
 
-    const locationLine = [location, baseState, zipCode].filter(Boolean).join(" ");
+    const categoryLine = mainCategory
+      ? `${mainCategory} · ${typeLine}`
+      : typeLine;
+
+    const locationLine = [location, zipCode].filter(Boolean).join(" ");
     const imageClass = `image-${(index % 4) + 1}`;
 
     const imageMarkup = imageUrl
@@ -941,7 +1005,7 @@ function renderListings(listings) {
           <div class="listing-price">${escapeHtml(price)}</div>
         </div>
 
-        <p class="listing-category">${escapeHtml(typeLine)}</p>
+        <p class="listing-category">${escapeHtml(categoryLine)}</p>
 
         <p class="listing-description">
           ${escapeHtml(description)}
@@ -950,7 +1014,7 @@ function renderListings(listings) {
         <div class="listing-meta">
           <span class="pill rating">${escapeHtml(rating)}</span>
           <span class="pill location">${escapeHtml(locationLine || "Location not listed")}</span>
-          ${eventType ? `<span class="pill type">${escapeHtml(eventType)}</span>` : ""}
+          ${renderEventTypePills(listing)}
           ${serviceArea ? `<span class="pill location">${escapeHtml(serviceArea)}</span>` : ""}
           <span class="pill available">${escapeHtml(availability)}</span>
         </div>
@@ -1003,9 +1067,9 @@ function applySearchAndFilter() {
   if (categoryQuery) {
     filtered = filtered.filter((listing) => {
       const listingCategory = [
+        listing.mainCategory,
         listing.category,
-        listing.customCategory,
-        listing.mainCategory
+        listing.customCategory
       ].join(" ").toLowerCase();
 
       return listingCategory.includes(categoryQuery);
