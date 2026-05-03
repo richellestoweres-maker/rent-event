@@ -78,9 +78,6 @@
       content: "";
       position: absolute;
       inset: 0;
-      width: auto;
-      height: auto;
-      border-radius: 0;
       background: linear-gradient(
         180deg,
         rgba(0, 0, 0, 0.38) 0%,
@@ -608,7 +605,7 @@
           <div class="summary-price" id="summaryPrice">$0+</div>
         </div>
 
-        <div class="summary-meta">
+        <div class="summary-meta" id="summaryMeta">
           <span class="pill rating" id="ratingPill">★ New</span>
           <span class="pill location" id="locationPill">Location</span>
           <span class="pill available" id="availabilityPill">Availability</span>
@@ -644,7 +641,7 @@
               <div class="feature-icon">★</div>
               <div class="feature-copy">
                 <h3>Best For</h3>
-                <p id="eventTypeText">Loading event type...</p>
+                <p id="eventTypeText">Loading event types...</p>
               </div>
             </div>
 
@@ -653,6 +650,14 @@
               <div class="feature-copy">
                 <h3>Service Area</h3>
                 <p id="serviceAreaText">Loading service area...</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">↗</div>
+              <div class="feature-copy">
+                <h3>Travel / National Service</h3>
+                <p id="travelText">Loading travel details...</p>
               </div>
             </div>
           </div>
@@ -681,12 +686,17 @@
         <div class="card">
           <div class="detail-grid">
             <div class="detail-row">
-              <div class="detail-label">Category</div>
+              <div class="detail-label">Main Category</div>
+              <div class="detail-value" id="mainCategoryValue">Loading</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Service</div>
               <div class="detail-value" id="categoryValue">Loading</div>
             </div>
 
             <div class="detail-row">
-              <div class="detail-label">Event Type</div>
+              <div class="detail-label">Best For</div>
               <div class="detail-value" id="eventTypeValue">Loading</div>
             </div>
 
@@ -696,13 +706,18 @@
             </div>
 
             <div class="detail-row">
-              <div class="detail-label">Location</div>
+              <div class="detail-label">Base Location</div>
               <div class="detail-value" id="locationValue">Loading</div>
             </div>
 
             <div class="detail-row">
               <div class="detail-label">Service Area</div>
               <div class="detail-value" id="serviceAreaValue">Loading</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">ZIP</div>
+              <div class="detail-value" id="zipValue">Loading</div>
             </div>
 
             <div class="detail-row">
@@ -722,7 +737,7 @@
     </div>
 
     <button class="action-btn-secondary" id="messageBtn" type="button">Message</button>
-    <a href="event-builder.html" class="action-btn">Add to Event</a>
+    <a href="event-builder.html" class="action-btn" id="addToEventBtn">Add to Event</a>
   </div>
 
 <script type="module">
@@ -758,6 +773,7 @@ let currentUser = null;
 let currentUserData = null;
 let currentListing = null;
 let currentListingId = null;
+let listingLoaded = false;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -801,6 +817,102 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function getEventTypes(listing) {
+  if (Array.isArray(listing.eventTypes) && listing.eventTypes.length) {
+    return listing.eventTypes.map((item) => safeText(item, "")).filter(Boolean);
+  }
+
+  const singleEventType = safeText(listing.eventType, "");
+
+  if (!singleEventType) return [];
+
+  if (singleEventType.includes(",")) {
+    return singleEventType.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+
+  return [singleEventType];
+}
+
+function getEventTypesText(listing) {
+  const eventTypes = getEventTypes(listing);
+  return eventTypes.length ? eventTypes.join(", ") : "Events";
+}
+
+function getLocationText(listing) {
+  const baseCity = safeText(listing.baseCity, "");
+  const baseState = safeText(listing.baseState || listing.state, "");
+  const location = safeText(listing.location, "");
+
+  if (baseCity && baseState) return `${baseCity}, ${baseState}`;
+  if (baseCity) return baseCity;
+  if (location) return location;
+
+  return "Location not listed";
+}
+
+function getServiceAreaText(listing) {
+  const serviceArea = safeText(listing.serviceArea, "");
+  const serviceCities = Array.isArray(listing.serviceCities)
+    ? listing.serviceCities.join(", ")
+    : safeText(listing.serviceCitiesText || listing.serviceCities, "");
+
+  if (serviceArea && serviceCities) {
+    return `${serviceArea}. Cities served: ${serviceCities}`;
+  }
+
+  if (serviceArea) return serviceArea;
+  if (serviceCities) return serviceCities;
+
+  return getLocationText(listing);
+}
+
+function getTravelText(listing) {
+  const travelAvailable = listing.travelAvailable === true;
+  const travelValue = safeText(listing.travelAvailableValue, "");
+  const radius = safeText(listing.serviceRadiusMiles, "");
+  const virtualService = listing.virtualService === true;
+  const nationalShipping = listing.nationalShipping === true;
+
+  const parts = [];
+
+  if (travelAvailable) {
+    if (travelValue === "limited") {
+      parts.push("Limited travel available");
+    } else {
+      parts.push("Travel available within service area");
+    }
+  } else {
+    parts.push("Travel details confirmed with vendor");
+  }
+
+  if (radius && radius !== "custom") {
+    parts.push(`Service radius: up to ${radius} miles`);
+  }
+
+  if (radius === "custom") {
+    parts.push("Service radius varies");
+  }
+
+  if (virtualService) {
+    parts.push("Virtual or digital service available");
+  }
+
+  if (nationalShipping) {
+    parts.push("National or shipping-based service available");
+  }
+
+  return parts.join(". ");
+}
+
 function renderMissingListing(message) {
   const page = document.getElementById("page");
 
@@ -809,7 +921,7 @@ function renderMissingListing(message) {
       <div class="empty-card">
         <div class="empty-icon">!</div>
         <h2>Listing not found</h2>
-        <p>${message}</p>
+        <p>${escapeHtml(message)}</p>
         <a class="action-btn" href="listings.html">Back to Listings</a>
       </div>
     </section>
@@ -836,13 +948,31 @@ function setHeroImage(imageUrl) {
   photoSection.style.display = "block";
 }
 
+function renderEventTypePills(eventTypes) {
+  const summaryMeta = document.getElementById("summaryMeta");
+
+  const extraPills = eventTypes.slice(0, 3).map((eventType) => {
+    return `<span class="pill type">${escapeHtml(eventType)}</span>`;
+  }).join("");
+
+  summaryMeta.innerHTML = `
+    <span class="pill rating" id="ratingPill">${escapeHtml(currentListing.rating ? `★ ${currentListing.rating}` : "★ New")}</span>
+    <span class="pill location" id="locationPill">${escapeHtml(getLocationText(currentListing))}</span>
+    <span class="pill available" id="availabilityPill">${escapeHtml(safeText(currentListing.availability, "Availability not listed"))}</span>
+    ${extraPills}
+  `;
+}
+
 function renderListing(listing) {
   const title = safeText(listing.title, "Untitled Listing");
+  const mainCategory = safeText(listing.mainCategory, "Event Services");
   const category = safeText(listing.category, "Event Service");
   const customCategory = safeText(listing.customCategory, "");
-  const eventType = safeText(listing.eventType, "Events");
-  const location = safeText(listing.location, "Location not listed");
-  const serviceArea = safeText(listing.serviceArea, location);
+  const eventTypesText = getEventTypesText(listing);
+  const eventTypes = getEventTypes(listing);
+  const location = getLocationText(listing);
+  const serviceArea = getServiceAreaText(listing);
+  const travelText = getTravelText(listing);
   const availability = safeText(listing.availability, "Availability not listed");
   const description = safeText(listing.description, "No description has been added yet.");
   const included = safeText(listing.included, "Details will be confirmed with the vendor.");
@@ -851,46 +981,57 @@ function renderListing(listing) {
   const imageUrl = safeText(listing.imageUrl, "");
   const price = formatPrice(listing.startingPrice);
   const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
+  const zipCode = safeText(listing.zipCode, "Not listed");
 
-  const typeLine = customCategory ? `${category} · ${customCategory}` : category;
+  const typeLine = customCategory
+    ? `${category} · ${customCategory}`
+    : category;
 
   currentListing = listing;
 
   document.title = `${title} | RentEvent`;
 
+  if (currentListingId) {
+    document.getElementById("addToEventBtn").href = `event-builder.html?add=${encodeURIComponent(currentListingId)}`;
+  }
+
   setHeroImage(imageUrl);
 
-  setText("heroPill", typeLine);
+  setText("heroPill", mainCategory);
   setText("heroTitle", title);
   setText("heroSubtitle", description);
 
   setText("summaryName", title);
   setText("summaryPrice", price);
-  setText("ratingPill", rating);
-  setText("locationPill", location);
-  setText("availabilityPill", availability);
+  renderEventTypePills(eventTypes);
   setText("summaryText", description);
 
   setText("includedText", included);
-  setText("eventTypeText", eventType);
+  setText("eventTypeText", eventTypesText);
   setText("serviceAreaText", serviceArea);
+  setText("travelText", travelText);
 
   setText("vendorInitials", initialsFromName(vendorName));
   setText("vendorName", vendorName);
-  setText("vendorText", `${vendorName} offers ${typeLine.toLowerCase()} for ${eventType.toLowerCase()} and other event needs.`);
+  setText("vendorText", `${vendorName} offers ${typeLine.toLowerCase()} for ${eventTypesText.toLowerCase()} and other event needs.`);
   setText("vendorRating", rating === "★ New" ? "★ New vendor listing" : `${rating} average rating`);
 
+  setText("mainCategoryValue", mainCategory);
   setText("categoryValue", typeLine);
-  setText("eventTypeValue", eventType);
+  setText("eventTypeValue", eventTypesText);
   setText("priceValue", price);
   setText("locationValue", location);
   setText("serviceAreaValue", serviceArea);
+  setText("zipValue", zipCode);
   setText("statusValue", titleCase(status));
 
   setText("bottomPrice", price);
 }
 
 async function loadListing() {
+  if (listingLoaded) return;
+  listingLoaded = true;
+
   const params = new URLSearchParams(window.location.search);
   const listingId = params.get("id");
   currentListingId = listingId;
@@ -1012,7 +1153,7 @@ async function startConversation() {
     const vendorName = safeText(currentListing.vendorName, "Vendor");
     const listingTitle = safeText(currentListing.title, "Event Listing");
     const listingCategory = safeText(currentListing.category, "Event Service");
-    const listingLocation = safeText(currentListing.location, "");
+    const listingLocation = getLocationText(currentListing);
 
     const conversationRef = await addDoc(collection(db, "conversations"), {
       conversationKey,
@@ -1033,7 +1174,7 @@ async function startConversation() {
       listingLocation,
       title: vendorName,
       contextType: "Vendor",
-      lastMessage: "Conversation started.",
+      lastMessage: `Hi! I’m interested in ${listingTitle}.`,
       lastSenderId: customerId,
       unreadFor: {
         [vendorId]: true
@@ -1062,26 +1203,20 @@ async function startConversation() {
 document.getElementById("messageBtn").addEventListener("click", startConversation);
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    currentUser = null;
-    currentUserData = null;
-    loadListing();
-    return;
-  }
+  currentUser = user || null;
+  currentUserData = null;
 
-  currentUser = user;
+  if (user) {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
 
-  const userRef = doc(db, "users", user.uid);
-  const userSnap = await getDoc(userRef);
-
-  if (userSnap.exists()) {
-    currentUserData = userSnap.data();
+    if (userSnap.exists()) {
+      currentUserData = userSnap.data();
+    }
   }
 
   loadListing();
 });
-
-loadListing();
 </script>
 
 </body>
