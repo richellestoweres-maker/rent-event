@@ -333,6 +333,11 @@
       color: var(--green-text);
     }
 
+    .pill.type {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
     .price-row {
       display: flex;
       align-items: flex-start;
@@ -844,6 +849,55 @@ function renderThumb(imageUrl, title) {
   return `<div class="vendor-thumb"></div>`;
 }
 
+function getEventTypes(source) {
+  if (Array.isArray(source.eventTypes) && source.eventTypes.length) {
+    return source.eventTypes.map((item) => safeText(item, "")).filter(Boolean);
+  }
+
+  const eventType = safeText(source.eventType, "");
+
+  if (!eventType) return [];
+
+  if (eventType.includes(",")) {
+    return eventType.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+
+  return [eventType];
+}
+
+function renderEventTypePills(source, max = 2) {
+  const eventTypes = getEventTypes(source);
+
+  if (!eventTypes.length) return "";
+
+  const visibleTypes = eventTypes.slice(0, max);
+  const remainingCount = eventTypes.length - visibleTypes.length;
+
+  const pills = visibleTypes.map((eventType) => {
+    return `<span class="pill type">${escapeHtml(eventType)}</span>`;
+  }).join("");
+
+  const morePill = remainingCount > 0
+    ? `<span class="pill type">+${remainingCount} more</span>`
+    : "";
+
+  return `${pills}${morePill}`;
+}
+
+function getCategoryLine(source) {
+  const mainCategory = safeText(source.mainCategory, "");
+  const category = safeText(source.listingCategory || source.category, "Event Service");
+  const customCategory = safeText(source.customCategory, "");
+
+  const typeLine = customCategory
+    ? `${category} · ${customCategory}`
+    : category;
+
+  return mainCategory
+    ? `${mainCategory} · ${typeLine}`
+    : typeLine;
+}
+
 function calculateTotals() {
   const vendorSubtotal = selectedVendors.reduce((total, vendor) => {
     return total + Number(vendor.priceNumber || 0);
@@ -915,7 +969,8 @@ function renderVendors() {
   container.innerHTML = selectedVendors.map((vendor) => {
     const listingId = encodeURIComponent(vendor.listingId || "");
     const title = safeText(vendor.listingTitle, "Untitled Listing");
-    const category = safeText(vendor.listingCategory, "Event Service");
+    const categoryLine = getCategoryLine(vendor);
+    const eventTypePills = renderEventTypePills(vendor, 2);
     const vendorName = safeText(vendor.vendorName, "Vendor");
     const price = formatMoney(vendor.priceNumber || 0);
     const imageUrl = safeText(vendor.imageUrl, "");
@@ -929,7 +984,7 @@ function renderVendors() {
 
             <div class="vendor-info">
               <h3 class="vendor-name">${escapeHtml(title)}</h3>
-              <p class="vendor-type">${escapeHtml(category)}</p>
+              <p class="vendor-type">${escapeHtml(categoryLine)}</p>
             </div>
           </div>
 
@@ -939,6 +994,7 @@ function renderVendors() {
         <div class="vendor-meta">
           <span class="pill pending">${escapeHtml(status)}</span>
           <span class="pill info">${escapeHtml(vendorName)}</span>
+          ${eventTypePills}
           <span class="pill safe">Review</span>
         </div>
 
