@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Listing | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft-2: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 132px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 310px;
+    }
+
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #574f47;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
+      font-family: inherit;
+      font-size: 0.96rem;
+      color: var(--text);
+      outline: none;
+      box-shadow: 0 4px 14px rgba(140, 111, 75, 0.02);
+    }
+
+    .input,
+    .select {
+      min-height: 54px;
+      padding: 0 16px;
+    }
+
+    .textarea {
+      min-height: 120px;
+      padding: 14px 16px;
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #a49a8f;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: 1fr 0.7fr 0.8fr;
+      gap: 12px;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+      margin-top: 4px;
+    }
+
+    .checkbox-chip {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #4f473f;
+      user-select: none;
+    }
+
+    .checkbox-chip input {
+      width: 18px;
+      height: 18px;
+      accent-color: #ff7a63;
+      flex-shrink: 0;
+    }
+
+    .checkbox-chip:has(input:checked) {
+      border-color: rgba(255, 122, 99, 0.42);
+      background: #fff4ef;
+      color: #c65248;
+    }
+
+    .helper-text,
+    .status-message {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .status-message {
+      display: none;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 700;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .image-preview-wrap {
+      display: none;
+      margin-top: 12px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--soft-2);
+      border: 1px solid var(--line);
+    }
+
+    .image-preview-wrap img {
+      display: block;
+      width: 100%;
+      height: 210px;
+      object-fit: cover;
+    }
+
+    .upload-card {
+      background: var(--soft-2);
+      border: 1px dashed #d7c7b2;
+      border-radius: 22px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .upload-icon {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 12px;
+      border-radius: 18px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-dark);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .upload-title {
+      margin: 0 0 6px;
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .upload-text {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+
+    .bottom-copy {
+      flex: 1;
+      padding-left: 8px;
+    }
+
+    .bottom-label {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bottom-value {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .bottom-btn,
+    .bottom-btn-secondary {
+      min-height: 54px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .bottom-btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
+    }
+
+    .bottom-btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    .bottom-btn:disabled,
+    .bottom-btn-secondary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 430px) {
+      .row-2,
+      .row-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-bar {
+        flex-wrap: wrap;
+        border-radius: 28px;
+      }
+
+      .bottom-copy {
+        width: 100%;
+        padding-left: 2px;
+      }
+
+      .bottom-btn,
+      .bottom-btn-secondary {
+        flex: 1;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .checkbox-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .bottom-bar {
+        max-width: 520px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="my-listings.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Vendor Portal</div>
+        <h1 class="page-title">Edit Listing</h1>
+      </div>
+
+      <a href="messages.html" class="icon-btn" aria-label="Messages">✉</a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">Update your service</div>
+        <h2 class="hero-title">Keep your listing fresh.</h2>
+        <p class="hero-subtitle">
+          Edit your photos, pricing, service area, categories, and event types whenever your offer changes.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Listing Details</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="listing-name">Listing Name</label>
+            <input id="listing-name" class="input" type="text" placeholder="Sunny Slides, Bloom & Co. Florals, The White Bounce House" />
+          </div>
+
+          <div class="field-group">
+            <label for="main-category">Main Category</label>
+            <select id="main-category" class="select">
+              <option selected disabled value="">Select a Main Category</option>
+              <option>Décor & Styling</option>
+              <option>Kids Parties & Activities</option>
+              <option>Rentals</option>
+              <option>Venues</option>
+              <option>Food & Beverage</option>
+              <option>Photo, Video & Content</option>
+              <option>Music & Entertainment</option>
+              <option>Planning & Staffing</option>
+              <option>Beauty & Formalwear</option>
+              <option>Transportation</option>
+              <option>Specialty Services</option>
+              <option>Other Event Service</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="category">Specific Service</label>
+            <select id="category" class="select" disabled>
+              <option selected value="">Select a Main Category First</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="custom-category">Custom Service / Extra Details</label>
+            <input id="custom-category" class="input" type="text" placeholder="Example: luxury grazing table, mobile mini golf, sensory play setup..." />
+          </div>
+
+          <div class="field-group">
+            <label>Best For / Event Types</label>
+            <div class="checkbox-grid" id="eventTypesGrid"></div>
+            <p class="helper-text">
+              Select every event type this listing works for.
+            </p>
+          </div>
+
+          <div class="row-2">
+            <div class="field-group">
+              <label for="starting-price">Starting Price</label>
+              <input id="starting-price" class="input" type="text" placeholder="$250+" />
+            </div>
+
+            <div class="field-group">
+              <label for="availability">Availability</label>
+              <select id="availability" class="select">
+                <option>Currently Available</option>
+                <option>Limited Availability</option>
+                <option>Waitlist Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="description">Description</label>
+            <textarea id="description" class="textarea" placeholder="Describe your service, what makes it special, and what clients can expect."></textarea>
+          </div>
+
+          <div class="status-message" id="statusMessage"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Location & Service Area</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div class="row-3">
+            <div class="field-group">
+              <label for="base-city">Base City</label>
+              <input id="base-city" class="input" type="text" placeholder="League City" />
+            </div>
+
+            <div class="field-group">
+              <label for="base-state">State</label>
+              <select id="base-state" class="select">
+                <option value="">State</option>
+                <option>TX</option>
+                <option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option>
+                <option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option>
+                <option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option>
+                <option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                <option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option>
+                <option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option>
+                <option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option>
+                <option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                <option>SD</option><option>TN</option><option>UT</option><option>VT</option><option>VA</option>
+                <option>WA</option><option>WV</option><option>WI</option><option>WY</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="zip-code">ZIP Code</label>
+              <input id="zip-code" class="input" type="text" placeholder="77573" />
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="field-group">
+              <label for="service-radius">Service Radius</label>
+              <select id="service-radius" class="select">
+                <option value="">Select Radius</option>
+                <option value="10">Up to 10 miles</option>
+                <option value="20">Up to 20 miles</option>
+                <option value="30">Up to 30 miles</option>
+                <option value="50">Up to 50 miles</option>
+                <option value="75">Up to 75 miles</option>
+                <option value="100">Up to 100 miles</option>
+                <option value="custom">Custom / Varies</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="travel-available">Travel Available?</label>
+              <select id="travel-available" class="select">
+                <option value="yes">Yes, within service area</option>
+                <option value="limited">Limited travel</option>
+                <option value="no">No travel</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="service-cities">Cities / Areas Served</label>
+            <textarea id="service-cities" class="textarea" placeholder="League City, Friendswood, Pearland, Webster, Clear Lake, Galveston..."></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="service-zip-codes">ZIP Codes Served</label>
+            <input id="service-zip-codes" class="input" type="text" placeholder="77573, 77546, 77581, 77058" />
+          </div>
+
+          <div class="row-2">
+            <div class="field-group">
+              <label for="virtual-service">Virtual / Digital Service?</label>
+              <select id="virtual-service" class="select">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="national-service">National / Shipping Available?</label>
+              <select id="national-service" class="select">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="service-area">Short Service Area Summary</label>
+            <input id="service-area" class="input" type="text" placeholder="Greater Houston, Galveston County, surrounding areas" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Service Details</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="included">What’s Included</label>
+            <textarea id="included" class="textarea" placeholder="Delivery, setup, pickup, styling items, consultation, etc."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Listing Photo</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="image-url">Main Photo URL</label>
+            <input id="image-url" class="input" type="url" placeholder="Paste a public image link here" />
+
+            <div class="image-preview-wrap" id="imagePreviewWrap">
+              <img id="imagePreview" src="" alt="Listing photo preview">
+            </div>
+          </div>
+
+          <div class="upload-card">
+            <div class="upload-icon">◎</div>
+            <h3 class="upload-title">Photo Display Preview</h3>
+            <p class="upload-text">
+              This image will appear on the marketplace, listing detail page, vendor dashboard, My Listings, and the event board.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="bottom-bar">
+    <div class="bottom-copy">
+      <span class="bottom-label">Vendor Action</span>
+      <span class="bottom-value">Update Listing</span>
+    </div>
+
+    <button class="bottom-btn-secondary" id="draftBtn" onclick="saveListing('draft')">Save Draft</button>
+    <button class="bottom-btn" id="publishBtn" onclick="saveListing('published')">Publish</button>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let currentListingId = null;
+let currentListingData = null;
+
+const serviceOptions = {
+  "Décor & Styling": [
+    "Balloon Décor", "Balloon Arches", "Balloon Garlands", "Balloon Mosaics",
+    "Backdrop Rentals", "Custom Backdrops", "Arch Rentals", "Flower Wall Rentals",
+    "Sequin Wall Rentals", "Greenery Wall Rentals", "Marquee Letters + Numbers",
+    "Neon Sign Rentals", "Custom Signage", "Welcome Signs", "Seating Charts",
+    "Invitations + Stationery", "Party Favors", "Event Décor", "Full Event Styling",
+    "Themed Party Setup", "Tablescape Styling", "Centerpieces", "Floral Design",
+    "Wedding Florals", "Holiday Decorating", "Christmas Decorating"
+  ],
+  "Kids Parties & Activities": [
+    "Bounce House Rentals", "White Bounce House Rentals", "Water Slide Rentals",
+    "Inflatable Obstacle Courses", "Soft Play Rentals", "Ball Pit Rentals",
+    "Toddler Play Rentals", "Kids Party Packages", "Foam Parties", "Bubble Parties",
+    "Train Rides", "Carnival Games", "Yard Games", "Game Truck / Mobile Gaming",
+    "Princess / Character Appearances", "Superhero Parties", "Kids Entertainment",
+    "Face Painting", "Magician / Performer", "Petting Zoo", "Pony Rides",
+    "Paint Party", "Craft Party", "Cooking Party", "Sports Party", "Pool Party Services"
+  ],
+  "Rentals": [
+    "Party Rentals", "Chair Rentals", "Table Rentals", "Linen Rentals", "Napkin Rentals",
+    "Chair Cover Rentals", "Tent Rentals", "Canopy Rentals", "Lounge Furniture Rentals",
+    "Cocktail Table Rentals", "Bar Rentals", "Dinnerware Rentals", "Charger Plate Rentals",
+    "Glassware Rentals", "Flatware Rentals", "Dance Floor Rentals", "Stage Rentals",
+    "Lighting Rentals", "Audio / Speaker Rentals", "Generator Rentals",
+    "Portable Restroom Rentals", "Luxury Restroom Trailer Rentals", "Display Shelf Rentals",
+    "Luxury Picnic Setup", "Luxury Sleepover Setup", "Teepee Party Setup",
+    "Spa Party Setup", "Tea Party Setup"
+  ],
+  "Venues": [
+    "Event Venues", "Wedding Venues", "Kids Party Venues", "Outdoor Event Spaces",
+    "Private Dining Spaces", "Banquet Halls", "Barn Venues", "Garden Venues",
+    "Church / Fellowship Hall", "Community Centers", "Studio Rentals", "Photo Studios",
+    "Restaurant Event Space", "Airbnb / Short-Term Rental Venue", "Rooftop Venue",
+    "Hotel Event Space", "Country Club Venue", "Waterfront Venue"
+  ],
+  "Food & Beverage": [
+    "Catering", "Private Chef", "Food Trucks", "Taco Cart", "Pizza Catering",
+    "BBQ Catering", "Brunch Catering", "Grazing Tables", "Charcuterie Boards",
+    "Dessert Tables", "Cakes", "Wedding Cakes", "Cupcakes", "Custom Cookies",
+    "Cake Pops", "Macarons", "Candy Tables", "Donut Wall", "Champagne Wall",
+    "Mobile Bar", "Mocktail Bar", "Bartending Services", "Coffee Cart",
+    "Lemonade Stand", "Snow Cone Cart", "Ice Cream Cart", "Cotton Candy Cart",
+    "Popcorn Cart", "Hot Chocolate Bar", "Tea Bar"
+  ],
+  "Photo, Video & Content": [
+    "Photography", "Wedding Photography", "Event Photography", "Kids Party Photography",
+    "Videography", "Wedding Videography", "Content Creator", "Social Media Event Coverage",
+    "Photo Booth", "360 Photo Booth", "Mirror Photo Booth", "Audio Guestbook",
+    "Guestbook Services"
+  ],
+  "Music & Entertainment": [
+    "DJ", "Wedding DJ", "Live Band", "Solo Musician", "Live Ceremony Music",
+    "Mariachi Band", "Karaoke", "Emcee / Host", "Dancers / Performers",
+    "Fireworks / Cold Sparks", "Event Lighting", "Uplighting", "Special Effects"
+  ],
+  "Planning & Staffing": [
+    "Event Planner", "Event Coordinator", "Day-of Coordinator", "Wedding Planner",
+    "Wedding Coordinator", "Event Assistant", "Event Staffing", "Servers", "Bartenders",
+    "Setup Crew", "Breakdown Crew", "Cleanup Crew", "Valet / Parking", "Security",
+    "Coat Check", "Restroom Attendant"
+  ],
+  "Beauty & Formalwear": [
+    "Hair + Makeup", "Bridal Hair", "Bridal Makeup", "Bridal Services", "Spray Tanning",
+    "Glam Services", "Nail Services", "Bridal Alterations", "Tuxedo / Suit Rentals",
+    "Wedding Dress Services", "Wedding Officiant"
+  ],
+  "Transportation": [
+    "Transportation", "Party Bus", "Limo Service", "Shuttle Service",
+    "Luxury Car Rental", "Horse Carriage", "Golf Cart Rentals"
+  ],
+  "Specialty Services": [
+    "Corporate Event Services", "Brand Activation Setup", "Fundraiser Services",
+    "Church Event Services", "Community Event Services", "School Event Services",
+    "Other Specialty Service"
+  ],
+  "Other Event Service": [
+    "Other Event Service"
+  ]
+};
+
+const eventTypeOptions = [
+  "Kids Birthday Parties",
+  "First Birthday Parties",
+  "Toddler Parties",
+  "Teen Birthday Parties",
+  "Adult Birthday Parties",
+  "Backyard Parties",
+  "Pool Parties",
+  "Sleepovers / Slumber Parties",
+  "Weddings",
+  "Bridal Showers",
+  "Engagement Parties",
+  "Bachelorette Parties",
+  "Rehearsal Dinners",
+  "Wedding Receptions",
+  "Baby Showers",
+  "Gender Reveals",
+  "Sip and See Events",
+  "Christenings / Baptisms",
+  "Graduation Parties",
+  "Prom / School Events",
+  "Homecoming Events",
+  "Quinceañeras",
+  "Sweet Sixteens",
+  "Corporate Events",
+  "Networking Events",
+  "Grand Openings",
+  "Brand Launches",
+  "Fundraisers",
+  "Galas",
+  "Holiday Parties",
+  "Christmas Events",
+  "Halloween Parties",
+  "Easter Events",
+  "Fourth of July Events",
+  "New Year’s Eve Events",
+  "Church Events",
+  "Community Events",
+  "Family Reunions",
+  "Anniversary Parties",
+  "Retirement Parties",
+  "Celebration of Life / Memorial Events",
+  "Luxury Dinner Parties",
+  "Open Houses",
+  "Girls’ Night / Private Parties",
+  "Other Event Type"
+];
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function splitCommaList(value) {
+  return safeText(value, "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function showStatus(message, type = "info") {
+  const status = document.getElementById("statusMessage");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
+}
+
+function setSaving(isSaving) {
+  document.getElementById("draftBtn").disabled = isSaving;
+  document.getElementById("publishBtn").disabled = isSaving;
+}
+
+function isValidImageUrl(url) {
+  if (!url) return true;
+
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function buildLocationLabel(baseCity, baseState) {
+  const city = safeText(baseCity, "");
+  const state = safeText(baseState, "");
+
+  if (city && state) return `${city}, ${state}`;
+  if (city) return city;
+  if (state) return state;
+
+  return "";
+}
+
+function getEventTypes(source) {
+  if (Array.isArray(source.eventTypes) && source.eventTypes.length) {
+    return source.eventTypes.map((item) => safeText(item, "")).filter(Boolean);
+  }
+
+  const eventType = safeText(source.eventType, "");
+
+  if (!eventType) return [];
+
+  if (eventType.includes(",")) {
+    return eventType.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+
+  return [eventType];
+}
+
+function getSelectedEventTypes() {
+  return Array.from(document.querySelectorAll('input[name="event-type"]:checked'))
+    .map((input) => input.value.trim())
+    .filter(Boolean);
+}
+
+function inferMainCategory(category) {
+  const cleanCategory = safeText(category, "");
+
+  for (const [mainCategory, options] of Object.entries(serviceOptions)) {
+    if (options.includes(cleanCategory)) {
+      return mainCategory;
+    }
+  }
+
+  return "";
+}
+
+function populateSpecificServices(mainCategory, selectedCategory = "") {
+  const categorySelect = document.getElementById("category");
+  const options = serviceOptions[mainCategory] || [];
+
+  categorySelect.innerHTML = "";
+
+  if (!mainCategory || !options.length) {
+    categorySelect.disabled = true;
+    categorySelect.innerHTML = `<option selected value="">Select a Main Category First</option>`;
+    return;
+  }
+
+  categorySelect.disabled = false;
+  categorySelect.innerHTML = `<option disabled value="">Select a Specific Service</option>`;
+
+  const finalOptions = [...options];
+
+  if (selectedCategory && !finalOptions.includes(selectedCategory)) {
+    finalOptions.unshift(selectedCategory);
+  }
+
+  finalOptions.forEach((optionValue) => {
+    const option = document.createElement("option");
+    option.value = optionValue;
+    option.textContent = optionValue;
+
+    if (optionValue === selectedCategory) {
+      option.selected = true;
+    }
+
+    categorySelect.appendChild(option);
+  });
+}
+
+function populateEventTypeCheckboxes(selectedTypes = []) {
+  const grid = document.getElementById("eventTypesGrid");
+  grid.innerHTML = "";
+
+  eventTypeOptions.forEach((eventType) => {
+    const label = document.createElement("label");
+    label.className = "checkbox-chip";
+
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.name = "event-type";
+    input.value = eventType;
+    input.checked = selectedTypes.includes(eventType);
+
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(eventType));
+    grid.appendChild(label);
+  });
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || "";
+}
+
+function setSelectValue(id, value, fallback = "") {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const finalValue = value || fallback;
+
+  if (finalValue) {
+    el.value = finalValue;
+  }
+}
+
+function renderImagePreview(url) {
+  const imagePreviewWrap = document.getElementById("imagePreviewWrap");
+  const imagePreview = document.getElementById("imagePreview");
+
+  if (!url || !isValidImageUrl(url)) {
+    imagePreviewWrap.style.display = "none";
+    imagePreview.src = "";
+    return;
+  }
+
+  imagePreview.src = url;
+  imagePreviewWrap.style.display = "block";
+}
+
+function populateForm(listing) {
+  const listingMainCategory =
+    safeText(listing.mainCategory, "") ||
+    inferMainCategory(listing.category);
+
+  setValue("listing-name", listing.title);
+  setSelectValue("main-category", listingMainCategory);
+  populateSpecificServices(listingMainCategory, listing.category);
+  setValue("custom-category", listing.customCategory);
+
+  populateEventTypeCheckboxes(getEventTypes(listing));
+
+  setValue("starting-price", listing.startingPrice);
+  setSelectValue("availability", listing.availability, "Currently Available");
+  setValue("description", listing.description);
+
+  setValue("base-city", listing.baseCity);
+  setSelectValue("base-state", listing.baseState || listing.state, "TX");
+  setValue("zip-code", listing.zipCode);
+  setSelectValue("service-radius", listing.serviceRadiusMiles, "30");
+  setSelectValue("travel-available", listing.travelAvailableValue, "yes");
+
+  const serviceCitiesText = Array.isArray(listing.serviceCities)
+    ? listing.serviceCities.join(", ")
+    : safeText(listing.serviceCitiesText || listing.serviceCities, "");
+
+  const serviceZipCodesText = Array.isArray(listing.serviceZipCodes)
+    ? listing.serviceZipCodes.join(", ")
+    : safeText(listing.serviceZipCodesText || listing.serviceZipCodes, "");
+
+  setValue("service-cities", serviceCitiesText);
+  setValue("service-zip-codes", serviceZipCodesText);
+  setSelectValue("virtual-service", listing.virtualService ? "yes" : "no", "no");
+  setSelectValue("national-service", listing.nationalShipping ? "yes" : "no", "no");
+  setValue("service-area", listing.serviceArea);
+
+  setValue("included", listing.included);
+  setValue("image-url", listing.imageUrl);
+  renderImagePreview(listing.imageUrl);
+}
+
+document.getElementById("main-category").addEventListener("change", (event) => {
+  populateSpecificServices(event.target.value);
+});
+
+const imageUrlInput = document.getElementById("image-url");
+const imagePreview = document.getElementById("imagePreview");
+
+imageUrlInput.addEventListener("input", () => {
+  renderImagePreview(imageUrlInput.value.trim());
+});
+
+imagePreview.addEventListener("error", () => {
+  document.getElementById("imagePreviewWrap").style.display = "none";
+});
+
+async function loadListing() {
+  const params = new URLSearchParams(window.location.search);
+  currentListingId = params.get("id");
+
+  if (!currentListingId) {
+    showStatus("Missing listing ID. Go back to My Listings and choose a listing to edit.", "error");
+    setSaving(true);
+    return;
+  }
+
+  const listingRef = doc(db, "listings", currentListingId);
+  const listingSnap = await getDoc(listingRef);
+
+  if (!listingSnap.exists()) {
+    showStatus("This listing could not be found.", "error");
+    setSaving(true);
+    return;
+  }
+
+  currentListingData = {
+    id: listingSnap.id,
+    ...listingSnap.data()
+  };
+
+  if (currentListingData.vendorId !== currentUser.uid) {
+    showStatus("You can only edit listings that belong to your vendor account.", "error");
+    setSaving(true);
+    return;
+  }
+
+  populateForm(currentListingData);
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+
+  if (userData.role !== "vendor") {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  currentUser = user;
+  currentUserData = userData;
+
+  populateEventTypeCheckboxes([]);
+  loadListing();
+});
+
+window.saveListing = async function(status) {
+  if (!currentUser || !currentUserData || !currentListingId) {
+    showStatus("Listing is still loading. Please wait and try again.", "error");
+    return;
+  }
+
+  const title = document.getElementById("listing-name").value.trim();
+  const mainCategory = document.getElementById("main-category").value.trim();
+  const category = document.getElementById("category").value.trim();
+  const customCategory = document.getElementById("custom-category").value.trim();
+  const eventTypes = getSelectedEventTypes();
+  const eventType = eventTypes.join(", ");
+  const startingPrice = document.getElementById("starting-price").value.trim();
+  const availability = document.getElementById("availability").value.trim();
+  const description = document.getElementById("description").value.trim();
+
+  const baseCity = document.getElementById("base-city").value.trim();
+  const baseState = document.getElementById("base-state").value.trim();
+  const zipCode = document.getElementById("zip-code").value.trim();
+  const serviceRadiusMiles = document.getElementById("service-radius").value.trim();
+  const travelAvailableValue = document.getElementById("travel-available").value.trim();
+  const serviceCitiesText = document.getElementById("service-cities").value.trim();
+  const serviceZipCodesText = document.getElementById("service-zip-codes").value.trim();
+  const virtualServiceValue = document.getElementById("virtual-service").value.trim();
+  const nationalServiceValue = document.getElementById("national-service").value.trim();
+  const serviceArea = document.getElementById("service-area").value.trim();
+
+  const included = document.getElementById("included").value.trim();
+  const imageUrl = document.getElementById("image-url").value.trim();
+
+  const location = buildLocationLabel(baseCity, baseState);
+  const serviceCities = splitCommaList(serviceCitiesText);
+  const serviceZipCodes = splitCommaList(serviceZipCodesText);
+
+  const travelAvailable = travelAvailableValue === "yes" || travelAvailableValue === "limited";
+  const virtualService = virtualServiceValue === "yes";
+  const nationalShipping = nationalServiceValue === "yes";
+
+  if (!title || !mainCategory || !category || !eventTypes.length || !startingPrice || !baseCity || !baseState || !description) {
+    showStatus("Please fill in listing name, main category, specific service, at least one event type, starting price, base city, state, and description before saving.", "error");
+    return;
+  }
+
+  if (!isValidImageUrl(imageUrl)) {
+    showStatus("Please enter a valid image URL that starts with http:// or https://, or leave the photo field blank.", "error");
+    return;
+  }
+
+  try {
+    setSaving(true);
+    showStatus(status === "published" ? "Updating and publishing your listing..." : "Saving your listing as a draft...", "info");
+
+    await updateDoc(doc(db, "listings", currentListingId), {
+      title,
+      mainCategory,
+      category,
+      customCategory,
+      eventTypes,
+      eventType,
+      startingPrice,
+      description,
+      availability,
+      included,
+      status,
+
+      location,
+      baseCity,
+      baseState,
+      state: baseState,
+      zipCode,
+      serviceArea,
+      serviceCities,
+      serviceCitiesText,
+      serviceZipCodes,
+      serviceZipCodesText,
+      serviceRadiusMiles,
+      travelAvailable,
+      travelAvailableValue,
+      virtualService,
+      nationalShipping,
+
+      vendorEmail: currentUserData.email || currentUser.email || "",
+      updatedAt: serverTimestamp(),
+      imageUrl
+    });
+
+    showStatus("Listing updated successfully.", "success");
+
+    setTimeout(() => {
+      window.location.href = "my-listings.html";
+    }, 900);
+
+  } catch (error) {
+    setSaving(false);
+    showStatus(error.message, "error");
+  }
+};
+</script>
+
+</body>
+</html>
