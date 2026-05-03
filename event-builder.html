@@ -39,9 +39,6 @@
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
-      --radius-lg: 28px;
-      --radius-md: 22px;
-      --radius-sm: 18px;
     }
 
     html,
@@ -137,7 +134,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 290px;
+      max-width: 310px;
     }
 
     .hero-label {
@@ -241,6 +238,79 @@
       font-weight: 700;
     }
 
+    .details-card,
+    .note-card,
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #574f47;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
+      font-family: inherit;
+      font-size: 0.96rem;
+      color: var(--text);
+      outline: none;
+      box-shadow: 0 4px 14px rgba(140, 111, 75, 0.02);
+    }
+
+    .input,
+    .select {
+      min-height: 54px;
+      padding: 0 16px;
+    }
+
+    .textarea {
+      min-height: 110px;
+      padding: 14px 16px;
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #a49a8f;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .save-details-btn {
+      width: 100%;
+      min-height: 52px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
     .vendor-list {
       display: grid;
       gap: 14px;
@@ -342,11 +412,6 @@
       font-weight: 700;
     }
 
-    .pill.confirmed {
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
     .pill.pending {
       background: #fff4df;
       color: #aa6f12;
@@ -402,21 +467,6 @@
       color: var(--red-text);
     }
 
-    .btn:disabled,
-    .btn-secondary:disabled,
-    .btn-danger:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    .note-card,
-    .empty-card {
-      background: var(--card);
-      border-radius: 28px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
     .empty-card {
       text-align: center;
       padding: 24px 18px;
@@ -466,6 +516,12 @@
       font-size: 0.85rem;
       font-weight: 700;
       line-height: 1.45;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
     }
 
     .status-message.success {
@@ -549,6 +605,12 @@
       color: #4a433d;
     }
 
+    @media (max-width: 430px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 390px) {
       .bottom-bar {
         flex-wrap: wrap;
@@ -579,6 +641,13 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .event-layout {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 18px;
+        align-items: start;
+      }
+
       .bottom-bar {
         max-width: 520px;
       }
@@ -603,72 +672,161 @@
       <div class="hero-content">
         <div class="hero-label">Current Event</div>
         <h2 class="hero-title" id="eventTitle">Your Event Board</h2>
-        <p class="hero-subtitle">
+        <p class="hero-subtitle" id="eventSubtitle">
           Keep your vendors, budget, and planning details all in one beautifully organized place.
         </p>
 
         <div class="hero-meta">
-          <span class="hero-pill">Planning in Progress</span>
+          <span class="hero-pill" id="heroEventType">Planning in Progress</span>
           <span class="hero-pill" id="heroVendorCount">0 Vendors</span>
           <span class="hero-pill" id="heroSubtotal">$0 Total</span>
         </div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Event Summary</h2>
-      </div>
+    <div class="event-layout">
+      <section>
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">Event Summary</h2>
+          </div>
 
-      <div class="summary-grid">
-        <div class="summary-card">
-          <span class="summary-number" id="summaryVendorCount">0</span>
-          <span class="summary-label">Vendors</span>
-        </div>
+          <div class="summary-grid">
+            <div class="summary-card">
+              <span class="summary-number" id="summaryVendorCount">0</span>
+              <span class="summary-label">Vendors</span>
+            </div>
 
-        <div class="summary-card">
-          <span class="summary-number" id="summarySubtotal">$0</span>
-          <span class="summary-label">Subtotal</span>
-        </div>
+            <div class="summary-card">
+              <span class="summary-number" id="summarySubtotal">$0</span>
+              <span class="summary-label">Subtotal</span>
+            </div>
 
-        <div class="summary-card">
-          <span class="summary-number" id="summaryPending">0</span>
-          <span class="summary-label">Pending</span>
-        </div>
-      </div>
+            <div class="summary-card">
+              <span class="summary-number" id="summaryPending">0</span>
+              <span class="summary-label">Pending</span>
+            </div>
+          </div>
 
-      <div class="status-message" id="statusMessage"></div>
-    </section>
+          <div class="status-message" id="statusMessage"></div>
+        </section>
 
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Selected Vendors</h2>
-        <a class="section-link" href="listings.html">Add More</a>
-      </div>
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">Event Details</h2>
+          </div>
 
-      <div class="vendor-list" id="selectedVendorList">
-        <div class="empty-card">
-          <div class="empty-icon">…</div>
-          <h3>Loading event board</h3>
-          <p>We’re pulling your selected vendors now.</p>
-        </div>
-      </div>
-    </section>
+          <div class="details-card">
+            <div class="form-grid">
+              <div class="field-group">
+                <label for="event-name">Event Name</label>
+                <input id="event-name" class="input" type="text" placeholder="Amelia’s 5th Birthday, Smith Wedding, Baby Shower..." />
+              </div>
 
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Available Vendors</h2>
-        <a class="section-link" href="listings.html">Browse All</a>
-      </div>
+              <div class="row-2">
+                <div class="field-group">
+                  <label for="event-date">Event Date</label>
+                  <input id="event-date" class="input" type="date" />
+                </div>
 
-      <div class="vendor-list" id="availableVendorList">
-        <div class="empty-card">
-          <div class="empty-icon">…</div>
-          <h3>Loading vendors</h3>
-          <p>We’re pulling published listings now.</p>
-        </div>
-      </div>
-    </section>
+                <div class="field-group">
+                  <label for="event-type">Event Type</label>
+                  <select id="event-type" class="select">
+                    <option value="">Select Type</option>
+                    <option>Kids Birthday Parties</option>
+                    <option>First Birthday Parties</option>
+                    <option>Toddler Parties</option>
+                    <option>Teen Birthday Parties</option>
+                    <option>Adult Birthday Parties</option>
+                    <option>Weddings</option>
+                    <option>Bridal Showers</option>
+                    <option>Baby Showers</option>
+                    <option>Gender Reveals</option>
+                    <option>Graduation Parties</option>
+                    <option>Corporate Events</option>
+                    <option>Networking Events</option>
+                    <option>Grand Openings</option>
+                    <option>Brand Launches</option>
+                    <option>Fundraisers</option>
+                    <option>Holiday Parties</option>
+                    <option>Church Events</option>
+                    <option>Community Events</option>
+                    <option>Family Reunions</option>
+                    <option>Anniversary Parties</option>
+                    <option>Luxury Dinner Parties</option>
+                    <option>Open Houses</option>
+                    <option>Other Event Type</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row-2">
+                <div class="field-group">
+                  <label for="event-city">Event City</label>
+                  <input id="event-city" class="input" type="text" placeholder="League City" />
+                </div>
+
+                <div class="field-group">
+                  <label for="event-zip">Event ZIP</label>
+                  <input id="event-zip" class="input" type="text" placeholder="77573" />
+                </div>
+              </div>
+
+              <div class="row-2">
+                <div class="field-group">
+                  <label for="guest-count">Guest Count</label>
+                  <input id="guest-count" class="input" type="number" min="0" placeholder="50" />
+                </div>
+
+                <div class="field-group">
+                  <label for="event-budget">Budget</label>
+                  <input id="event-budget" class="input" type="text" placeholder="$1,500" />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="event-notes">Notes</label>
+                <textarea id="event-notes" class="textarea" placeholder="Theme, colors, must-haves, timeline, venue notes, or anything vendors should know."></textarea>
+              </div>
+
+              <button class="save-details-btn" id="saveEventDetailsBtn" type="button">Save Event Details</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">Selected Vendors</h2>
+            <a class="section-link" href="listings.html">Add More</a>
+          </div>
+
+          <div class="vendor-list" id="selectedVendorList">
+            <div class="empty-card">
+              <div class="empty-icon">…</div>
+              <h3>Loading event board</h3>
+              <p>We’re pulling your selected vendors now.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">Available Vendors</h2>
+            <a class="section-link" href="listings.html">Browse All</a>
+          </div>
+
+          <div class="vendor-list" id="availableVendorList">
+            <div class="empty-card">
+              <div class="empty-icon">…</div>
+              <h3>Loading vendors</h3>
+              <p>We’re pulling published listings now.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
 
     <section class="section">
       <div class="section-header">
@@ -678,7 +836,7 @@
       <div class="note-card">
         <h3 class="note-title">Event Reminder</h3>
         <p class="note-text">
-          Add vendors to your board, message them for availability, and keep your planning decisions in one place. Checkout can come later once booking and payment features are fully built.
+          Add vendors to your board, save your event details, message vendors for availability, and keep your planning decisions in one place. Checkout can come later once booking and payment features are fully built.
         </p>
       </div>
     </section>
@@ -701,6 +859,7 @@ import {
   getFirestore,
   doc,
   getDoc,
+  setDoc,
   collection,
   addDoc,
   deleteDoc,
@@ -726,6 +885,7 @@ const db = getFirestore(app);
 
 let currentUser = null;
 let currentUserData = null;
+let currentEventData = null;
 let publishedListings = [];
 let selectedVendors = [];
 let isBusy = false;
@@ -775,6 +935,11 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || "";
+}
+
 function showStatus(message, type = "success") {
   const status = document.getElementById("statusMessage");
   status.textContent = message;
@@ -783,7 +948,7 @@ function showStatus(message, type = "success") {
 
   setTimeout(() => {
     status.style.display = "none";
-  }, 2600);
+  }, 3000);
 }
 
 function getEventTypes(source) {
@@ -800,11 +965,6 @@ function getEventTypes(source) {
   }
 
   return [eventType];
-}
-
-function getEventTypesText(source) {
-  const eventTypes = getEventTypes(source);
-  return eventTypes.length ? eventTypes.join(", ") : "";
 }
 
 function renderEventTypePills(source, max = 2) {
@@ -882,6 +1042,103 @@ function updateSummary() {
   setText("bottomTotal", formatMoney(subtotal));
   setText("heroVendorCount", `${count} Vendor${count === 1 ? "" : "s"}`);
   setText("heroSubtotal", `${formatMoney(subtotal)} Total`);
+}
+
+function updateHeroFromEventDetails() {
+  const firstName = currentUserData?.name ? currentUserData.name.split(" ")[0] : "Your";
+  const eventName = safeText(currentEventData?.eventName, "");
+  const eventType = safeText(currentEventData?.eventType, "");
+  const eventCity = safeText(currentEventData?.eventCity, "");
+  const eventDate = safeText(currentEventData?.eventDate, "");
+
+  if (eventName) {
+    setText("eventTitle", eventName);
+  } else {
+    setText("eventTitle", `${firstName}'s Event Board`);
+  }
+
+  const subtitleParts = [];
+
+  if (eventCity) subtitleParts.push(eventCity);
+  if (eventDate) subtitleParts.push(eventDate);
+  if (currentEventData?.guestCount) subtitleParts.push(`${currentEventData.guestCount} guests`);
+
+  if (subtitleParts.length) {
+    setText("eventSubtitle", subtitleParts.join(" · "));
+  } else {
+    setText("eventSubtitle", "Keep your vendors, budget, and planning details all in one beautifully organized place.");
+  }
+
+  setText("heroEventType", eventType || "Planning in Progress");
+}
+
+function populateEventDetailsForm(data) {
+  setValue("event-name", data?.eventName || "");
+  setValue("event-date", data?.eventDate || "");
+  setValue("event-type", data?.eventType || "");
+  setValue("event-city", data?.eventCity || "");
+  setValue("event-zip", data?.eventZip || "");
+  setValue("guest-count", data?.guestCount || "");
+  setValue("event-budget", data?.eventBudget || "");
+  setValue("event-notes", data?.eventNotes || "");
+}
+
+function getEventDetailsFromForm() {
+  return {
+    eventName: document.getElementById("event-name").value.trim(),
+    eventDate: document.getElementById("event-date").value.trim(),
+    eventType: document.getElementById("event-type").value.trim(),
+    eventCity: document.getElementById("event-city").value.trim(),
+    eventZip: document.getElementById("event-zip").value.trim(),
+    guestCount: document.getElementById("guest-count").value.trim(),
+    eventBudget: document.getElementById("event-budget").value.trim(),
+    eventNotes: document.getElementById("event-notes").value.trim()
+  };
+}
+
+async function loadEventDetails() {
+  const eventRef = doc(db, "customerEvents", currentUser.uid);
+  const eventSnap = await getDoc(eventRef);
+
+  if (eventSnap.exists()) {
+    currentEventData = {
+      id: eventSnap.id,
+      ...eventSnap.data()
+    };
+  } else {
+    currentEventData = null;
+  }
+
+  populateEventDetailsForm(currentEventData);
+  updateHeroFromEventDetails();
+}
+
+async function saveEventDetails() {
+  if (!currentUser) return;
+
+  const eventDetails = getEventDetailsFromForm();
+
+  try {
+    showStatus("Saving event details...", "info");
+
+    await setDoc(doc(db, "customerEvents", currentUser.uid), {
+      ...eventDetails,
+      customerId: currentUser.uid,
+      customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Customer",
+      updatedAt: serverTimestamp(),
+      createdAt: currentEventData?.createdAt || serverTimestamp()
+    }, { merge: true });
+
+    currentEventData = {
+      ...currentEventData,
+      ...eventDetails
+    };
+
+    updateHeroFromEventDetails();
+    showStatus("Event details saved.", "success");
+  } catch (error) {
+    showStatus(error.message, "error");
+  }
 }
 
 function renderSelectedVendors() {
@@ -1289,6 +1546,7 @@ async function handleUrlAddParam() {
 
 async function loadPage() {
   try {
+    await loadEventDetails();
     await loadPublishedListings();
     await loadSelectedVendors();
 
@@ -1315,6 +1573,8 @@ async function loadPage() {
   }
 }
 
+document.getElementById("saveEventDetailsBtn").addEventListener("click", saveEventDetails);
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -1336,10 +1596,6 @@ onAuthStateChanged(auth, async (user) => {
   if (currentUserData.role === "vendor") {
     window.location.href = "vendor-dashboard.html";
     return;
-  }
-
-  if (currentUserData.name) {
-    setText("eventTitle", `${currentUserData.name.split(" ")[0]}'s Event Board`);
   }
 
   loadPage();
