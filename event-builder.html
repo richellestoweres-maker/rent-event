@@ -786,6 +786,72 @@ function showStatus(message, type = "success") {
   }, 2600);
 }
 
+function getEventTypes(source) {
+  if (Array.isArray(source.eventTypes) && source.eventTypes.length) {
+    return source.eventTypes.map((item) => safeText(item, "")).filter(Boolean);
+  }
+
+  const eventType = safeText(source.eventType, "");
+
+  if (!eventType) return [];
+
+  if (eventType.includes(",")) {
+    return eventType.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+
+  return [eventType];
+}
+
+function getEventTypesText(source) {
+  const eventTypes = getEventTypes(source);
+  return eventTypes.length ? eventTypes.join(", ") : "";
+}
+
+function renderEventTypePills(source, max = 2) {
+  const eventTypes = getEventTypes(source);
+
+  if (!eventTypes.length) return "";
+
+  const visibleTypes = eventTypes.slice(0, max);
+  const remainingCount = eventTypes.length - visibleTypes.length;
+
+  const pills = visibleTypes.map((eventType) => {
+    return `<span class="pill note">${escapeHtml(eventType)}</span>`;
+  }).join("");
+
+  const morePill = remainingCount > 0
+    ? `<span class="pill note">+${remainingCount} more</span>`
+    : "";
+
+  return `${pills}${morePill}`;
+}
+
+function getCategoryLine(source) {
+  const mainCategory = safeText(source.mainCategory, "");
+  const category = safeText(source.listingCategory || source.category, "Event Service");
+  const customCategory = safeText(source.customCategory, "");
+
+  const typeLine = customCategory
+    ? `${category} · ${customCategory}`
+    : category;
+
+  return mainCategory
+    ? `${mainCategory} · ${typeLine}`
+    : typeLine;
+}
+
+function getLocationText(source) {
+  const baseCity = safeText(source.baseCity, "");
+  const baseState = safeText(source.baseState || source.state, "");
+  const location = safeText(source.location, "");
+
+  if (baseCity && baseState) return `${baseCity}, ${baseState}`;
+  if (baseCity) return baseCity;
+  if (location) return location;
+
+  return "";
+}
+
 function isSelected(listingId) {
   return selectedVendors.some((vendor) => vendor.listingId === listingId);
 }
@@ -838,6 +904,8 @@ function renderSelectedVendors() {
   container.innerHTML = selectedVendors.map((vendor) => {
     const boardId = encodeURIComponent(vendor.id || "");
     const listingId = encodeURIComponent(vendor.listingId || "");
+    const categoryLine = getCategoryLine(vendor);
+    const eventTypePills = renderEventTypePills(vendor, 2);
 
     return `
       <article class="vendor-card">
@@ -847,7 +915,7 @@ function renderSelectedVendors() {
 
             <div class="vendor-info">
               <h3 class="vendor-name">${escapeHtml(vendor.listingTitle)}</h3>
-              <p class="vendor-type">${escapeHtml(vendor.listingCategory)}</p>
+              <p class="vendor-type">${escapeHtml(categoryLine)}</p>
             </div>
           </div>
 
@@ -857,6 +925,7 @@ function renderSelectedVendors() {
         <div class="vendor-meta">
           <span class="pill pending">${escapeHtml(vendor.status || "pending")}</span>
           <span class="pill note">${escapeHtml(vendor.vendorName || "Vendor")}</span>
+          ${eventTypePills}
         </div>
 
         <div class="vendor-actions">
@@ -903,13 +972,11 @@ function renderAvailableVendors() {
   container.innerHTML = available.slice(0, 8).map((listing) => {
     const listingId = encodeURIComponent(listing.id || "");
     const title = safeText(listing.title, "Untitled Listing");
-    const category = safeText(listing.category, "Event Service");
-    const customCategory = safeText(listing.customCategory, "");
-    const eventType = safeText(listing.eventType, "");
     const vendorName = safeText(listing.vendorName, "Vendor");
     const imageUrl = safeText(listing.imageUrl, "");
     const price = formatPrice(listing.startingPrice);
-    const typeLine = customCategory ? `${category} · ${customCategory}` : category;
+    const categoryLine = getCategoryLine(listing);
+    const eventTypePills = renderEventTypePills(listing, 2);
 
     return `
       <article class="vendor-card">
@@ -919,7 +986,7 @@ function renderAvailableVendors() {
 
             <div class="vendor-info">
               <h3 class="vendor-name">${escapeHtml(title)}</h3>
-              <p class="vendor-type">${escapeHtml(typeLine)}</p>
+              <p class="vendor-type">${escapeHtml(categoryLine)}</p>
             </div>
           </div>
 
@@ -928,8 +995,8 @@ function renderAvailableVendors() {
 
         <div class="vendor-meta">
           <span class="pill available">Available</span>
-          ${eventType ? `<span class="pill note">${escapeHtml(eventType)}</span>` : ""}
           <span class="pill note">${escapeHtml(vendorName)}</span>
+          ${eventTypePills}
         </div>
 
         <div class="vendor-actions">
@@ -1023,21 +1090,38 @@ async function addVendorToBoard(listingId) {
     isBusy = true;
 
     const priceNumber = extractNumber(listing.startingPrice);
+    const eventTypes = getEventTypes(listing);
+    const eventType = eventTypes.join(", ");
 
     const newItem = {
       userId: currentUser.uid,
       listingId: cleanListingId,
       listingTitle: safeText(listing.title, "Untitled Listing"),
+
+      mainCategory: safeText(listing.mainCategory, ""),
       listingCategory: safeText(listing.category, "Event Service"),
+      category: safeText(listing.category, "Event Service"),
       customCategory: safeText(listing.customCategory, ""),
-      eventType: safeText(listing.eventType, ""),
+
+      eventTypes,
+      eventType,
+
       startingPrice: safeText(listing.startingPrice, ""),
       priceNumber,
+
       vendorId: safeText(listing.vendorId, ""),
       vendorName: safeText(listing.vendorName, "Vendor"),
       vendorEmail: safeText(listing.vendorEmail, ""),
+
       imageUrl: safeText(listing.imageUrl, ""),
-      location: safeText(listing.location, ""),
+
+      location: getLocationText(listing),
+      baseCity: safeText(listing.baseCity, ""),
+      baseState: safeText(listing.baseState || listing.state, ""),
+      state: safeText(listing.baseState || listing.state, ""),
+      zipCode: safeText(listing.zipCode, ""),
+      serviceArea: safeText(listing.serviceArea, ""),
+
       status: "pending",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
