@@ -36,6 +36,8 @@
       --red-text: #c74f4d;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
@@ -240,7 +242,8 @@
 
     .details-card,
     .note-card,
-    .empty-card {
+    .empty-card,
+    .ai-card {
       background: var(--card);
       border-radius: 28px;
       padding: 18px;
@@ -297,7 +300,8 @@
       gap: 12px;
     }
 
-    .save-details-btn {
+    .save-details-btn,
+    .generate-ai-btn {
       width: 100%;
       min-height: 52px;
       border-radius: 999px;
@@ -309,6 +313,143 @@
       font-weight: 800;
       cursor: pointer;
       box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .generate-ai-btn:disabled {
+      opacity: 0.72;
+      cursor: not-allowed;
+    }
+
+    .ai-card {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ai-card::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      right: -38px;
+      top: -38px;
+      background: linear-gradient(135deg, rgba(255, 154, 115, 0.14), rgba(111, 74, 184, 0.12));
+      pointer-events: none;
+    }
+
+    .ai-card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ai-kicker {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--purple-soft);
+      color: var(--purple-text);
+      font-size: 0.76rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .ai-title {
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .ai-summary {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .ai-results {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .suggestion-card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 22px;
+      padding: 14px;
+    }
+
+    .suggestion-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .suggestion-title {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .priority-pill {
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: #fff4df;
+      color: #aa6f12;
+      font-size: 0.7rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .suggestion-category {
+      margin: 0 0 8px;
+      color: var(--blue-text);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .suggestion-why {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.48;
+    }
+
+    .suggestion-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ai-tip {
+      margin-top: 14px;
+      border-radius: 20px;
+      background: var(--soft-2);
+      border: 1px solid var(--line);
+      padding: 14px;
+    }
+
+    .ai-tip-title {
+      margin: 0 0 6px;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .ai-tip-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
     }
 
     .vendor-list {
@@ -637,7 +778,8 @@
         max-width: 960px;
       }
 
-      .vendor-list {
+      .vendor-list,
+      .ai-results {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -739,7 +881,9 @@
                     <option>Teen Birthday Parties</option>
                     <option>Adult Birthday Parties</option>
                     <option>Weddings</option>
+                    <option>Destination Weddings</option>
                     <option>Bridal Showers</option>
+                    <option>Bachelorette Parties</option>
                     <option>Baby Showers</option>
                     <option>Gender Reveals</option>
                     <option>Graduation Parties</option>
@@ -784,12 +928,65 @@
                 </div>
               </div>
 
+              <div class="row-2">
+                <div class="field-group">
+                  <label for="planning-style">Planning Style</label>
+                  <select id="planning-style" class="select">
+                    <option>Planning my own event</option>
+                    <option>Event planner / coordinator</option>
+                    <option>Planning for a client</option>
+                    <option>Vendor building a package</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="destination-event">Destination Event?</label>
+                  <select id="destination-event" class="select">
+                    <option>No / local event</option>
+                    <option>Yes, destination event</option>
+                    <option>Not sure yet</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="style-vibe">Style / Vibe</label>
+                <input id="style-vibe" class="input" type="text" placeholder="Soft garden party, luxury glam, playful kids theme, coastal wedding..." />
+              </div>
+
               <div class="field-group">
                 <label for="event-notes">Notes</label>
-                <textarea id="event-notes" class="textarea" placeholder="Theme, colors, must-haves, timeline, venue notes, or anything vendors should know."></textarea>
+                <textarea id="event-notes" class="textarea" placeholder="Theme, colors, must-haves, timeline, venue notes, travel details, or anything vendors should know."></textarea>
               </div>
 
               <button class="save-details-btn" id="saveEventDetailsBtn" type="button">Save Event Details</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">AI Event Planner</h2>
+          </div>
+
+          <div class="ai-card">
+            <div class="ai-card-content">
+              <div class="ai-kicker">RentEvent Concierge</div>
+              <h3 class="ai-title" id="aiHeadline">Get ideas for what your event still needs.</h3>
+              <p class="ai-summary" id="aiSummary">
+                Save your event details, then generate personalized vendor and add-on suggestions based on your event type, location, guest count, budget, style, and selected vendors.
+              </p>
+
+              <button class="generate-ai-btn" id="generateAiBtn" type="button">Generate AI Ideas</button>
+
+              <div class="status-message" id="aiStatus"></div>
+
+              <div class="ai-results" id="aiResults"></div>
+
+              <div class="ai-tip" id="aiTip" style="display: none;">
+                <p class="ai-tip-title">Planner Tip</p>
+                <p class="ai-tip-text" id="aiTipText"></p>
+              </div>
             </div>
           </div>
         </section>
@@ -836,7 +1033,7 @@
       <div class="note-card">
         <h3 class="note-title">Event Reminder</h3>
         <p class="note-text">
-          Add vendors to your board, save your event details, message vendors for availability, and keep your planning decisions in one place. Checkout can come later once booking and payment features are fully built.
+          Add vendors to your board, save your event details, message vendors for availability, and use the AI Event Planner for ideas on what to add next.
         </p>
       </div>
     </section>
@@ -883,12 +1080,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const AI_PLANNER_FUNCTION_URL = "https://generateplannersuggestions-prhcxdwbdq-uc.a.run.app";
+
 let currentUser = null;
 let currentUserData = null;
 let currentEventData = null;
 let publishedListings = [];
 let selectedVendors = [];
 let isBusy = false;
+let isGeneratingAi = false;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -949,6 +1149,18 @@ function showStatus(message, type = "success") {
   setTimeout(() => {
     status.style.display = "none";
   }, 3000);
+}
+
+function showAiStatus(message, type = "info") {
+  const status = document.getElementById("aiStatus");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
+}
+
+function hideAiStatus() {
+  const status = document.getElementById("aiStatus");
+  status.style.display = "none";
 }
 
 function getEventTypes(source) {
@@ -1080,6 +1292,9 @@ function populateEventDetailsForm(data) {
   setValue("event-zip", data?.eventZip || "");
   setValue("guest-count", data?.guestCount || "");
   setValue("event-budget", data?.eventBudget || "");
+  setValue("planning-style", data?.planningStyle || "Planning my own event");
+  setValue("destination-event", data?.destinationEvent || "No / local event");
+  setValue("style-vibe", data?.styleVibe || "");
   setValue("event-notes", data?.eventNotes || "");
 }
 
@@ -1092,6 +1307,9 @@ function getEventDetailsFromForm() {
     eventZip: document.getElementById("event-zip").value.trim(),
     guestCount: document.getElementById("guest-count").value.trim(),
     eventBudget: document.getElementById("event-budget").value.trim(),
+    planningStyle: document.getElementById("planning-style").value.trim(),
+    destinationEvent: document.getElementById("destination-event").value.trim(),
+    styleVibe: document.getElementById("style-vibe").value.trim(),
     eventNotes: document.getElementById("event-notes").value.trim()
   };
 }
@@ -1138,6 +1356,172 @@ async function saveEventDetails() {
     showStatus("Event details saved.", "success");
   } catch (error) {
     showStatus(error.message, "error");
+  }
+}
+
+function getAvailableCategories() {
+  const categorySet = new Set();
+
+  publishedListings.forEach((listing) => {
+    [
+      listing.mainCategory,
+      listing.category,
+      listing.customCategory,
+      listing.listingCategory
+    ].forEach((value) => {
+      const clean = safeText(value, "");
+      if (clean) categorySet.add(clean);
+    });
+  });
+
+  const defaults = [
+    "Wedding Cakes",
+    "Cakes",
+    "Dessert Tables",
+    "Charcuterie Boards",
+    "Grazing Tables",
+    "Catering",
+    "Private Chef",
+    "Florals",
+    "Wedding Florals",
+    "Balloon Décor",
+    "Balloon Arches",
+    "Photo Booth",
+    "360 Photo Booth",
+    "Photography",
+    "Videography",
+    "DJ",
+    "Wedding Officiant",
+    "Hair + Makeup",
+    "Transportation",
+    "Shuttle Service",
+    "Event Planner",
+    "Day-of Coordinator",
+    "Tables and Chairs",
+    "Linen Rentals",
+    "Setup Crew",
+    "Cleanup Crew",
+    "Coffee Cart",
+    "Mocktail Bar",
+    "Mobile Bar"
+  ];
+
+  defaults.forEach((item) => categorySet.add(item));
+
+  return Array.from(categorySet).sort();
+}
+
+function renderAiSuggestions(result) {
+  const headline = safeText(result?.headline, "AI Event Planner Suggestions");
+  const summary = safeText(result?.summary, "Here are a few ideas to help complete your event.");
+  const plannerTip = safeText(result?.plannerTip, "");
+  const suggestions = Array.isArray(result?.suggestions) ? result.suggestions : [];
+
+  setText("aiHeadline", headline);
+  setText("aiSummary", summary);
+
+  const resultsContainer = document.getElementById("aiResults");
+
+  if (!suggestions.length) {
+    resultsContainer.innerHTML = `
+      <div class="suggestion-card">
+        <h4 class="suggestion-title">No suggestions returned yet</h4>
+        <p class="suggestion-why">Try adding more event details like event type, guest count, city, budget, and style.</p>
+      </div>
+    `;
+  } else {
+    resultsContainer.innerHTML = suggestions.map((suggestion) => {
+      const title = safeText(suggestion.title, "Event Add-On");
+      const category = safeText(suggestion.category, "Event Service");
+      const why = safeText(suggestion.why, "This could help complete the event experience.");
+      const priority = safeText(suggestion.priority, "Medium");
+      const searchTerms = Array.isArray(suggestion.searchTerms) && suggestion.searchTerms.length
+        ? suggestion.searchTerms
+        : [category, title];
+
+      const firstSearch = safeText(searchTerms[0] || category, category);
+      const browseUrl = `listings.html?search=${encodeURIComponent(firstSearch)}`;
+
+      return `
+        <article class="suggestion-card">
+          <div class="suggestion-top">
+            <h4 class="suggestion-title">${escapeHtml(title)}</h4>
+            <span class="priority-pill">${escapeHtml(priority)}</span>
+          </div>
+
+          <p class="suggestion-category">${escapeHtml(category)}</p>
+          <p class="suggestion-why">${escapeHtml(why)}</p>
+
+          <div class="suggestion-actions">
+            <a class="btn" href="${browseUrl}">Browse Vendors</a>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  if (plannerTip) {
+    document.getElementById("aiTip").style.display = "block";
+    setText("aiTipText", plannerTip);
+  } else {
+    document.getElementById("aiTip").style.display = "none";
+    setText("aiTipText", "");
+  }
+}
+
+async function generateAiIdeas() {
+  if (isGeneratingAi) return;
+
+  const generateBtn = document.getElementById("generateAiBtn");
+
+  try {
+    isGeneratingAi = true;
+    generateBtn.disabled = true;
+    generateBtn.textContent = "Generating Ideas...";
+
+    const eventDetails = getEventDetailsFromForm();
+
+    if (!eventDetails.eventType && !eventDetails.eventNotes && !eventDetails.styleVibe) {
+      showAiStatus("Add at least an event type, style/vibe, or notes so the AI planner has something to work with.", "error");
+      return;
+    }
+
+    currentEventData = {
+      ...currentEventData,
+      ...eventDetails
+    };
+
+    await saveEventDetails();
+
+    showAiStatus("The RentEvent Concierge is thinking through your event...", "info");
+
+    const response = await fetch(AI_PLANNER_FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        eventDetails,
+        selectedVendors,
+        availableCategories: getAvailableCategories()
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "AI planner could not generate suggestions yet.");
+    }
+
+    renderAiSuggestions(data.result);
+    hideAiStatus();
+
+  } catch (error) {
+    showAiStatus(error.message, "error");
+  } finally {
+    isGeneratingAi = false;
+    generateBtn.disabled = false;
+    generateBtn.textContent = "Generate AI Ideas";
   }
 }
 
@@ -1574,6 +1958,7 @@ async function loadPage() {
 }
 
 document.getElementById("saveEventDetailsBtn").addEventListener("click", saveEventDetails);
+document.getElementById("generateAiBtn").addEventListener("click", generateAiIdeas);
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
