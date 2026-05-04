@@ -36,6 +36,8 @@
       --red-text: #c74f4d;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
@@ -134,7 +136,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 300px;
+      max-width: 310px;
     }
 
     .hero-label {
@@ -211,11 +213,47 @@
 
     .checkout-card,
     .empty-card,
-    .note-card {
+    .note-card,
+    .event-card,
+    .success-card {
       background: var(--card);
       border-radius: 28px;
       padding: 18px;
       box-shadow: var(--shadow);
+    }
+
+    .event-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .event-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .event-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .event-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .event-value {
+      text-align: right;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      max-width: 62%;
     }
 
     .vendor-list {
@@ -338,6 +376,11 @@
       color: var(--blue-text);
     }
 
+    .pill.ai {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
     .price-row {
       display: flex;
       align-items: flex-start;
@@ -440,7 +483,8 @@
 
     .payment-placeholder h3,
     .empty-card h3,
-    .note-title {
+    .note-title,
+    .success-card h3 {
       margin: 0 0 8px;
       font-size: 1rem;
       font-weight: 800;
@@ -449,7 +493,8 @@
 
     .payment-placeholder p,
     .empty-card p,
-    .note-text {
+    .note-text,
+    .success-card p {
       margin: 0;
       font-size: 0.9rem;
       line-height: 1.5;
@@ -461,7 +506,8 @@
       padding: 24px 18px;
     }
 
-    .empty-icon {
+    .empty-icon,
+    .success-icon {
       width: 64px;
       height: 64px;
       border-radius: 22px;
@@ -473,6 +519,11 @@
       justify-content: center;
       font-size: 1.6rem;
       font-weight: 800;
+    }
+
+    .success-icon {
+      background: var(--green-soft);
+      color: var(--green-text);
     }
 
     .empty-card p {
@@ -520,6 +571,12 @@
       display: block;
       background: #fff4df;
       color: #8d5f11;
+    }
+
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
     }
 
     .status-message.error {
@@ -653,7 +710,7 @@
       <a href="event-builder.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Secure Checkout</div>
+        <div class="eyebrow">Request Review</div>
         <h1 class="page-title">Checkout</h1>
       </div>
 
@@ -663,15 +720,39 @@
     <section class="hero-card">
       <div class="hero-content">
         <div class="hero-label">RentEvent Checkout</div>
-        <h2 class="hero-title">Review your event total.</h2>
+        <h2 class="hero-title">Submit your event request.</h2>
         <p class="hero-subtitle">
-          Confirm your selected vendors, service fee, and estimated payment total before moving forward.
+          Review your vendors, event details, and estimated total before sending your request.
         </p>
 
         <div class="hero-meta">
           <span class="hero-pill" id="heroVendorCount">0 Vendors</span>
           <span class="hero-pill" id="heroTotal">$0 Total</span>
-          <span class="hero-pill">Payment Setup Pending</span>
+          <span class="hero-pill">Request Only</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="successSection" style="display: none;">
+      <div class="success-card">
+        <div class="success-icon">✓</div>
+        <h3>Request submitted</h3>
+        <p id="successMessage">
+          Your booking request has been saved. Vendors will be able to review the request once the vendor request dashboard is connected.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Event Details</h2>
+        <a class="section-link" href="event-builder.html">Edit</a>
+      </div>
+
+      <div class="event-card" id="eventDetailsCard">
+        <div class="event-row">
+          <span class="event-label">Event</span>
+          <span class="event-value">Loading...</span>
         </div>
       </div>
     </section>
@@ -724,15 +805,15 @@
 
           <div class="total-row">
             <div>
-              <p class="total-label">Total Due</p>
-              <p class="total-note">This is an estimate until live Stripe checkout is connected.</p>
+              <p class="total-label">Estimated Total</p>
+              <p class="total-note">This request does not collect payment yet.</p>
             </div>
 
             <div class="total-value" id="totalDue">$0</div>
           </div>
 
           <div class="status-message info" id="checkoutStatus">
-            Stripe is not connected yet. This page is ready for embedded payment setup once we add the secure backend.
+            This MVP saves a booking request first. Stripe payments can be connected after the request flow is working.
           </div>
         </div>
       </section>
@@ -740,14 +821,14 @@
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title">Payment</h2>
+        <h2 class="section-title">Request Notes</h2>
       </div>
 
       <div class="payment-placeholder" id="paymentMount">
         <div class="payment-icon">◎</div>
-        <h3>Embedded payment will live here</h3>
+        <h3>No payment collected yet</h3>
         <p>
-          When Stripe is connected, this area can become the embedded card/payment form so customers can pay inside RentEvent instead of being redirected away.
+          Clicking Submit Request will save this event request in Firebase so vendors can review the event details, selected services, and estimated total.
         </p>
       </div>
     </section>
@@ -760,7 +841,7 @@
       <div class="note-card">
         <h3 class="note-title">Important MVP Note</h3>
         <p class="note-text">
-          This checkout currently calculates totals from the event board. The final payment flow will need Stripe Embedded Checkout or Stripe Connect through a secure backend before real money can be collected.
+          This creates a pending booking request. Later, this request can connect to vendor availability, messages, confirmations, Stripe Embedded Checkout, and RentEvent’s platform fee.
         </p>
       </div>
     </section>
@@ -768,12 +849,12 @@
 
   <div class="bottom-bar">
     <div class="bottom-info">
-      <span class="bottom-label">Total Due</span>
+      <span class="bottom-label">Estimated Total</span>
       <span class="bottom-value" id="bottomTotal">$0</span>
     </div>
 
     <a href="event-builder.html" class="bottom-btn-secondary">Edit</a>
-    <button class="bottom-btn" id="continuePaymentBtn" type="button">Continue</button>
+    <button class="bottom-btn" id="continuePaymentBtn" type="button">Submit Request</button>
   </div>
 
 <script type="module">
@@ -784,9 +865,11 @@ import {
   doc,
   getDoc,
   collection,
+  addDoc,
   getDocs,
   query,
-  where
+  where,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -805,7 +888,10 @@ const db = getFirestore(app);
 
 let currentUser = null;
 let currentUserData = null;
+let currentEventData = null;
 let selectedVendors = [];
+let isSubmitting = false;
+let lastBookingRequestId = null;
 
 const SERVICE_FEE_PERCENT = 0.10;
 const PROCESSING_PERCENT = 0.029;
@@ -835,6 +921,13 @@ function formatMoney(value) {
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
+}
+
+function setCheckoutStatus(message, type = "info") {
+  const status = document.getElementById("checkoutStatus");
+  status.className = `status-message ${type}`;
+  status.textContent = message;
+  status.style.display = "block";
 }
 
 function renderThumb(imageUrl, title) {
@@ -904,7 +997,6 @@ function calculateTotals() {
   }, 0);
 
   const serviceFee = vendorSubtotal * SERVICE_FEE_PERCENT;
-
   const baseBeforeProcessing = vendorSubtotal + serviceFee;
   const processingFee = baseBeforeProcessing > 0
     ? (baseBeforeProcessing * PROCESSING_PERCENT) + PROCESSING_FIXED
@@ -937,10 +1029,97 @@ function updateTotals() {
   if (vendorCount === 0) {
     continueBtn.disabled = true;
     continueBtn.textContent = "Add Vendor";
+  } else if (lastBookingRequestId) {
+    continueBtn.disabled = true;
+    continueBtn.textContent = "Request Submitted";
   } else {
     continueBtn.disabled = false;
-    continueBtn.textContent = "Continue";
+    continueBtn.textContent = "Submit Request";
   }
+}
+
+function renderEventDetails() {
+  const card = document.getElementById("eventDetailsCard");
+
+  if (!currentEventData) {
+    card.innerHTML = `
+      <div class="event-row">
+        <span class="event-label">Event</span>
+        <span class="event-value">No event details saved yet</span>
+      </div>
+      <div>
+        <a class="btn" href="event-builder.html">Add Event Details</a>
+      </div>
+    `;
+    return;
+  }
+
+  const eventName = safeText(currentEventData.eventName, "Unnamed Event");
+  const eventType = safeText(currentEventData.eventType, "Event type not selected");
+  const eventDate = safeText(currentEventData.eventDate, "Date not listed");
+  const eventCity = safeText(currentEventData.eventCity, "");
+  const eventZip = safeText(currentEventData.eventZip, "");
+  const guestCount = safeText(currentEventData.guestCount, "Not listed");
+  const eventBudget = safeText(currentEventData.eventBudget, "Not listed");
+  const planningStyle = safeText(currentEventData.planningStyle, "Planning my own event");
+  const destinationEvent = safeText(currentEventData.destinationEvent, "No / local event");
+  const styleVibe = safeText(currentEventData.styleVibe, "Not listed");
+
+  const location = [eventCity, eventZip].filter(Boolean).join(" ");
+
+  card.innerHTML = `
+    <div class="event-row">
+      <span class="event-label">Event</span>
+      <span class="event-value">${escapeHtml(eventName)}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Type</span>
+      <span class="event-value">${escapeHtml(eventType)}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Date</span>
+      <span class="event-value">${escapeHtml(eventDate)}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Location</span>
+      <span class="event-value">${escapeHtml(location || "Location not listed")}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Guests</span>
+      <span class="event-value">${escapeHtml(guestCount)}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Budget</span>
+      <span class="event-value">${escapeHtml(eventBudget)}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Style</span>
+      <span class="event-value">${escapeHtml(styleVibe)}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Planning</span>
+      <span class="event-value">${escapeHtml(planningStyle)}</span>
+    </div>
+
+    <div class="event-row">
+      <span class="event-label">Destination</span>
+      <span class="event-value">${escapeHtml(destinationEvent)}</span>
+    </div>
+
+    ${currentEventData.aiPlannerSuggestions ? `
+      <div class="event-row">
+        <span class="event-label">AI Planner</span>
+        <span class="event-value">${escapeHtml(currentEventData.aiPlannerSuggestions?.suggestions?.length || 0)} saved ideas</span>
+      </div>
+    ` : ""}
+  `;
 }
 
 function renderEmptyCheckout() {
@@ -995,7 +1174,7 @@ function renderVendors() {
           <span class="pill pending">${escapeHtml(status)}</span>
           <span class="pill info">${escapeHtml(vendorName)}</span>
           ${eventTypePills}
-          <span class="pill safe">Review</span>
+          <span class="pill safe">Request Review</span>
         </div>
 
         <div style="margin-top: 12px;">
@@ -1006,6 +1185,22 @@ function renderVendors() {
   }).join("");
 
   updateTotals();
+}
+
+async function loadEventDetails() {
+  const eventRef = doc(db, "customerEvents", currentUser.uid);
+  const eventSnap = await getDoc(eventRef);
+
+  if (eventSnap.exists()) {
+    currentEventData = {
+      id: eventSnap.id,
+      ...eventSnap.data()
+    };
+  } else {
+    currentEventData = null;
+  }
+
+  renderEventDetails();
 }
 
 async function loadSelectedVendors() {
@@ -1035,25 +1230,116 @@ async function loadSelectedVendors() {
   renderVendors();
 }
 
-function showCheckoutNotice() {
-  const status = document.getElementById("checkoutStatus");
+function sanitizeVendorForRequest(vendor) {
+  return {
+    boardItemId: safeText(vendor.id, ""),
+    listingId: safeText(vendor.listingId, ""),
+    listingTitle: safeText(vendor.listingTitle, ""),
+    mainCategory: safeText(vendor.mainCategory, ""),
+    category: safeText(vendor.category || vendor.listingCategory, ""),
+    customCategory: safeText(vendor.customCategory, ""),
+    eventTypes: getEventTypes(vendor),
+    startingPrice: safeText(vendor.startingPrice, ""),
+    priceNumber: Number(vendor.priceNumber || 0),
+    vendorId: safeText(vendor.vendorId, ""),
+    vendorName: safeText(vendor.vendorName, ""),
+    vendorEmail: safeText(vendor.vendorEmail, ""),
+    imageUrl: safeText(vendor.imageUrl, ""),
+    location: safeText(vendor.location, ""),
+    baseCity: safeText(vendor.baseCity, ""),
+    baseState: safeText(vendor.baseState || vendor.state, ""),
+    zipCode: safeText(vendor.zipCode, ""),
+    serviceArea: safeText(vendor.serviceArea, ""),
+    status: safeText(vendor.status, "pending")
+  };
+}
+
+function buildBookingRequestPayload() {
+  const totals = calculateTotals();
+  const cleanVendors = selectedVendors.map(sanitizeVendorForRequest);
+  const vendorIds = Array.from(new Set(cleanVendors.map((vendor) => vendor.vendorId).filter(Boolean)));
+  const listingIds = Array.from(new Set(cleanVendors.map((vendor) => vendor.listingId).filter(Boolean)));
+
+  return {
+    customerId: currentUser.uid,
+    customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Customer",
+    customerEmail: currentUserData?.email || currentUser.email || "",
+
+    eventId: currentUser.uid,
+    eventDetails: currentEventData || {},
+    aiPlannerSuggestions: currentEventData?.aiPlannerSuggestions || null,
+
+    vendors: cleanVendors,
+    vendorIds,
+    listingIds,
+
+    vendorSubtotal: totals.vendorSubtotal,
+    serviceFee: totals.serviceFee,
+    processingFee: totals.processingFee,
+    totalDue: totals.totalDue,
+    serviceFeePercent: SERVICE_FEE_PERCENT,
+    processingPercent: PROCESSING_PERCENT,
+    processingFixed: PROCESSING_FIXED,
+
+    paymentStatus: "not_collected",
+    requestStatus: "pending",
+    status: "pending",
+
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+}
+
+async function submitBookingRequest() {
+  if (isSubmitting) return;
+
+  const button = document.getElementById("continuePaymentBtn");
 
   if (!selectedVendors.length) {
     window.location.href = "event-builder.html";
     return;
   }
 
-  status.className = "status-message info";
-  status.textContent = "Next step: connect Stripe Embedded Checkout through a secure backend. This button is ready, but live payment is not active yet.";
-  status.style.display = "block";
+  try {
+    isSubmitting = true;
+    button.disabled = true;
+    button.textContent = "Submitting...";
+    setCheckoutStatus("Submitting your booking request...", "info");
 
-  document.getElementById("paymentMount").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
+    const payload = buildBookingRequestPayload();
+
+    const bookingRef = await addDoc(collection(db, "bookingRequests"), payload);
+
+    lastBookingRequestId = bookingRef.id;
+
+    document.getElementById("successSection").style.display = "block";
+    document.getElementById("successMessage").textContent =
+      `Your request was submitted successfully. Request ID: ${bookingRef.id}`;
+
+    setCheckoutStatus("Booking request submitted successfully. Next, we will build the vendor request dashboard so vendors can review and respond.", "success");
+
+    document.getElementById("successSection").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    updateTotals();
+
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "Submit Request";
+    setCheckoutStatus(error.message, "error");
+  } finally {
+    isSubmitting = false;
+  }
 }
 
-document.getElementById("continuePaymentBtn").addEventListener("click", showCheckoutNotice);
+async function loadPage() {
+  await loadEventDetails();
+  await loadSelectedVendors();
+}
+
+document.getElementById("continuePaymentBtn").addEventListener("click", submitBookingRequest);
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -1078,7 +1364,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  loadSelectedVendors();
+  loadPage();
 });
 </script>
 
