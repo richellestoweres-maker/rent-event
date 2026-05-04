@@ -656,6 +656,7 @@
 
         <select id="categoryInput" class="select-input">
           <option value="">All Categories</option>
+
           <option>Décor & Styling</option>
           <option>Kids Parties & Activities</option>
           <option>Rentals</option>
@@ -667,16 +668,97 @@
           <option>Beauty & Formalwear</option>
           <option>Transportation</option>
           <option>Specialty Services</option>
+
           <option>Balloon Décor</option>
+          <option>Balloon Arches</option>
+          <option>Balloon Garlands</option>
+          <option>Backdrop Rentals</option>
+          <option>Flower Wall Rentals</option>
+          <option>Marquee Letters + Numbers</option>
+          <option>Custom Signage</option>
+          <option>Florals</option>
+          <option>Wedding Florals</option>
+          <option>Centerpieces</option>
+
           <option>Bounce House Rentals</option>
-          <option>Charcuterie Boards</option>
+          <option>White Bounce House Rentals</option>
+          <option>Soft Play Rentals</option>
+          <option>Ball Pit Rentals</option>
+          <option>Face Painting</option>
+          <option>Character Appearances</option>
+          <option>Kids Entertainment</option>
+          <option>Party Favors</option>
+
+          <option>Chair Rentals</option>
+          <option>Table Rentals</option>
+          <option>Tables and Chairs</option>
+          <option>Linen Rentals</option>
+          <option>Tent Rentals</option>
+          <option>Lounge Furniture Rentals</option>
+          <option>Dance Floor Rentals</option>
+          <option>Stage Rentals</option>
+          <option>Lighting Rentals</option>
+          <option>Portable Restroom Rentals</option>
+
           <option>Catering</option>
+          <option>Private Chef</option>
+          <option>Food Trucks</option>
+          <option>Charcuterie Boards</option>
+          <option>Grazing Tables</option>
+          <option>Cakes</option>
+          <option>Wedding Cakes</option>
+          <option>Cupcakes</option>
+          <option>Custom Cookies</option>
+          <option>Dessert Tables</option>
+          <option>Mocktail Bar</option>
+          <option>Mobile Bar</option>
+          <option>Bartending Services</option>
+          <option>Coffee Cart</option>
+
           <option>Photo Booth</option>
+          <option>360 Photo Booth</option>
           <option>Photography</option>
+          <option>Wedding Photography</option>
           <option>Videography</option>
-          <option>Hair + Makeup</option>
+          <option>Wedding Videography</option>
+          <option>Content Creator</option>
+
           <option>DJ</option>
+          <option>Wedding DJ</option>
+          <option>Live Band</option>
+          <option>Live Ceremony Music</option>
+          <option>Emcee / Host</option>
+          <option>Cold Sparks</option>
+          <option>Special Effects</option>
+
           <option>Event Planner</option>
+          <option>Event Coordinator</option>
+          <option>Day-of Coordinator</option>
+          <option>Wedding Planner</option>
+          <option>Wedding Coordinator</option>
+          <option>Setup Crew</option>
+          <option>Cleanup Crew</option>
+          <option>Event Staffing</option>
+          <option>Security</option>
+
+          <option>Hair + Makeup</option>
+          <option>Bridal Hair</option>
+          <option>Bridal Makeup</option>
+          <option>Glam Services</option>
+          <option>Wedding Officiant</option>
+
+          <option>Transportation</option>
+          <option>Party Bus</option>
+          <option>Limo Service</option>
+          <option>Shuttle Service</option>
+          <option>Luxury Car Rental</option>
+
+          <option>Corporate Event Services</option>
+          <option>Brand Activation Setup</option>
+          <option>Fundraiser Services</option>
+          <option>Church Event Services</option>
+          <option>School Event Services</option>
+
           <option>Other Event Service</option>
         </select>
       </div>
@@ -889,11 +971,11 @@ function listingMatchesFilter(listing, filter) {
   const nationalService = listing.nationalShipping === true || listing.virtualService === true || normalize(listing.nationalShipping).includes("yes") || normalize(listing.virtualService).includes("yes");
 
   if (filter === "birthday") {
-    return searchable.includes("birthday") || searchable.includes("party");
+    return searchable.includes("birthday") || searchable.includes("party") || searchable.includes("cake") || searchable.includes("bounce");
   }
 
   if (filter === "wedding") {
-    return searchable.includes("wedding") || searchable.includes("bridal") || searchable.includes("engagement") || searchable.includes("rehearsal");
+    return searchable.includes("wedding") || searchable.includes("bridal") || searchable.includes("engagement") || searchable.includes("rehearsal") || searchable.includes("officiant");
   }
 
   if (filter === "shower") {
@@ -909,11 +991,11 @@ function listingMatchesFilter(listing, filter) {
   }
 
   if (filter === "decor") {
-    return searchable.includes("decor") || searchable.includes("décor") || searchable.includes("balloon") || searchable.includes("floral") || searchable.includes("styling") || searchable.includes("backdrop");
+    return searchable.includes("decor") || searchable.includes("décor") || searchable.includes("balloon") || searchable.includes("floral") || searchable.includes("florals") || searchable.includes("styling") || searchable.includes("backdrop");
   }
 
   if (filter === "catering") {
-    return searchable.includes("catering") || searchable.includes("food") || searchable.includes("cake") || searchable.includes("dessert") || searchable.includes("charcuterie") || searchable.includes("bar") || searchable.includes("coffee");
+    return searchable.includes("catering") || searchable.includes("food") || searchable.includes("chef") || searchable.includes("cake") || searchable.includes("dessert") || searchable.includes("charcuterie") || searchable.includes("grazing") || searchable.includes("bar") || searchable.includes("coffee");
   }
 
   if (filter === "venue") {
@@ -925,7 +1007,7 @@ function listingMatchesFilter(listing, filter) {
   }
 
   if (filter === "travel") {
-    return travelAvailable || searchable.includes("travel available") || searchable.includes("travels");
+    return travelAvailable || searchable.includes("travel available") || searchable.includes("travels") || searchable.includes("destination") || searchable.includes("shuttle") || searchable.includes("transportation");
   }
 
   if (filter === "virtual") {
@@ -1069,7 +1151,9 @@ function applySearchAndFilter() {
       const listingCategory = [
         listing.mainCategory,
         listing.category,
-        listing.customCategory
+        listing.customCategory,
+        listing.eventType,
+        getEventTypesText(listing)
       ].join(" ").toLowerCase();
 
       return listingCategory.includes(categoryQuery);
@@ -1077,6 +1161,62 @@ function applySearchAndFilter() {
   }
 
   renderListings(filtered);
+}
+
+function setActiveFilter(filterValue) {
+  activeFilter = filterValue || "all";
+
+  document.querySelectorAll(".filter-pill").forEach((pill) => {
+    pill.classList.remove("active");
+
+    if (pill.dataset.filter === activeFilter) {
+      pill.classList.add("active");
+    }
+  });
+
+  if (!document.querySelector(".filter-pill.active")) {
+    activeFilter = "all";
+    document.querySelector('[data-filter="all"]').classList.add("active");
+  }
+}
+
+function applyUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+
+  const search = params.get("search") || params.get("q") || "";
+  const location = params.get("location") || params.get("city") || "";
+  const state = params.get("state") || "";
+  const category = params.get("category") || "";
+  const filter = params.get("filter") || "";
+
+  if (search) {
+    document.getElementById("searchInput").value = search;
+  }
+
+  if (location) {
+    document.getElementById("locationInput").value = location;
+  }
+
+  if (state) {
+    document.getElementById("stateInput").value = state.toUpperCase();
+  }
+
+  if (category) {
+    const categoryInput = document.getElementById("categoryInput");
+    const matchingOption = Array.from(categoryInput.options).find((option) => {
+      return normalize(option.value) === normalize(category) || normalize(option.textContent) === normalize(category);
+    });
+
+    if (matchingOption) {
+      categoryInput.value = matchingOption.value;
+    } else {
+      document.getElementById("searchInput").value = category;
+    }
+  }
+
+  if (filter) {
+    setActiveFilter(filter);
+  }
 }
 
 async function loadListings() {
@@ -1105,7 +1245,8 @@ async function loadListings() {
 
     allListings = listings;
 
-    renderListings(allListings);
+    applyUrlParams();
+    applySearchAndFilter();
 
   } catch (error) {
     renderEmptyState("Could not load listings", error.message);
@@ -1118,10 +1259,9 @@ function clearFilters() {
   document.getElementById("stateInput").value = "";
   document.getElementById("categoryInput").value = "";
 
-  activeFilter = "all";
+  setActiveFilter("all");
 
-  document.querySelectorAll(".filter-pill").forEach((pill) => pill.classList.remove("active"));
-  document.querySelector('[data-filter="all"]').classList.add("active");
+  window.history.replaceState({}, document.title, "listings.html");
 
   renderListings(allListings);
 }
@@ -1134,9 +1274,7 @@ document.getElementById("clearFiltersBtn").addEventListener("click", clearFilter
 
 document.querySelectorAll(".filter-pill").forEach((button) => {
   button.addEventListener("click", () => {
-    document.querySelectorAll(".filter-pill").forEach((pill) => pill.classList.remove("active"));
-    button.classList.add("active");
-    activeFilter = button.dataset.filter;
+    setActiveFilter(button.dataset.filter);
     applySearchAndFilter();
   });
 });
