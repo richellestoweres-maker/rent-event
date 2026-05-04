@@ -1474,6 +1474,8 @@ function renderAiSuggestions(result) {
     document.getElementById("aiTip").style.display = "none";
     setText("aiTipText", "");
   }
+
+  document.getElementById("generateAiBtn").textContent = "Regenerate AI Ideas";
 }
 
 async function generateAiIdeas() {
