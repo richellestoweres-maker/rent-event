@@ -1330,6 +1330,12 @@ async function loadEventDetails() {
 
   populateEventDetailsForm(currentEventData);
   updateHeroFromEventDetails();
+
+  if (currentEventData?.aiPlannerSuggestions) {
+    currentAiPlannerResult = currentEventData.aiPlannerSuggestions;
+    renderAiSuggestions(currentAiPlannerResult);
+    document.getElementById("generateAiBtn").textContent = "Regenerate AI Ideas";
+  }
 }
 
 async function saveEventDetails() {
