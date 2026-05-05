@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Requests | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft-2: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 112px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 320px;
+    }
+
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .section-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .request-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .request-card,
+    .empty-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .request-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .request-title {
+      margin: 0 0 4px;
+      font-size: 1.08rem;
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .request-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    .request-total {
+      font-size: 1rem;
+      font-weight: 800;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .pill.pending {
+      background: #fff4df;
+      color: #aa6f12;
+    }
+
+    .pill.info {
+      background: #f6efe4;
+      color: #6a625a;
+    }
+
+    .pill.safe {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.ai {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .pill.type {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .request-grid {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 22px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
+      padding-bottom: 8px;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .info-value {
+      font-size: 0.88rem;
+      text-align: right;
+      font-weight: 700;
+      max-width: 62%;
+    }
+
+    .vendor-box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .vendor-box h4 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .vendor-box p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .ai-box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 22px;
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .ai-box h4 {
+      margin: 0 0 6px;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .ai-box p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .request-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 46px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      flex: 1;
+      cursor: pointer;
+      min-width: 120px;
+      padding: 0 16px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    .empty-card {
+      text-align: center;
+      padding: 24px 18px;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-item {
+      min-height: 58px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0 4px;
+      position: relative;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .request-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .bottom-nav {
+        max-width: 520px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Customer Portal</div>
+        <h1 class="page-title">My Requests</h1>
+      </div>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">Submitted Event Requests</div>
+        <h2 class="hero-title">Track your event requests.</h2>
+        <p class="hero-subtitle">
+          Review the requests you submitted, selected vendors, AI planner context, and estimated totals.
+        </p>
+
+        <div class="hero-meta">
+          <span class="hero-pill" id="requestCountPill">0 Requests</span>
+          <span class="hero-pill" id="pendingCountPill">0 Pending</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Requests</h2>
+        <a class="section-link" href="event-builder.html">Plan Event</a>
+      </div>
+
+      <div class="status-message" id="statusMessage"></div>
+
+      <div class="request-list" id="requestList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading requests</h3>
+          <p>We’re checking your submitted event requests now.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Customer navigation">
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" href="listings.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Listings</span>
+    </a>
+
+    <a class="nav-item active" href="my-requests.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Requests</span>
+    </a>
+
+    <a class="nav-item" href="messages.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Inbox</span>
+    </a>
+  </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let bookingRequests = [];
+let isBusy = false;
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatMoney(value) {
+  const number = Number(value || 0);
+  return `$${Math.round(number).toLocaleString()}`;
+}
+
+function formatTime(value) {
+  if (!value || !value.seconds) return "New";
+
+  const date = new Date(value.seconds * 1000);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return "Now";
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+  if (diffHours < 24) return `${diffHours} hr ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  return date.toLocaleDateString();
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function showStatus(message, type = "info") {
+  const status = document.getElementById("statusMessage");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
+
+  setTimeout(() => {
+    status.style.display = "none";
+  }, 3500);
+}
+
+function getEventLocation(eventDetails) {
+  const city = safeText(eventDetails?.eventCity, "");
+  const zip = safeText(eventDetails?.eventZip, "");
+  return [city, zip].filter(Boolean).join(" ") || "Location not listed";
+}
+
+function getAiSummary(request) {
+  const ai = request.aiPlannerSuggestions;
+  const suggestions = Array.isArray(ai?.suggestions) ? ai.suggestions : [];
+
+  if (!suggestions.length) return "";
+
+  const titles = suggestions
+    .slice(0, 3)
+    .map((item) => safeText(item.title, "Suggested add-on"))
+    .filter(Boolean);
+
+  return titles.join(", ");
+}
+
+function renderEmptyRequests() {
+  document.getElementById("requestList").innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No requests yet</h3>
+      <p>When you submit an event request from checkout, it will appear here.</p>
+      <a class="btn" href="event-builder.html">Start Planning</a>
+    </div>
+  `;
+}
+
+function renderRequests() {
+  const container = document.getElementById("requestList");
+
+  const pendingCount = bookingRequests.filter((request) => {
+    return safeText(request.requestStatus || request.status, "pending") === "pending";
+  }).length;
+
+  setText("requestCountPill", `${bookingRequests.length} Request${bookingRequests.length === 1 ? "" : "s"}`);
+  setText("pendingCountPill", `${pendingCount} Pending`);
+
+  if (!bookingRequests.length) {
+    renderEmptyRequests();
+    return;
+  }
+
+  container.innerHTML = bookingRequests.map((request) => {
+    const requestId = encodeURIComponent(request.id || "");
+    const eventDetails = request.eventDetails || {};
+    const eventName = safeText(eventDetails.eventName, "Unnamed Event");
+    const eventType = safeText(eventDetails.eventType, "Event");
+    const eventDate = safeText(eventDetails.eventDate, "Date not listed");
+    const location = getEventLocation(eventDetails);
+    const guestCount = safeText(eventDetails.guestCount, "Not listed");
+    const budget = safeText(eventDetails.eventBudget, "Not listed");
+    const styleVibe = safeText(eventDetails.styleVibe, "Not listed");
+    const status = safeText(request.requestStatus || request.status, "pending");
+    const paymentStatus = safeText(request.paymentStatus, "not_collected");
+    const time = formatTime(request.createdAt);
+    const total = formatMoney(request.totalDue || 0);
+    const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+    const aiSummary = getAiSummary(request);
+
+    const vendorBox = vendors.length
+      ? vendors.map((vendor) => {
+          const title = safeText(vendor.listingTitle, "Requested Listing");
+          const category = safeText(vendor.category || vendor.mainCategory, "Event Service");
+          const price = formatMoney(vendor.priceNumber || 0);
+          const vendorName = safeText(vendor.vendorName, "Vendor");
+
+          return `
+            <div class="vendor-box">
+              <h4>${escapeHtml(title)}</h4>
+              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+            </div>
+          `;
+        }).join("")
+      : `
+        <div class="vendor-box">
+          <h4>No vendors saved</h4>
+          <p>This request did not include vendor details.</p>
+        </div>
+      `;
+
+    return `
+      <article class="request-card">
+        <div class="request-top">
+          <div>
+            <h3 class="request-title">${escapeHtml(eventName)}</h3>
+            <p class="request-subtitle">Submitted ${escapeHtml(time)}</p>
+          </div>
+
+          <div class="request-total">${escapeHtml(total)}</div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill pending">${escapeHtml(status)}</span>
+          <span class="pill info">${escapeHtml(paymentStatus.replaceAll("_", " "))}</span>
+          <span class="pill type">${escapeHtml(eventType)}</span>
+          ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
+        </div>
+
+        <div class="request-grid">
+          <div class="info-row">
+            <span class="info-label">Date</span>
+            <span class="info-value">${escapeHtml(eventDate)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Location</span>
+            <span class="info-value">${escapeHtml(location)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Guests</span>
+            <span class="info-value">${escapeHtml(guestCount)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Budget</span>
+            <span class="info-value">${escapeHtml(budget)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Style</span>
+            <span class="info-value">${escapeHtml(styleVibe)}</span>
+          </div>
+        </div>
+
+        ${vendorBox}
+
+        ${aiSummary ? `
+          <div class="ai-box">
+            <h4>AI Planner Context</h4>
+            <p>${escapeHtml(aiSummary)}</p>
+          </div>
+        ` : ""}
+
+        <div class="request-actions">
+          <button class="btn" type="button" data-message-request="${requestId}">Message Vendors</button>
+          <a class="btn-secondary" href="event-builder.html">Edit Event</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  document.querySelectorAll("[data-message-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      messageVendorsForRequest(button.dataset.messageRequest);
+    });
+  });
+}
+
+async function findExistingConversation(customerId, vendorId, listingId) {
+  const conversationKey = `${customerId}_${vendorId}_${listingId}`;
+  const q = query(
+    collection(db, "conversations"),
+    where("conversationKey", "==", conversationKey)
+  );
+
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) return null;
+
+  let conversation = null;
+
+  snapshot.forEach((docSnap) => {
+    conversation = {
+      id: docSnap.id,
+      ...docSnap.data()
+    };
+  });
+
+  return conversation;
+}
+
+async function messageVendorsForRequest(requestId) {
+  if (isBusy) return;
+
+  const cleanRequestId = decodeURIComponent(requestId);
+  const request = bookingRequests.find((item) => item.id === cleanRequestId);
+
+  if (!request) {
+    showStatus("Could not find that booking request.", "error");
+    return;
+  }
+
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const firstVendor = vendors.find((vendor) => vendor.vendorId) || null;
+
+  if (!firstVendor) {
+    showStatus("This request does not have a vendor to message yet.", "error");
+    return;
+  }
+
+  try {
+    isBusy = true;
+    showStatus("Opening vendor conversation...", "info");
+
+    const existingConversation = await findExistingConversation(
+      currentUser.uid,
+      firstVendor.vendorId,
+      firstVendor.listingId || cleanRequestId
+    );
+
+    if (existingConversation) {
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
+      return;
+    }
+
+    const customerName =
+      currentUserData.name ||
+      currentUser.displayName ||
+      currentUser.email ||
+      "Customer";
+
+    const vendorName = safeText(firstVendor.vendorName, "Vendor");
+    const listingId = safeText(firstVendor.listingId, cleanRequestId);
+    const listingTitle = safeText(firstVendor.listingTitle, "your listing");
+    const listingCategory = safeText(firstVendor.category || firstVendor.mainCategory, "Event Service");
+    const eventDetails = request.eventDetails || {};
+    const eventName = safeText(eventDetails.eventName, "my event");
+    const conversationKey = `${currentUser.uid}_${firstVendor.vendorId}_${listingId}`;
+    const firstMessage = `Hi! I submitted a RentEvent request for ${eventName} and wanted to ask about availability for ${listingTitle}.`;
+
+    const conversationRef = await addDoc(collection(db, "conversations"), {
+      conversationKey,
+      participantIds: [currentUser.uid, firstVendor.vendorId],
+      participantNames: {
+        [currentUser.uid]: customerName,
+        [firstVendor.vendorId]: vendorName
+      },
+      participantRoles: {
+        [currentUser.uid]: "customer",
+        [firstVendor.vendorId]: "vendor"
+      },
+      customerId: currentUser.uid,
+      vendorId: firstVendor.vendorId,
+      listingId,
+      bookingRequestId: cleanRequestId,
+      listingTitle,
+      listingCategory,
+      listingLocation: getEventLocation(eventDetails),
+      title: vendorName,
+      contextType: "Booking Request",
+      lastMessage: firstMessage,
+      lastSenderId: currentUser.uid,
+      unreadFor: {
+        [firstVendor.vendorId]: true
+      },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
+      text: firstMessage,
+      senderId: currentUser.uid,
+      senderName: customerName,
+      senderRole: "customer",
+      createdAt: serverTimestamp()
+    });
+
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
+}
+
+async function loadBookingRequests() {
+  try {
+    const q = query(
+      collection(db, "bookingRequests"),
+      where("customerId", "==", currentUser.uid)
+    );
+
+    const snapshot = await getDocs(q);
+
+    const requests = [];
+
+    snapshot.forEach((docSnap) => {
+      requests.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    requests.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    bookingRequests = requests;
+    renderRequests();
+
+  } catch (error) {
+    document.getElementById("requestList").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load requests</h3>
+        <p>${escapeHtml(error.message)}</p>
+        <a class="btn" href="dashboard.html">Back to Dashboard</a>
+      </div>
+    `;
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+
+  if (currentUserData.role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
+    return;
+  }
+
+  loadBookingRequests();
+});
+</script>
+
+</body>
+</html>
