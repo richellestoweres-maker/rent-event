@@ -197,7 +197,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 300px;
+      max-width: 315px;
     }
 
     .hero-label {
@@ -656,7 +656,7 @@
       }
 
       .hero-content {
-        max-width: 470px;
+        max-width: 500px;
       }
 
       .quick-grid {
@@ -707,11 +707,12 @@
         <div class="hero-label" id="welcomeText">Welcome back</div>
         <h2 class="hero-title">Plan your next event beautifully.</h2>
         <p class="hero-subtitle">
-          Keep rentals, vendors, ideas, and event details all in one place.
+          Keep rentals, vendors, ideas, requests, and event details all in one place.
         </p>
 
         <div class="hero-actions">
           <a class="hero-btn" href="event-builder.html">Start New Event</a>
+          <a class="hero-btn-secondary" href="my-requests.html">My Requests</a>
           <a class="hero-btn-secondary" href="listings.html">Browse Listings</a>
           <a class="hero-btn-secondary" href="notifications.html" id="alertHeroBtn">View Alerts</a>
         </div>
@@ -747,7 +748,21 @@
           </div>
           <div>
             <h3>Listings</h3>
-            <p>Explore venues, décor, catering, rentals, and more.</p>
+            <p>Explore venues, décor, catering, rentals, glam, and more.</p>
+          </div>
+        </a>
+
+        <a class="quick-card" href="my-requests.html">
+          <div class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>My Requests</h3>
+            <p>Track submitted event requests, vendors, and estimated totals.</p>
           </div>
         </a>
 
@@ -765,26 +780,13 @@
             <p>Chat with vendors and keep every detail organized.</p>
           </div>
         </a>
-
-        <a class="quick-card" href="profile.html">
-          <div class="quick-icon">
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-              <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-            </svg>
-          </div>
-          <div>
-            <h3>Profile</h3>
-            <p>View saved events, account settings, and favorites.</p>
-          </div>
-        </a>
       </div>
     </section>
 
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">My Current Event</h2>
-        <a class="section-link" href="event-builder.html">View All</a>
+        <a class="section-link" href="event-builder.html">View Board</a>
       </div>
 
       <article class="event-card">
@@ -810,14 +812,14 @@
           </div>
 
           <div class="stat-box">
-            <span class="stat-number">New</span>
-            <span class="stat-label">Board</span>
+            <span class="stat-number">AI</span>
+            <span class="stat-label">Planner</span>
           </div>
         </div>
 
         <div class="event-actions">
           <a class="btn" href="event-builder.html">Open Event</a>
-          <a class="btn-secondary" href="listings.html">Add Vendor</a>
+          <a class="btn-secondary" href="my-requests.html">My Requests</a>
         </div>
       </article>
     </section>
@@ -855,6 +857,15 @@
       <span>Listings</span>
     </a>
 
+    <a class="nav-item" href="my-requests.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Requests</span>
+    </a>
+
     <a class="nav-item" href="messages.html">
       <span class="nav-badge" id="bottomInboxBadge">0</span>
       <svg viewBox="0 0 24 24" fill="none">
@@ -863,14 +874,6 @@
         <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
       <span>Inbox</span>
-    </a>
-
-    <a class="nav-item" href="profile.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Profile</span>
     </a>
   </nav>
 
