@@ -335,7 +335,13 @@
       color: var(--blue-text);
     }
 
-    .vendor-box {
+    .pill.declined {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .vendor-box,
+    .response-box {
       margin-top: 12px;
       padding: 14px;
       border-radius: 22px;
@@ -343,17 +349,30 @@
       border: 1px solid var(--line);
     }
 
-    .vendor-box h4 {
+    .vendor-box h4,
+    .response-box h4 {
       margin: 0 0 6px;
       font-size: 0.95rem;
       font-weight: 800;
     }
 
-    .vendor-box p {
+    .vendor-box p,
+    .response-box p {
       margin: 0;
       font-size: 0.84rem;
       line-height: 1.45;
       color: var(--muted);
+    }
+
+    .response-box {
+      background: var(--soft-2);
+    }
+
+    .response-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
     }
 
     .ai-box {
@@ -384,7 +403,10 @@
     }
 
     .btn,
-    .btn-secondary {
+    .btn-secondary,
+    .btn-safe,
+    .btn-warning,
+    .btn-danger {
       min-height: 46px;
       border-radius: 999px;
       display: inline-flex;
@@ -410,6 +432,26 @@
     .btn-secondary {
       background: var(--soft-2);
       color: #4a433d;
+    }
+
+    .btn-safe {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .btn-warning {
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .btn-danger {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
 
     .empty-card {
@@ -533,6 +575,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .response-actions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
       .bottom-nav {
         max-width: 520px;
       }
@@ -558,7 +604,7 @@
         <div class="hero-label">Incoming Event Requests</div>
         <h2 class="hero-title">Review client requests.</h2>
         <p class="hero-subtitle">
-          See event details, selected services, AI planner context, and estimated totals before responding.
+          See event details, selected services, AI planner context, and respond with availability.
         </p>
 
         <div class="hero-meta">
@@ -633,6 +679,7 @@ import {
   getDocs,
   query,
   where,
+  updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -708,6 +755,15 @@ function showStatus(message, type = "info") {
   }, 3500);
 }
 
+function getVendorDisplayName() {
+  return (
+    safeText(currentUserData?.businessName, "") ||
+    safeText(currentUserData?.vendorName, "") ||
+    safeText(currentUserData?.name, "") ||
+    "Vendor"
+  );
+}
+
 function getVendorItemsForRequest(request) {
   const vendors = Array.isArray(request.vendors) ? request.vendors : [];
   return vendors.filter((vendor) => vendor.vendorId === currentUser.uid);
@@ -733,6 +789,25 @@ function getAiSummary(request) {
   return titles.join(", ");
 }
 
+function getVendorResponse(request) {
+  const responses = request.vendorResponses || {};
+  return responses[currentUser.uid] || null;
+}
+
+function getResponseLabel(status) {
+  if (status === "available") return "Available";
+  if (status === "needs_info") return "Needs More Info";
+  if (status === "declined") return "Declined";
+  return "No Response Yet";
+}
+
+function getResponsePillClass(status) {
+  if (status === "available") return "safe";
+  if (status === "needs_info") return "pending";
+  if (status === "declined") return "declined";
+  return "info";
+}
+
 function renderEmptyRequests() {
   document.getElementById("requestList").innerHTML = `
     <div class="empty-card">
@@ -748,11 +823,12 @@ function renderRequests() {
   const container = document.getElementById("requestList");
 
   const pendingCount = bookingRequests.filter((request) => {
-    return safeText(request.requestStatus || request.status, "pending") === "pending";
+    const response = getVendorResponse(request);
+    return !response || safeText(response.status, "") === "";
   }).length;
 
   setText("requestCountPill", `${bookingRequests.length} Request${bookingRequests.length === 1 ? "" : "s"}`);
-  setText("pendingCountPill", `${pendingCount} Pending`);
+  setText("pendingCountPill", `${pendingCount} Pending Response${pendingCount === 1 ? "" : "s"}`);
 
   if (!bookingRequests.length) {
     renderEmptyRequests();
@@ -775,6 +851,10 @@ function renderRequests() {
     const total = formatMoney(request.totalDue || 0);
     const matchingVendorItems = getVendorItemsForRequest(request);
     const aiSummary = getAiSummary(request);
+    const response = getVendorResponse(request);
+    const responseStatus = safeText(response?.status, "");
+    const responseLabel = getResponseLabel(responseStatus);
+    const responsePillClass = getResponsePillClass(responseStatus);
 
     const vendorBox = matchingVendorItems.length
       ? matchingVendorItems.map((vendor) => {
@@ -810,6 +890,7 @@ function renderRequests() {
         <div class="pill-row">
           <span class="pill pending">${escapeHtml(status)}</span>
           <span class="pill type">${escapeHtml(eventType)}</span>
+          <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
           ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
         </div>
 
@@ -842,6 +923,25 @@ function renderRequests() {
 
         ${vendorBox}
 
+        <div class="response-box">
+          <h4>Your Response</h4>
+          <p>${escapeHtml(responseLabel)}${response?.note ? ` · ${escapeHtml(response.note)}` : ""}</p>
+
+          <div class="response-actions">
+            <button class="btn-safe" type="button" data-response-request="${requestId}" data-response-status="available">
+              Mark Available
+            </button>
+
+            <button class="btn-warning" type="button" data-response-request="${requestId}" data-response-status="needs_info">
+              Need More Info
+            </button>
+
+            <button class="btn-danger" type="button" data-response-request="${requestId}" data-response-status="declined">
+              Decline
+            </button>
+          </div>
+        </div>
+
         ${aiSummary ? `
           <div class="ai-box">
             <h4>AI Planner Context</h4>
@@ -862,6 +962,65 @@ function renderRequests() {
       messageCustomerForRequest(button.dataset.messageRequest);
     });
   });
+
+  document.querySelectorAll("[data-response-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      updateVendorResponse(button.dataset.responseRequest, button.dataset.responseStatus);
+    });
+  });
+}
+
+async function updateVendorResponse(requestId, responseStatus) {
+  if (isBusy) return;
+
+  const cleanRequestId = decodeURIComponent(requestId);
+  const request = bookingRequests.find((item) => item.id === cleanRequestId);
+
+  if (!request) {
+    showStatus("Could not find that booking request.", "error");
+    return;
+  }
+
+  const responseLabel = getResponseLabel(responseStatus);
+  const vendorName = getVendorDisplayName();
+
+  try {
+    isBusy = true;
+    showStatus(`Saving response: ${responseLabel}...`, "info");
+
+    const requestRef = doc(db, "bookingRequests", cleanRequestId);
+
+    const updatedVendorResponses = {
+      ...(request.vendorResponses || {}),
+      [currentUser.uid]: {
+        vendorId: currentUser.uid,
+        vendorName,
+        status: responseStatus,
+        statusLabel: responseLabel,
+        note: responseStatus === "available"
+          ? "Vendor marked themselves as available."
+          : responseStatus === "needs_info"
+            ? "Vendor needs more information before confirming."
+            : "Vendor declined this request.",
+        respondedAt: new Date().toISOString()
+      }
+    };
+
+    await updateDoc(requestRef, {
+      vendorResponses: updatedVendorResponses,
+      updatedAt: serverTimestamp()
+    });
+
+    request.vendorResponses = updatedVendorResponses;
+
+    renderRequests();
+    showStatus(`Response saved: ${responseLabel}`, "success");
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
 }
 
 async function findExistingConversation(customerId, vendorId, listingId) {
@@ -924,12 +1083,7 @@ async function messageCustomerForRequest(requestId) {
     }
 
     const customerName = safeText(request.customerName, "Customer");
-    const vendorName =
-      safeText(currentUserData.businessName, "") ||
-      safeText(currentUserData.vendorName, "") ||
-      safeText(currentUserData.name, "") ||
-      "Vendor";
-
+    const vendorName = getVendorDisplayName();
     const eventDetails = request.eventDetails || {};
     const eventName = safeText(eventDetails.eventName, "your event");
     const listingTitle = safeText(firstVendorItem.listingTitle, "your requested service");
