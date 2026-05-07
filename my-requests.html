@@ -295,6 +295,11 @@
       color: var(--blue-text);
     }
 
+    .pill.declined {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
     .request-grid {
       display: grid;
       gap: 10px;
@@ -333,7 +338,8 @@
       max-width: 62%;
     }
 
-    .vendor-box {
+    .vendor-box,
+    .response-box {
       margin-top: 12px;
       padding: 14px;
       border-radius: 22px;
@@ -341,17 +347,53 @@
       border: 1px solid var(--line);
     }
 
-    .vendor-box h4 {
+    .vendor-box h4,
+    .response-box h4 {
       margin: 0 0 6px;
       font-size: 0.95rem;
       font-weight: 800;
     }
 
-    .vendor-box p {
+    .vendor-box p,
+    .response-box p {
       margin: 0;
       font-size: 0.84rem;
       line-height: 1.45;
       color: var(--muted);
+    }
+
+    .response-box {
+      background: var(--soft-2);
+    }
+
+    .response-item {
+      padding: 12px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+
+    .response-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .response-name {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .response-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
     }
 
     .ai-box {
@@ -556,7 +598,7 @@
         <div class="hero-label">Submitted Event Requests</div>
         <h2 class="hero-title">Track your event requests.</h2>
         <p class="hero-subtitle">
-          Review the requests you submitted, selected vendors, AI planner context, and estimated totals.
+          Review your submitted requests, vendor responses, AI planner context, and estimated totals.
         </p>
 
         <div class="hero-meta">
@@ -727,6 +769,56 @@ function getAiSummary(request) {
   return titles.join(", ");
 }
 
+function getResponseLabel(status) {
+  if (status === "available") return "Available";
+  if (status === "needs_info") return "Needs More Info";
+  if (status === "declined") return "Declined";
+  return "No Response Yet";
+}
+
+function getResponsePillClass(status) {
+  if (status === "available") return "safe";
+  if (status === "needs_info") return "pending";
+  if (status === "declined") return "declined";
+  return "info";
+}
+
+function getVendorResponse(request, vendorId) {
+  const responses = request.vendorResponses || {};
+  return responses[vendorId] || null;
+}
+
+function getVendorResponseSummary(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const responses = request.vendorResponses || {};
+
+  if (!vendors.length) {
+    return {
+      available: 0,
+      needsInfo: 0,
+      declined: 0,
+      waiting: 0
+    };
+  }
+
+  return vendors.reduce((summary, vendor) => {
+    const response = responses[vendor.vendorId];
+    const status = safeText(response?.status, "");
+
+    if (status === "available") summary.available += 1;
+    else if (status === "needs_info") summary.needsInfo += 1;
+    else if (status === "declined") summary.declined += 1;
+    else summary.waiting += 1;
+
+    return summary;
+  }, {
+    available: 0,
+    needsInfo: 0,
+    declined: 0,
+    waiting: 0
+  });
+}
+
 function renderEmptyRequests() {
   document.getElementById("requestList").innerHTML = `
     <div class="empty-card">
@@ -769,6 +861,7 @@ function renderRequests() {
     const total = formatMoney(request.totalDue || 0);
     const vendors = Array.isArray(request.vendors) ? request.vendors : [];
     const aiSummary = getAiSummary(request);
+    const responseSummary = getVendorResponseSummary(request);
 
     const vendorBox = vendors.length
       ? vendors.map((vendor) => {
@@ -776,11 +869,18 @@ function renderRequests() {
           const category = safeText(vendor.category || vendor.mainCategory, "Event Service");
           const price = formatMoney(vendor.priceNumber || 0);
           const vendorName = safeText(vendor.vendorName, "Vendor");
+          const response = getVendorResponse(request, vendor.vendorId);
+          const responseStatus = safeText(response?.status, "");
+          const responseLabel = getResponseLabel(responseStatus);
+          const responsePillClass = getResponsePillClass(responseStatus);
 
           return `
             <div class="vendor-box">
               <h4>${escapeHtml(title)}</h4>
               <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+              <div class="pill-row">
+                <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+              </div>
             </div>
           `;
         }).join("")
@@ -790,6 +890,45 @@ function renderRequests() {
           <p>This request did not include vendor details.</p>
         </div>
       `;
+
+    const responseBox = vendors.length
+      ? `
+        <div class="response-box">
+          <h4>Vendor Responses</h4>
+          <p>
+            ${responseSummary.available} available ·
+            ${responseSummary.needsInfo} need more info ·
+            ${responseSummary.declined} declined ·
+            ${responseSummary.waiting} waiting
+          </p>
+
+          ${vendors.map((vendor) => {
+            const vendorName = safeText(vendor.vendorName, "Vendor");
+            const title = safeText(vendor.listingTitle, "Requested Listing");
+            const response = getVendorResponse(request, vendor.vendorId);
+            const responseStatus = safeText(response?.status, "");
+            const responseLabel = getResponseLabel(responseStatus);
+            const responsePillClass = getResponsePillClass(responseStatus);
+            const responseNote = safeText(response?.note, responseStatus ? "" : "This vendor has not responded yet.");
+
+            return `
+              <div class="response-item">
+                <div class="response-top">
+                  <div>
+                    <h5 class="response-name">${escapeHtml(vendorName)}</h5>
+                    <p class="response-note">${escapeHtml(title)}</p>
+                  </div>
+
+                  <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+                </div>
+
+                ${responseNote ? `<p class="response-note">${escapeHtml(responseNote)}</p>` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `
+      : "";
 
     return `
       <article class="request-card">
@@ -806,6 +945,7 @@ function renderRequests() {
           <span class="pill pending">${escapeHtml(status)}</span>
           <span class="pill info">${escapeHtml(paymentStatus.replaceAll("_", " "))}</span>
           <span class="pill type">${escapeHtml(eventType)}</span>
+          ${responseSummary.available > 0 ? `<span class="pill safe">${responseSummary.available} Available</span>` : ""}
           ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
         </div>
 
@@ -837,6 +977,7 @@ function renderRequests() {
         </div>
 
         ${vendorBox}
+        ${responseBox}
 
         ${aiSummary ? `
           <div class="ai-box">
