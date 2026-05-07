@@ -1086,10 +1086,7 @@ async function withdrawRequest(requestId) {
 
   if (!confirmed) return;
 
-  const reason = window.prompt(
-    "Optional: Why are you withdrawing this request?",
-    "Found another vendor"
-  );
+const reason = "Customer withdrew this request.";
 
   try {
     isBusy = true;
