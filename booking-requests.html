@@ -222,6 +222,10 @@
       box-shadow: var(--shadow);
     }
 
+    .request-card.withdrawn-card {
+      opacity: 0.86;
+    }
+
     .request-top {
       display: flex;
       justify-content: space-between;
@@ -335,13 +339,15 @@
       color: var(--blue-text);
     }
 
-    .pill.declined {
+    .pill.declined,
+    .pill.withdrawn {
       background: var(--red-soft);
       color: var(--red-text);
     }
 
     .vendor-box,
-    .response-box {
+    .response-box,
+    .withdrawn-box {
       margin-top: 12px;
       padding: 14px;
       border-radius: 22px;
@@ -350,14 +356,16 @@
     }
 
     .vendor-box h4,
-    .response-box h4 {
+    .response-box h4,
+    .withdrawn-box h4 {
       margin: 0 0 6px;
       font-size: 0.95rem;
       font-weight: 800;
     }
 
     .vendor-box p,
-    .response-box p {
+    .response-box p,
+    .withdrawn-box p {
       margin: 0;
       font-size: 0.84rem;
       line-height: 1.45;
@@ -366,6 +374,16 @@
 
     .response-box {
       background: var(--soft-2);
+    }
+
+    .withdrawn-box {
+      background: var(--red-soft);
+      border-color: rgba(199, 79, 77, 0.18);
+    }
+
+    .withdrawn-box h4,
+    .withdrawn-box p {
+      color: var(--red-text);
     }
 
     .response-actions {
@@ -789,6 +807,19 @@ function getAiSummary(request) {
   return titles.join(", ");
 }
 
+function getRequestStatusLabel(status) {
+  if (status === "withdrawn") return "Withdrawn";
+  if (status === "confirmed") return "Confirmed";
+  if (status === "paid") return "Paid";
+  return "Pending";
+}
+
+function getRequestPillClass(status) {
+  if (status === "withdrawn") return "withdrawn";
+  if (status === "confirmed" || status === "paid") return "safe";
+  return "pending";
+}
+
 function getVendorResponse(request) {
   const responses = request.vendorResponses || {};
   return responses[currentUser.uid] || null;
@@ -823,8 +854,9 @@ function renderRequests() {
   const container = document.getElementById("requestList");
 
   const pendingCount = bookingRequests.filter((request) => {
+    const status = safeText(request.requestStatus || request.status, "pending");
     const response = getVendorResponse(request);
-    return !response || safeText(response.status, "") === "";
+    return status !== "withdrawn" && (!response || safeText(response.status, "") === "");
   }).length;
 
   setText("requestCountPill", `${bookingRequests.length} Request${bookingRequests.length === 1 ? "" : "s"}`);
@@ -847,6 +879,10 @@ function renderRequests() {
     const styleVibe = safeText(eventDetails.styleVibe, "Not listed");
     const customerName = safeText(request.customerName, "Customer");
     const status = safeText(request.requestStatus || request.status, "pending");
+    const requestStatusLabel = getRequestStatusLabel(status);
+    const requestPillClass = getRequestPillClass(status);
+    const isWithdrawn = status === "withdrawn";
+    const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "Customer withdrew this request.");
     const time = formatTime(request.createdAt);
     const total = formatMoney(request.totalDue || 0);
     const matchingVendorItems = getVendorItemsForRequest(request);
@@ -877,7 +913,7 @@ function renderRequests() {
       `;
 
     return `
-      <article class="request-card">
+      <article class="request-card ${isWithdrawn ? "withdrawn-card" : ""}">
         <div class="request-top">
           <div>
             <h3 class="request-title">${escapeHtml(eventName)}</h3>
@@ -888,11 +924,18 @@ function renderRequests() {
         </div>
 
         <div class="pill-row">
-          <span class="pill pending">${escapeHtml(status)}</span>
+          <span class="pill ${requestPillClass}">${escapeHtml(requestStatusLabel)}</span>
           <span class="pill type">${escapeHtml(eventType)}</span>
           <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
           ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
         </div>
+
+        ${isWithdrawn ? `
+          <div class="withdrawn-box">
+            <h4>Request Withdrawn</h4>
+            <p>The customer has withdrawn this request. Reason: ${escapeHtml(withdrawnReason)}</p>
+          </div>
+        ` : ""}
 
         <div class="request-grid">
           <div class="info-row">
@@ -925,21 +968,28 @@ function renderRequests() {
 
         <div class="response-box">
           <h4>Your Response</h4>
-          <p>${escapeHtml(responseLabel)}${response?.note ? ` · ${escapeHtml(response.note)}` : ""}</p>
+          <p>
+            ${isWithdrawn
+              ? "This request has been withdrawn, so vendor responses are closed."
+              : `${escapeHtml(responseLabel)}${response?.note ? ` · ${escapeHtml(response.note)}` : ""}`
+            }
+          </p>
 
-          <div class="response-actions">
-            <button class="btn-safe" type="button" data-response-request="${requestId}" data-response-status="available">
-              Mark Available
-            </button>
+          ${isWithdrawn ? "" : `
+            <div class="response-actions">
+              <button class="btn-safe" type="button" data-response-request="${requestId}" data-response-status="available">
+                Mark Available
+              </button>
 
-            <button class="btn-warning" type="button" data-response-request="${requestId}" data-response-status="needs_info">
-              Need More Info
-            </button>
+              <button class="btn-warning" type="button" data-response-request="${requestId}" data-response-status="needs_info">
+                Need More Info
+              </button>
 
-            <button class="btn-danger" type="button" data-response-request="${requestId}" data-response-status="declined">
-              Decline
-            </button>
-          </div>
+              <button class="btn-danger" type="button" data-response-request="${requestId}" data-response-status="declined">
+                Decline
+              </button>
+            </div>
+          `}
         </div>
 
         ${aiSummary ? `
@@ -950,8 +1000,13 @@ function renderRequests() {
         ` : ""}
 
         <div class="request-actions">
-          <button class="btn" type="button" data-message-request="${requestId}">Message Customer</button>
-          <a class="btn-secondary" href="booking-requests.html?id=${requestId}">View</a>
+          ${isWithdrawn
+            ? `<a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>`
+            : `
+              <button class="btn" type="button" data-message-request="${requestId}">Message Customer</button>
+              <a class="btn-secondary" href="booking-requests.html?id=${requestId}">View</a>
+            `
+          }
         </div>
       </article>
     `;
@@ -978,6 +1033,13 @@ async function updateVendorResponse(requestId, responseStatus) {
 
   if (!request) {
     showStatus("Could not find that booking request.", "error");
+    return;
+  }
+
+  const status = safeText(request.requestStatus || request.status, "pending");
+
+  if (status === "withdrawn") {
+    showStatus("This request has been withdrawn, so you can no longer respond to it.", "error");
     return;
   }
 
@@ -1054,6 +1116,13 @@ async function messageCustomerForRequest(requestId) {
 
   if (!request) {
     showStatus("Could not find that booking request.", "error");
+    return;
+  }
+
+  const status = safeText(request.requestStatus || request.status, "pending");
+
+  if (status === "withdrawn") {
+    showStatus("This request has been withdrawn, so messaging from this request is disabled.", "error");
     return;
   }
 
