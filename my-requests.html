@@ -542,6 +542,102 @@
       color: var(--red-text);
     }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 22, 22, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 50;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 390px;
+      background: #fff;
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 24px 70px rgba(22, 22, 22, 0.22);
+    }
+
+    .modal-label {
+      display: inline-flex;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: var(--red-soft);
+      color: var(--red-text);
+      font-size: 0.76rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .modal-text {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .modal-field {
+      margin-bottom: 14px;
+    }
+
+    .modal-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .modal-field select,
+    .modal-field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      background: var(--soft-2);
+      color: var(--text);
+      outline: none;
+    }
+
+    .modal-field textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-actions .btn-secondary,
+    .modal-actions .btn-danger {
+      min-width: 0;
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -655,6 +751,39 @@
     </section>
   </main>
 
+  <div class="modal-overlay" id="withdrawModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="withdrawModalTitle">
+      <div class="modal-label">Withdraw Request</div>
+
+      <h2 class="modal-title" id="withdrawModalTitle">Are you sure?</h2>
+
+      <p class="modal-text">
+        Vendors will see that this request is no longer active. You can still keep a record of it in your request history.
+      </p>
+
+      <div class="modal-field">
+        <label for="withdrawReasonSelect">Reason</label>
+        <select id="withdrawReasonSelect">
+          <option value="Found another vendor">Found another vendor</option>
+          <option value="Changed event plans">Changed event plans</option>
+          <option value="No longer needed">No longer needed</option>
+          <option value="Submitted by mistake">Submitted by mistake</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label for="withdrawReasonNote">Optional note</label>
+        <textarea id="withdrawReasonNote" placeholder="Add a short note if needed..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="keepRequestBtn">Keep Request</button>
+        <button class="btn-danger" type="button" id="confirmWithdrawBtn">Withdraw Request</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="bottom-nav" aria-label="Customer navigation">
     <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
@@ -725,6 +854,7 @@ let currentUser = null;
 let currentUserData = null;
 let bookingRequests = [];
 let isBusy = false;
+let pendingWithdrawRequestId = null;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -1069,24 +1199,50 @@ function renderRequests() {
   });
 }
 
-async function withdrawRequest(requestId) {
-  if (isBusy) return;
+function openWithdrawModal(requestId) {
+  pendingWithdrawRequestId = decodeURIComponent(requestId);
 
-  const cleanRequestId = decodeURIComponent(requestId);
+  const modal = document.getElementById("withdrawModal");
+  const reasonSelect = document.getElementById("withdrawReasonSelect");
+  const reasonNote = document.getElementById("withdrawReasonNote");
+
+  reasonSelect.value = "Found another vendor";
+  reasonNote.value = "";
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeWithdrawModal() {
+  pendingWithdrawRequestId = null;
+
+  const modal = document.getElementById("withdrawModal");
+
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+async function confirmWithdrawRequest() {
+  if (isBusy || !pendingWithdrawRequestId) return;
+
+  const cleanRequestId = pendingWithdrawRequestId;
   const request = bookingRequests.find((item) => item.id === cleanRequestId);
 
   if (!request) {
     showStatus("Could not find that request.", "error");
+    closeWithdrawModal();
     return;
   }
 
-  const confirmed = window.confirm(
-    "Are you sure you want to withdraw this request? Vendors will see that the request is no longer active."
-  );
+  const reasonSelect = document.getElementById("withdrawReasonSelect");
+  const reasonNote = document.getElementById("withdrawReasonNote");
 
-  if (!confirmed) return;
+  const selectedReason = safeText(reasonSelect.value, "Customer withdrew this request.");
+  const extraNote = safeText(reasonNote.value, "");
 
-const reason = "Customer withdrew this request.";
+  const finalReason = extraNote
+    ? `${selectedReason}: ${extraNote}`
+    : selectedReason;
 
   try {
     isBusy = true;
@@ -1098,8 +1254,8 @@ const reason = "Customer withdrew this request.";
       status: "withdrawn",
       requestStatus: "withdrawn",
       withdrawnBy: "customer",
-      withdrawnReason: safeText(reason, "Customer withdrew the request."),
-      withdrawReason: safeText(reason, "Customer withdrew the request."),
+      withdrawnReason: finalReason,
+      withdrawReason: finalReason,
       withdrawnAt: new Date().toISOString(),
       updatedAt: serverTimestamp()
     });
@@ -1107,10 +1263,11 @@ const reason = "Customer withdrew this request.";
     request.status = "withdrawn";
     request.requestStatus = "withdrawn";
     request.withdrawnBy = "customer";
-    request.withdrawnReason = safeText(reason, "Customer withdrew the request.");
-    request.withdrawReason = safeText(reason, "Customer withdrew the request.");
+    request.withdrawnReason = finalReason;
+    request.withdrawReason = finalReason;
     request.withdrawnAt = new Date().toISOString();
 
+    closeWithdrawModal();
     renderRequests();
     showStatus("Request withdrawn successfully.", "success");
 
@@ -1119,6 +1276,10 @@ const reason = "Customer withdrew this request.";
   } finally {
     isBusy = false;
   }
+}
+
+function withdrawRequest(requestId) {
+  openWithdrawModal(requestId);
 }
 
 async function findExistingConversation(customerId, vendorId, listingId) {
@@ -1284,6 +1445,15 @@ async function loadBookingRequests() {
     `;
   }
 }
+
+document.getElementById("keepRequestBtn").addEventListener("click", closeWithdrawModal);
+document.getElementById("confirmWithdrawBtn").addEventListener("click", confirmWithdrawRequest);
+
+document.getElementById("withdrawModal").addEventListener("click", (event) => {
+  if (event.target.id === "withdrawModal") {
+    closeWithdrawModal();
+  }
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
