@@ -197,7 +197,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 315px;
+      max-width: 325px;
     }
 
     .hero-label {
@@ -239,6 +239,9 @@
       text-decoration: none;
       font-weight: 700;
       font-size: 0.95rem;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
     }
 
     .hero-btn {
@@ -281,6 +284,11 @@
       font-size: 0.93rem;
       font-weight: 700;
       white-space: nowrap;
+      border: none;
+      background: none;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 0;
     }
 
     .quick-grid {
@@ -301,6 +309,10 @@
       flex-direction: column;
       justify-content: space-between;
       position: relative;
+      border: none;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
     }
 
     .quick-icon {
@@ -335,6 +347,11 @@
       color: var(--muted);
     }
 
+    .event-list {
+      display: grid;
+      gap: 14px;
+    }
+
     .event-card {
       background: var(--card);
       border-radius: 30px;
@@ -349,8 +366,8 @@
     }
 
     .event-thumb {
-      width: 92px;
-      height: 92px;
+      width: 74px;
+      height: 74px;
       border-radius: 24px;
       flex-shrink: 0;
       background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
@@ -360,10 +377,10 @@
     .event-thumb::after {
       content: "";
       position: absolute;
-      left: 24px;
-      top: 18px;
-      width: 44px;
-      height: 44px;
+      left: 19px;
+      top: 16px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.26);
     }
@@ -374,7 +391,7 @@
     }
 
     .event-date {
-      font-size: 0.88rem;
+      font-size: 0.84rem;
       color: var(--muted);
       margin-bottom: 6px;
       font-weight: 600;
@@ -382,7 +399,7 @@
 
     .event-name {
       margin: 0 0 8px;
-      font-size: 1.34rem;
+      font-size: 1.25rem;
       line-height: 1.02;
       letter-spacing: -0.04em;
       font-weight: 800;
@@ -391,13 +408,12 @@
     .event-status {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      min-height: 34px;
-      padding: 0 12px;
+      min-height: 32px;
+      padding: 0 11px;
       border-radius: 999px;
       background: #fff4e2;
       color: #a46a14;
-      font-size: 0.84rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
 
@@ -438,7 +454,8 @@
     }
 
     .btn,
-    .btn-secondary {
+    .btn-secondary,
+    .btn-danger {
       min-height: 54px;
       border-radius: 999px;
       border: none;
@@ -450,6 +467,8 @@
       align-items: center;
       justify-content: center;
       text-decoration: none;
+      text-align: center;
+      padding: 0 16px;
     }
 
     .btn {
@@ -461,6 +480,11 @@
     .btn-secondary {
       color: #4a433d;
       background: #f3ebde;
+    }
+
+    .btn-danger {
+      color: var(--red-text);
+      background: var(--red-soft);
     }
 
     .vendor-list {
@@ -598,6 +622,129 @@
       line-height: 1.45;
     }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 22, 22, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 80;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 430px;
+      max-height: calc(100vh - 36px);
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 24px 70px rgba(22, 22, 22, 0.22);
+    }
+
+    .modal-label {
+      display: inline-flex;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: #fff4df;
+      color: #aa6f12;
+      font-size: 0.76rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .modal-text {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .modal-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .form-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      background: var(--soft-2);
+      color: var(--text);
+      outline: none;
+    }
+
+    .form-field textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -663,7 +810,12 @@
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
+      .event-list,
       .vendor-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .modal-grid.two {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -705,14 +857,14 @@
     <section class="hero-card">
       <div class="hero-content">
         <div class="hero-label" id="welcomeText">Welcome back</div>
-        <h2 class="hero-title">Plan your next event beautifully.</h2>
+        <h2 class="hero-title">Plan every event in one place.</h2>
         <p class="hero-subtitle">
-          Keep rentals, vendors, ideas, requests, and event details all in one place.
+          Create separate event boards for weddings, birthdays, showers, styled shoots, and client events.
         </p>
 
         <div class="hero-actions">
-          <a class="hero-btn" href="event-builder.html">Start New Event</a>
-          <a class="hero-btn-secondary" href="my-requests.html">My Requests</a>
+          <button class="hero-btn" type="button" id="openCreateEventBtn">Create New Event</button>
+          <a class="hero-btn-secondary" href="#myEventsSection">My Events</a>
           <a class="hero-btn-secondary" href="listings.html">Browse Listings</a>
           <a class="hero-btn-secondary" href="notifications.html" id="alertHeroBtn">View Alerts</a>
         </div>
@@ -725,7 +877,7 @@
       </div>
 
       <div class="quick-grid">
-        <a class="quick-card" href="event-builder.html">
+        <button class="quick-card" type="button" id="openCreateEventQuickBtn">
           <div class="quick-icon">
             <svg viewBox="0 0 24 24" fill="none">
               <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -734,21 +886,21 @@
           </div>
           <div>
             <h3>New Event</h3>
-            <p>Create a fresh event board and start planning from scratch.</p>
+            <p>Create a fresh event project with its own vendors and details.</p>
           </div>
-        </a>
+        </button>
 
-        <a class="quick-card" href="listings.html">
+        <a class="quick-card" href="#myEventsSection">
           <div class="quick-icon">
             <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
-              <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-              <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M5 5H19V19H5V5Z" stroke="currentColor" stroke-width="2"></path>
+              <path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M8 13H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
             </svg>
           </div>
           <div>
-            <h3>Listings</h3>
-            <p>Explore venues, décor, catering, glam, entertainment, and more.</p>
+            <h3>My Events</h3>
+            <p>Open existing event boards and keep client projects separate.</p>
           </div>
         </a>
 
@@ -762,7 +914,7 @@
           </div>
           <div>
             <h3>My Requests</h3>
-            <p>Track submitted event requests, vendors, and estimated totals.</p>
+            <p>Track submitted vendor requests and responses.</p>
           </div>
         </a>
 
@@ -783,45 +935,19 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="myEventsSection">
       <div class="section-header">
-        <h2 class="section-title">My Current Event</h2>
-        <a class="section-link" href="event-builder.html">View Board</a>
+        <h2 class="section-title">My Events</h2>
+        <button class="section-link" type="button" id="openCreateEventSmallBtn">Add Event</button>
       </div>
 
-      <article class="event-card">
-        <div class="event-top">
-          <div class="event-thumb"></div>
-
-          <div class="event-meta">
-            <div class="event-date" id="eventDate">Start planning today</div>
-            <h3 class="event-name" id="eventName">Your Event Board</h3>
-            <div class="event-status" id="eventStatus">Planning in Progress</div>
-          </div>
+      <div class="event-list" id="eventList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading events</h3>
+          <p>We’re pulling your event projects now.</p>
         </div>
-
-        <div class="event-stats">
-          <div class="stat-box">
-            <span class="stat-number" id="suggestedCount">0</span>
-            <span class="stat-label">Saved</span>
-          </div>
-
-          <div class="stat-box">
-            <span class="stat-number" id="unreadStat">0</span>
-            <span class="stat-label">Alerts</span>
-          </div>
-
-          <div class="stat-box">
-            <span class="stat-number">AI</span>
-            <span class="stat-label">Planner</span>
-          </div>
-        </div>
-
-        <div class="event-actions">
-          <a class="btn" href="event-builder.html">Open Event</a>
-          <a class="btn-secondary" href="my-requests.html">My Requests</a>
-        </div>
-      </article>
+      </div>
     </section>
 
     <section class="section">
@@ -840,6 +966,87 @@
     </section>
   </main>
 
+  <div class="modal-overlay" id="createEventModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="createEventTitle">
+      <div class="modal-label">New Event Project</div>
+
+      <h2 class="modal-title" id="createEventTitle">Create a new event</h2>
+      <p class="modal-text">
+        Give this event its own name so vendors, requests, and planning details stay organized.
+      </p>
+
+      <div class="status-message" id="createEventStatus"></div>
+
+      <div class="modal-grid">
+        <div class="form-field">
+          <label for="eventNameInput">Event Name</label>
+          <input id="eventNameInput" type="text" placeholder="Madison Wedding, Ava Birthday, Johnson Shower..." />
+        </div>
+
+        <div class="form-field">
+          <label for="eventTypeInput">Event Type</label>
+          <select id="eventTypeInput">
+            <option value="">Select event type</option>
+            <option>Wedding</option>
+            <option>Destination Wedding</option>
+            <option>Bridal Shower</option>
+            <option>Baby Shower</option>
+            <option>Birthday Party</option>
+            <option>Kids Birthday</option>
+            <option>Graduation Party</option>
+            <option>Corporate Event</option>
+            <option>Holiday Party</option>
+            <option>Styled Shoot</option>
+            <option>Church Event</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-grid two" style="margin-top: 12px;">
+        <div class="form-field">
+          <label for="eventDateInput">Event Date</label>
+          <input id="eventDateInput" type="date" />
+        </div>
+
+        <div class="form-field">
+          <label for="guestCountInput">Guest Count</label>
+          <input id="guestCountInput" type="text" placeholder="75, 150, 250..." />
+        </div>
+
+        <div class="form-field">
+          <label for="eventCityInput">City</label>
+          <input id="eventCityInput" type="text" placeholder="Houston, League City..." />
+        </div>
+
+        <div class="form-field">
+          <label for="eventZipInput">ZIP Code</label>
+          <input id="eventZipInput" type="text" placeholder="77573" />
+        </div>
+
+        <div class="form-field">
+          <label for="eventBudgetInput">Budget</label>
+          <input id="eventBudgetInput" type="text" placeholder="$2,500, $10,000..." />
+        </div>
+
+        <div class="form-field">
+          <label for="styleVibeInput">Style / Vibe</label>
+          <input id="styleVibeInput" type="text" placeholder="Romantic, coastal, luxury, western..." />
+        </div>
+      </div>
+
+      <div class="form-field" style="margin-top: 12px;">
+        <label for="eventNotesInput">Notes</label>
+        <textarea id="eventNotesInput" placeholder="Optional notes about the event, client, venue, colors, or vision..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="cancelCreateEventBtn">Cancel</button>
+        <button class="btn" type="button" id="createEventBtn">Create Event</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="bottom-nav" aria-label="Bottom navigation">
     <a class="nav-item active" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
@@ -857,13 +1064,13 @@
       <span>Listings</span>
     </a>
 
-    <a class="nav-item" href="my-requests.html">
+    <a class="nav-item" href="#myEventsSection">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M5 5H19V19H5V5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 13H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Requests</span>
+      <span>Events</span>
     </a>
 
     <a class="nav-item" href="messages.html">
@@ -887,7 +1094,9 @@ import {
   collection,
   query,
   where,
-  getDocs
+  getDocs,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -903,6 +1112,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let customerEvents = [];
+let eventBoardCounts = {};
+let requestCounts = {};
+let isCreatingEvent = false;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -933,6 +1149,22 @@ function formatPrice(value) {
   return `$${Math.round(number)}+`;
 }
 
+function formatEventDate(value) {
+  const text = safeText(value, "");
+
+  if (!text) return "Date not set";
+
+  const date = new Date(`${text}T12:00:00`);
+
+  if (Number.isNaN(date.getTime())) return text;
+
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
@@ -951,13 +1183,45 @@ function setBadge(id, count) {
   }
 }
 
+function showCreateEventStatus(message, type = "info") {
+  const status = document.getElementById("createEventStatus");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
+}
+
+function openCreateEventModal() {
+  const modal = document.getElementById("createEventModal");
+
+  document.getElementById("eventNameInput").value = "";
+  document.getElementById("eventTypeInput").value = "";
+  document.getElementById("eventDateInput").value = "";
+  document.getElementById("guestCountInput").value = "";
+  document.getElementById("eventCityInput").value = "";
+  document.getElementById("eventZipInput").value = "";
+  document.getElementById("eventBudgetInput").value = "";
+  document.getElementById("styleVibeInput").value = "";
+  document.getElementById("eventNotesInput").value = "";
+
+  document.getElementById("createEventStatus").style.display = "none";
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeCreateEventModal() {
+  const modal = document.getElementById("createEventModal");
+
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+
 function updateNotificationBadges(messageCount, appNotificationCount) {
   const totalAlerts = Number(messageCount || 0) + Number(appNotificationCount || 0);
 
   setBadge("topNotificationBadge", totalAlerts);
   setBadge("bottomInboxBadge", messageCount);
   setBadge("messageQuickBadge", messageCount);
-  setText("unreadStat", totalAlerts);
 
   const alertHeroBtn = document.getElementById("alertHeroBtn");
 
@@ -1008,19 +1272,6 @@ async function loadUnreadCounts(user) {
   updateNotificationBadges(unreadMessages, unreadNotifications);
 }
 
-function renderEmptyVendors() {
-  const vendorList = document.getElementById("vendorList");
-
-  vendorList.innerHTML = `
-    <div class="empty-card">
-      <div class="empty-icon">+</div>
-      <h3>No vendors yet</h3>
-      <p>Once vendors publish listings, they’ll show here for customers to browse.</p>
-      <a class="btn" href="listings.html">Browse Listings</a>
-    </div>
-  `;
-}
-
 function getCategoryLine(listing) {
   const mainCategory = safeText(listing.mainCategory, "");
   const category = safeText(listing.category || listing.listingCategory, "Event Service");
@@ -1033,6 +1284,19 @@ function getCategoryLine(listing) {
   return mainCategory
     ? `${mainCategory} · ${typeLine}`
     : typeLine;
+}
+
+function renderEmptyVendors() {
+  const vendorList = document.getElementById("vendorList");
+
+  vendorList.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No vendors yet</h3>
+      <p>Once vendors publish listings, they’ll show here for customers to browse.</p>
+      <a class="btn" href="listings.html">Browse Listings</a>
+    </div>
+  `;
 }
 
 function renderVendors(listings) {
@@ -1117,7 +1381,80 @@ async function loadSuggestedVendors() {
   }
 }
 
-async function loadEventBoardCount(user) {
+function renderEmptyEvents() {
+  const eventList = document.getElementById("eventList");
+
+  eventList.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No events yet</h3>
+      <p>Create your first event project so each wedding, party, shower, or client event has its own planning board.</p>
+      <button class="btn" type="button" onclick="openEventModalFromWindow()">Create New Event</button>
+    </div>
+  `;
+}
+
+function renderEvents() {
+  const eventList = document.getElementById("eventList");
+
+  if (!customerEvents.length) {
+    renderEmptyEvents();
+    return;
+  }
+
+  eventList.innerHTML = customerEvents.map((eventData) => {
+    const eventId = encodeURIComponent(eventData.id || "");
+    const eventName = safeText(eventData.eventName, "Untitled Event");
+    const eventType = safeText(eventData.eventType, "Event");
+    const eventDate = formatEventDate(eventData.eventDate);
+    const eventCity = safeText(eventData.eventCity, "");
+    const eventZip = safeText(eventData.eventZip, "");
+    const location = [eventCity, eventZip].filter(Boolean).join(" ") || "Location not set";
+    const savedCount = eventBoardCounts[eventData.id] || 0;
+    const requests = requestCounts[eventData.id] || 0;
+    const eventStatus = safeText(eventData.status, "planning");
+
+    return `
+      <article class="event-card">
+        <div class="event-top">
+          <div class="event-thumb"></div>
+
+          <div class="event-meta">
+            <div class="event-date">${escapeHtml(eventDate)} · ${escapeHtml(location)}</div>
+            <h3 class="event-name">${escapeHtml(eventName)}</h3>
+            <div class="event-status">${escapeHtml(eventType)} · ${escapeHtml(eventStatus)}</div>
+          </div>
+        </div>
+
+        <div class="event-stats">
+          <div class="stat-box">
+            <span class="stat-number">${savedCount}</span>
+            <span class="stat-label">Saved</span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-number">${requests}</span>
+            <span class="stat-label">Requests</span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-number">AI</span>
+            <span class="stat-label">Planner</span>
+          </div>
+        </div>
+
+        <div class="event-actions">
+          <a class="btn" href="event-builder.html?eventId=${eventId}">Open Event</a>
+          <a class="btn-secondary" href="my-requests.html?eventId=${eventId}">Requests</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadEventBoardCounts(user) {
+  eventBoardCounts = {};
+
   try {
     const boardQuery = query(
       collection(db, "eventBoardItems"),
@@ -1125,38 +1462,183 @@ async function loadEventBoardCount(user) {
     );
 
     const snapshot = await getDocs(boardQuery);
-    setText("suggestedCount", snapshot.size);
+
+    snapshot.forEach((docSnap) => {
+      const item = docSnap.data();
+      const eventId = safeText(item.eventId, "");
+
+      if (eventId) {
+        eventBoardCounts[eventId] = (eventBoardCounts[eventId] || 0) + 1;
+      }
+    });
   } catch {
-    setText("suggestedCount", "0");
+    eventBoardCounts = {};
   }
 }
 
-async function loadCustomerEvent(user) {
+async function loadRequestCounts(user) {
+  requestCounts = {};
+
   try {
-    const eventRef = doc(db, "customerEvents", user.uid);
-    const eventSnap = await getDoc(eventRef);
+    const requestQuery = query(
+      collection(db, "bookingRequests"),
+      where("customerId", "==", user.uid)
+    );
 
-    if (!eventSnap.exists()) return;
+    const snapshot = await getDocs(requestQuery);
 
-    const eventData = eventSnap.data();
+    snapshot.forEach((docSnap) => {
+      const request = docSnap.data();
+      const eventId = safeText(request.eventId, "");
 
-    const eventName = safeText(eventData.eventName, "Your Event Board");
-    const eventDate = safeText(eventData.eventDate, "Date not set");
-    const eventType = safeText(eventData.eventType, "Planning in Progress");
-
-    setText("eventName", eventName);
-    setText("eventDate", eventDate);
-    setText("eventStatus", eventType);
+      if (eventId && !request.hiddenForCustomer) {
+        requestCounts[eventId] = (requestCounts[eventId] || 0) + 1;
+      }
+    });
   } catch {
+    requestCounts = {};
+  }
+}
+
+async function loadCustomerEvents(user) {
+  try {
+    const events = [];
+
+    const eventsQuery = query(
+      collection(db, "customerEvents"),
+      where("customerId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(eventsQuery);
+
+    snapshot.forEach((docSnap) => {
+      events.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+
+    const legacyRef = doc(db, "customerEvents", user.uid);
+    const legacySnap = await getDoc(legacyRef);
+
+    if (legacySnap.exists()) {
+      const alreadyIncluded = events.some((eventData) => eventData.id === legacySnap.id);
+
+      if (!alreadyIncluded) {
+        events.push({
+          id: legacySnap.id,
+          legacy: true,
+          ...legacySnap.data()
+        });
+      }
+    }
+
+    events.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    customerEvents = events;
+    renderEvents();
+
+  } catch (error) {
+    document.getElementById("eventList").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load events</h3>
+        <p>${escapeHtml(error.message)}</p>
+        <button class="btn" type="button" onclick="openEventModalFromWindow()">Create New Event</button>
+      </div>
+    `;
+  }
+}
+
+async function createEvent() {
+  if (isCreatingEvent || !currentUser) return;
+
+  const eventName = safeText(document.getElementById("eventNameInput").value, "");
+  const eventType = safeText(document.getElementById("eventTypeInput").value, "");
+  const eventDate = safeText(document.getElementById("eventDateInput").value, "");
+  const guestCount = safeText(document.getElementById("guestCountInput").value, "");
+  const eventCity = safeText(document.getElementById("eventCityInput").value, "");
+  const eventZip = safeText(document.getElementById("eventZipInput").value, "");
+  const eventBudget = safeText(document.getElementById("eventBudgetInput").value, "");
+  const styleVibe = safeText(document.getElementById("styleVibeInput").value, "");
+  const eventNotes = safeText(document.getElementById("eventNotesInput").value, "");
+
+  if (!eventName) {
+    showCreateEventStatus("Please add an event name first.", "error");
     return;
   }
+
+  try {
+    isCreatingEvent = true;
+
+    const button = document.getElementById("createEventBtn");
+    button.disabled = true;
+    button.textContent = "Creating...";
+
+    showCreateEventStatus("Creating your event project...", "info");
+
+    const eventRef = await addDoc(collection(db, "customerEvents"), {
+      customerId: currentUser.uid,
+      ownerId: currentUser.uid,
+      customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Customer",
+      customerEmail: currentUserData?.email || currentUser.email || "",
+
+      eventName,
+      eventType,
+      eventDate,
+      guestCount,
+      eventCity,
+      eventZip,
+      eventBudget,
+      styleVibe,
+      eventNotes,
+
+      status: "planning",
+      eventStatus: "planning",
+
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    showCreateEventStatus("Event created. Opening your event board...", "success");
+
+    window.location.href = `event-builder.html?eventId=${encodeURIComponent(eventRef.id)}`;
+
+  } catch (error) {
+    showCreateEventStatus(error.message, "error");
+  } finally {
+    isCreatingEvent = false;
+    const button = document.getElementById("createEventBtn");
+    button.disabled = false;
+    button.textContent = "Create Event";
+  }
 }
+
+document.getElementById("openCreateEventBtn").addEventListener("click", openCreateEventModal);
+document.getElementById("openCreateEventQuickBtn").addEventListener("click", openCreateEventModal);
+document.getElementById("openCreateEventSmallBtn").addEventListener("click", openCreateEventModal);
+document.getElementById("cancelCreateEventBtn").addEventListener("click", closeCreateEventModal);
+document.getElementById("createEventBtn").addEventListener("click", createEvent);
+
+document.getElementById("createEventModal").addEventListener("click", (event) => {
+  if (event.target.id === "createEventModal") {
+    closeCreateEventModal();
+  }
+});
+
+window.openEventModalFromWindow = openCreateEventModal;
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
     return;
   }
+
+  currentUser = user;
 
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
@@ -1166,20 +1648,24 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userData = userSnap.data();
+  currentUserData = userSnap.data();
 
-  if (userData.role === "vendor") {
+  if (currentUserData.role === "vendor") {
     window.location.href = "vendor-dashboard.html";
     return;
   }
 
-  const firstName = safeText(userData.name, user.email || "there").split(" ")[0];
+  const firstName = safeText(currentUserData.name, user.email || "there").split(" ")[0];
   setText("welcomeText", `Welcome back, ${firstName}`);
 
-  loadUnreadCounts(user);
-  loadEventBoardCount(user);
-  loadCustomerEvent(user);
-  loadSuggestedVendors();
+  await Promise.all([
+    loadUnreadCounts(user),
+    loadEventBoardCounts(user),
+    loadRequestCounts(user),
+    loadSuggestedVendors()
+  ]);
+
+  await loadCustomerEvents(user);
 });
 
 window.logout = async function () {
