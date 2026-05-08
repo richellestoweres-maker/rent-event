@@ -1231,6 +1231,54 @@ function closeWithdrawModal() {
   modal.setAttribute("aria-hidden", "true");
 }
 
+async function createVendorWithdrawNotifications(request, finalReason) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const uniqueVendorIds = Array.from(
+    new Set(
+      vendors
+        .map((vendor) => safeText(vendor.vendorId, ""))
+        .filter(Boolean)
+    )
+  );
+
+  if (!uniqueVendorIds.length) return;
+
+  const eventDetails = request.eventDetails || {};
+  const eventName = safeText(eventDetails.eventName, "an event request");
+  const customerName =
+    currentUserData?.name ||
+    currentUser.displayName ||
+    currentUser.email ||
+    "Customer";
+
+  for (const vendorId of uniqueVendorIds) {
+    await addDoc(collection(db, "notifications"), {
+      recipientId: vendorId,
+      recipientRole: "vendor",
+
+      type: "request_withdrawn",
+      typeLabel: "Request Withdrawn",
+      category: "Booking Request",
+
+      title: "A customer withdrew a request",
+      body: `${customerName} withdrew the request for ${eventName}. Reason: ${finalReason}`,
+
+      sourceId: request.id,
+      sourceCollection: "bookingRequests",
+      sourceLabel: eventName,
+      eventName,
+
+      customerId: currentUser.uid,
+      customerName,
+      withdrawReason: finalReason,
+
+      read: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  }
+}
+
 async function confirmWithdrawRequest() {
   if (isBusy || !pendingWithdrawRequestId) return;
 
@@ -1269,6 +1317,7 @@ async function confirmWithdrawRequest() {
       updatedAt: serverTimestamp()
     });
 
+    request.id = cleanRequestId;
     request.status = "withdrawn";
     request.requestStatus = "withdrawn";
     request.withdrawnBy = "customer";
@@ -1276,9 +1325,11 @@ async function confirmWithdrawRequest() {
     request.withdrawReason = finalReason;
     request.withdrawnAt = new Date().toISOString();
 
+    await createVendorWithdrawNotifications(request, finalReason);
+
     closeWithdrawModal();
     renderRequests();
-    showStatus("Request withdrawn successfully.", "success");
+    showStatus("Request withdrawn successfully. Vendors notified.", "success");
 
   } catch (error) {
     showStatus(error.message, "error");
