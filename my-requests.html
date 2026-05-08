@@ -221,7 +221,7 @@
     }
 
     .request-card.withdrawn-card {
-      opacity: 0.86;
+      opacity: 0.88;
     }
 
     .request-top {
@@ -1006,20 +1006,22 @@ function renderEmptyRequests() {
 function renderRequests() {
   const container = document.getElementById("requestList");
 
-  const activeCount = bookingRequests.filter((request) => {
+  const visibleRequests = bookingRequests.filter((request) => !request.hiddenForCustomer);
+
+  const activeCount = visibleRequests.filter((request) => {
     const status = safeText(request.requestStatus || request.status, "pending");
     return status !== "withdrawn";
   }).length;
 
-  setText("requestCountPill", `${bookingRequests.length} Request${bookingRequests.length === 1 ? "" : "s"}`);
+  setText("requestCountPill", `${visibleRequests.length} Request${visibleRequests.length === 1 ? "" : "s"}`);
   setText("pendingCountPill", `${activeCount} Active`);
 
-  if (!bookingRequests.length) {
+  if (!visibleRequests.length) {
     renderEmptyRequests();
     return;
   }
 
-  container.innerHTML = bookingRequests.map((request) => {
+  container.innerHTML = visibleRequests.map((request) => {
     const requestId = encodeURIComponent(request.id || "");
     const eventDetails = request.eventDetails || {};
     const eventName = safeText(eventDetails.eventName, "Unnamed Event");
@@ -1174,6 +1176,7 @@ function renderRequests() {
         ${isWithdrawn ? `
           <div class="request-actions">
             <a class="btn-secondary" href="event-builder.html">Plan New Event</a>
+            <button class="btn-danger" type="button" data-clear-request="${requestId}">Clear From My Requests</button>
           </div>
         ` : `
           <div class="request-actions">
@@ -1195,6 +1198,12 @@ function renderRequests() {
   document.querySelectorAll("[data-withdraw-request]").forEach((button) => {
     button.addEventListener("click", () => {
       withdrawRequest(button.dataset.withdrawRequest);
+    });
+  });
+
+  document.querySelectorAll("[data-clear-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      clearRequestFromCustomerView(button.dataset.clearRequest);
     });
   });
 }
@@ -1280,6 +1289,42 @@ async function confirmWithdrawRequest() {
 
 function withdrawRequest(requestId) {
   openWithdrawModal(requestId);
+}
+
+async function clearRequestFromCustomerView(requestId) {
+  if (isBusy) return;
+
+  const cleanRequestId = decodeURIComponent(requestId);
+  const request = bookingRequests.find((item) => item.id === cleanRequestId);
+
+  if (!request) {
+    showStatus("Could not find that request.", "error");
+    return;
+  }
+
+  try {
+    isBusy = true;
+    showStatus("Clearing request from your page...", "info");
+
+    const requestRef = doc(db, "bookingRequests", cleanRequestId);
+
+    await updateDoc(requestRef, {
+      hiddenForCustomer: true,
+      hiddenForCustomerAt: new Date().toISOString(),
+      updatedAt: serverTimestamp()
+    });
+
+    request.hiddenForCustomer = true;
+    request.hiddenForCustomerAt = new Date().toISOString();
+
+    renderRequests();
+    showStatus("Request cleared from your page.", "success");
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
 }
 
 async function findExistingConversation(customerId, vendorId, listingId) {
@@ -1419,10 +1464,14 @@ async function loadBookingRequests() {
     const requests = [];
 
     snapshot.forEach((docSnap) => {
-      requests.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
+      const data = docSnap.data();
+
+      if (!data.hiddenForCustomer) {
+        requests.push({
+          id: docSnap.id,
+          ...data
+        });
+      }
     });
 
     requests.sort((a, b) => {
