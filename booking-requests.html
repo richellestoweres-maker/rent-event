@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Booking Requests | RentEvent</title>
+  <title>My Requests | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,12 +23,10 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f4ede2;
       --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
@@ -223,7 +221,7 @@
     }
 
     .request-card.withdrawn-card {
-      opacity: 0.86;
+      opacity: 0.88;
     }
 
     .request-top {
@@ -255,44 +253,6 @@
       font-weight: 800;
       white-space: nowrap;
       text-align: right;
-    }
-
-    .request-grid {
-      display: grid;
-      gap: 10px;
-      margin: 14px 0;
-      padding: 14px;
-      border: 1px solid var(--line);
-      background: var(--soft-2);
-      border-radius: 22px;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
-      padding-bottom: 8px;
-    }
-
-    .info-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .info-label {
-      font-size: 0.76rem;
-      color: var(--muted);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .info-value {
-      font-size: 0.88rem;
-      text-align: right;
-      font-weight: 700;
-      max-width: 62%;
     }
 
     .pill-row {
@@ -345,6 +305,44 @@
       color: var(--red-text);
     }
 
+    .request-grid {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 22px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
+      padding-bottom: 8px;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .info-value {
+      font-size: 0.88rem;
+      text-align: right;
+      font-weight: 700;
+      max-width: 62%;
+    }
+
     .vendor-box,
     .response-box,
     .withdrawn-box {
@@ -386,11 +384,34 @@
       color: var(--red-text);
     }
 
-    .response-actions {
-      display: grid;
-      grid-template-columns: 1fr;
+    .response-item {
+      padding: 12px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+
+    .response-top {
+      display: flex;
+      justify-content: space-between;
       gap: 10px;
-      margin-top: 12px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .response-name {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .response-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
     }
 
     .ai-box {
@@ -422,8 +443,6 @@
 
     .btn,
     .btn-secondary,
-    .btn-safe,
-    .btn-warning,
     .btn-danger {
       min-height: 46px;
       border-radius: 999px;
@@ -450,16 +469,6 @@
     .btn-secondary {
       background: var(--soft-2);
       color: #4a433d;
-    }
-
-    .btn-safe {
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .btn-warning {
-      background: #fff4df;
-      color: #8d5f11;
     }
 
     .btn-danger {
@@ -533,6 +542,102 @@
       color: var(--red-text);
     }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 22, 22, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 50;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 390px;
+      background: #fff;
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 24px 70px rgba(22, 22, 22, 0.22);
+    }
+
+    .modal-label {
+      display: inline-flex;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: var(--red-soft);
+      color: var(--red-text);
+      font-size: 0.76rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .modal-text {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .modal-field {
+      margin-bottom: 14px;
+    }
+
+    .modal-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .modal-field select,
+    .modal-field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      background: var(--soft-2);
+      color: var(--text);
+      outline: none;
+    }
+
+    .modal-field textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-actions .btn-secondary,
+    .modal-actions .btn-danger {
+      min-width: 0;
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -593,10 +698,6 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .response-actions {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
       .bottom-nav {
         max-width: 520px;
       }
@@ -607,11 +708,11 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">←</a>
+      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Vendor Portal</div>
-        <h1 class="page-title">Booking Requests</h1>
+        <div class="eyebrow">Customer Portal</div>
+        <h1 class="page-title">My Requests</h1>
       </div>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
@@ -619,15 +720,15 @@
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Incoming Event Requests</div>
-        <h2 class="hero-title">Review client requests.</h2>
+        <div class="hero-label">Submitted Event Requests</div>
+        <h2 class="hero-title">Track your event requests.</h2>
         <p class="hero-subtitle">
-          See event details, selected services, AI planner context, and respond with availability.
+          Review your submitted requests, vendor responses, AI planner context, and estimated totals.
         </p>
 
         <div class="hero-meta">
           <span class="hero-pill" id="requestCountPill">0 Requests</span>
-          <span class="hero-pill" id="pendingCountPill">0 Pending</span>
+          <span class="hero-pill" id="pendingCountPill">0 Active</span>
         </div>
       </div>
     </section>
@@ -635,7 +736,7 @@
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">Requests</h2>
-        <a class="section-link" href="messages.html">Inbox</a>
+        <a class="section-link" href="event-builder.html">Plan Event</a>
       </div>
 
       <div class="status-message" id="statusMessage"></div>
@@ -644,29 +745,63 @@
         <div class="empty-card">
           <div class="empty-icon">…</div>
           <h3>Loading requests</h3>
-          <p>We’re checking for booking requests connected to your vendor account.</p>
+          <p>We’re checking your submitted event requests now.</p>
         </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Vendor navigation">
-    <a class="nav-item" href="vendor-dashboard.html">
+  <div class="modal-overlay" id="withdrawModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="withdrawModalTitle">
+      <div class="modal-label">Withdraw Request</div>
+
+      <h2 class="modal-title" id="withdrawModalTitle">Are you sure?</h2>
+
+      <p class="modal-text">
+        Vendors will see that this request is no longer active. You can still keep a record of it in your request history.
+      </p>
+
+      <div class="modal-field">
+        <label for="withdrawReasonSelect">Reason</label>
+        <select id="withdrawReasonSelect">
+          <option value="Found another vendor">Found another vendor</option>
+          <option value="Changed event plans">Changed event plans</option>
+          <option value="No longer needed">No longer needed</option>
+          <option value="Submitted by mistake">Submitted by mistake</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label for="withdrawReasonNote">Optional note</label>
+        <textarea id="withdrawReasonNote" placeholder="Add a short note if needed..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="keepRequestBtn">Keep Request</button>
+        <button class="btn-danger" type="button" id="confirmWithdrawBtn">Withdraw Request</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Customer navigation">
+    <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
       </svg>
       <span>Home</span>
     </a>
 
-    <a class="nav-item" href="add-listing.html">
+    <a class="nav-item" href="listings.html">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Add</span>
+      <span>Listings</span>
     </a>
 
-    <a class="nav-item active" href="booking-requests.html">
+    <a class="nav-item active" href="my-requests.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -719,6 +854,9 @@ let currentUser = null;
 let currentUserData = null;
 let bookingRequests = [];
 let isBusy = false;
+const pageParams = new URLSearchParams(window.location.search);
+const selectedRequestId = pageParams.get("id") || "";
+let pendingWithdrawRequestId = null;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -773,20 +911,6 @@ function showStatus(message, type = "info") {
   }, 3500);
 }
 
-function getVendorDisplayName() {
-  return (
-    safeText(currentUserData?.businessName, "") ||
-    safeText(currentUserData?.vendorName, "") ||
-    safeText(currentUserData?.name, "") ||
-    "Vendor"
-  );
-}
-
-function getVendorItemsForRequest(request) {
-  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
-  return vendors.filter((vendor) => vendor.vendorId === currentUser.uid);
-}
-
 function getEventLocation(eventDetails) {
   const city = safeText(eventDetails?.eventCity, "");
   const zip = safeText(eventDetails?.eventZip, "");
@@ -807,22 +931,17 @@ function getAiSummary(request) {
   return titles.join(", ");
 }
 
-function getRequestStatusLabel(status) {
+function getStatusLabel(status) {
   if (status === "withdrawn") return "Withdrawn";
   if (status === "confirmed") return "Confirmed";
   if (status === "paid") return "Paid";
   return "Pending";
 }
 
-function getRequestPillClass(status) {
+function getStatusPillClass(status) {
   if (status === "withdrawn") return "withdrawn";
   if (status === "confirmed" || status === "paid") return "safe";
   return "pending";
-}
-
-function getVendorResponse(request) {
-  const responses = request.vendorResponses || {};
-  return responses[currentUser.uid] || null;
 }
 
 function getResponseLabel(status) {
@@ -839,18 +958,49 @@ function getResponsePillClass(status) {
   return "info";
 }
 
-function isHiddenForCurrentVendor(request) {
-  const hiddenForVendorIds = request.hiddenForVendorIds || {};
-  return Boolean(hiddenForVendorIds[currentUser.uid]);
+function getVendorResponse(request, vendorId) {
+  const responses = request.vendorResponses || {};
+  return responses[vendorId] || null;
+}
+
+function getVendorResponseSummary(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const responses = request.vendorResponses || {};
+
+  if (!vendors.length) {
+    return {
+      available: 0,
+      needsInfo: 0,
+      declined: 0,
+      waiting: 0
+    };
+  }
+
+  return vendors.reduce((summary, vendor) => {
+    const response = responses[vendor.vendorId];
+    const status = safeText(response?.status, "");
+
+    if (status === "available") summary.available += 1;
+    else if (status === "needs_info") summary.needsInfo += 1;
+    else if (status === "declined") summary.declined += 1;
+    else summary.waiting += 1;
+
+    return summary;
+  }, {
+    available: 0,
+    needsInfo: 0,
+    declined: 0,
+    waiting: 0
+  });
 }
 
 function renderEmptyRequests() {
   document.getElementById("requestList").innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">✉</div>
-      <h3>No booking requests</h3>
-      <p>New active requests and withdrawn requests that still need review will appear here.</p>
-      <a class="btn" href="vendor-dashboard.html">Back to Dashboard</a>
+      <div class="empty-icon">+</div>
+      <h3>No requests yet</h3>
+      <p>When you submit an event request from checkout, it will appear here.</p>
+      <a class="btn" href="event-builder.html">Start Planning</a>
     </div>
   `;
 }
@@ -858,16 +1008,15 @@ function renderEmptyRequests() {
 function renderRequests() {
   const container = document.getElementById("requestList");
 
-  const visibleRequests = bookingRequests.filter((request) => !isHiddenForCurrentVendor(request));
+  const visibleRequests = bookingRequests.filter((request) => !request.hiddenForCustomer);
 
-  const pendingCount = visibleRequests.filter((request) => {
+  const activeCount = visibleRequests.filter((request) => {
     const status = safeText(request.requestStatus || request.status, "pending");
-    const response = getVendorResponse(request);
-    return status !== "withdrawn" && (!response || safeText(response.status, "") === "");
+    return status !== "withdrawn";
   }).length;
 
   setText("requestCountPill", `${visibleRequests.length} Request${visibleRequests.length === 1 ? "" : "s"}`);
-  setText("pendingCountPill", `${pendingCount} Pending Response${pendingCount === 1 ? "" : "s"}`);
+  setText("pendingCountPill", `${activeCount} Active`);
 
   if (!visibleRequests.length) {
     renderEmptyRequests();
@@ -877,70 +1026,116 @@ function renderRequests() {
   container.innerHTML = visibleRequests.map((request) => {
     const requestId = encodeURIComponent(request.id || "");
     const eventDetails = request.eventDetails || {};
-    const eventName = safeText(eventDetails.eventName, "Unnamed Event");
+    const eventId = safeText(request.eventId || eventDetails.id, "");
+    const eventName = safeText(eventDetails.eventName || request.eventName, "Unnamed Event");
     const eventType = safeText(eventDetails.eventType, "Event");
     const eventDate = safeText(eventDetails.eventDate, "Date not listed");
     const location = getEventLocation(eventDetails);
     const guestCount = safeText(eventDetails.guestCount, "Not listed");
     const budget = safeText(eventDetails.eventBudget, "Not listed");
     const styleVibe = safeText(eventDetails.styleVibe, "Not listed");
-    const customerName = safeText(request.customerName, "Customer");
     const status = safeText(request.requestStatus || request.status, "pending");
-    const requestStatusLabel = getRequestStatusLabel(status);
-    const requestPillClass = getRequestPillClass(status);
+    const statusLabel = getStatusLabel(status);
+    const statusPillClass = getStatusPillClass(status);
     const isWithdrawn = status === "withdrawn";
-    const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "Customer withdrew this request.");
+    const paymentStatus = safeText(request.paymentStatus, "not_collected");
     const time = formatTime(request.createdAt);
     const total = formatMoney(request.totalDue || 0);
-    const matchingVendorItems = getVendorItemsForRequest(request);
+    const vendors = Array.isArray(request.vendors) ? request.vendors : [];
     const aiSummary = getAiSummary(request);
-    const response = getVendorResponse(request);
-    const responseStatus = safeText(response?.status, "");
-    const responseLabel = getResponseLabel(responseStatus);
-    const responsePillClass = getResponsePillClass(responseStatus);
+    const responseSummary = getVendorResponseSummary(request);
+    const withdrawnReason = safeText(request.withdrawReason, "No reason provided.");
 
-    const vendorBox = matchingVendorItems.length
-      ? matchingVendorItems.map((vendor) => {
+    const vendorBox = vendors.length
+      ? vendors.map((vendor) => {
           const title = safeText(vendor.listingTitle, "Requested Listing");
           const category = safeText(vendor.category || vendor.mainCategory, "Event Service");
           const price = formatMoney(vendor.priceNumber || 0);
+          const vendorName = safeText(vendor.vendorName, "Vendor");
+          const response = getVendorResponse(request, vendor.vendorId);
+          const responseStatus = safeText(response?.status, "");
+          const responseLabel = getResponseLabel(responseStatus);
+          const responsePillClass = getResponsePillClass(responseStatus);
 
           return `
             <div class="vendor-box">
               <h4>${escapeHtml(title)}</h4>
-              <p>${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+              <div class="pill-row">
+                <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+              </div>
             </div>
           `;
         }).join("")
       : `
         <div class="vendor-box">
-          <h4>Your service was included</h4>
-          <p>This request includes your vendor account, but the specific listing details were not found.</p>
+          <h4>No vendors saved</h4>
+          <p>This request did not include vendor details.</p>
         </div>
       `;
+
+    const responseBox = vendors.length
+      ? `
+        <div class="response-box">
+          <h4>Vendor Responses</h4>
+          <p>
+            ${responseSummary.available} available ·
+            ${responseSummary.needsInfo} need more info ·
+            ${responseSummary.declined} declined ·
+            ${responseSummary.waiting} waiting
+          </p>
+
+          ${vendors.map((vendor) => {
+            const vendorName = safeText(vendor.vendorName, "Vendor");
+            const title = safeText(vendor.listingTitle, "Requested Listing");
+            const response = getVendorResponse(request, vendor.vendorId);
+            const responseStatus = safeText(response?.status, "");
+            const responseLabel = getResponseLabel(responseStatus);
+            const responsePillClass = getResponsePillClass(responseStatus);
+            const responseNote = safeText(response?.note, responseStatus ? "" : "This vendor has not responded yet.");
+
+            return `
+              <div class="response-item">
+                <div class="response-top">
+                  <div>
+                    <h5 class="response-name">${escapeHtml(vendorName)}</h5>
+                    <p class="response-note">${escapeHtml(title)}</p>
+                  </div>
+
+                  <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+                </div>
+
+                ${responseNote ? `<p class="response-note">${escapeHtml(responseNote)}</p>` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `
+      : "";
 
     return `
       <article class="request-card ${isWithdrawn ? "withdrawn-card" : ""}">
         <div class="request-top">
           <div>
             <h3 class="request-title">${escapeHtml(eventName)}</h3>
-            <p class="request-subtitle">${escapeHtml(customerName)} · ${escapeHtml(time)}</p>
+            <p class="request-subtitle">Submitted ${escapeHtml(time)}</p>
           </div>
 
           <div class="request-total">${escapeHtml(total)}</div>
         </div>
 
         <div class="pill-row">
-          <span class="pill ${requestPillClass}">${escapeHtml(requestStatusLabel)}</span>
+          <span class="pill ${statusPillClass}">${escapeHtml(statusLabel)}</span>
+          <span class="pill info">${escapeHtml(paymentStatus.replaceAll("_", " "))}</span>
           <span class="pill type">${escapeHtml(eventType)}</span>
-          <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+          ${responseSummary.available > 0 ? `<span class="pill safe">${responseSummary.available} Available</span>` : ""}
           ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
         </div>
 
         ${isWithdrawn ? `
           <div class="withdrawn-box">
             <h4>Request Withdrawn</h4>
-            <p>The customer has withdrawn this request. Reason: ${escapeHtml(withdrawnReason)}</p>
+            <p>You withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p>
           </div>
         ` : ""}
 
@@ -969,35 +1164,15 @@ function renderRequests() {
             <span class="info-label">Style</span>
             <span class="info-value">${escapeHtml(styleVibe)}</span>
           </div>
+
+          <div class="info-row">
+            <span class="info-label">Event Project</span>
+            <span class="info-value">${escapeHtml(eventName)}</span>
+          </div>
         </div>
 
         ${vendorBox}
-
-        <div class="response-box">
-          <h4>Your Response</h4>
-          <p>
-            ${isWithdrawn
-              ? "This request has been withdrawn, so vendor responses are closed."
-              : `${escapeHtml(responseLabel)}${response?.note ? ` · ${escapeHtml(response.note)}` : ""}`
-            }
-          </p>
-
-          ${isWithdrawn ? "" : `
-            <div class="response-actions">
-              <button class="btn-safe" type="button" data-response-request="${requestId}" data-response-status="available">
-                Mark Available
-              </button>
-
-              <button class="btn-warning" type="button" data-response-request="${requestId}" data-response-status="needs_info">
-                Need More Info
-              </button>
-
-              <button class="btn-danger" type="button" data-response-request="${requestId}" data-response-status="declined">
-                Decline
-              </button>
-            </div>
-          `}
-        </div>
+        ${responseBox}
 
         ${aiSummary ? `
           <div class="ai-box">
@@ -1006,110 +1181,163 @@ function renderRequests() {
           </div>
         ` : ""}
 
-        <div class="request-actions">
-          ${isWithdrawn
-            ? `
-              <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
-              <button class="btn-danger" type="button" data-clear-vendor-request="${requestId}">
-                Clear From Requests
-              </button>
-            `
-            : `
-              <button class="btn" type="button" data-message-request="${requestId}">Message Customer</button>
-              <a class="btn-secondary" href="booking-requests.html?id=${requestId}">View</a>
-            `
-          }
-        </div>
+        ${isWithdrawn ? `
+          <div class="request-actions">
+            <a class="btn-secondary" href="event-builder.html">Plan New Event</a>
+            <button class="btn-danger" type="button" data-clear-request="${requestId}">Clear From My Requests</button>
+          </div>
+        ` : `
+          <div class="request-actions">
+            <button class="btn" type="button" data-message-request="${requestId}">Message Vendors</button>
+            <a class="btn-secondary" href="event-builder.html">Edit Event</a>
+            <button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>
+          </div>
+        `}
       </article>
     `;
   }).join("");
 
   document.querySelectorAll("[data-message-request]").forEach((button) => {
     button.addEventListener("click", () => {
-      messageCustomerForRequest(button.dataset.messageRequest);
+      messageVendorsForRequest(button.dataset.messageRequest);
     });
   });
 
-  document.querySelectorAll("[data-response-request]").forEach((button) => {
+  document.querySelectorAll("[data-withdraw-request]").forEach((button) => {
     button.addEventListener("click", () => {
-      updateVendorResponse(button.dataset.responseRequest, button.dataset.responseStatus);
+      withdrawRequest(button.dataset.withdrawRequest);
     });
   });
 
-  document.querySelectorAll("[data-clear-vendor-request]").forEach((button) => {
+  document.querySelectorAll("[data-clear-request]").forEach((button) => {
     button.addEventListener("click", () => {
-      clearRequestFromVendorView(button.dataset.clearVendorRequest);
+      clearRequestFromCustomerView(button.dataset.clearRequest);
     });
   });
 }
 
-async function createCustomerResponseNotification(request, responseStatus, responseLabel) {
-  const customerId = safeText(request.customerId, "");
+function openWithdrawModal(requestId) {
+  pendingWithdrawRequestId = decodeURIComponent(requestId);
 
-  if (!customerId) return;
+  const modal = document.getElementById("withdrawModal");
+  const reasonSelect = document.getElementById("withdrawReasonSelect");
+  const reasonNote = document.getElementById("withdrawReasonNote");
+
+  reasonSelect.value = "Found another vendor";
+  reasonNote.value = "";
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeWithdrawModal() {
+  pendingWithdrawRequestId = null;
+
+  const modal = document.getElementById("withdrawModal");
+
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+async function createVendorWithdrawNotifications(request, finalReason) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const uniqueVendorIds = Array.from(
+    new Set(
+      vendors
+        .map((vendor) => safeText(vendor.vendorId, ""))
+        .filter(Boolean)
+    )
+  );
+
+  if (!uniqueVendorIds.length) return;
 
   const eventDetails = request.eventDetails || {};
-  const eventName = safeText(eventDetails.eventName, "your event request");
-  const vendorName = getVendorDisplayName();
+  const eventName = safeText(eventDetails.eventName, "an event request");
+  const customerName =
+    currentUserData?.name ||
+    currentUser.displayName ||
+    currentUser.email ||
+    "Customer";
 
-  await addDoc(collection(db, "notifications"), {
-    recipientId: customerId,
-    recipientRole: "customer",
+  for (const vendorId of uniqueVendorIds) {
+    await addDoc(collection(db, "notifications"), {
+      recipientId: vendorId,
+      recipientRole: "vendor",
 
-    type: "vendor_response",
-    typeLabel: "Vendor Response",
-    category: "Booking Request",
+      type: "request_withdrawn",
+      typeLabel: "Request Withdrawn",
+      category: "Booking Request",
 
-    title: `${vendorName} responded to your request`,
-    body: `${vendorName} marked themselves as ${responseLabel} for ${eventName}.`,
+      title: "A customer withdrew a request",
+      body: `${customerName} withdrew the request for ${eventName}. Reason: ${finalReason}`,
 
-    sourceId: request.id,
-    sourceCollection: "bookingRequests",
-    sourceLabel: eventName,
-    eventName,
+      sourceId: request.id,
+      sourceCollection: "bookingRequests",
+      sourceLabel: eventName,
+      eventName,
 
-    vendorId: currentUser.uid,
-    vendorName,
-    responseStatus,
-    responseLabel,
+      customerId: currentUser.uid,
+      customerName,
+      withdrawReason: finalReason,
 
-    read: false,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  });
+      read: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  }
 }
 
-async function clearRequestFromVendorView(requestId) {
-  if (isBusy) return;
+async function confirmWithdrawRequest() {
+  if (isBusy || !pendingWithdrawRequestId) return;
 
-  const cleanRequestId = decodeURIComponent(requestId);
+  const cleanRequestId = pendingWithdrawRequestId;
   const request = bookingRequests.find((item) => item.id === cleanRequestId);
 
   if (!request) {
-    showStatus("Could not find that booking request.", "error");
+    showStatus("Could not find that request.", "error");
+    closeWithdrawModal();
     return;
   }
 
+  const reasonSelect = document.getElementById("withdrawReasonSelect");
+  const reasonNote = document.getElementById("withdrawReasonNote");
+
+  const selectedReason = safeText(reasonSelect.value, "Customer withdrew this request.");
+  const extraNote = safeText(reasonNote.value, "");
+
+  const finalReason = extraNote
+    ? `${selectedReason}: ${extraNote}`
+    : selectedReason;
+
   try {
     isBusy = true;
-    showStatus("Clearing withdrawn request...", "info");
+    showStatus("Withdrawing request...", "info");
 
     const requestRef = doc(db, "bookingRequests", cleanRequestId);
 
-    const updatedHiddenForVendorIds = {
-      ...(request.hiddenForVendorIds || {}),
-      [currentUser.uid]: true
-    };
-
     await updateDoc(requestRef, {
-      hiddenForVendorIds: updatedHiddenForVendorIds,
+      status: "withdrawn",
+      requestStatus: "withdrawn",
+      withdrawnBy: "customer",
+      withdrawnReason: finalReason,
+      withdrawReason: finalReason,
+      withdrawnAt: new Date().toISOString(),
       updatedAt: serverTimestamp()
     });
 
-    request.hiddenForVendorIds = updatedHiddenForVendorIds;
+    request.id = cleanRequestId;
+    request.status = "withdrawn";
+    request.requestStatus = "withdrawn";
+    request.withdrawnBy = "customer";
+    request.withdrawnReason = finalReason;
+    request.withdrawReason = finalReason;
+    request.withdrawnAt = new Date().toISOString();
 
+    await createVendorWithdrawNotifications(request, finalReason);
+
+    closeWithdrawModal();
     renderRequests();
-    showStatus("Withdrawn request cleared from your page.", "success");
+    showStatus("Request withdrawn successfully. Vendors notified.", "success");
 
   } catch (error) {
     showStatus(error.message, "error");
@@ -1118,61 +1346,38 @@ async function clearRequestFromVendorView(requestId) {
   }
 }
 
-async function updateVendorResponse(requestId, responseStatus) {
+function withdrawRequest(requestId) {
+  openWithdrawModal(requestId);
+}
+
+async function clearRequestFromCustomerView(requestId) {
   if (isBusy) return;
 
   const cleanRequestId = decodeURIComponent(requestId);
   const request = bookingRequests.find((item) => item.id === cleanRequestId);
 
   if (!request) {
-    showStatus("Could not find that booking request.", "error");
+    showStatus("Could not find that request.", "error");
     return;
   }
-
-  const status = safeText(request.requestStatus || request.status, "pending");
-
-  if (status === "withdrawn") {
-    showStatus("This request has been withdrawn, so you can no longer respond to it.", "error");
-    return;
-  }
-
-  const responseLabel = getResponseLabel(responseStatus);
-  const vendorName = getVendorDisplayName();
 
   try {
     isBusy = true;
-    showStatus(`Saving response: ${responseLabel}...`, "info");
+    showStatus("Clearing request from your page...", "info");
 
     const requestRef = doc(db, "bookingRequests", cleanRequestId);
 
-    const updatedVendorResponses = {
-      ...(request.vendorResponses || {}),
-      [currentUser.uid]: {
-        vendorId: currentUser.uid,
-        vendorName,
-        status: responseStatus,
-        statusLabel: responseLabel,
-        note: responseStatus === "available"
-          ? "Vendor marked themselves as available."
-          : responseStatus === "needs_info"
-            ? "Vendor needs more information before confirming."
-            : "Vendor declined this request.",
-        respondedAt: new Date().toISOString()
-      }
-    };
-
     await updateDoc(requestRef, {
-      vendorResponses: updatedVendorResponses,
+      hiddenForCustomer: true,
+      hiddenForCustomerAt: new Date().toISOString(),
       updatedAt: serverTimestamp()
     });
 
-    request.id = cleanRequestId;
-    request.vendorResponses = updatedVendorResponses;
-
-    await createCustomerResponseNotification(request, responseStatus, responseLabel);
+    request.hiddenForCustomer = true;
+    request.hiddenForCustomerAt = new Date().toISOString();
 
     renderRequests();
-    showStatus(`Response saved: ${responseLabel}. Customer notified.`, "success");
+    showStatus("Request cleared from your page.", "success");
 
   } catch (error) {
     showStatus(error.message, "error");
@@ -1204,7 +1409,7 @@ async function findExistingConversation(customerId, vendorId, listingId) {
   return conversation;
 }
 
-async function messageCustomerForRequest(requestId) {
+async function messageVendorsForRequest(requestId) {
   if (isBusy) return;
 
   const cleanRequestId = decodeURIComponent(requestId);
@@ -1222,24 +1427,22 @@ async function messageCustomerForRequest(requestId) {
     return;
   }
 
-  const matchingVendorItems = getVendorItemsForRequest(request);
-  const firstVendorItem = matchingVendorItems[0] || {};
-  const listingId = safeText(firstVendorItem.listingId, cleanRequestId);
-  const customerId = safeText(request.customerId, "");
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const firstVendor = vendors.find((vendor) => vendor.vendorId) || null;
 
-  if (!customerId) {
-    showStatus("This request is missing customer information.", "error");
+  if (!firstVendor) {
+    showStatus("This request does not have a vendor to message yet.", "error");
     return;
   }
 
   try {
     isBusy = true;
-    showStatus("Opening customer conversation...", "info");
+    showStatus("Opening vendor conversation...", "info");
 
     const existingConversation = await findExistingConversation(
-      customerId,
       currentUser.uid,
-      listingId
+      firstVendor.vendorId,
+      firstVendor.listingId || cleanRequestId
     );
 
     if (existingConversation) {
@@ -1247,40 +1450,47 @@ async function messageCustomerForRequest(requestId) {
       return;
     }
 
-    const customerName = safeText(request.customerName, "Customer");
-    const vendorName = getVendorDisplayName();
+    const customerName =
+      currentUserData.name ||
+      currentUser.displayName ||
+      currentUser.email ||
+      "Customer";
+
+    const vendorName = safeText(firstVendor.vendorName, "Vendor");
+    const listingId = safeText(firstVendor.listingId, cleanRequestId);
+    const listingTitle = safeText(firstVendor.listingTitle, "your listing");
+    const listingCategory = safeText(firstVendor.category || firstVendor.mainCategory, "Event Service");
     const eventDetails = request.eventDetails || {};
-    const eventName = safeText(eventDetails.eventName, "your event");
-    const listingTitle = safeText(firstVendorItem.listingTitle, "your requested service");
-    const listingCategory = safeText(firstVendorItem.category || firstVendorItem.mainCategory, "Event Service");
-    const listingLocation = getEventLocation(eventDetails);
-    const conversationKey = `${customerId}_${currentUser.uid}_${listingId}`;
-    const firstMessage = `Hi ${customerName}! I received your RentEvent request for ${eventName} and would love to discuss availability for ${listingTitle}.`;
+    const eventName = safeText(eventDetails.eventName, "my event");
+    const conversationKey = `${currentUser.uid}_${firstVendor.vendorId}_${listingId}`;
+    const firstMessage = `Hi! I submitted a RentEvent request for ${eventName} and wanted to ask about availability for ${listingTitle}.`;
 
     const conversationRef = await addDoc(collection(db, "conversations"), {
       conversationKey,
-      participantIds: [customerId, currentUser.uid],
+      participantIds: [currentUser.uid, firstVendor.vendorId],
       participantNames: {
-        [customerId]: customerName,
-        [currentUser.uid]: vendorName
+        [currentUser.uid]: customerName,
+        [firstVendor.vendorId]: vendorName
       },
       participantRoles: {
-        [customerId]: "customer",
-        [currentUser.uid]: "vendor"
+        [currentUser.uid]: "customer",
+        [firstVendor.vendorId]: "vendor"
       },
-      customerId,
-      vendorId: currentUser.uid,
+      customerId: currentUser.uid,
+      vendorId: firstVendor.vendorId,
       listingId,
       bookingRequestId: cleanRequestId,
+      eventId,
+      eventName,
       listingTitle,
       listingCategory,
-      listingLocation,
-      title: customerName,
+      listingLocation: getEventLocation(eventDetails),
+      title: vendorName,
       contextType: "Booking Request",
       lastMessage: firstMessage,
       lastSenderId: currentUser.uid,
       unreadFor: {
-        [customerId]: true
+        [firstVendor.vendorId]: true
       },
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
@@ -1289,8 +1499,8 @@ async function messageCustomerForRequest(requestId) {
     await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
       text: firstMessage,
       senderId: currentUser.uid,
-      senderName: vendorName,
-      senderRole: "vendor",
+      senderName: customerName,
+      senderRole: "customer",
       createdAt: serverTimestamp()
     });
 
@@ -1307,7 +1517,7 @@ async function loadBookingRequests() {
   try {
     const q = query(
       collection(db, "bookingRequests"),
-      where("vendorIds", "array-contains", currentUser.uid)
+      where("customerId", "==", currentUser.uid)
     );
 
     const snapshot = await getDocs(q);
@@ -1317,9 +1527,7 @@ async function loadBookingRequests() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
 
-      const hiddenForVendorIds = data.hiddenForVendorIds || {};
-
-      if (!hiddenForVendorIds[currentUser.uid]) {
+      if (!data.hiddenForCustomer) {
         requests.push({
           id: docSnap.id,
           ...data
@@ -1342,11 +1550,20 @@ async function loadBookingRequests() {
         <div class="empty-icon">!</div>
         <h3>Could not load requests</h3>
         <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="vendor-dashboard.html">Back to Dashboard</a>
+        <a class="btn" href="dashboard.html">Back to Dashboard</a>
       </div>
     `;
   }
 }
+
+document.getElementById("keepRequestBtn").addEventListener("click", closeWithdrawModal);
+document.getElementById("confirmWithdrawBtn").addEventListener("click", confirmWithdrawRequest);
+
+document.getElementById("withdrawModal").addEventListener("click", (event) => {
+  if (event.target.id === "withdrawModal") {
+    closeWithdrawModal();
+  }
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -1366,9 +1583,13 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUserData = userSnap.data();
 
-  if (currentUserData.role !== "vendor") {
-    window.location.href = "dashboard.html";
+  if (currentUserData.role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
     return;
+  }
+
+  if (selectedRequestId) {
+    setText("requestCountPill", "1 Request");
   }
 
   loadBookingRequests();
