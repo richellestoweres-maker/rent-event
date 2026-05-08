@@ -34,6 +34,8 @@
       --green-text: #2d7a49;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
@@ -237,6 +239,10 @@
       box-shadow: 0 20px 42px rgba(123, 96, 58, 0.1);
     }
 
+    .message-card.unread {
+      border: 1px solid rgba(255, 95, 103, 0.26);
+    }
+
     .avatar {
       width: 58px;
       height: 58px;
@@ -343,6 +349,11 @@
     .pill.system {
       background: var(--green-soft);
       color: var(--green-text);
+    }
+
+    .pill.event {
+      background: var(--purple-soft);
+      color: var(--purple-text);
     }
 
     .empty-card {
@@ -556,8 +567,26 @@ let currentUser = null;
 let currentUserData = null;
 let allConversations = [];
 
+const urlParams = new URLSearchParams(window.location.search);
+const currentEventId = urlParams.get("eventId") || "";
+
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function withEventParam(url) {
+  if (!currentEventId) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}eventId=${encodeURIComponent(currentEventId)}`;
 }
 
 function initialsFromName(name) {
@@ -679,7 +708,7 @@ function renderBottomNav(role) {
       <span>Home</span>
     </a>
 
-    <a class="nav-item" href="listings.html">
+    <a class="nav-item" href="${withEventParam("listings.html")}">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
         <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -712,14 +741,16 @@ function applyRoleLayout(role) {
 
   if (role === "vendor") {
     backLink.href = "vendor-dashboard.html";
-    setText("roleEyebrow", "Vendor Inbox");
+    setText("roleEyebrow", currentEventId ? "Event Inbox" : "Vendor Inbox");
     setText("heroLabel", "Stay bookable");
     setText("heroSubtitle", "Reply to client questions, confirm details, and keep your booking conversations organized.");
   } else {
-    backLink.href = "dashboard.html";
-    setText("roleEyebrow", "Inbox");
+    backLink.href = currentEventId ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}` : "dashboard.html";
+    setText("roleEyebrow", currentEventId ? "Event Inbox" : "Inbox");
     setText("heroLabel", "Stay connected");
-    setText("heroSubtitle", "Ask questions, confirm details, and keep all your event communication in one place.");
+    setText("heroSubtitle", currentEventId
+      ? "Keep every vendor conversation for this event project in one place."
+      : "Ask questions, confirm details, and keep all your event communication in one place.");
   }
 
   renderBottomNav(role);
@@ -729,11 +760,14 @@ function renderEmptyState() {
   const messageList = document.getElementById("messageList");
   const role = currentUserData?.role || "customer";
 
-  const primaryHref = role === "vendor" ? "my-listings.html" : "listings.html";
+  const primaryHref = role === "vendor" ? "my-listings.html" : withEventParam("listings.html");
   const primaryText = role === "vendor" ? "View My Listings" : "Browse Listings";
+  const homeHref = role === "vendor" ? "vendor-dashboard.html" : currentEventId ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}` : "dashboard.html";
   const copy = role === "vendor"
-    ? "When customers message you about a listing, those conversations will appear here."
-    : "When you message vendors about listings, those conversations will appear here.";
+    ? "When customers message you about a listing or event request, those conversations will appear here."
+    : currentEventId
+      ? "When you message vendors for this event, those conversations will appear here."
+      : "When you message vendors about listings, those conversations will appear here.";
 
   messageList.innerHTML = `
     <div class="empty-card">
@@ -742,44 +776,89 @@ function renderEmptyState() {
       <p>${copy}</p>
       <div class="empty-actions">
         <a class="btn" href="${primaryHref}">${primaryText}</a>
-        <a class="btn-secondary" href="${role === "vendor" ? "vendor-dashboard.html" : "dashboard.html"}">Back Home</a>
+        <a class="btn-secondary" href="${homeHref}">Back Home</a>
       </div>
     </div>
   `;
 }
 
+function getConversationTitle(conversation) {
+  const participantNames = conversation.participantNames || {};
+  const otherIds = Array.isArray(conversation.participantIds)
+    ? conversation.participantIds.filter((id) => currentUser && id !== currentUser.uid)
+    : [];
+  const otherId = otherIds[0];
+
+  if (otherId && participantNames[otherId]) {
+    return participantNames[otherId];
+  }
+
+  return safeText(conversation.title, "Conversation");
+}
+
+function getConversationEventName(conversation) {
+  return safeText(
+    conversation.eventName ||
+    conversation.sourceLabel ||
+    conversation.eventDetails?.eventName ||
+    "",
+    ""
+  );
+}
+
 function renderConversations(conversations) {
   const messageList = document.getElementById("messageList");
+  const sectionTitle = document.getElementById("sectionTitle");
 
   if (!conversations.length) {
+    sectionTitle.textContent = currentEventId ? "Event Conversations" : "Recent Conversations";
     renderEmptyState();
     return;
   }
 
+  const unreadCount = conversations.filter((conversation) => {
+    const unreadFor = conversation.unreadFor || {};
+    return currentUser && unreadFor[currentUser.uid];
+  }).length;
+
+  sectionTitle.textContent = currentEventId
+    ? `${conversations.length} Event Conversation${conversations.length === 1 ? "" : "s"}`
+    : unreadCount
+      ? `${unreadCount} Unread Conversation${unreadCount === 1 ? "" : "s"}`
+      : "Recent Conversations";
+
   messageList.innerHTML = conversations.map((conversation) => {
-    const title = safeText(conversation.title, "Conversation");
+    const title = getConversationTitle(conversation);
     const lastMessage = safeText(conversation.lastMessage, "No messages yet.");
     const time = formatTime(conversation.updatedAt || conversation.createdAt);
     const roleLabel = safeText(conversation.contextType, currentUserData?.role === "vendor" ? "Customer" : "Vendor");
+    const listingTitle = safeText(conversation.listingTitle, "");
+    const eventName = getConversationEventName(conversation);
+    const bookingRequestId = safeText(conversation.bookingRequestId, "");
+    const eventId = safeText(conversation.eventId, currentEventId);
     const initials = initialsFromName(title);
     const unreadFor = conversation.unreadFor || {};
     const isUnread = currentUser && unreadFor[currentUser.uid];
+    const hrefEventId = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
 
     return `
-      <a class="message-card" href="chat-thread.html?id=${encodeURIComponent(conversation.id || "")}">
-        <div class="avatar"><span>${initials}</span></div>
+      <a class="message-card ${isUnread ? "unread" : ""}" href="chat-thread.html?id=${encodeURIComponent(conversation.id || "")}${hrefEventId}">
+        <div class="avatar"><span>${escapeHtml(initials)}</span></div>
 
         <div class="message-content">
           <div class="message-top">
-            <h3 class="message-name">${title}</h3>
-            <span class="message-time">${time}</span>
+            <h3 class="message-name">${escapeHtml(title)}</h3>
+            <span class="message-time">${escapeHtml(time)}</span>
           </div>
 
-          <p class="message-preview">${lastMessage}</p>
+          <p class="message-preview">${escapeHtml(lastMessage)}</p>
 
           <div class="message-meta">
             ${isUnread ? `<span class="pill new">New</span>` : ""}
-            <span class="pill ${roleLabel.toLowerCase().includes("customer") ? "customer" : "vendor"}">${roleLabel}</span>
+            <span class="pill ${roleLabel.toLowerCase().includes("customer") ? "customer" : "vendor"}">${escapeHtml(roleLabel)}</span>
+            ${eventName ? `<span class="pill event">${escapeHtml(eventName)}</span>` : ""}
+            ${listingTitle ? `<span class="pill system">${escapeHtml(listingTitle)}</span>` : ""}
+            ${bookingRequestId ? `<span class="pill system">Request</span>` : ""}
           </div>
         </div>
       </a>
@@ -797,11 +876,17 @@ function applySearch() {
   }
 
   const filtered = allConversations.filter((conversation) => {
+    const participantNames = conversation.participantNames || {};
     const searchable = [
       conversation.title,
+      Object.values(participantNames).join(" "),
       conversation.lastMessage,
       conversation.contextType,
-      conversation.listingTitle
+      conversation.listingTitle,
+      conversation.listingCategory,
+      conversation.eventName,
+      conversation.sourceLabel,
+      conversation.bookingRequestId
     ].join(" ").toLowerCase();
 
     return searchable.includes(queryText);
@@ -818,7 +903,7 @@ async function loadConversations(user) {
     const conversationsQuery = query(conversationsRef, where("participantIds", "array-contains", user.uid));
     const snapshot = await getDocs(conversationsQuery);
 
-    const conversations = [];
+    let conversations = [];
 
     snapshot.forEach((docSnap) => {
       conversations.push({
@@ -826,6 +911,14 @@ async function loadConversations(user) {
         ...docSnap.data()
       });
     });
+
+    if (currentEventId) {
+      conversations = conversations.filter((conversation) => {
+        const conversationEventId = safeText(conversation.eventId, "");
+        const requestEventId = safeText(conversation.requestEventId, "");
+        return conversationEventId === currentEventId || requestEventId === currentEventId;
+      });
+    }
 
     conversations.sort((a, b) => {
       const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
@@ -844,13 +937,15 @@ async function loadConversations(user) {
     renderConversations(allConversations);
 
   } catch (error) {
+    const homeHref = currentUserData?.role === "vendor" ? "vendor-dashboard.html" : currentEventId ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}` : "dashboard.html";
+
     messageList.innerHTML = `
       <div class="empty-card">
         <div class="empty-icon">!</div>
         <h3>Could not load messages</h3>
-        <p>${error.message}</p>
+        <p>${escapeHtml(error.message)}</p>
         <div class="empty-actions">
-          <a class="btn" href="${currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "dashboard.html"}">Back Home</a>
+          <a class="btn" href="${homeHref}">Back Home</a>
         </div>
       </div>
     `;
