@@ -86,6 +86,28 @@
       font-weight: 800;
     }
 
+    .notification-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.7rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+    }
+
     .topbar-center {
       flex: 1;
       text-align: center;
@@ -475,6 +497,7 @@
       </div>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <span class="notification-badge" id="topNotificationBadge">0</span>
         🔔
       </a>
     </header>
@@ -570,6 +593,41 @@ function formatTime(value) {
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
+}
+
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+async function loadUnreadAppNotifications(user) {
+  try {
+    const notificationsRef = collection(db, "notifications");
+    const notificationsQuery = query(notificationsRef, where("recipientId", "==", user.uid));
+    const snapshot = await getDocs(notificationsQuery);
+
+    let unreadCount = 0;
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (data.read === false) {
+        unreadCount += 1;
+      }
+    });
+
+    setBadge("topNotificationBadge", unreadCount);
+  } catch (error) {
+    setBadge("topNotificationBadge", 0);
+  }
 }
 
 function renderBottomNav(role) {
@@ -770,6 +828,13 @@ async function loadConversations(user) {
     });
 
     conversations.sort((a, b) => {
+      const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
+      const bUnread = b.unreadFor && b.unreadFor[user.uid] ? 1 : 0;
+
+      if (aUnread !== bUnread) {
+        return bUnread - aUnread;
+      }
+
       const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : 0;
       const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : 0;
       return bTime - aTime;
@@ -812,6 +877,7 @@ onAuthStateChanged(auth, async (user) => {
   currentUserData = userSnap.data();
 
   applyRoleLayout(currentUserData.role);
+  loadUnreadAppNotifications(user);
   loadConversations(user);
 });
 </script>
