@@ -1043,6 +1043,42 @@ function renderRequests() {
   });
 }
 
+async function createCustomerResponseNotification(request, responseStatus, responseLabel) {
+  const customerId = safeText(request.customerId, "");
+
+  if (!customerId) return;
+
+  const eventDetails = request.eventDetails || {};
+  const eventName = safeText(eventDetails.eventName, "your event request");
+  const vendorName = getVendorDisplayName();
+
+  await addDoc(collection(db, "notifications"), {
+    recipientId: customerId,
+    recipientRole: "customer",
+
+    type: "vendor_response",
+    typeLabel: "Vendor Response",
+    category: "Booking Request",
+
+    title: `${vendorName} responded to your request`,
+    body: `${vendorName} marked themselves as ${responseLabel} for ${eventName}.`,
+
+    sourceId: request.id,
+    sourceCollection: "bookingRequests",
+    sourceLabel: eventName,
+    eventName,
+
+    vendorId: currentUser.uid,
+    vendorName,
+    responseStatus,
+    responseLabel,
+
+    read: false,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+}
+
 async function clearRequestFromVendorView(requestId) {
   if (isBusy) return;
 
@@ -1130,10 +1166,13 @@ async function updateVendorResponse(requestId, responseStatus) {
       updatedAt: serverTimestamp()
     });
 
+    request.id = cleanRequestId;
     request.vendorResponses = updatedVendorResponses;
 
+    await createCustomerResponseNotification(request, responseStatus, responseLabel);
+
     renderRequests();
-    showStatus(`Response saved: ${responseLabel}`, "success");
+    showStatus(`Response saved: ${responseLabel}. Customer notified.`, "success");
 
   } catch (error) {
     showStatus(error.message, "error");
