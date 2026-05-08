@@ -28,7 +28,6 @@
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
@@ -179,8 +178,6 @@
       background: rgba(255, 255, 255, 0.16);
       border: 1px solid rgba(255, 255, 255, 0.18);
       color: #fff;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
     }
 
     .section {
@@ -738,7 +735,7 @@
         <div class="success-icon">✓</div>
         <h3>Request submitted</h3>
         <p id="successMessage">
-          Your booking request has been saved. Vendors will be able to review the request once the vendor request dashboard is connected.
+          Your request was submitted successfully. You can track updates from your My Requests page.
         </p>
       </div>
     </section>
@@ -1284,6 +1281,7 @@ function buildBookingRequestPayload() {
     paymentStatus: "not_collected",
     requestStatus: "pending",
     status: "pending",
+    hiddenForCustomer: false,
 
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
@@ -1307,16 +1305,15 @@ async function submitBookingRequest() {
     setCheckoutStatus("Submitting your booking request...", "info");
 
     const payload = buildBookingRequestPayload();
-
     const bookingRef = await addDoc(collection(db, "bookingRequests"), payload);
 
     lastBookingRequestId = bookingRef.id;
 
     document.getElementById("successSection").style.display = "block";
     document.getElementById("successMessage").textContent =
-      `Your request was submitted successfully. Request ID: ${bookingRef.id}`;
+      "Your request was submitted successfully. You can track updates from your My Requests page.";
 
-    setCheckoutStatus("Booking request submitted successfully. Next, we will build the vendor request dashboard so vendors can review and respond.", "success");
+    setCheckoutStatus("Booking request submitted successfully. You can track updates from your My Requests page.", "success");
 
     document.getElementById("successSection").scrollIntoView({
       behavior: "smooth",
