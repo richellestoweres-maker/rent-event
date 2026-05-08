@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checkout | RentEvent</title>
+  <title>Booking Requests | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,15 +28,16 @@
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
+      --gold: #f4a43a;
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
-      --red-soft: #ffe7e2;
-      --red-text: #c74f4d;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
       --purple-soft: #f0eaff;
       --purple-text: #6f4ab8;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
@@ -60,7 +61,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 132px;
+      padding: 20px 18px 112px;
     }
 
     .topbar {
@@ -135,7 +136,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 310px;
+      max-width: 320px;
     }
 
     .hero-label {
@@ -208,138 +209,97 @@
       white-space: nowrap;
     }
 
-    .checkout-card,
-    .empty-card,
-    .note-card,
-    .event-card,
-    .success-card {
+    .request-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .request-card,
+    .empty-card {
       background: var(--card);
       border-radius: 28px;
       padding: 18px;
       box-shadow: var(--shadow);
     }
 
-    .event-card {
-      display: grid;
-      gap: 12px;
+    .request-card.withdrawn-card {
+      opacity: 0.86;
     }
 
-    .event-row {
+    .request-top {
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--line);
+      align-items: flex-start;
+      margin-bottom: 10px;
     }
 
-    .event-row:last-child {
+    .request-title {
+      margin: 0 0 4px;
+      font-size: 1.08rem;
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .request-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    .request-total {
+      font-size: 1rem;
+      font-weight: 800;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .request-grid {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 22px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
+      padding-bottom: 8px;
+    }
+
+    .info-row:last-child {
       border-bottom: none;
       padding-bottom: 0;
     }
 
-    .event-label {
-      font-size: 0.78rem;
+    .info-label {
+      font-size: 0.76rem;
+      color: var(--muted);
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--muted);
     }
 
-    .event-value {
+    .info-value {
+      font-size: 0.88rem;
       text-align: right;
-      font-size: 0.9rem;
       font-weight: 700;
-      color: var(--text);
       max-width: 62%;
     }
 
-    .vendor-list {
-      display: grid;
-      gap: 14px;
-    }
-
-    .vendor-card {
-      background: var(--card);
-      border-radius: 24px;
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .vendor-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .vendor-left {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .vendor-thumb {
-      width: 62px;
-      height: 62px;
-      border-radius: 20px;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .vendor-thumb::before {
-      content: "";
-      position: absolute;
-      inset: 14px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.22);
-    }
-
-    .vendor-thumb.has-photo::before {
-      display: none;
-    }
-
-    .vendor-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .vendor-info {
-      min-width: 0;
-    }
-
-    .vendor-name {
-      margin: 0 0 4px;
-      font-size: 1rem;
-      line-height: 1.12;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .vendor-type {
-      margin: 0;
-      font-size: 0.88rem;
-      line-height: 1.4;
-      color: var(--muted);
-    }
-
-    .vendor-price {
-      font-size: 1rem;
-      font-weight: 800;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .vendor-meta {
+    .pill-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      margin: 12px 0;
     }
 
     .pill {
@@ -351,6 +311,7 @@
       justify-content: center;
       font-size: 0.76rem;
       font-weight: 700;
+      text-transform: capitalize;
     }
 
     .pill.pending {
@@ -368,134 +329,147 @@
       color: var(--green-text);
     }
 
-    .pill.type {
-      background: var(--blue-soft);
-      color: var(--blue-text);
-    }
-
     .pill.ai {
       background: var(--purple-soft);
       color: var(--purple-text);
     }
 
-    .price-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--line);
+    .pill.type {
+      background: var(--blue-soft);
+      color: var(--blue-text);
     }
 
-    .price-row:first-child {
-      padding-top: 0;
+    .pill.declined,
+    .pill.withdrawn {
+      background: var(--red-soft);
+      color: var(--red-text);
     }
 
-    .price-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .price-copy {
-      min-width: 0;
-    }
-
-    .price-label {
-      margin: 0 0 4px;
-      font-size: 0.94rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .price-note {
-      margin: 0;
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.42;
-    }
-
-    .price-value {
-      font-size: 0.98rem;
-      font-weight: 800;
-      white-space: nowrap;
-      text-align: right;
-    }
-
-    .total-row {
+    .vendor-box,
+    .response-box,
+    .withdrawn-box {
       margin-top: 12px;
-      padding: 16px;
+      padding: 14px;
       border-radius: 22px;
-      background: linear-gradient(135deg, #fff5ec, #fff);
-      border: 1px solid #f1dfcd;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-
-    .total-label {
-      margin: 0 0 4px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .total-note {
-      margin: 0;
-      font-size: 0.82rem;
-      line-height: 1.4;
-      color: var(--muted);
-    }
-
-    .total-value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      white-space: nowrap;
-    }
-
-    .payment-placeholder {
-      border: 1px dashed #d7c7b2;
-      background: var(--soft-2);
-      border-radius: 24px;
-      padding: 18px;
-      text-align: center;
-    }
-
-    .payment-icon {
-      width: 58px;
-      height: 58px;
-      margin: 0 auto 14px;
-      border-radius: 20px;
       background: #fff;
-      color: var(--gold-dark);
+      border: 1px solid var(--line);
+    }
+
+    .vendor-box h4,
+    .response-box h4,
+    .withdrawn-box h4 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .vendor-box p,
+    .response-box p,
+    .withdrawn-box p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .response-box {
+      background: var(--soft-2);
+    }
+
+    .withdrawn-box {
+      background: var(--red-soft);
+      border-color: rgba(199, 79, 77, 0.18);
+    }
+
+    .withdrawn-box h4,
+    .withdrawn-box p {
+      color: var(--red-text);
+    }
+
+    .response-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .ai-box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 22px;
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .ai-box h4 {
+      margin: 0 0 6px;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .ai-box p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .request-actions {
       display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn,
+    .btn-secondary,
+    .btn-safe,
+    .btn-warning,
+    .btn-danger {
+      min-height: 46px;
+      border-radius: 999px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
-      font-weight: 800;
-    }
-
-    .payment-placeholder h3,
-    .empty-card h3,
-    .note-title,
-    .success-card h3 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .payment-placeholder p,
-    .empty-card p,
-    .note-text,
-    .success-card p {
-      margin: 0;
+      text-decoration: none;
       font-size: 0.9rem;
-      line-height: 1.5;
-      color: var(--muted);
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      flex: 1;
+      cursor: pointer;
+      min-width: 120px;
+      padding: 0 16px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    .btn-safe {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .btn-warning {
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .btn-danger {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
 
     .empty-card {
@@ -503,8 +477,7 @@
       padding: 24px 18px;
     }
 
-    .empty-icon,
-    .success-icon {
+    .empty-icon {
       width: 64px;
       height: 64px;
       border-radius: 22px;
@@ -518,40 +491,18 @@
       font-weight: 800;
     }
 
-    .success-icon {
-      background: var(--green-soft);
-      color: var(--green-text);
+    .empty-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
     }
 
     .empty-card p {
-      margin-bottom: 16px;
-    }
-
-    .btn,
-    .btn-secondary {
-      min-height: 46px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
+      margin: 0 0 16px;
+      color: var(--muted);
       font-size: 0.9rem;
-      font-weight: 700;
-      font-family: inherit;
-      border: none;
-      padding: 0 18px;
-      cursor: pointer;
-    }
-
-    .btn {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
-    }
-
-    .btn-secondary {
-      background: var(--soft-2);
-      color: #4a433d;
+      line-height: 1.45;
     }
 
     .status-message {
@@ -582,7 +533,7 @@
       color: var(--red-text);
     }
 
-    .bottom-bar {
+    .bottom-nav {
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
@@ -592,86 +543,41 @@
       background: rgba(255, 255, 255, 0.94);
       border: 1px solid rgba(235, 225, 211, 0.95);
       border-radius: 999px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
       box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      z-index: 10;
     }
 
-    .bottom-info {
-      flex: 1;
-      padding-left: 8px;
-    }
-
-    .bottom-label {
-      display: block;
-      font-size: 0.74rem;
-      color: var(--muted);
-      margin-bottom: 3px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .bottom-value {
-      display: block;
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .bottom-btn,
-    .bottom-btn-secondary {
-      min-height: 54px;
+    .nav-item {
+      min-height: 58px;
       border-radius: 999px;
-      border: none;
-      font-size: 0.92rem;
-      font-weight: 800;
-      font-family: inherit;
       text-decoration: none;
-      display: inline-flex;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0 16px;
-      white-space: nowrap;
-      cursor: pointer;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0 4px;
+      position: relative;
     }
 
-    .bottom-btn {
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active {
       background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
-    }
-
-    .bottom-btn-secondary {
-      background: var(--soft-2);
-      color: #4a433d;
-    }
-
-    .bottom-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    @media (max-width: 390px) {
-      .bottom-bar {
-        flex-wrap: wrap;
-        border-radius: 28px;
-      }
-
-      .bottom-info {
-        width: 100%;
-        padding-left: 2px;
-      }
-
-      .bottom-btn,
-      .bottom-btn-secondary {
-        flex: 1;
-      }
+      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
     @media (min-width: 768px) {
@@ -683,18 +589,15 @@
         max-width: 960px;
       }
 
-      .vendor-list {
+      .request-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .checkout-grid {
-        display: grid;
-        grid-template-columns: 1.15fr 0.85fr;
-        gap: 18px;
-        align-items: start;
+      .response-actions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
-      .bottom-bar {
+      .bottom-nav {
         max-width: 520px;
       }
     }
@@ -704,11 +607,11 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="event-builder.html" class="back-link" aria-label="Go back">←</a>
+      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Request Review</div>
-        <h1 class="page-title">Checkout</h1>
+        <div class="eyebrow">Vendor Portal</div>
+        <h1 class="page-title">Booking Requests</h1>
       </div>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
@@ -716,143 +619,71 @@
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">RentEvent Checkout</div>
-        <h2 class="hero-title">Submit your event request.</h2>
+        <div class="hero-label">Incoming Event Requests</div>
+        <h2 class="hero-title">Review client requests.</h2>
         <p class="hero-subtitle">
-          Review your vendors, event details, and estimated total before sending your request.
+          See event details, selected services, AI planner context, and respond with availability.
         </p>
 
         <div class="hero-meta">
-          <span class="hero-pill" id="heroVendorCount">0 Vendors</span>
-          <span class="hero-pill" id="heroTotal">$0 Total</span>
-          <span class="hero-pill">Request Only</span>
+          <span class="hero-pill" id="requestCountPill">0 Requests</span>
+          <span class="hero-pill" id="pendingCountPill">0 Pending</span>
         </div>
-      </div>
-    </section>
-
-    <section class="section" id="successSection" style="display: none;">
-      <div class="success-card">
-        <div class="success-icon">✓</div>
-        <h3>Request submitted</h3>
-        <p id="successMessage">
-          Your request was submitted successfully. You can track updates from your My Requests page.
-        </p>
       </div>
     </section>
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title">Event Details</h2>
-        <a class="section-link" href="event-builder.html">Edit</a>
+        <h2 class="section-title">Requests</h2>
+        <a class="section-link" href="messages.html">Inbox</a>
       </div>
 
-      <div class="event-card" id="eventDetailsCard">
-        <div class="event-row">
-          <span class="event-label">Event</span>
-          <span class="event-value">Loading...</span>
+      <div class="status-message" id="statusMessage"></div>
+
+      <div class="request-list" id="requestList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading requests</h3>
+          <p>We’re checking for booking requests connected to your vendor account.</p>
         </div>
-      </div>
-    </section>
-
-    <div class="checkout-grid">
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">Selected Vendors</h2>
-          <a class="section-link" href="event-builder.html">Edit Board</a>
-        </div>
-
-        <div class="vendor-list" id="vendorList">
-          <div class="empty-card">
-            <div class="empty-icon">…</div>
-            <h3>Loading checkout</h3>
-            <p>We’re pulling your selected vendors now.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">Order Summary</h2>
-        </div>
-
-        <div class="checkout-card">
-          <div class="price-row">
-            <div class="price-copy">
-              <p class="price-label">Vendor Subtotal</p>
-              <p class="price-note">Total of selected vendor starting prices.</p>
-            </div>
-            <div class="price-value" id="vendorSubtotal">$0</div>
-          </div>
-
-          <div class="price-row">
-            <div class="price-copy">
-              <p class="price-label">RentEvent Service Fee</p>
-              <p class="price-note">Estimated 10% platform fee for booking support and marketplace operations.</p>
-            </div>
-            <div class="price-value" id="serviceFee">$0</div>
-          </div>
-
-          <div class="price-row">
-            <div class="price-copy">
-              <p class="price-label">Processing Estimate</p>
-              <p class="price-note">Estimated card processing placeholder. Final amount may change when Stripe is connected.</p>
-            </div>
-            <div class="price-value" id="processingFee">$0</div>
-          </div>
-
-          <div class="total-row">
-            <div>
-              <p class="total-label">Estimated Total</p>
-              <p class="total-note">This request does not collect payment yet.</p>
-            </div>
-
-            <div class="total-value" id="totalDue">$0</div>
-          </div>
-
-          <div class="status-message info" id="checkoutStatus">
-            This MVP saves a booking request first. Stripe payments can be connected after the request flow is working.
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Request Notes</h2>
-      </div>
-
-      <div class="payment-placeholder" id="paymentMount">
-        <div class="payment-icon">◎</div>
-        <h3>No payment collected yet</h3>
-        <p>
-          Clicking Submit Request will save this event request in Firebase so vendors can review the event details, selected services, and estimated total.
-        </p>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Checkout Notes</h2>
-      </div>
-
-      <div class="note-card">
-        <h3 class="note-title">Important MVP Note</h3>
-        <p class="note-text">
-          This creates a pending booking request. Later, this request can connect to vendor availability, messages, confirmations, Stripe Embedded Checkout, and RentEvent’s platform fee.
-        </p>
       </div>
     </section>
   </main>
 
-  <div class="bottom-bar">
-    <div class="bottom-info">
-      <span class="bottom-label">Estimated Total</span>
-      <span class="bottom-value" id="bottomTotal">$0</span>
-    </div>
+  <nav class="bottom-nav" aria-label="Vendor navigation">
+    <a class="nav-item" href="vendor-dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+      </svg>
+      <span>Home</span>
+    </a>
 
-    <a href="event-builder.html" class="bottom-btn-secondary">Edit</a>
-    <button class="bottom-btn" id="continuePaymentBtn" type="button">Submit Request</button>
-  </div>
+    <a class="nav-item" href="add-listing.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Add</span>
+    </a>
+
+    <a class="nav-item active" href="booking-requests.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Requests</span>
+    </a>
+
+    <a class="nav-item" href="messages.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Inbox</span>
+    </a>
+  </nav>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -882,6 +713,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+const params = new URLSearchParams(window.location.search);
+const activeEventId = params.get("eventId") || "";
 
 let currentUser = null;
 let currentUserData = null;
@@ -925,6 +759,41 @@ function setCheckoutStatus(message, type = "info") {
   status.className = `status-message ${type}`;
   status.textContent = message;
   status.style.display = "block";
+}
+
+function eventBuilderHref(extraParams = {}) {
+  const eventParams = new URLSearchParams();
+
+  if (activeEventId) {
+    eventParams.set("eventId", activeEventId);
+  }
+
+  Object.entries(extraParams).forEach(([key, value]) => {
+    if (value) eventParams.set(key, value);
+  });
+
+  const queryString = eventParams.toString();
+  return queryString ? `event-builder.html?${queryString}` : "dashboard.html";
+}
+
+function myRequestsHref() {
+  return activeEventId
+    ? `my-requests.html?eventId=${encodeURIComponent(activeEventId)}`
+    : "my-requests.html";
+}
+
+function applyEventLinks() {
+  const builderLink = eventBuilderHref();
+
+  [
+    "backToEventLink",
+    "editEventTopLink",
+    "editBoardTopLink",
+    "editBottomLink"
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.href = builderLink;
+  });
 }
 
 function renderThumb(imageUrl, title) {
@@ -1023,7 +892,10 @@ function updateTotals() {
 
   const continueBtn = document.getElementById("continuePaymentBtn");
 
-  if (vendorCount === 0) {
+  if (!activeEventId) {
+    continueBtn.disabled = true;
+    continueBtn.textContent = "Choose Event";
+  } else if (vendorCount === 0) {
     continueBtn.disabled = true;
     continueBtn.textContent = "Add Vendor";
   } else if (lastBookingRequestId) {
@@ -1033,6 +905,31 @@ function updateTotals() {
     continueBtn.disabled = false;
     continueBtn.textContent = "Submit Request";
   }
+}
+
+function renderMissingEvent() {
+  const card = document.getElementById("eventDetailsCard");
+
+  card.innerHTML = `
+    <div class="event-row">
+      <span class="event-label">Event</span>
+      <span class="event-value">No event selected</span>
+    </div>
+    <div>
+      <a class="btn" href="dashboard.html#myEventsSection">Choose or Create Event</a>
+    </div>
+  `;
+
+  document.getElementById("vendorList").innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">!</div>
+      <h3>No event selected</h3>
+      <p>Please open checkout from a specific event board so RentEvent knows which project this request belongs to.</p>
+      <a class="btn" href="dashboard.html#myEventsSection">Back to My Events</a>
+    </div>
+  `;
+
+  updateTotals();
 }
 
 function renderEventDetails() {
@@ -1045,7 +942,7 @@ function renderEventDetails() {
         <span class="event-value">No event details saved yet</span>
       </div>
       <div>
-        <a class="btn" href="event-builder.html">Add Event Details</a>
+        <a class="btn" href="${eventBuilderHref()}">Add Event Details</a>
       </div>
     `;
     return;
@@ -1126,8 +1023,8 @@ function renderEmptyCheckout() {
     <div class="empty-card">
       <div class="empty-icon">+</div>
       <h3>No vendors selected</h3>
-      <p>Add vendors to your event board before checking out.</p>
-      <a class="btn" href="event-builder.html">Back to Event Board</a>
+      <p>Add vendors to this event board before checking out.</p>
+      <a class="btn" href="${eventBuilderHref()}">Back to Event Board</a>
     </div>
   `;
 
@@ -1151,6 +1048,9 @@ function renderVendors() {
     const price = formatMoney(vendor.priceNumber || 0);
     const imageUrl = safeText(vendor.imageUrl, "");
     const status = safeText(vendor.status, "pending");
+    const detailHref = activeEventId
+      ? `detail.html?id=${listingId}&eventId=${encodeURIComponent(activeEventId)}`
+      : `detail.html?id=${listingId}`;
 
     return `
       <article class="vendor-card">
@@ -1175,7 +1075,7 @@ function renderVendors() {
         </div>
 
         <div style="margin-top: 12px;">
-          <a class="btn-secondary" href="detail.html?id=${listingId}">View Listing</a>
+          <a class="btn-secondary" href="${detailHref}">View Listing</a>
         </div>
       </article>
     `;
@@ -1185,25 +1085,44 @@ function renderVendors() {
 }
 
 async function loadEventDetails() {
-  const eventRef = doc(db, "customerEvents", currentUser.uid);
+  if (!activeEventId) {
+    currentEventData = null;
+    renderMissingEvent();
+    return;
+  }
+
+  const eventRef = doc(db, "customerEvents", activeEventId);
   const eventSnap = await getDoc(eventRef);
 
-  if (eventSnap.exists()) {
-    currentEventData = {
-      id: eventSnap.id,
-      ...eventSnap.data()
-    };
-  } else {
+  if (!eventSnap.exists()) {
     currentEventData = null;
+    renderMissingEvent();
+    return;
   }
+
+  const eventData = eventSnap.data();
+
+  if (eventData.customerId && eventData.customerId !== currentUser.uid && eventData.ownerId !== currentUser.uid) {
+    currentEventData = null;
+    renderMissingEvent();
+    return;
+  }
+
+  currentEventData = {
+    id: eventSnap.id,
+    ...eventData
+  };
 
   renderEventDetails();
 }
 
 async function loadSelectedVendors() {
+  if (!activeEventId) return;
+
   const q = query(
     collection(db, "eventBoardItems"),
-    where("userId", "==", currentUser.uid)
+    where("userId", "==", currentUser.uid),
+    where("eventId", "==", activeEventId)
   );
 
   const snapshot = await getDocs(q);
@@ -1256,13 +1175,15 @@ function buildBookingRequestPayload() {
   const cleanVendors = selectedVendors.map(sanitizeVendorForRequest);
   const vendorIds = Array.from(new Set(cleanVendors.map((vendor) => vendor.vendorId).filter(Boolean)));
   const listingIds = Array.from(new Set(cleanVendors.map((vendor) => vendor.listingId).filter(Boolean)));
+  const eventName = safeText(currentEventData?.eventName, "Event Request");
 
   return {
     customerId: currentUser.uid,
     customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Customer",
     customerEmail: currentUserData?.email || currentUser.email || "",
 
-    eventId: currentUser.uid,
+    eventId: activeEventId,
+    eventName,
     eventDetails: currentEventData || {},
     aiPlannerSuggestions: currentEventData?.aiPlannerSuggestions || null,
 
@@ -1288,13 +1209,52 @@ function buildBookingRequestPayload() {
   };
 }
 
+async function createVendorBookingNotifications(requestId, payload) {
+  const vendorIds = Array.isArray(payload.vendorIds) ? payload.vendorIds : [];
+  const uniqueVendorIds = Array.from(new Set(vendorIds.filter(Boolean)));
+
+  if (!uniqueVendorIds.length) return;
+
+  for (const vendorId of uniqueVendorIds) {
+    await addDoc(collection(db, "notifications"), {
+      recipientId: vendorId,
+      recipientRole: "vendor",
+
+      type: "booking_request",
+      typeLabel: "Booking Request",
+      category: "Booking Request",
+
+      title: "New booking request",
+      body: `${payload.customerName} submitted a request for ${payload.eventName}.`,
+
+      sourceId: requestId,
+      sourceCollection: "bookingRequests",
+      sourceLabel: payload.eventName,
+      eventId: payload.eventId,
+      eventName: payload.eventName,
+
+      customerId: payload.customerId,
+      customerName: payload.customerName,
+
+      read: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  }
+}
+
 async function submitBookingRequest() {
   if (isSubmitting) return;
 
   const button = document.getElementById("continuePaymentBtn");
 
+  if (!activeEventId) {
+    window.location.href = "dashboard.html#myEventsSection";
+    return;
+  }
+
   if (!selectedVendors.length) {
-    window.location.href = "event-builder.html";
+    window.location.href = eventBuilderHref();
     return;
   }
 
@@ -1309,11 +1269,13 @@ async function submitBookingRequest() {
 
     lastBookingRequestId = bookingRef.id;
 
+    await createVendorBookingNotifications(bookingRef.id, payload);
+
     document.getElementById("successSection").style.display = "block";
     document.getElementById("successMessage").textContent =
       "Your request was submitted successfully. You can track updates from your My Requests page.";
 
-    setCheckoutStatus("Booking request submitted successfully. You can track updates from your My Requests page.", "success");
+    setCheckoutStatus("Booking request submitted successfully. Vendors have been notified.", "success");
 
     document.getElementById("successSection").scrollIntoView({
       behavior: "smooth",
@@ -1332,6 +1294,7 @@ async function submitBookingRequest() {
 }
 
 async function loadPage() {
+  applyEventLinks();
   await loadEventDetails();
   await loadSelectedVendors();
 }
