@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vendor Dashboard | RentEvent</title>
+  <title>My Requests | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,17 +23,17 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f4ede2;
       --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
@@ -66,13 +66,30 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
       margin-bottom: 22px;
     }
 
-    .brand-wrap {
-      min-width: 0;
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+
+    .topbar-center {
       flex: 1;
+      text-align: center;
     }
 
     .eyebrow {
@@ -84,7 +101,7 @@
       margin-bottom: 4px;
     }
 
-    .brand {
+    .page-title {
       margin: 0;
       font-size: 1.55rem;
       line-height: 1;
@@ -92,231 +109,74 @@
       font-weight: 800;
     }
 
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-
-    .icon-btn,
-    .logout-btn {
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.88);
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
-      color: #222;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      position: relative;
-    }
-
-    .icon-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      overflow: visible;
-    }
-
-    .icon-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .profile-photo-small {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border-radius: 50%;
-    }
-
-    .profile-initials-small {
-      font-size: 0.86rem;
-      font-weight: 800;
-    }
-
-    .logout-btn {
-      min-height: 44px;
-      padding: 0 14px;
-      border-radius: 999px;
-      font-size: 0.88rem;
-      white-space: nowrap;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
-      color: #fff;
-      font-size: 0.7rem;
-      line-height: 20px;
-      font-weight: 800;
-      text-align: center;
-      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
-      border: 2px solid #fff;
-      display: none;
-      z-index: 3;
-    }
-
-    .nav-badge {
-      position: absolute;
-      top: 6px;
-      right: 16px;
-      min-width: 18px;
-      height: 18px;
-      padding: 0 5px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
-      color: #fff;
-      font-size: 0.66rem;
-      line-height: 18px;
-      font-weight: 800;
-      text-align: center;
-      border: 2px solid #fff;
-      display: none;
-      z-index: 3;
-    }
-
     .hero-card {
       position: relative;
       overflow: hidden;
       border-radius: var(--radius-xl);
-      padding: 24px 22px;
+      padding: 22px 20px;
       background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
       box-shadow: var(--shadow-strong);
-      margin-bottom: 26px;
-    }
-
-    .hero-card::before {
-      content: "";
-      position: absolute;
-      width: 190px;
-      height: 190px;
-      border-radius: 50%;
-      right: -70px;
-      top: -42px;
-      background: rgba(255, 255, 255, 0.12);
+      margin-bottom: 24px;
     }
 
     .hero-card::after {
       content: "";
       position: absolute;
-      width: 130px;
-      height: 130px;
+      width: 170px;
+      height: 170px;
       border-radius: 50%;
-      right: 24px;
-      bottom: -60px;
-      background: rgba(255, 255, 255, 0.08);
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
     }
 
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 330px;
-    }
-
-    .hero-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .hero-avatar {
-      width: 58px;
-      height: 58px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
-      color: #fff;
-      font-weight: 800;
-    }
-
-    .hero-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      max-width: 320px;
     }
 
     .hero-label {
       font-size: 0.88rem;
       font-weight: 600;
-      opacity: 0.94;
-      margin-bottom: 4px;
-    }
-
-    .hero-business {
-      margin: 0;
-      font-size: 0.92rem;
-      line-height: 1.3;
-      color: rgba(255, 255, 255, 0.9);
-      font-weight: 700;
+      opacity: 0.95;
+      margin-bottom: 8px;
     }
 
     .hero-title {
-      margin: 0 0 12px;
-      font-size: 2.05rem;
+      margin: 0 0 10px;
+      font-size: 2rem;
       line-height: 0.98;
-      letter-spacing: -0.06em;
+      letter-spacing: -0.05em;
       font-weight: 800;
     }
 
     .hero-subtitle {
-      margin: 0 0 18px;
-      font-size: 0.96rem;
+      margin: 0 0 16px;
+      font-size: 0.95rem;
       line-height: 1.45;
       color: rgba(255, 255, 255, 0.95);
     }
 
-    .hero-actions {
+    .hero-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .hero-btn,
-    .hero-btn-secondary {
-      min-height: 50px;
-      padding: 0 18px;
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      text-decoration: none;
+      font-size: 0.76rem;
       font-weight: 700;
-      font-size: 0.95rem;
-    }
-
-    .hero-btn {
-      background: #fff;
-      color: #ff5f67;
-      box-shadow: 0 8px 20px rgba(169, 67, 62, 0.12);
-    }
-
-    .hero-btn-secondary {
       background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       color: #fff;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
     }
 
     .section {
@@ -327,143 +187,79 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
       margin-bottom: 16px;
     }
 
     .section-title {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       line-height: 1.02;
-      letter-spacing: -0.05em;
+      letter-spacing: -0.04em;
       font-weight: 800;
     }
 
     .section-link {
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.93rem;
+      font-size: 0.92rem;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    .stats-grid {
+    .request-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 16px;
     }
 
-    .stat-card {
+    .request-card,
+    .empty-card {
       background: var(--card);
-      border-radius: 24px;
-      padding: 16px;
+      border-radius: 28px;
+      padding: 18px;
       box-shadow: var(--shadow);
     }
 
-    .stat-label {
-      margin: 0 0 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    .request-card.withdrawn-card {
+      opacity: 0.88;
     }
 
-    .stat-value {
-      margin: 0 0 5px;
-      font-size: 1.5rem;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      font-weight: 800;
-    }
-
-    .stat-note {
-      margin: 0;
-      font-size: 0.84rem;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .listing-list {
-      display: grid;
-      gap: 14px;
-    }
-
-    .listing-card {
-      background: var(--card);
-      border-radius: 26px;
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .listing-top {
+    .request-top {
       display: flex;
-      align-items: center;
+      justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
     }
 
-    .listing-thumb {
-      width: 64px;
-      height: 64px;
-      border-radius: 20px;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .listing-thumb::before {
-      content: "";
-      position: absolute;
-      inset: 14px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.22);
-    }
-
-    .listing-thumb.has-photo::before {
-      display: none;
-    }
-
-    .listing-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .listing-info {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .listing-name {
+    .request-title {
       margin: 0 0 4px;
-      font-size: 1rem;
+      font-size: 1.08rem;
       line-height: 1.12;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
     }
 
-    .listing-type {
+    .request-subtitle {
       margin: 0;
-      font-size: 0.88rem;
       color: var(--muted);
-      line-height: 1.35;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      font-weight: 600;
     }
 
-    .listing-price {
-      font-size: 0.96rem;
+    .request-total {
+      font-size: 1rem;
       font-weight: 800;
       white-space: nowrap;
-      flex-shrink: 0;
+      text-align: right;
     }
 
-    .listing-meta {
+    .pill-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 12px;
+      margin: 12px 0;
     }
 
     .pill {
@@ -478,51 +274,176 @@
       text-transform: capitalize;
     }
 
-    .pill.active {
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .pill.draft,
-    .pill.paused {
-      background: var(--red-soft);
-      color: var(--red-text);
-    }
-
-    .pill.views {
-      background: var(--blue-soft);
-      color: var(--blue-text);
-    }
-
-    .pill.saves {
+    .pill.pending {
       background: #fff4df;
       color: #aa6f12;
     }
 
-    .pill.unread {
-      background: var(--red-soft);
-      color: var(--red-text);
+    .pill.info {
+      background: #f6efe4;
+      color: #6a625a;
     }
 
-    .pill.message {
+    .pill.safe {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.ai {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .pill.type {
       background: var(--blue-soft);
       color: var(--blue-text);
     }
 
-    .listing-note {
-      margin: 0 0 12px;
+    .pill.declined,
+    .pill.withdrawn {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .request-grid {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 22px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
+      padding-bottom: 8px;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .info-value {
       font-size: 0.88rem;
+      text-align: right;
+      font-weight: 700;
+      max-width: 62%;
+    }
+
+    .vendor-box,
+    .response-box,
+    .withdrawn-box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .vendor-box h4,
+    .response-box h4,
+    .withdrawn-box h4 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .vendor-box p,
+    .response-box p,
+    .withdrawn-box p {
+      margin: 0;
+      font-size: 0.84rem;
       line-height: 1.45;
       color: var(--muted);
     }
 
-    .listing-actions {
+    .response-box {
+      background: var(--soft-2);
+    }
+
+    .withdrawn-box {
+      background: var(--red-soft);
+      border-color: rgba(199, 79, 77, 0.18);
+    }
+
+    .withdrawn-box h4,
+    .withdrawn-box p {
+      color: var(--red-text);
+    }
+
+    .response-item {
+      padding: 12px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+
+    .response-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .response-name {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .response-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .ai-box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 22px;
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .ai-box h4 {
+      margin: 0 0 6px;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .ai-box p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .request-actions {
       display: flex;
       gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
     }
 
     .btn,
-    .btn-secondary {
+    .btn-secondary,
+    .btn-danger {
       min-height: 46px;
       border-radius: 999px;
       display: inline-flex;
@@ -534,6 +455,9 @@
       font-family: inherit;
       border: none;
       flex: 1;
+      cursor: pointer;
+      min-width: 120px;
+      padding: 0 16px;
     }
 
     .btn {
@@ -547,25 +471,32 @@
       color: #4a433d;
     }
 
+    .btn-danger {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
     .empty-card {
-      background: var(--card);
-      border-radius: 26px;
-      padding: 22px 18px;
-      box-shadow: var(--shadow);
       text-align: center;
+      padding: 24px 18px;
     }
 
     .empty-icon {
-      width: 58px;
-      height: 58px;
-      border-radius: 20px;
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
       margin: 0 auto 14px;
       background: #fff1dc;
       color: var(--gold-dark);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 800;
     }
 
@@ -583,112 +514,128 @@
       line-height: 1.45;
     }
 
-    .request-list {
-      display: grid;
-      gap: 14px;
-    }
-
-    .request-card {
-      background: var(--card);
-      border-radius: 24px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      border: 1px solid transparent;
-    }
-
-    .request-card.unread {
-      border-color: rgba(255, 95, 103, 0.24);
-    }
-
-    .request-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 6px;
-      align-items: flex-start;
-    }
-
-    .request-name {
-      margin: 0;
-      font-size: 1rem;
-      line-height: 1.12;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .request-time {
-      font-size: 0.74rem;
+    .status-message {
+      display: none;
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
       font-weight: 700;
-      color: #9a9084;
-      white-space: nowrap;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .request-text {
-      margin: 0 0 12px;
-      font-size: 0.88rem;
       line-height: 1.45;
-      color: var(--muted);
     }
 
-    .request-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
     }
 
-    .profile-card {
-      background: var(--card);
-      border-radius: 26px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-      display: flex;
-      gap: 14px;
-      align-items: center;
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
     }
 
-    .profile-card-avatar {
-      width: 58px;
-      height: 58px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-      color: #fff;
-      display: flex;
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 22, 22, 0.42);
+      display: none;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      overflow: hidden;
-      flex-shrink: 0;
+      padding: 18px;
+      z-index: 50;
     }
 
-    .profile-card-avatar img {
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-card {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      max-width: 390px;
+      background: #fff;
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 24px 70px rgba(22, 22, 22, 0.22);
     }
 
-    .profile-card-copy {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .profile-card-copy h3 {
-      margin: 0 0 4px;
-      font-size: 1rem;
+    .modal-label {
+      display: inline-flex;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: var(--red-soft);
+      color: var(--red-text);
+      font-size: 0.76rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      margin-bottom: 12px;
     }
 
-    .profile-card-copy p {
-      margin: 0;
+    .modal-title {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .modal-text {
+      margin: 0 0 16px;
       color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.4;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .modal-field {
+      margin-bottom: 14px;
+    }
+
+    .modal-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .modal-field select,
+    .modal-field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      background: var(--soft-2);
+      color: var(--text);
+      outline: none;
+    }
+
+    .modal-field textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-actions .btn-secondary,
+    .modal-actions .btn-danger {
+      min-width: 0;
     }
 
     .bottom-nav {
@@ -747,15 +694,6 @@
         max-width: 960px;
       }
 
-      .hero-content {
-        max-width: 500px;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-      }
-
-      .listing-list,
       .request-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -770,165 +708,91 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <div class="brand-wrap">
-        <div class="eyebrow">Vendor Portal</div>
-        <h1 class="brand">Dashboard</h1>
+      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Customer Portal</div>
+        <h1 class="page-title">My Requests</h1>
       </div>
 
-      <div class="top-actions">
-        <a class="icon-btn" href="messages.html" aria-label="Messages">
-          <span class="notification-badge" id="topMessageBadge">0</span>
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-            <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-            <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          </svg>
-        </a>
-
-        <a class="icon-btn" href="notifications.html" aria-label="Notifications">
-          <span class="notification-badge" id="topNotificationBadge">0</span>
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-            <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          </svg>
-        </a>
-
-        <a class="icon-btn" href="vendor-profile.html" aria-label="Vendor profile" id="topProfileButton">
-          <span class="profile-initials-small" id="topProfileInitials">RE</span>
-        </a>
-
-        <button class="logout-btn" onclick="logout()">Log Out</button>
-      </div>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-profile">
-          <div class="hero-avatar" id="heroAvatar">RE</div>
-
-          <div>
-            <div class="hero-label" id="heroLabel">Welcome back</div>
-            <p class="hero-business" id="heroBusiness">RentEvent Vendor</p>
-          </div>
-        </div>
-
-        <h2 class="hero-title">Manage your listings beautifully.</h2>
+        <div class="hero-label">Submitted Event Requests</div>
+        <h2 class="hero-title">Track your event requests.</h2>
         <p class="hero-subtitle">
-          Track performance, respond to requests, and keep your vendor profile polished and bookable.
+          Review your submitted requests, vendor responses, AI planner context, and estimated totals.
         </p>
 
-    <div class="hero-actions">
-  <a class="hero-btn" href="booking-requests.html">Booking Requests</a>
-  <a class="hero-btn-secondary" href="add-listing.html">Add Listing</a>
-  <a class="hero-btn-secondary" href="my-listings.html">My Listings</a>
-  <a class="hero-btn-secondary" href="messages.html" id="heroInboxBtn">Inbox</a>
-  <a class="hero-btn-secondary" href="vendor-profile.html">Edit Profile</a>
-</div>
-</div>
-</section>
-
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Overview</h2>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <p class="stat-label">Published</p>
-          <p class="stat-value" id="publishedCount">0</p>
-          <p class="stat-note">Live listings</p>
-        </div>
-
-        <div class="stat-card">
-          <p class="stat-label">Drafts</p>
-          <p class="stat-value" id="draftCount">0</p>
-          <p class="stat-note">Saved drafts</p>
-        </div>
-
-        <div class="stat-card">
-          <p class="stat-label">Views</p>
-          <p class="stat-value" id="viewCount">0</p>
-          <p class="stat-note">Across listings</p>
-        </div>
-
-        <div class="stat-card">
-          <p class="stat-label">Listings</p>
-          <p class="stat-value" id="listingCount">0</p>
-          <p class="stat-note">Total services</p>
-        </div>
-
-        <div class="stat-card">
-          <p class="stat-label">Unread</p>
-          <p class="stat-value" id="unreadCount">0</p>
-          <p class="stat-note">New inquiries</p>
+        <div class="hero-meta">
+          <span class="hero-pill" id="requestCountPill">0 Requests</span>
+          <span class="hero-pill" id="pendingCountPill">0 Active</span>
         </div>
       </div>
     </section>
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title">Profile Snapshot</h2>
-        <a class="section-link" href="vendor-profile.html">Edit</a>
+        <h2 class="section-title">Requests</h2>
+        <a class="section-link" href="event-builder.html">Plan Event</a>
       </div>
 
-      <div class="profile-card">
-        <div class="profile-card-avatar" id="profileCardAvatar">RE</div>
+      <div class="status-message" id="statusMessage"></div>
 
-        <div class="profile-card-copy">
-          <h3 id="profileCardName">RentEvent Vendor</h3>
-          <p id="profileCardText">Complete your vendor profile so customers can trust your business at a glance.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Featured Listings</h2>
-        <a class="section-link" href="my-listings.html">View All</a>
-      </div>
-
-      <div class="listing-list" id="featuredListings">
-        <div class="empty-card">
-          <div class="empty-icon">…</div>
-          <h3>Loading listings</h3>
-          <p>We’re pulling your latest vendor listings now.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Recent Messages</h2>
-<a class="section-link" href="booking-requests.html">Booking Requests</a>
-      </div>
-
-      <div class="request-list" id="recentRequests">
+      <div class="request-list" id="requestList">
         <div class="empty-card">
           <div class="empty-icon">…</div>
           <h3>Loading requests</h3>
-          <p>We’re checking your latest customer inquiries now.</p>
+          <p>We’re checking your submitted event requests now.</p>
         </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Vendor navigation">
-    <a class="nav-item active" href="vendor-dashboard.html">
+  <div class="modal-overlay" id="withdrawModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="withdrawModalTitle">
+      <div class="modal-label">Withdraw Request</div>
+
+      <h2 class="modal-title" id="withdrawModalTitle">Are you sure?</h2>
+
+      <p class="modal-text">
+        Vendors will see that this request is no longer active. You can still keep a record of it in your request history.
+      </p>
+
+      <div class="modal-field">
+        <label for="withdrawReasonSelect">Reason</label>
+        <select id="withdrawReasonSelect">
+          <option value="Found another vendor">Found another vendor</option>
+          <option value="Changed event plans">Changed event plans</option>
+          <option value="No longer needed">No longer needed</option>
+          <option value="Submitted by mistake">Submitted by mistake</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label for="withdrawReasonNote">Optional note</label>
+        <textarea id="withdrawReasonNote" placeholder="Add a short note if needed..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="keepRequestBtn">Keep Request</button>
+        <button class="btn-danger" type="button" id="confirmWithdrawBtn">Withdraw Request</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Customer navigation">
+    <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
       </svg>
       <span>Home</span>
     </a>
 
-    <a class="nav-item" href="add-listing.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Add Listing</span>
-    </a>
-
-    <a class="nav-item" href="my-listings.html">
+    <a class="nav-item" href="listings.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
         <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -937,27 +801,39 @@
       <span>Listings</span>
     </a>
 
-   <a class="nav-item" href="booking-requests.html">
-  <svg viewBox="0 0 24 24" fill="none">
-    <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-    <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-    <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-  </svg>
-  <span>Requests</span>
-</a>
+    <a class="nav-item active" href="my-requests.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Requests</span>
+    </a>
+
+    <a class="nav-item" href="messages.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Inbox</span>
+    </a>
   </nav>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
   getDoc,
   collection,
+  addDoc,
+  getDocs,
   query,
   where,
-  getDocs
+  updateDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -974,6 +850,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+let currentUser = null;
+let currentUserData = null;
+let bookingRequests = [];
+let isBusy = false;
+let pendingWithdrawRequestId = null;
+
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
@@ -987,42 +869,9 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function initialsFromName(name) {
-  const cleanName = safeText(name, "RE");
-  const parts = cleanName.split(" ").filter(Boolean);
-
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-
-  return cleanName.slice(0, 2).toUpperCase();
-}
-
-function isValidUrl(url) {
-  if (!url) return false;
-
-  try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-function formatPrice(value) {
-  const raw = safeText(value, "");
-
-  if (!raw) return "$0+";
-
-  const numberMatch = raw.match(/\d+(\.\d+)?/);
-
-  if (!numberMatch) return raw;
-
-  const number = Number(numberMatch[0]);
-
-  if (Number.isNaN(number)) return raw;
-
-  return `$${Math.round(number)}+`;
+function formatMoney(value) {
+  const number = Number(value || 0);
+  return `$${Math.round(number).toLocaleString()}`;
 }
 
 function formatTime(value) {
@@ -1044,342 +893,624 @@ function formatTime(value) {
   return date.toLocaleDateString();
 }
 
-function statusClass(status) {
-  if (status === "published") return "active";
-  if (status === "draft") return "draft";
-  return "paused";
-}
-
-function statusLabel(status) {
-  if (status === "published") return "Active";
-  if (status === "draft") return "Draft";
-  return safeText(status, "Paused");
-}
-
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
 }
 
-function setBadge(id, count) {
-  const badge = document.getElementById(id);
-  if (!badge) return;
+function showStatus(message, type = "info") {
+  const status = document.getElementById("statusMessage");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
 
-  if (count > 0) {
-    badge.textContent = count > 99 ? "99+" : String(count);
-    badge.style.display = "inline-flex";
-    badge.style.alignItems = "center";
-    badge.style.justifyContent = "center";
-  } else {
-    badge.textContent = "0";
-    badge.style.display = "none";
+  setTimeout(() => {
+    status.style.display = "none";
+  }, 3500);
+}
+
+function getEventLocation(eventDetails) {
+  const city = safeText(eventDetails?.eventCity, "");
+  const zip = safeText(eventDetails?.eventZip, "");
+  return [city, zip].filter(Boolean).join(" ") || "Location not listed";
+}
+
+function getAiSummary(request) {
+  const ai = request.aiPlannerSuggestions;
+  const suggestions = Array.isArray(ai?.suggestions) ? ai.suggestions : [];
+
+  if (!suggestions.length) return "";
+
+  const titles = suggestions
+    .slice(0, 3)
+    .map((item) => safeText(item.title, "Suggested add-on"))
+    .filter(Boolean);
+
+  return titles.join(", ");
+}
+
+function getStatusLabel(status) {
+  if (status === "withdrawn") return "Withdrawn";
+  if (status === "confirmed") return "Confirmed";
+  if (status === "paid") return "Paid";
+  return "Pending";
+}
+
+function getStatusPillClass(status) {
+  if (status === "withdrawn") return "withdrawn";
+  if (status === "confirmed" || status === "paid") return "safe";
+  return "pending";
+}
+
+function getResponseLabel(status) {
+  if (status === "available") return "Available";
+  if (status === "needs_info") return "Needs More Info";
+  if (status === "declined") return "Declined";
+  return "No Response Yet";
+}
+
+function getResponsePillClass(status) {
+  if (status === "available") return "safe";
+  if (status === "needs_info") return "pending";
+  if (status === "declined") return "declined";
+  return "info";
+}
+
+function getVendorResponse(request, vendorId) {
+  const responses = request.vendorResponses || {};
+  return responses[vendorId] || null;
+}
+
+function getVendorResponseSummary(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const responses = request.vendorResponses || {};
+
+  if (!vendors.length) {
+    return {
+      available: 0,
+      needsInfo: 0,
+      declined: 0,
+      waiting: 0
+    };
   }
-}
 
-function updateNotificationBadges(count) {
-  setBadge("topMessageBadge", count);
-  setBadge("topNotificationBadge", count);
-  setBadge("bottomInboxBadge", count);
-  setText("unreadCount", count);
+  return vendors.reduce((summary, vendor) => {
+    const response = responses[vendor.vendorId];
+    const status = safeText(response?.status, "");
 
-  const heroInboxBtn = document.getElementById("heroInboxBtn");
+    if (status === "available") summary.available += 1;
+    else if (status === "needs_info") summary.needsInfo += 1;
+    else if (status === "declined") summary.declined += 1;
+    else summary.waiting += 1;
 
-  if (count > 0) {
-    heroInboxBtn.textContent = `${count} New Inquir${count === 1 ? "y" : "ies"}`;
-  } else {
-    heroInboxBtn.textContent = "Inbox";
-  }
-}
-
-function setProfileImage(containerId, imageUrl, fallbackName, small = false) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-
-  if (imageUrl && isValidUrl(imageUrl)) {
-    el.innerHTML = `<img class="${small ? "profile-photo-small" : ""}" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(fallbackName)}">`;
-  } else {
-    el.textContent = initialsFromName(fallbackName);
-  }
-}
-
-function getOtherParticipantName(conversation, user) {
-  const participantNames = conversation.participantNames || {};
-  const otherIds = (conversation.participantIds || []).filter((id) => id !== user.uid);
-  const otherId = otherIds[0];
-
-  if (otherId && participantNames[otherId]) {
-    return participantNames[otherId];
-  }
-
-  return safeText(conversation.title, "Customer");
-}
-
-function renderEmptyListings() {
-  const container = document.getElementById("featuredListings");
-
-  container.innerHTML = `
-    <div class="empty-card">
-      <div class="empty-icon">+</div>
-      <h3>No listings yet</h3>
-      <p>Create your first listing so customers can discover and book your services.</p>
-      <a class="btn" href="add-listing.html">Add Listing</a>
-    </div>
-  `;
-}
-
-function renderFeaturedListings(listings) {
-  const container = document.getElementById("featuredListings");
-
-  if (!listings.length) {
-    renderEmptyListings();
-    return;
-  }
-
-  const featured = listings.slice(0, 2);
-
-  container.innerHTML = featured.map((listing) => {
-    const title = safeText(listing.title, "Untitled Listing");
-    const category = safeText(listing.category, "Event Service");
-    const customCategory = safeText(listing.customCategory, "");
-    const eventType = safeText(listing.eventType, "");
-    const description = safeText(listing.description, "No description has been added yet.");
-    const price = formatPrice(listing.startingPrice);
-    const views = Number(listing.views || 0);
-    const saves = Number(listing.saves || 0);
-    const status = safeText(listing.status, "draft");
-    const imageUrl = safeText(listing.imageUrl, "");
-    const listingId = encodeURIComponent(listing.id || "");
-
-    const typeLine = customCategory
-      ? `${category} · ${customCategory}`
-      : category;
-
-    const noteParts = [];
-    if (eventType) noteParts.push(`Best for ${eventType.toLowerCase()}.`);
-    noteParts.push(description);
-
-    const thumbMarkup = imageUrl
-      ? `<div class="listing-thumb has-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}"></div>`
-      : `<div class="listing-thumb"></div>`;
-
-    return `
-      <article class="listing-card">
-        <div class="listing-top">
-          ${thumbMarkup}
-
-          <div class="listing-info">
-            <h3 class="listing-name">${escapeHtml(title)}</h3>
-            <p class="listing-type">${escapeHtml(typeLine)}</p>
-          </div>
-
-          <div class="listing-price">${escapeHtml(price)}</div>
-        </div>
-
-        <div class="listing-meta">
-          <span class="pill ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>
-          <span class="pill views">${views} Views</span>
-          <span class="pill saves">${saves} Saves</span>
-        </div>
-
-        <p class="listing-note">
-          ${escapeHtml(noteParts.join(" "))}
-        </p>
-
-        <div class="listing-actions">
-          <a class="btn" href="detail.html?id=${listingId}">View</a>
-         <a class="btn-secondary" href="edit-listing.html?id=${listingId}">Edit</a>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-function updateStats(listings) {
-  const published = listings.filter((listing) => listing.status === "published").length;
-  const drafts = listings.filter((listing) => listing.status === "draft").length;
-  const views = listings.reduce((total, listing) => total + Number(listing.views || 0), 0);
-
-  setText("publishedCount", published);
-  setText("draftCount", drafts);
-  setText("viewCount", views);
-  setText("listingCount", listings.length);
-}
-
-function updateProfileSnapshot(userData) {
-  const businessName =
-    safeText(userData.businessName, "") ||
-    safeText(userData.vendorName, "") ||
-    safeText(userData.name, "") ||
-    "RentEvent Vendor";
-
-  const ownerName = safeText(userData.ownerName, "") || safeText(userData.name, "") || "Vendor";
-  const baseCity = safeText(userData.baseCity, "") || safeText(userData.location, "") || "Service area not set";
-  const category = safeText(userData.mainCategory, "") || safeText(userData.category, "") || "Event service";
-  const logoUrl = safeText(userData.logoUrl, "");
-
-  setText("heroLabel", `Welcome back, ${ownerName.split(" ")[0] || "Vendor"}`);
-  setText("heroBusiness", businessName);
-  setText("profileCardName", businessName);
-  setText("profileCardText", `${category}. ${baseCity}. Keep your profile polished so clients know who they are booking.`);
-
-  setProfileImage("heroAvatar", logoUrl, businessName);
-  setProfileImage("profileCardAvatar", logoUrl, businessName);
-  setProfileImage("topProfileButton", logoUrl, businessName, true);
-
-  if (!logoUrl || !isValidUrl(logoUrl)) {
-    document.getElementById("topProfileButton").innerHTML = `<span class="profile-initials-small">${initialsFromName(businessName)}</span>`;
-  }
+    return summary;
+  }, {
+    available: 0,
+    needsInfo: 0,
+    declined: 0,
+    waiting: 0
+  });
 }
 
 function renderEmptyRequests() {
-  const requestList = document.getElementById("recentRequests");
-
-  requestList.innerHTML = `
+  document.getElementById("requestList").innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">✉</div>
+      <div class="empty-icon">+</div>
       <h3>No requests yet</h3>
-      <p>Once clients start messaging or requesting your services, you’ll see those inquiries here.</p>
-      <a class="btn" href="messages.html">Open Inbox</a>
+      <p>When you submit an event request from checkout, it will appear here.</p>
+      <a class="btn" href="event-builder.html">Start Planning</a>
     </div>
   `;
 }
 
-function renderRecentRequests(conversations, user) {
-  const requestList = document.getElementById("recentRequests");
+function renderRequests() {
+  const container = document.getElementById("requestList");
 
-  if (!conversations.length) {
+  const visibleRequests = bookingRequests.filter((request) => !request.hiddenForCustomer);
+
+  const activeCount = visibleRequests.filter((request) => {
+    const status = safeText(request.requestStatus || request.status, "pending");
+    return status !== "withdrawn";
+  }).length;
+
+  setText("requestCountPill", `${visibleRequests.length} Request${visibleRequests.length === 1 ? "" : "s"}`);
+  setText("pendingCountPill", `${activeCount} Active`);
+
+  if (!visibleRequests.length) {
     renderEmptyRequests();
     return;
   }
 
-  const recent = conversations.slice(0, 4);
+  container.innerHTML = visibleRequests.map((request) => {
+    const requestId = encodeURIComponent(request.id || "");
+    const eventDetails = request.eventDetails || {};
+    const eventName = safeText(eventDetails.eventName, "Unnamed Event");
+    const eventType = safeText(eventDetails.eventType, "Event");
+    const eventDate = safeText(eventDetails.eventDate, "Date not listed");
+    const location = getEventLocation(eventDetails);
+    const guestCount = safeText(eventDetails.guestCount, "Not listed");
+    const budget = safeText(eventDetails.eventBudget, "Not listed");
+    const styleVibe = safeText(eventDetails.styleVibe, "Not listed");
+    const status = safeText(request.requestStatus || request.status, "pending");
+    const statusLabel = getStatusLabel(status);
+    const statusPillClass = getStatusPillClass(status);
+    const isWithdrawn = status === "withdrawn";
+    const paymentStatus = safeText(request.paymentStatus, "not_collected");
+    const time = formatTime(request.createdAt);
+    const total = formatMoney(request.totalDue || 0);
+    const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+    const aiSummary = getAiSummary(request);
+    const responseSummary = getVendorResponseSummary(request);
+    const withdrawnReason = safeText(request.withdrawReason, "No reason provided.");
 
-  requestList.innerHTML = recent.map((conversation) => {
-    const unreadFor = conversation.unreadFor || {};
-    const isUnread = !!unreadFor[user.uid];
+    const vendorBox = vendors.length
+      ? vendors.map((vendor) => {
+          const title = safeText(vendor.listingTitle, "Requested Listing");
+          const category = safeText(vendor.category || vendor.mainCategory, "Event Service");
+          const price = formatMoney(vendor.priceNumber || 0);
+          const vendorName = safeText(vendor.vendorName, "Vendor");
+          const response = getVendorResponse(request, vendor.vendorId);
+          const responseStatus = safeText(response?.status, "");
+          const responseLabel = getResponseLabel(responseStatus);
+          const responsePillClass = getResponsePillClass(responseStatus);
 
-    const otherName = getOtherParticipantName(conversation, user);
-    const listingTitle = safeText(conversation.listingTitle, "Event listing");
-    const lastMessage = safeText(conversation.lastMessage, "Conversation updated.");
-    const time = formatTime(conversation.updatedAt || conversation.createdAt);
-    const conversationId = encodeURIComponent(conversation.id || "");
+          return `
+            <div class="vendor-box">
+              <h4>${escapeHtml(title)}</h4>
+              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+              <div class="pill-row">
+                <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+              </div>
+            </div>
+          `;
+        }).join("")
+      : `
+        <div class="vendor-box">
+          <h4>No vendors saved</h4>
+          <p>This request did not include vendor details.</p>
+        </div>
+      `;
+
+    const responseBox = vendors.length
+      ? `
+        <div class="response-box">
+          <h4>Vendor Responses</h4>
+          <p>
+            ${responseSummary.available} available ·
+            ${responseSummary.needsInfo} need more info ·
+            ${responseSummary.declined} declined ·
+            ${responseSummary.waiting} waiting
+          </p>
+
+          ${vendors.map((vendor) => {
+            const vendorName = safeText(vendor.vendorName, "Vendor");
+            const title = safeText(vendor.listingTitle, "Requested Listing");
+            const response = getVendorResponse(request, vendor.vendorId);
+            const responseStatus = safeText(response?.status, "");
+            const responseLabel = getResponseLabel(responseStatus);
+            const responsePillClass = getResponsePillClass(responseStatus);
+            const responseNote = safeText(response?.note, responseStatus ? "" : "This vendor has not responded yet.");
+
+            return `
+              <div class="response-item">
+                <div class="response-top">
+                  <div>
+                    <h5 class="response-name">${escapeHtml(vendorName)}</h5>
+                    <p class="response-note">${escapeHtml(title)}</p>
+                  </div>
+
+                  <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+                </div>
+
+                ${responseNote ? `<p class="response-note">${escapeHtml(responseNote)}</p>` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `
+      : "";
 
     return `
-      <a class="request-card ${isUnread ? "unread" : ""}" href="chat-thread.html?id=${conversationId}">
+      <article class="request-card ${isWithdrawn ? "withdrawn-card" : ""}">
         <div class="request-top">
-          <h3 class="request-name">${escapeHtml(otherName)}</h3>
-          <span class="request-time">${escapeHtml(time)}</span>
+          <div>
+            <h3 class="request-title">${escapeHtml(eventName)}</h3>
+            <p class="request-subtitle">Submitted ${escapeHtml(time)}</p>
+          </div>
+
+          <div class="request-total">${escapeHtml(total)}</div>
         </div>
 
-        <p class="request-text">
-          ${escapeHtml(lastMessage)} Related to ${escapeHtml(listingTitle)}.
-        </p>
-
-        <div class="request-meta">
-          ${isUnread ? `<span class="pill unread">Unread</span>` : `<span class="pill message">Message</span>`}
-          <span class="pill saves">${escapeHtml(listingTitle)}</span>
+        <div class="pill-row">
+          <span class="pill ${statusPillClass}">${escapeHtml(statusLabel)}</span>
+          <span class="pill info">${escapeHtml(paymentStatus.replaceAll("_", " "))}</span>
+          <span class="pill type">${escapeHtml(eventType)}</span>
+          ${responseSummary.available > 0 ? `<span class="pill safe">${responseSummary.available} Available</span>` : ""}
+          ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
         </div>
-      </a>
+
+        ${isWithdrawn ? `
+          <div class="withdrawn-box">
+            <h4>Request Withdrawn</h4>
+            <p>You withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p>
+          </div>
+        ` : ""}
+
+        <div class="request-grid">
+          <div class="info-row">
+            <span class="info-label">Date</span>
+            <span class="info-value">${escapeHtml(eventDate)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Location</span>
+            <span class="info-value">${escapeHtml(location)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Guests</span>
+            <span class="info-value">${escapeHtml(guestCount)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Budget</span>
+            <span class="info-value">${escapeHtml(budget)}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Style</span>
+            <span class="info-value">${escapeHtml(styleVibe)}</span>
+          </div>
+        </div>
+
+        ${vendorBox}
+        ${responseBox}
+
+        ${aiSummary ? `
+          <div class="ai-box">
+            <h4>AI Planner Context</h4>
+            <p>${escapeHtml(aiSummary)}</p>
+          </div>
+        ` : ""}
+
+        ${isWithdrawn ? `
+          <div class="request-actions">
+            <a class="btn-secondary" href="event-builder.html">Plan New Event</a>
+            <button class="btn-danger" type="button" data-clear-request="${requestId}">Clear From My Requests</button>
+          </div>
+        ` : `
+          <div class="request-actions">
+            <button class="btn" type="button" data-message-request="${requestId}">Message Vendors</button>
+            <a class="btn-secondary" href="event-builder.html">Edit Event</a>
+            <button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>
+          </div>
+        `}
+      </article>
     `;
   }).join("");
+
+  document.querySelectorAll("[data-message-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      messageVendorsForRequest(button.dataset.messageRequest);
+    });
+  });
+
+  document.querySelectorAll("[data-withdraw-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      withdrawRequest(button.dataset.withdrawRequest);
+    });
+  });
+
+  document.querySelectorAll("[data-clear-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      clearRequestFromCustomerView(button.dataset.clearRequest);
+    });
+  });
 }
 
-async function loadVendorListings(user) {
+function openWithdrawModal(requestId) {
+  pendingWithdrawRequestId = decodeURIComponent(requestId);
+
+  const modal = document.getElementById("withdrawModal");
+  const reasonSelect = document.getElementById("withdrawReasonSelect");
+  const reasonNote = document.getElementById("withdrawReasonNote");
+
+  reasonSelect.value = "Found another vendor";
+  reasonNote.value = "";
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeWithdrawModal() {
+  pendingWithdrawRequestId = null;
+
+  const modal = document.getElementById("withdrawModal");
+
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+async function confirmWithdrawRequest() {
+  if (isBusy || !pendingWithdrawRequestId) return;
+
+  const cleanRequestId = pendingWithdrawRequestId;
+  const request = bookingRequests.find((item) => item.id === cleanRequestId);
+
+  if (!request) {
+    showStatus("Could not find that request.", "error");
+    closeWithdrawModal();
+    return;
+  }
+
+  const reasonSelect = document.getElementById("withdrawReasonSelect");
+  const reasonNote = document.getElementById("withdrawReasonNote");
+
+  const selectedReason = safeText(reasonSelect.value, "Customer withdrew this request.");
+  const extraNote = safeText(reasonNote.value, "");
+
+  const finalReason = extraNote
+    ? `${selectedReason}: ${extraNote}`
+    : selectedReason;
+
   try {
-    const listingsRef = collection(db, "listings");
-    const q = query(listingsRef, where("vendorId", "==", user.uid));
-    const snapshot = await getDocs(q);
+    isBusy = true;
+    showStatus("Withdrawing request...", "info");
 
-    const listings = [];
+    const requestRef = doc(db, "bookingRequests", cleanRequestId);
 
-    snapshot.forEach((docSnap) => {
-      listings.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
+    await updateDoc(requestRef, {
+      status: "withdrawn",
+      requestStatus: "withdrawn",
+      withdrawnBy: "customer",
+      withdrawnReason: finalReason,
+      withdrawReason: finalReason,
+      withdrawnAt: new Date().toISOString(),
+      updatedAt: serverTimestamp()
     });
 
-    listings.sort((a, b) => {
+    request.status = "withdrawn";
+    request.requestStatus = "withdrawn";
+    request.withdrawnBy = "customer";
+    request.withdrawnReason = finalReason;
+    request.withdrawReason = finalReason;
+    request.withdrawnAt = new Date().toISOString();
+
+    closeWithdrawModal();
+    renderRequests();
+    showStatus("Request withdrawn successfully.", "success");
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
+}
+
+function withdrawRequest(requestId) {
+  openWithdrawModal(requestId);
+}
+
+async function clearRequestFromCustomerView(requestId) {
+  if (isBusy) return;
+
+  const cleanRequestId = decodeURIComponent(requestId);
+  const request = bookingRequests.find((item) => item.id === cleanRequestId);
+
+  if (!request) {
+    showStatus("Could not find that request.", "error");
+    return;
+  }
+
+  try {
+    isBusy = true;
+    showStatus("Clearing request from your page...", "info");
+
+    const requestRef = doc(db, "bookingRequests", cleanRequestId);
+
+    await updateDoc(requestRef, {
+      hiddenForCustomer: true,
+      hiddenForCustomerAt: new Date().toISOString(),
+      updatedAt: serverTimestamp()
+    });
+
+    request.hiddenForCustomer = true;
+    request.hiddenForCustomerAt = new Date().toISOString();
+
+    renderRequests();
+    showStatus("Request cleared from your page.", "success");
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
+}
+
+async function findExistingConversation(customerId, vendorId, listingId) {
+  const conversationKey = `${customerId}_${vendorId}_${listingId}`;
+  const q = query(
+    collection(db, "conversations"),
+    where("conversationKey", "==", conversationKey)
+  );
+
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) return null;
+
+  let conversation = null;
+
+  snapshot.forEach((docSnap) => {
+    conversation = {
+      id: docSnap.id,
+      ...docSnap.data()
+    };
+  });
+
+  return conversation;
+}
+
+async function messageVendorsForRequest(requestId) {
+  if (isBusy) return;
+
+  const cleanRequestId = decodeURIComponent(requestId);
+  const request = bookingRequests.find((item) => item.id === cleanRequestId);
+
+  if (!request) {
+    showStatus("Could not find that booking request.", "error");
+    return;
+  }
+
+  const status = safeText(request.requestStatus || request.status, "pending");
+
+  if (status === "withdrawn") {
+    showStatus("This request has been withdrawn, so messaging from this request is disabled.", "error");
+    return;
+  }
+
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const firstVendor = vendors.find((vendor) => vendor.vendorId) || null;
+
+  if (!firstVendor) {
+    showStatus("This request does not have a vendor to message yet.", "error");
+    return;
+  }
+
+  try {
+    isBusy = true;
+    showStatus("Opening vendor conversation...", "info");
+
+    const existingConversation = await findExistingConversation(
+      currentUser.uid,
+      firstVendor.vendorId,
+      firstVendor.listingId || cleanRequestId
+    );
+
+    if (existingConversation) {
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
+      return;
+    }
+
+    const customerName =
+      currentUserData.name ||
+      currentUser.displayName ||
+      currentUser.email ||
+      "Customer";
+
+    const vendorName = safeText(firstVendor.vendorName, "Vendor");
+    const listingId = safeText(firstVendor.listingId, cleanRequestId);
+    const listingTitle = safeText(firstVendor.listingTitle, "your listing");
+    const listingCategory = safeText(firstVendor.category || firstVendor.mainCategory, "Event Service");
+    const eventDetails = request.eventDetails || {};
+    const eventName = safeText(eventDetails.eventName, "my event");
+    const conversationKey = `${currentUser.uid}_${firstVendor.vendorId}_${listingId}`;
+    const firstMessage = `Hi! I submitted a RentEvent request for ${eventName} and wanted to ask about availability for ${listingTitle}.`;
+
+    const conversationRef = await addDoc(collection(db, "conversations"), {
+      conversationKey,
+      participantIds: [currentUser.uid, firstVendor.vendorId],
+      participantNames: {
+        [currentUser.uid]: customerName,
+        [firstVendor.vendorId]: vendorName
+      },
+      participantRoles: {
+        [currentUser.uid]: "customer",
+        [firstVendor.vendorId]: "vendor"
+      },
+      customerId: currentUser.uid,
+      vendorId: firstVendor.vendorId,
+      listingId,
+      bookingRequestId: cleanRequestId,
+      listingTitle,
+      listingCategory,
+      listingLocation: getEventLocation(eventDetails),
+      title: vendorName,
+      contextType: "Booking Request",
+      lastMessage: firstMessage,
+      lastSenderId: currentUser.uid,
+      unreadFor: {
+        [firstVendor.vendorId]: true
+      },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
+      text: firstMessage,
+      senderId: currentUser.uid,
+      senderName: customerName,
+      senderRole: "customer",
+      createdAt: serverTimestamp()
+    });
+
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    isBusy = false;
+  }
+}
+
+async function loadBookingRequests() {
+  try {
+    const q = query(
+      collection(db, "bookingRequests"),
+      where("customerId", "==", currentUser.uid)
+    );
+
+    const snapshot = await getDocs(q);
+
+    const requests = [];
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (!data.hiddenForCustomer) {
+        requests.push({
+          id: docSnap.id,
+          ...data
+        });
+      }
+    });
+
+    requests.sort((a, b) => {
       const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
       const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
       return bTime - aTime;
     });
 
-    updateStats(listings);
-    renderFeaturedListings(listings);
+    bookingRequests = requests;
+    renderRequests();
 
   } catch (error) {
-    const container = document.getElementById("featuredListings");
-
-    container.innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not load listings</h3>
-        <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="my-listings.html">Open My Listings</a>
-      </div>
-    `;
-  }
-}
-
-async function loadVendorConversations(user) {
-  try {
-    const conversationsRef = collection(db, "conversations");
-    const q = query(conversationsRef, where("participantIds", "array-contains", user.uid));
-    const snapshot = await getDocs(q);
-
-    const conversations = [];
-    let unreadCount = 0;
-
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const unreadFor = data.unreadFor || {};
-
-      if (unreadFor[user.uid]) {
-        unreadCount += 1;
-      }
-
-      conversations.push({
-        id: docSnap.id,
-        ...data
-      });
-    });
-
-    conversations.sort((a, b) => {
-      const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
-      const bUnread = b.unreadFor && b.unreadFor[user.uid] ? 1 : 0;
-
-      if (aUnread !== bUnread) {
-        return bUnread - aUnread;
-      }
-
-      const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : 0;
-      const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : 0;
-      return bTime - aTime;
-    });
-
-    updateNotificationBadges(unreadCount);
-    renderRecentRequests(conversations, user);
-
-  } catch (error) {
-    updateNotificationBadges(0);
-
-    document.getElementById("recentRequests").innerHTML = `
+    document.getElementById("requestList").innerHTML = `
       <div class="empty-card">
         <div class="empty-icon">!</div>
         <h3>Could not load requests</h3>
         <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="messages.html">Open Inbox</a>
+        <a class="btn" href="dashboard.html">Back to Dashboard</a>
       </div>
     `;
   }
 }
+
+document.getElementById("keepRequestBtn").addEventListener("click", closeWithdrawModal);
+document.getElementById("confirmWithdrawBtn").addEventListener("click", confirmWithdrawRequest);
+
+document.getElementById("withdrawModal").addEventListener("click", (event) => {
+  if (event.target.id === "withdrawModal") {
+    closeWithdrawModal();
+  }
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
     return;
   }
+
+  currentUser = user;
 
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
@@ -1389,22 +1520,15 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userData = userSnap.data();
+  currentUserData = userSnap.data();
 
-  if (userData.role !== "vendor") {
-    window.location.href = "dashboard.html";
+  if (currentUserData.role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
     return;
   }
 
-  updateProfileSnapshot(userData);
-  loadVendorListings(user);
-  loadVendorConversations(user);
+  loadBookingRequests();
 });
-
-window.logout = async function () {
-  await signOut(auth);
-  window.location.href = "index.html";
-};
 </script>
 
 </body>
