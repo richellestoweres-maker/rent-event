@@ -13,9 +13,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -23,24 +21,23 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f4ede2;
       --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       background: var(--bg);
@@ -48,9 +45,7 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .page {
       width: 100%;
@@ -78,12 +73,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0.38) 0%,
-        rgba(0, 0, 0, 0.12) 38%,
-        rgba(0, 0, 0, 0.62) 100%
-      );
+      background: linear-gradient(180deg, rgba(0,0,0,0.38), rgba(0,0,0,0.12) 38%, rgba(0,0,0,0.62));
       z-index: 1;
     }
 
@@ -192,13 +182,14 @@
       padding: 0 18px;
     }
 
-    .summary-card {
+    .summary-card, .photo-card, .card, .empty-card, .status-card {
       background: var(--card);
       border-radius: 28px;
       padding: 18px;
       box-shadow: var(--shadow);
-      margin-bottom: 22px;
     }
+
+    .summary-card { margin-bottom: 22px; }
 
     .summary-top {
       display: flex;
@@ -222,7 +213,7 @@
       white-space: nowrap;
     }
 
-    .summary-meta {
+    .summary-meta, .tag-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
@@ -238,54 +229,25 @@
       justify-content: center;
       font-size: 0.76rem;
       font-weight: 700;
+      text-transform: capitalize;
     }
 
-    .pill.rating {
-      background: #fff4df;
-      color: #aa6f12;
-    }
+    .pill.rating { background: #fff4df; color: #aa6f12; }
+    .pill.location { background: #f6efe4; color: #6a625a; }
+    .pill.available { background: var(--green-soft); color: var(--green-text); }
+    .pill.type { background: var(--blue-soft); color: var(--blue-text); }
 
-    .pill.location {
-      background: #f6efe4;
-      color: #6a625a;
-    }
-
-    .pill.available {
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .pill.type {
-      background: var(--blue-soft);
-      color: var(--blue-text);
-    }
-
-    .summary-text {
+    .summary-text, .feature-copy p, .vendor-info p, .empty-card p, .status-card p {
       margin: 0;
       font-size: 0.9rem;
       line-height: 1.5;
       color: var(--muted);
     }
 
-    .photo-card {
-      background: var(--card);
-      border-radius: 28px;
-      padding: 12px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
+    .photo-card { padding: 12px; overflow: hidden; }
+    .photo-card img { display: block; width: 100%; height: 230px; object-fit: cover; border-radius: 20px; }
 
-    .photo-card img {
-      display: block;
-      width: 100%;
-      height: 230px;
-      object-fit: cover;
-      border-radius: 20px;
-    }
-
-    .section {
-      margin-top: 26px;
-    }
+    .section { margin-top: 26px; }
 
     .section-title {
       margin: 0 0 14px;
@@ -295,17 +257,7 @@
       font-weight: 800;
     }
 
-    .card {
-      background: var(--card);
-      border-radius: 28px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .feature-list {
-      display: grid;
-      gap: 12px;
-    }
+    .feature-list, .detail-grid { display: grid; gap: 12px; }
 
     .feature-item {
       display: flex;
@@ -315,10 +267,7 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .feature-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
+    .feature-item:last-child { border-bottom: none; padding-bottom: 0; }
 
     .feature-icon {
       width: 42px;
@@ -333,25 +282,14 @@
       font-weight: 800;
     }
 
-    .feature-copy h3 {
+    .feature-copy h3, .vendor-info h3 {
       margin: 0 0 4px;
       font-size: 0.96rem;
       line-height: 1.1;
       font-weight: 800;
     }
 
-    .feature-copy p {
-      margin: 0;
-      font-size: 0.88rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .vendor-card {
-      display: flex;
-      gap: 14px;
-      align-items: center;
-    }
+    .vendor-card { display: flex; gap: 14px; align-items: center; }
 
     .vendor-avatar {
       width: 62px;
@@ -376,41 +314,9 @@
       background: rgba(255, 255, 255, 0.22);
     }
 
-    .vendor-avatar span {
-      position: relative;
-      z-index: 1;
-    }
-
-    .vendor-info {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .vendor-info h3 {
-      margin: 0 0 4px;
-      font-size: 1rem;
-      line-height: 1.12;
-      letter-spacing: -0.02em;
-      font-weight: 800;
-    }
-
-    .vendor-info p {
-      margin: 0 0 6px;
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .vendor-rating {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #b37619;
-    }
-
-    .detail-grid {
-      display: grid;
-      gap: 12px;
-    }
+    .vendor-avatar span { position: relative; z-index: 1; }
+    .vendor-info { min-width: 0; flex: 1; }
+    .vendor-rating { font-size: 0.8rem; font-weight: 700; color: #b37619; }
 
     .detail-row {
       display: flex;
@@ -420,32 +326,11 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .detail-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
+    .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .detail-label { font-size: 0.88rem; color: var(--muted); font-weight: 700; }
+    .detail-value { font-size: 0.9rem; color: var(--text); font-weight: 700; text-align: right; }
 
-    .detail-label {
-      font-size: 0.88rem;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .detail-value {
-      font-size: 0.9rem;
-      color: var(--text);
-      font-weight: 700;
-      text-align: right;
-    }
-
-    .empty-card {
-      background: var(--card);
-      border-radius: 28px;
-      padding: 24px 18px;
-      box-shadow: var(--shadow);
-      text-align: center;
-      margin-top: 18px;
-    }
+    .empty-card { text-align: center; margin: 18px; }
 
     .empty-icon {
       width: 64px;
@@ -461,18 +346,19 @@
       font-weight: 800;
     }
 
-    .empty-card h2 {
-      margin: 0 0 8px;
-      font-size: 1.25rem;
-      font-weight: 800;
+    .empty-card h2, .status-card h3 { margin: 0 0 8px; font-size: 1.15rem; font-weight: 800; }
+
+    .status-card {
+      background: #fff4df;
+      color: #8d5f11;
+      margin-top: 16px;
+      display: none;
     }
 
-    .empty-card p {
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.45;
-    }
+    .status-card.error { background: var(--red-soft); color: var(--red-text); }
+    .status-card.success { background: var(--green-soft); color: var(--green-text); }
+
+    .status-card p { color: inherit; font-weight: 700; }
 
     .action-bar {
       position: fixed;
@@ -494,30 +380,11 @@
       z-index: 20;
     }
 
-    .action-info {
-      flex: 1;
-      padding-left: 8px;
-    }
+    .action-info { flex: 1; padding-left: 8px; }
+    .action-label { display: block; font-size: 0.74rem; color: var(--muted); margin-bottom: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+    .action-value { display: block; font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
 
-    .action-label {
-      display: block;
-      font-size: 0.74rem;
-      color: var(--muted);
-      margin-bottom: 3px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .action-value {
-      display: block;
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .action-btn,
-    .action-btn-secondary {
+    .action-btn, .action-btn-secondary {
       min-height: 54px;
       border-radius: 999px;
       border: none;
@@ -533,52 +400,20 @@
       cursor: pointer;
     }
 
-    .action-btn {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
-    }
-
-    .action-btn-secondary {
-      background: var(--soft-2);
-      color: #4a433d;
-    }
-
-    .action-btn:disabled,
-    .action-btn-secondary:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
+    .action-btn { background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3)); color: #fff; box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18); }
+    .action-btn-secondary { background: var(--soft-2); color: #4a433d; }
+    .action-btn:disabled, .action-btn-secondary:disabled { opacity: 0.65; cursor: not-allowed; }
 
     @media (max-width: 390px) {
-      .action-bar {
-        flex-wrap: wrap;
-        border-radius: 28px;
-      }
-
-      .action-info {
-        width: 100%;
-        padding-left: 2px;
-      }
-
-      .action-btn,
-      .action-btn-secondary {
-        flex: 1;
-      }
+      .action-bar { flex-wrap: wrap; border-radius: 28px; }
+      .action-info { width: 100%; padding-left: 2px; }
+      .action-btn, .action-btn-secondary { flex: 1; }
     }
 
     @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
-      }
-
-      .page {
-        max-width: 430px;
-      }
-
-      .action-bar {
-        max-width: 406px;
-      }
+      body { padding: 24px 0; }
+      .page { max-width: 430px; }
+      .action-bar { max-width: 406px; }
     }
   </style>
 </head>
@@ -587,7 +422,7 @@
   <main class="page" id="page">
     <section class="hero" id="hero">
       <div class="hero-topbar">
-        <a href="listings.html" class="hero-btn" aria-label="Go back">←</a>
+        <a href="listings.html" class="hero-btn" id="backToListingsBtn" aria-label="Go back">←</a>
         <a href="notifications.html" class="hero-btn" aria-label="Notifications">🔔</a>
       </div>
 
@@ -606,71 +441,38 @@
         </div>
 
         <div class="summary-meta" id="summaryMeta">
-          <span class="pill rating" id="ratingPill">★ New</span>
-          <span class="pill location" id="locationPill">Location</span>
-          <span class="pill available" id="availabilityPill">Availability</span>
+          <span class="pill rating">★ New</span>
+          <span class="pill location">Location</span>
+          <span class="pill available">Availability</span>
         </div>
 
-        <p class="summary-text" id="summaryText">
-          Please wait while we load this vendor listing.
-        </p>
+        <p class="summary-text" id="summaryText">Please wait while we load this vendor listing.</p>
       </div>
+
+      <div class="status-card" id="statusCard"><p id="statusText"></p></div>
 
       <section class="section" id="photoSection" style="display: none;">
         <h2 class="section-title">Photo</h2>
-
-        <div class="photo-card">
-          <img id="detailPhoto" src="" alt="Listing photo">
-        </div>
+        <div class="photo-card"><img id="detailPhoto" src="" alt="Listing photo"></div>
       </section>
 
       <section class="section">
         <h2 class="section-title">What’s Included</h2>
-
         <div class="card">
           <div class="feature-list">
-            <div class="feature-item">
-              <div class="feature-icon">✓</div>
-              <div class="feature-copy">
-                <h3>Included Details</h3>
-                <p id="includedText">Loading included details...</p>
-              </div>
-            </div>
-
-            <div class="feature-item">
-              <div class="feature-icon">★</div>
-              <div class="feature-copy">
-                <h3>Best For</h3>
-                <p id="eventTypeText">Loading event types...</p>
-              </div>
-            </div>
-
-            <div class="feature-item">
-              <div class="feature-icon">⌂</div>
-              <div class="feature-copy">
-                <h3>Service Area</h3>
-                <p id="serviceAreaText">Loading service area...</p>
-              </div>
-            </div>
-
-            <div class="feature-item">
-              <div class="feature-icon">↗</div>
-              <div class="feature-copy">
-                <h3>Travel / National Service</h3>
-                <p id="travelText">Loading travel details...</p>
-              </div>
-            </div>
+            <div class="feature-item"><div class="feature-icon">✓</div><div class="feature-copy"><h3>Included Details</h3><p id="includedText">Loading included details...</p></div></div>
+            <div class="feature-item"><div class="feature-icon">★</div><div class="feature-copy"><h3>Best For</h3><p id="eventTypeText">Loading event types...</p></div></div>
+            <div class="feature-item"><div class="feature-icon">⌂</div><div class="feature-copy"><h3>Service Area</h3><p id="serviceAreaText">Loading service area...</p></div></div>
+            <div class="feature-item"><div class="feature-icon">↗</div><div class="feature-copy"><h3>Travel / National Service</h3><p id="travelText">Loading travel details...</p></div></div>
           </div>
         </div>
       </section>
 
       <section class="section">
         <h2 class="section-title">Vendor</h2>
-
         <div class="card">
           <div class="vendor-card">
             <div class="vendor-avatar"><span id="vendorInitials">RE</span></div>
-
             <div class="vendor-info">
               <h3 id="vendorName">Vendor</h3>
               <p id="vendorText">This vendor offers event services through RentEvent.</p>
@@ -682,48 +484,16 @@
 
       <section class="section">
         <h2 class="section-title">Details</h2>
-
         <div class="card">
           <div class="detail-grid">
-            <div class="detail-row">
-              <div class="detail-label">Main Category</div>
-              <div class="detail-value" id="mainCategoryValue">Loading</div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-label">Service</div>
-              <div class="detail-value" id="categoryValue">Loading</div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-label">Best For</div>
-              <div class="detail-value" id="eventTypeValue">Loading</div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-label">Starting Price</div>
-              <div class="detail-value" id="priceValue">Loading</div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-label">Base Location</div>
-              <div class="detail-value" id="locationValue">Loading</div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-label">Service Area</div>
-              <div class="detail-value" id="serviceAreaValue">Loading</div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-label">ZIP</div>
-              <div class="detail-value" id="zipValue">Loading</div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-label">Status</div>
-              <div class="detail-value" id="statusValue">Loading</div>
-            </div>
+            <div class="detail-row"><div class="detail-label">Main Category</div><div class="detail-value" id="mainCategoryValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">Service</div><div class="detail-value" id="categoryValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">Best For</div><div class="detail-value" id="eventTypeValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">Starting Price</div><div class="detail-value" id="priceValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">Base Location</div><div class="detail-value" id="locationValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">Service Area</div><div class="detail-value" id="serviceAreaValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">ZIP</div><div class="detail-value" id="zipValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value" id="statusValue">Loading</div></div>
           </div>
         </div>
       </section>
@@ -737,7 +507,7 @@
     </div>
 
     <button class="action-btn-secondary" id="messageBtn" type="button">Message</button>
-    <a href="event-builder.html" class="action-btn" id="addToEventBtn">Add to Event</a>
+    <a href="dashboard.html#myEventsSection" class="action-btn" id="addToEventBtn">Choose Event</a>
   </div>
 
 <script type="module">
@@ -773,23 +543,30 @@ let currentUser = null;
 let currentUserData = null;
 let currentListing = null;
 let currentListingId = null;
+let currentEventId = "";
 let listingLoaded = false;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function formatPrice(value) {
   const raw = safeText(value, "");
-
   if (!raw) return "$0+";
 
   const numberMatch = raw.match(/\d+(\.\d+)?/);
-
   if (!numberMatch) return raw;
 
   const number = Number(numberMatch[0]);
-
   if (Number.isNaN(number)) return raw;
 
   return `$${Math.round(number)}+`;
@@ -805,10 +582,7 @@ function initialsFromName(name) {
   const cleanName = safeText(name, "RE");
   const parts = cleanName.split(" ").filter(Boolean);
 
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   return cleanName.slice(0, 2).toUpperCase();
 }
 
@@ -817,13 +591,51 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function showStatus(message, type = "info") {
+  const card = document.getElementById("statusCard");
+  const text = document.getElementById("statusText");
+  card.className = `status-card ${type}`;
+  text.textContent = message;
+  card.style.display = "block";
+
+  setTimeout(() => {
+    card.style.display = "none";
+  }, 3500);
+}
+
+function getEventAwareUrl(baseUrl, params = {}) {
+  const urlParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    const cleanValue = safeText(value, "");
+    if (cleanValue) urlParams.set(key, cleanValue);
+  });
+
+  if (currentEventId) {
+    urlParams.set("eventId", currentEventId);
+  }
+
+  const queryString = urlParams.toString();
+  return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+}
+
+function updateEventAwareLinks() {
+  const backBtn = document.getElementById("backToListingsBtn");
+  const addBtn = document.getElementById("addToEventBtn");
+
+  if (backBtn) {
+    backBtn.href = getEventAwareUrl("listings.html");
+  }
+
+  if (!addBtn) return;
+
+  if (currentEventId && currentListingId) {
+    addBtn.href = getEventAwareUrl("event-builder.html", { add: currentListingId });
+    addBtn.textContent = "Add to Event";
+  } else {
+    addBtn.href = "dashboard.html#myEventsSection";
+    addBtn.textContent = "Choose Event";
+  }
 }
 
 function getEventTypes(listing) {
@@ -832,7 +644,6 @@ function getEventTypes(listing) {
   }
 
   const singleEventType = safeText(listing.eventType, "");
-
   if (!singleEventType) return [];
 
   if (singleEventType.includes(",")) {
@@ -865,13 +676,9 @@ function getServiceAreaText(listing) {
     ? listing.serviceCities.join(", ")
     : safeText(listing.serviceCitiesText || listing.serviceCities, "");
 
-  if (serviceArea && serviceCities) {
-    return `${serviceArea}. Cities served: ${serviceCities}`;
-  }
-
+  if (serviceArea && serviceCities) return `${serviceArea}. Cities served: ${serviceCities}`;
   if (serviceArea) return serviceArea;
   if (serviceCities) return serviceCities;
-
   return getLocationText(listing);
 }
 
@@ -885,36 +692,22 @@ function getTravelText(listing) {
   const parts = [];
 
   if (travelAvailable) {
-    if (travelValue === "limited") {
-      parts.push("Limited travel available");
-    } else {
-      parts.push("Travel available within service area");
-    }
+    parts.push(travelValue === "limited" ? "Limited travel available" : "Travel available within service area");
   } else {
     parts.push("Travel details confirmed with vendor");
   }
 
-  if (radius && radius !== "custom") {
-    parts.push(`Service radius: up to ${radius} miles`);
-  }
-
-  if (radius === "custom") {
-    parts.push("Service radius varies");
-  }
-
-  if (virtualService) {
-    parts.push("Virtual or digital service available");
-  }
-
-  if (nationalShipping) {
-    parts.push("National or shipping-based service available");
-  }
+  if (radius && radius !== "custom") parts.push(`Service radius: up to ${radius} miles`);
+  if (radius === "custom") parts.push("Service radius varies");
+  if (virtualService) parts.push("Virtual or digital service available");
+  if (nationalShipping) parts.push("National or shipping-based service available");
 
   return parts.join(". ");
 }
 
 function renderMissingListing(message) {
   const page = document.getElementById("page");
+  const backUrl = getEventAwareUrl("listings.html");
 
   page.innerHTML = `
     <section class="content" style="margin-top: 0; padding-top: 20px;">
@@ -922,7 +715,7 @@ function renderMissingListing(message) {
         <div class="empty-icon">!</div>
         <h2>Listing not found</h2>
         <p>${escapeHtml(message)}</p>
-        <a class="action-btn" href="listings.html">Back to Listings</a>
+        <a class="action-btn" href="${escapeHtml(backUrl)}">Back to Listings</a>
       </div>
     </section>
   `;
@@ -943,7 +736,6 @@ function setHeroImage(imageUrl) {
 
   hero.classList.add("has-photo");
   hero.style.backgroundImage = `url("${imageUrl}")`;
-
   detailPhoto.src = imageUrl;
   photoSection.style.display = "block";
 }
@@ -956,9 +748,9 @@ function renderEventTypePills(eventTypes) {
   }).join("");
 
   summaryMeta.innerHTML = `
-    <span class="pill rating" id="ratingPill">${escapeHtml(currentListing.rating ? `★ ${currentListing.rating}` : "★ New")}</span>
-    <span class="pill location" id="locationPill">${escapeHtml(getLocationText(currentListing))}</span>
-    <span class="pill available" id="availabilityPill">${escapeHtml(safeText(currentListing.availability, "Availability not listed"))}</span>
+    <span class="pill rating">${escapeHtml(currentListing.rating ? `★ ${currentListing.rating}` : "★ New")}</span>
+    <span class="pill location">${escapeHtml(getLocationText(currentListing))}</span>
+    <span class="pill available">${escapeHtml(safeText(currentListing.availability, "Availability not listed"))}</span>
     ${extraPills}
   `;
 }
@@ -973,7 +765,6 @@ function renderListing(listing) {
   const location = getLocationText(listing);
   const serviceArea = getServiceAreaText(listing);
   const travelText = getTravelText(listing);
-  const availability = safeText(listing.availability, "Availability not listed");
   const description = safeText(listing.description, "No description has been added yet.");
   const included = safeText(listing.included, "Details will be confirmed with the vendor.");
   const vendorName = safeText(listing.vendorName, "RentEvent Vendor");
@@ -983,39 +774,29 @@ function renderListing(listing) {
   const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
   const zipCode = safeText(listing.zipCode, "Not listed");
 
-  const typeLine = customCategory
-    ? `${category} · ${customCategory}`
-    : category;
+  const typeLine = customCategory ? `${category} · ${customCategory}` : category;
 
   currentListing = listing;
-
   document.title = `${title} | RentEvent`;
-
-  if (currentListingId) {
-    document.getElementById("addToEventBtn").href = `event-builder.html?add=${encodeURIComponent(currentListingId)}`;
-  }
+  updateEventAwareLinks();
 
   setHeroImage(imageUrl);
 
   setText("heroPill", mainCategory);
   setText("heroTitle", title);
   setText("heroSubtitle", description);
-
   setText("summaryName", title);
   setText("summaryPrice", price);
   renderEventTypePills(eventTypes);
   setText("summaryText", description);
-
   setText("includedText", included);
   setText("eventTypeText", eventTypesText);
   setText("serviceAreaText", serviceArea);
   setText("travelText", travelText);
-
   setText("vendorInitials", initialsFromName(vendorName));
   setText("vendorName", vendorName);
   setText("vendorText", `${vendorName} offers ${typeLine.toLowerCase()} for ${eventTypesText.toLowerCase()} and other event needs.`);
   setText("vendorRating", rating === "★ New" ? "★ New vendor listing" : `${rating} average rating`);
-
   setText("mainCategoryValue", mainCategory);
   setText("categoryValue", typeLine);
   setText("eventTypeValue", eventTypesText);
@@ -1024,7 +805,6 @@ function renderListing(listing) {
   setText("serviceAreaValue", serviceArea);
   setText("zipValue", zipCode);
   setText("statusValue", titleCase(status));
-
   setText("bottomPrice", price);
 }
 
@@ -1034,7 +814,9 @@ async function loadListing() {
 
   const params = new URLSearchParams(window.location.search);
   const listingId = params.get("id");
+  currentEventId = params.get("eventId") || params.get("event") || "";
   currentListingId = listingId;
+  updateEventAwareLinks();
 
   try {
     if (listingId) {
@@ -1046,27 +828,16 @@ async function loadListing() {
         return;
       }
 
-      renderListing({
-        id: listingSnap.id,
-        ...listingSnap.data()
-      });
-
+      renderListing({ id: listingSnap.id, ...listingSnap.data() });
       return;
     }
 
-    const listingsRef = collection(db, "listings");
-    const snapshot = await getDocs(listingsRef);
-
+    const snapshot = await getDocs(collection(db, "listings"));
     const listings = [];
+
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
-
-      if (data.status === "published") {
-        listings.push({
-          id: docSnap.id,
-          ...data
-        });
-      }
+      if (data.status === "published") listings.push({ id: docSnap.id, ...data });
     });
 
     listings.sort((a, b) => {
@@ -1081,6 +852,7 @@ async function loadListing() {
     }
 
     currentListingId = listings[0].id;
+    updateEventAwareLinks();
     renderListing(listings[0]);
 
   } catch (error) {
@@ -1088,22 +860,19 @@ async function loadListing() {
   }
 }
 
-async function findExistingConversation(customerId, vendorId, listingId) {
-  const conversationsRef = collection(db, "conversations");
-  const q = query(conversationsRef, where("conversationKey", "==", `${customerId}_${vendorId}_${listingId}`));
+async function findExistingConversation(customerId, vendorId, listingId, eventId = "") {
+  const conversationKey = eventId
+    ? `${customerId}_${vendorId}_${listingId}_${eventId}`
+    : `${customerId}_${vendorId}_${listingId}`;
+
+  const q = query(collection(db, "conversations"), where("conversationKey", "==", conversationKey));
   const snapshot = await getDocs(q);
 
-  if (snapshot.empty) {
-    return null;
-  }
+  if (snapshot.empty) return null;
 
   let conversation = null;
-
   snapshot.forEach((docSnap) => {
-    conversation = {
-      id: docSnap.id,
-      ...docSnap.data()
-    };
+    conversation = { id: docSnap.id, ...docSnap.data() };
   });
 
   return conversation;
@@ -1118,19 +887,19 @@ async function startConversation() {
   }
 
   if (!currentListing || !currentListingId) {
-    alert("This listing is still loading. Please try again in a second.");
+    showStatus("This listing is still loading. Please try again in a second.", "error");
     return;
   }
 
   const vendorId = safeText(currentListing.vendorId, "");
 
   if (!vendorId) {
-    alert("This listing is missing vendor information, so messaging cannot start yet.");
+    showStatus("This listing is missing vendor information, so messaging cannot start yet.", "error");
     return;
   }
 
   if (vendorId === currentUser.uid) {
-    alert("This is your own listing. Customers will be able to message you from this page.");
+    showStatus("This is your own listing. Customers will be able to message you from this page.", "error");
     return;
   }
 
@@ -1140,9 +909,11 @@ async function startConversation() {
 
     const customerId = currentUser.uid;
     const listingId = currentListingId;
-    const conversationKey = `${customerId}_${vendorId}_${listingId}`;
+    const conversationKey = currentEventId
+      ? `${customerId}_${vendorId}_${listingId}_${currentEventId}`
+      : `${customerId}_${vendorId}_${listingId}`;
 
-    const existingConversation = await findExistingConversation(customerId, vendorId, listingId);
+    const existingConversation = await findExistingConversation(customerId, vendorId, listingId, currentEventId);
 
     if (existingConversation) {
       window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
@@ -1169,11 +940,12 @@ async function startConversation() {
       customerId,
       vendorId,
       listingId,
+      eventId: currentEventId || "",
       listingTitle,
       listingCategory,
       listingLocation,
       title: vendorName,
-      contextType: "Vendor",
+      contextType: currentEventId ? "Event Vendor" : "Vendor",
       lastMessage: `Hi! I’m interested in ${listingTitle}.`,
       lastSenderId: customerId,
       unreadFor: {
@@ -1194,7 +966,7 @@ async function startConversation() {
     window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
 
   } catch (error) {
-    alert(error.message);
+    showStatus(error.message, "error");
     messageBtn.disabled = false;
     messageBtn.textContent = "Message";
   }
