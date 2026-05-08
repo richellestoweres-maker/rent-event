@@ -708,7 +708,7 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Customer Portal</div>
@@ -736,7 +736,7 @@
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">Requests</h2>
-        <a class="section-link" href="event-builder.html">Plan Event</a>
+        <a class="section-link" href="dashboard.html" id="planEventLink">Plan Event</a>
       </div>
 
       <div class="status-message" id="statusMessage"></div>
@@ -785,14 +785,14 @@
   </div>
 
   <nav class="bottom-nav" aria-label="Customer navigation">
-    <a class="nav-item" href="dashboard.html">
+    <a class="nav-item" href="dashboard.html" id="bottomHomeLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
       </svg>
       <span>Home</span>
     </a>
 
-    <a class="nav-item" href="listings.html">
+    <a class="nav-item" href="listings.html" id="bottomListingsLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
         <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -856,6 +856,9 @@ let bookingRequests = [];
 let isBusy = false;
 let pendingWithdrawRequestId = null;
 
+const pageParams = new URLSearchParams(window.location.search);
+const currentEventId = pageParams.get("eventId") || "";
+
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
@@ -896,6 +899,48 @@ function formatTime(value) {
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
+}
+
+function withEventParam(path, eventId = currentEventId) {
+  const cleanEventId = safeText(eventId, "");
+
+  if (!cleanEventId) return path;
+
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}eventId=${encodeURIComponent(cleanEventId)}`;
+}
+
+function getRequestEventId(request) {
+  return safeText(request.eventId, "") || safeText(request.eventDetails?.id, "") || currentEventId;
+}
+
+function updateEventScopedLinks() {
+  const backLink = document.getElementById("backLink");
+  const planEventLink = document.getElementById("planEventLink");
+  const bottomHomeLink = document.getElementById("bottomHomeLink");
+  const bottomListingsLink = document.getElementById("bottomListingsLink");
+
+  if (backLink) {
+    backLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html";
+  }
+
+  if (planEventLink) {
+    planEventLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html#myEventsSection";
+    planEventLink.textContent = currentEventId ? "Back to Event" : "Plan Event";
+  }
+
+  if (bottomHomeLink) bottomHomeLink.href = "dashboard.html";
+  if (bottomListingsLink) bottomListingsLink.href = currentEventId ? withEventParam("listings.html") : "listings.html";
+
+  if (currentEventId) {
+    const heroLabel = document.querySelector(".hero-label");
+    const heroTitle = document.querySelector(".hero-title");
+    const heroSubtitle = document.querySelector(".hero-subtitle");
+
+    if (heroLabel) heroLabel.textContent = "Event Requests";
+    if (heroTitle) heroTitle.textContent = "Track this event request.";
+    if (heroSubtitle) heroSubtitle.textContent = "Review vendor responses and request status for this specific event project.";
+  }
 }
 
 function showStatus(message, type = "info") {
@@ -998,7 +1043,7 @@ function renderEmptyRequests() {
       <div class="empty-icon">+</div>
       <h3>No requests yet</h3>
       <p>When you submit an event request from checkout, it will appear here.</p>
-      <a class="btn" href="event-builder.html">Start Planning</a>
+      ${currentEventId ? `<a class="btn" href="${withEventParam("event-builder.html")}">Back to Event</a>` : `<a class="btn" href="dashboard.html#myEventsSection">Create or Choose Event</a>`}
     </div>
   `;
 }
@@ -1175,13 +1220,13 @@ function renderRequests() {
 
         ${isWithdrawn ? `
           <div class="request-actions">
-            <a class="btn-secondary" href="event-builder.html">Plan New Event</a>
+            <a class="btn-secondary" href="dashboard.html#myEventsSection">Plan New Event</a>
             <button class="btn-danger" type="button" data-clear-request="${requestId}">Clear From My Requests</button>
           </div>
         ` : `
           <div class="request-actions">
             <button class="btn" type="button" data-message-request="${requestId}">Message Vendors</button>
-            <a class="btn-secondary" href="event-builder.html">Edit Event</a>
+            <a class="btn-secondary" href="${withEventParam("event-builder.html", getRequestEventId(request))}">Edit Event</a>
             <button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>
           </div>
         `}
@@ -1231,54 +1276,6 @@ function closeWithdrawModal() {
   modal.setAttribute("aria-hidden", "true");
 }
 
-async function createVendorWithdrawNotifications(request, finalReason) {
-  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
-  const uniqueVendorIds = Array.from(
-    new Set(
-      vendors
-        .map((vendor) => safeText(vendor.vendorId, ""))
-        .filter(Boolean)
-    )
-  );
-
-  if (!uniqueVendorIds.length) return;
-
-  const eventDetails = request.eventDetails || {};
-  const eventName = safeText(eventDetails.eventName, "an event request");
-  const customerName =
-    currentUserData?.name ||
-    currentUser.displayName ||
-    currentUser.email ||
-    "Customer";
-
-  for (const vendorId of uniqueVendorIds) {
-    await addDoc(collection(db, "notifications"), {
-      recipientId: vendorId,
-      recipientRole: "vendor",
-
-      type: "request_withdrawn",
-      typeLabel: "Request Withdrawn",
-      category: "Booking Request",
-
-      title: "A customer withdrew a request",
-      body: `${customerName} withdrew the request for ${eventName}. Reason: ${finalReason}`,
-
-      sourceId: request.id,
-      sourceCollection: "bookingRequests",
-      sourceLabel: eventName,
-      eventName,
-
-      customerId: currentUser.uid,
-      customerName,
-      withdrawReason: finalReason,
-
-      read: false,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-  }
-}
-
 async function confirmWithdrawRequest() {
   if (isBusy || !pendingWithdrawRequestId) return;
 
@@ -1317,7 +1314,6 @@ async function confirmWithdrawRequest() {
       updatedAt: serverTimestamp()
     });
 
-    request.id = cleanRequestId;
     request.status = "withdrawn";
     request.requestStatus = "withdrawn";
     request.withdrawnBy = "customer";
@@ -1325,11 +1321,9 @@ async function confirmWithdrawRequest() {
     request.withdrawReason = finalReason;
     request.withdrawnAt = new Date().toISOString();
 
-    await createVendorWithdrawNotifications(request, finalReason);
-
     closeWithdrawModal();
     renderRequests();
-    showStatus("Request withdrawn successfully. Vendors notified.", "success");
+    showStatus("Request withdrawn successfully.", "success");
 
   } catch (error) {
     showStatus(error.message, "error");
@@ -1378,8 +1372,9 @@ async function clearRequestFromCustomerView(requestId) {
   }
 }
 
-async function findExistingConversation(customerId, vendorId, listingId) {
-  const conversationKey = `${customerId}_${vendorId}_${listingId}`;
+async function findExistingConversation(customerId, vendorId, listingId, eventId) {
+  const cleanEventId = safeText(eventId, "general");
+  const conversationKey = `${customerId}_${vendorId}_${listingId}_${cleanEventId}`;
   const q = query(
     collection(db, "conversations"),
     where("conversationKey", "==", conversationKey)
@@ -1420,6 +1415,7 @@ async function messageVendorsForRequest(requestId) {
   }
 
   const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const requestEventId = getRequestEventId(request);
   const firstVendor = vendors.find((vendor) => vendor.vendorId) || null;
 
   if (!firstVendor) {
@@ -1434,7 +1430,8 @@ async function messageVendorsForRequest(requestId) {
     const existingConversation = await findExistingConversation(
       currentUser.uid,
       firstVendor.vendorId,
-      firstVendor.listingId || cleanRequestId
+      firstVendor.listingId || cleanRequestId,
+      requestEventId || cleanRequestId
     );
 
     if (existingConversation) {
@@ -1454,7 +1451,7 @@ async function messageVendorsForRequest(requestId) {
     const listingCategory = safeText(firstVendor.category || firstVendor.mainCategory, "Event Service");
     const eventDetails = request.eventDetails || {};
     const eventName = safeText(eventDetails.eventName, "my event");
-    const conversationKey = `${currentUser.uid}_${firstVendor.vendorId}_${listingId}`;
+    const conversationKey = `${currentUser.uid}_${firstVendor.vendorId}_${listingId}_${requestEventId || cleanRequestId}`;
     const firstMessage = `Hi! I submitted a RentEvent request for ${eventName} and wanted to ask about availability for ${listingTitle}.`;
 
     const conversationRef = await addDoc(collection(db, "conversations"), {
@@ -1471,6 +1468,7 @@ async function messageVendorsForRequest(requestId) {
       customerId: currentUser.uid,
       vendorId: firstVendor.vendorId,
       listingId,
+      eventId: requestEventId || cleanRequestId,
       bookingRequestId: cleanRequestId,
       listingTitle,
       listingCategory,
@@ -1517,7 +1515,10 @@ async function loadBookingRequests() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
 
-      if (!data.hiddenForCustomer) {
+      const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
+      const matchesCurrentEvent = !currentEventId || requestEventId === currentEventId;
+
+      if (!data.hiddenForCustomer && matchesCurrentEvent) {
         requests.push({
           id: docSnap.id,
           ...data
@@ -1578,6 +1579,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  updateEventScopedLinks();
   loadBookingRequests();
 });
 </script>
