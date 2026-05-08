@@ -30,6 +30,12 @@
       --coral-3: #ff5f67;
       --gold: #f4a43a;
       --gold-dark: #d88914;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
@@ -54,7 +60,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 120px;
+      padding: 20px 18px 128px;
     }
 
     .topbar {
@@ -70,13 +76,13 @@
       height: 44px;
       border-radius: 50%;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,0.88);
+      background: rgba(255, 255, 255, 0.88);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
       text-decoration: none;
-      box-shadow: 0 8px 20px rgba(140,111,75,0.05);
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 800;
     }
@@ -109,7 +115,7 @@
       position: absolute;
       inset: 12px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.22);
+      background: rgba(255, 255, 255, 0.22);
     }
 
     .avatar span {
@@ -148,7 +154,7 @@
       padding: 16px 18px;
       color: white;
       box-shadow: var(--shadow-strong);
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .banner h2 {
@@ -163,7 +169,77 @@
       margin: 0;
       font-size: 0.9rem;
       line-height: 1.45;
-      color: rgba(255,255,255,0.94);
+      color: rgba(255, 255, 255, 0.94);
+    }
+
+    .context-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .context-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .context-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .context-label {
+      color: var(--muted);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .context-value {
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-align: right;
+      max-width: 62%;
+    }
+
+    .context-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .mini-btn,
+    .mini-btn-secondary {
+      min-height: 38px;
+      border-radius: 999px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      flex: 1;
+      min-width: 118px;
+    }
+
+    .mini-btn {
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+    }
+
+    .mini-btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
     }
 
     .thread {
@@ -288,14 +364,14 @@
       bottom: 16px;
       width: calc(100% - 24px);
       max-width: 406px;
-      background: rgba(255,255,255,0.94);
-      border: 1px solid rgba(235,225,211,0.95);
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
       border-radius: 28px;
       padding: 10px;
       display: flex;
       gap: 10px;
       align-items: center;
-      box-shadow: 0 18px 38px rgba(120,96,60,0.14);
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       z-index: 20;
@@ -332,7 +408,7 @@
       align-items: center;
       justify-content: center;
       text-decoration: none;
-      box-shadow: 0 14px 28px rgba(255,107,97,0.18);
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
       cursor: pointer;
     }
 
@@ -371,7 +447,7 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="messages.html" class="back-link" aria-label="Go back">←</a>
+      <a href="messages.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="chat-head">
         <div class="avatar"><span id="avatarInitials">RE</span></div>
@@ -386,10 +462,32 @@
     </header>
 
     <section class="banner">
-      <h2>Event Conversation</h2>
+      <h2 id="bannerTitle">Event Conversation</h2>
       <p id="bannerText">
         Keep pricing, setup times, and booking details organized in one place.
       </p>
+    </section>
+
+    <section class="context-card" id="contextCard" style="display: none;">
+      <div class="context-row">
+        <span class="context-label">Event</span>
+        <span class="context-value" id="contextEventName">Not listed</span>
+      </div>
+
+      <div class="context-row">
+        <span class="context-label">Service</span>
+        <span class="context-value" id="contextListingTitle">Not listed</span>
+      </div>
+
+      <div class="context-row">
+        <span class="context-label">Request</span>
+        <span class="context-value" id="contextRequest">Conversation</span>
+      </div>
+
+      <div class="context-actions">
+        <a class="mini-btn" href="messages.html" id="messagesContextLink">Back to Inbox</a>
+        <a class="mini-btn-secondary" href="event-builder.html" id="eventContextLink">Open Event</a>
+      </div>
     </section>
 
     <section class="thread" id="thread">
@@ -440,6 +538,8 @@ let currentUser = null;
 let currentUserData = null;
 let conversationId = null;
 let conversationData = null;
+let eventData = null;
+let bookingRequestData = null;
 
 let unsubscribeMessages = null;
 let unsubscribeConversation = null;
@@ -447,6 +547,7 @@ let latestMessages = [];
 
 const params = new URLSearchParams(window.location.search);
 conversationId = params.get("id");
+const urlEventId = params.get("eventId");
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -486,6 +587,20 @@ function formatMessageTime(value) {
     hour: "numeric",
     minute: "2-digit"
   });
+}
+
+function getEventId() {
+  return safeText(conversationData?.eventId, "") || safeText(urlEventId, "");
+}
+
+function getBackHref() {
+  const eventId = getEventId();
+
+  if (currentUserData?.role === "customer" && eventId) {
+    return `messages.html?eventId=${encodeURIComponent(eventId)}`;
+  }
+
+  return "messages.html";
 }
 
 function renderError(title, message) {
@@ -613,26 +728,145 @@ function getOtherParticipantName() {
   return safeText(conversationData.title, "Conversation");
 }
 
-function updateHeader() {
+async function loadEventContext() {
+  const eventId = getEventId();
+
+  eventData = null;
+
+  if (!eventId) return;
+
+  try {
+    const eventRef = doc(db, "customerEvents", eventId);
+    const eventSnap = await getDoc(eventRef);
+
+    if (eventSnap.exists()) {
+      eventData = {
+        id: eventSnap.id,
+        ...eventSnap.data()
+      };
+    }
+  } catch {
+    eventData = null;
+  }
+}
+
+async function loadBookingRequestContext() {
+  const requestId = safeText(conversationData?.bookingRequestId, "");
+
+  bookingRequestData = null;
+
+  if (!requestId) return;
+
+  try {
+    const requestRef = doc(db, "bookingRequests", requestId);
+    const requestSnap = await getDoc(requestRef);
+
+    if (requestSnap.exists()) {
+      bookingRequestData = {
+        id: requestSnap.id,
+        ...requestSnap.data()
+      };
+    }
+  } catch {
+    bookingRequestData = null;
+  }
+}
+
+function updateContextCard() {
+  const eventId = getEventId();
+  const contextCard = document.getElementById("contextCard");
+
+  if (!conversationData) {
+    contextCard.style.display = "none";
+    return;
+  }
+
+  const eventName =
+    safeText(eventData?.eventName, "") ||
+    safeText(conversationData.eventName, "") ||
+    safeText(bookingRequestData?.eventDetails?.eventName, "") ||
+    "Event not listed";
+
+  const listingTitle = safeText(conversationData.listingTitle, "Event service");
+  const requestStatus =
+    safeText(bookingRequestData?.requestStatus || bookingRequestData?.status, "") ||
+    safeText(conversationData.contextType, "Conversation");
+
+  setText("contextEventName", eventName);
+  setText("contextListingTitle", listingTitle);
+  setText("contextRequest", requestStatus.replaceAll("_", " "));
+
+  const messagesLink = document.getElementById("messagesContextLink");
+  const eventLink = document.getElementById("eventContextLink");
+
+  messagesLink.href = currentUserData?.role === "customer" && eventId
+    ? `messages.html?eventId=${encodeURIComponent(eventId)}`
+    : "messages.html";
+
+  if (currentUserData?.role === "customer" && eventId) {
+    eventLink.href = `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
+    eventLink.style.display = "inline-flex";
+  } else if (conversationData.bookingRequestId) {
+    eventLink.href = `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
+    eventLink.textContent = "Open Request";
+    eventLink.style.display = "inline-flex";
+  } else {
+    eventLink.style.display = "none";
+  }
+
+  contextCard.style.display = "grid";
+}
+
+async function updateHeader() {
   if (!conversationData) return;
+
+  await Promise.all([
+    loadEventContext(),
+    loadBookingRequestContext()
+  ]);
 
   const otherName = getOtherParticipantName();
   const listingTitle = safeText(conversationData.listingTitle, "Event listing");
   const listingCategory = safeText(conversationData.listingCategory, "Event service");
   const listingLocation = safeText(conversationData.listingLocation, "");
+  const eventId = getEventId();
 
   setText("avatarInitials", initialsFromName(otherName));
   setText("chatName", otherName);
 
   const subParts = [listingTitle, listingCategory];
-  if (listingLocation) subParts.push(listingLocation);
+
+  if (listingLocation) {
+    subParts.push(listingLocation);
+  }
 
   setText("chatSub", subParts.join(" · "));
-  setText("bannerText", `Use this thread to ask questions, confirm details, and keep communication organized for ${listingTitle}.`);
+
+  const eventName =
+    safeText(eventData?.eventName, "") ||
+    safeText(conversationData.eventName, "") ||
+    safeText(bookingRequestData?.eventDetails?.eventName, "");
+
+  setText("bannerTitle", eventName ? eventName : "Event Conversation");
+  setText(
+    "bannerText",
+    `Use this thread to ask questions, confirm details, and keep communication organized for ${listingTitle}.`
+  );
+
+  const backLink = document.getElementById("backLink");
+  backLink.href = getBackHref();
+
+  const listingLink = document.getElementById("listingLink");
 
   if (conversationData.listingId) {
-    document.getElementById("listingLink").href = `detail.html?id=${encodeURIComponent(conversationData.listingId)}`;
+    listingLink.href = eventId
+      ? `detail.html?id=${encodeURIComponent(conversationData.listingId)}&eventId=${encodeURIComponent(eventId)}`
+      : `detail.html?id=${encodeURIComponent(conversationData.listingId)}`;
+  } else {
+    listingLink.href = currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "listings.html";
   }
+
+  updateContextCard();
 }
 
 async function markConversationAsRead() {
@@ -684,7 +918,7 @@ function watchConversation() {
       return;
     }
 
-    updateHeader();
+    await updateHeader();
     renderMessages();
 
     await markConversationAsRead();
@@ -744,8 +978,7 @@ async function loadConversation() {
       return;
     }
 
-    updateHeader();
-
+    await updateHeader();
     await markConversationAsRead();
 
     watchConversation();
@@ -784,6 +1017,9 @@ async function sendMessage(text) {
       senderId: currentUser.uid,
       senderName,
       senderRole: currentUserData.role || "customer",
+      eventId: getEventId() || null,
+      bookingRequestId: conversationData.bookingRequestId || null,
+      listingId: conversationData.listingId || null,
       createdAt: serverTimestamp()
     });
 
@@ -800,6 +1036,7 @@ async function sendMessage(text) {
     await updateDoc(conversationRef, {
       lastMessage: messageText,
       lastSenderId: currentUser.uid,
+      eventId: getEventId() || conversationData.eventId || null,
       updatedAt: serverTimestamp(),
       unreadFor
     });
