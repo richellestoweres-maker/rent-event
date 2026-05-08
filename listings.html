@@ -13,9 +13,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -34,13 +32,16 @@
       --green-text: #2d7a49;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       background: var(--bg);
@@ -48,9 +49,7 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .page {
       width: 100%;
@@ -68,8 +67,7 @@
       margin-bottom: 22px;
     }
 
-    .back-link,
-    .icon-btn {
+    .back-link, .icon-btn {
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -83,6 +81,7 @@
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 700;
+      position: relative;
     }
 
     .topbar-center {
@@ -132,7 +131,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 310px;
+      max-width: 330px;
     }
 
     .hero-label {
@@ -151,10 +150,30 @@
     }
 
     .hero-subtitle {
-      margin: 0;
+      margin: 0 0 14px;
       font-size: 0.95rem;
       line-height: 1.45;
       color: rgba(255, 255, 255, 0.95);
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
     }
 
     .search-panel {
@@ -171,8 +190,7 @@
       gap: 10px;
     }
 
-    .search-input,
-    .select-input {
+    .search-input, .select-input {
       width: 100%;
       min-height: 54px;
       border-radius: 999px;
@@ -186,9 +204,7 @@
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.03);
     }
 
-    .search-input::placeholder {
-      color: #9f9488;
-    }
+    .search-input::placeholder { color: #9f9488; }
 
     .filter-row {
       display: grid;
@@ -208,6 +224,21 @@
       cursor: pointer;
     }
 
+    .context-card {
+      display: none;
+      background: var(--purple-soft);
+      border: 1px solid rgba(111, 74, 184, 0.12);
+      color: var(--purple-text);
+      border-radius: 22px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      line-height: 1.42;
+      font-weight: 700;
+    }
+
+    .context-card.show { display: block; }
+
     .filters {
       display: flex;
       gap: 10px;
@@ -217,9 +248,7 @@
       scrollbar-width: none;
     }
 
-    .filters::-webkit-scrollbar {
-      display: none;
-    }
+    .filters::-webkit-scrollbar { display: none; }
 
     .filter-pill {
       min-height: 40px;
@@ -246,9 +275,7 @@
       border-color: transparent;
     }
 
-    .section {
-      margin-top: 28px;
-    }
+    .section { margin-top: 28px; }
 
     .section-header {
       display: flex;
@@ -318,10 +345,7 @@
       background: rgba(255, 255, 255, 0.16);
     }
 
-    .listing-image.has-photo::before,
-    .listing-image.has-photo::after {
-      display: none;
-    }
+    .listing-image.has-photo::before, .listing-image.has-photo::after { display: none; }
 
     .listing-image img {
       width: 100%;
@@ -330,21 +354,10 @@
       display: block;
     }
 
-    .image-1 {
-      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
-    }
-
-    .image-2 {
-      background: linear-gradient(135deg, #ffe6d8, #f1b58f 48%, #d9867e 100%);
-    }
-
-    .image-3 {
-      background: linear-gradient(135deg, #ffe7dd, #f3b58d 48%, #b783ff 100%);
-    }
-
-    .image-4 {
-      background: linear-gradient(135deg, #e5f0ff, #c9ddff 48%, #95b6ff 100%);
-    }
+    .image-1 { background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%); }
+    .image-2 { background: linear-gradient(135deg, #ffe6d8, #f1b58f 48%, #d9867e 100%); }
+    .image-3 { background: linear-gradient(135deg, #ffe7dd, #f3b58d 48%, #b783ff 100%); }
+    .image-4 { background: linear-gradient(135deg, #e5f0ff, #c9ddff 48%, #95b6ff 100%); }
 
     .listing-top {
       display: flex;
@@ -400,33 +413,18 @@
       font-weight: 700;
     }
 
-    .pill.rating {
-      background: #fff4df;
-      color: #aa6f12;
-    }
-
-    .pill.location {
-      background: #f6efe4;
-      color: #6a625a;
-    }
-
-    .pill.type {
-      background: var(--blue-soft);
-      color: var(--blue-text);
-    }
-
-    .pill.available {
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
+    .pill.rating { background: #fff4df; color: #aa6f12; }
+    .pill.location { background: #f6efe4; color: #6a625a; }
+    .pill.type { background: var(--blue-soft); color: var(--blue-text); }
+    .pill.available { background: var(--green-soft); color: var(--green-text); }
+    .pill.event { background: var(--purple-soft); color: var(--purple-text); }
 
     .listing-actions {
       display: flex;
       gap: 10px;
     }
 
-    .btn,
-    .btn-secondary {
+    .btn, .btn-secondary, .btn-disabled {
       min-height: 46px;
       border-radius: 999px;
       display: inline-flex;
@@ -438,6 +436,7 @@
       font-family: inherit;
       border: none;
       flex: 1;
+      text-align: center;
     }
 
     .btn {
@@ -449,6 +448,11 @@
     .btn-secondary {
       background: var(--soft-2);
       color: #4a433d;
+    }
+
+    .btn-disabled {
+      background: var(--soft-2);
+      color: var(--muted);
     }
 
     .empty-card {
@@ -522,10 +526,7 @@
       padding: 0 4px;
     }
 
-    .nav-item svg {
-      width: 20px;
-      height: 20px;
-    }
+    .nav-item svg { width: 20px; height: 20px; }
 
     .nav-item.active {
       background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
@@ -534,35 +535,17 @@
     }
 
     @media (max-width: 390px) {
-      .filter-row {
-        grid-template-columns: 1fr;
-      }
+      .filter-row { grid-template-columns: 1fr; }
+      .listing-actions { flex-direction: column; }
     }
 
     @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
-      }
-
-      .page {
-        max-width: 960px;
-      }
-
-      .hero-content {
-        max-width: 460px;
-      }
-
-      .search-wrap {
-        grid-template-columns: 1fr 0.7fr 0.7fr;
-      }
-
-      .listing-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .bottom-nav {
-        max-width: 520px;
-      }
+      body { padding: 24px 0; }
+      .page { max-width: 960px; }
+      .hero-content { max-width: 520px; }
+      .search-wrap { grid-template-columns: 1fr 0.7fr 0.7fr; }
+      .listing-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .bottom-nav { max-width: 520px; }
     }
   </style>
 </head>
@@ -570,7 +553,7 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Marketplace</div>
@@ -582,73 +565,42 @@
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Find your perfect match</div>
+        <div class="hero-label" id="heroLabel">Find your perfect match</div>
         <h2 class="hero-title">Browse event vendors near your event.</h2>
-        <p class="hero-subtitle">
-          Search by city, ZIP, category, and event type so RentEvent can grow from local to national.
+        <p class="hero-subtitle" id="heroSubtitle">
+          Search by city, ZIP, category, and event type. Add vendors directly to the event project you are building.
         </p>
+
+        <div class="hero-pills">
+          <span class="hero-pill" id="eventContextPill">Marketplace</span>
+          <span class="hero-pill">Vendors</span>
+          <span class="hero-pill">Rentals</span>
+        </div>
       </div>
     </section>
 
+    <div class="context-card" id="eventContextCard">
+      Browsing for this event project. Vendors you add will go back to this event board.
+    </div>
+
     <section class="search-panel">
       <div class="search-wrap">
-        <input id="searchInput" class="search-input" type="text" placeholder="Search vendors, rentals, décor..." />
+        <input id="searchInput" class="search-input" type="text" placeholder="Search DJs, singers, rentals, glam, décor..." />
 
         <input id="locationInput" class="search-input" type="text" placeholder="City, ZIP, or service area" />
 
         <div class="filter-row">
           <select id="stateInput" class="select-input">
             <option value="">State</option>
-            <option>TX</option>
-            <option>AL</option>
-            <option>AK</option>
-            <option>AZ</option>
-            <option>AR</option>
-            <option>CA</option>
-            <option>CO</option>
-            <option>CT</option>
-            <option>DE</option>
-            <option>FL</option>
-            <option>GA</option>
-            <option>HI</option>
-            <option>ID</option>
-            <option>IL</option>
-            <option>IN</option>
-            <option>IA</option>
-            <option>KS</option>
-            <option>KY</option>
-            <option>LA</option>
-            <option>ME</option>
-            <option>MD</option>
-            <option>MA</option>
-            <option>MI</option>
-            <option>MN</option>
-            <option>MS</option>
-            <option>MO</option>
-            <option>MT</option>
-            <option>NE</option>
-            <option>NV</option>
-            <option>NH</option>
-            <option>NJ</option>
-            <option>NM</option>
-            <option>NY</option>
-            <option>NC</option>
-            <option>ND</option>
-            <option>OH</option>
-            <option>OK</option>
-            <option>OR</option>
-            <option>PA</option>
-            <option>RI</option>
-            <option>SC</option>
-            <option>SD</option>
-            <option>TN</option>
-            <option>UT</option>
-            <option>VT</option>
-            <option>VA</option>
-            <option>WA</option>
-            <option>WV</option>
-            <option>WI</option>
-            <option>WY</option>
+            <option>TX</option><option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option>
+            <option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option><option>HI</option>
+            <option>ID</option><option>IL</option><option>IN</option><option>IA</option><option>KS</option><option>KY</option>
+            <option>LA</option><option>ME</option><option>MD</option><option>MA</option><option>MI</option><option>MN</option>
+            <option>MS</option><option>MO</option><option>MT</option><option>NE</option><option>NV</option><option>NH</option>
+            <option>NJ</option><option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option>
+            <option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option><option>SD</option>
+            <option>TN</option><option>UT</option><option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+            <option>WI</option><option>WY</option>
           </select>
 
           <button id="clearFiltersBtn" class="clear-btn" type="button">Clear</button>
@@ -725,9 +677,20 @@
 
           <option>DJ</option>
           <option>Wedding DJ</option>
+          <option>Live Singer</option>
+          <option>Wedding Singer</option>
+          <option>Ceremony Singer</option>
+          <option>Worship Singer</option>
+          <option>Acoustic Singer</option>
+          <option>Acoustic Guitarist</option>
           <option>Live Band</option>
           <option>Live Ceremony Music</option>
+          <option>Violinist</option>
+          <option>String Quartet</option>
+          <option>Pianist</option>
+          <option>Karaoke Host</option>
           <option>Emcee / Host</option>
+          <option>Sound & Lighting</option>
           <option>Cold Sparks</option>
           <option>Special Effects</option>
 
@@ -745,6 +708,10 @@
           <option>Bridal Hair</option>
           <option>Bridal Makeup</option>
           <option>Glam Services</option>
+          <option>Skin Prep Facial</option>
+          <option>Spray Tan Artist</option>
+          <option>Formalwear</option>
+          <option>Bridal Styling</option>
           <option>Wedding Officiant</option>
 
           <option>Transportation</option>
@@ -775,6 +742,8 @@
       <button class="filter-pill" data-filter="catering">Food</button>
       <button class="filter-pill" data-filter="venue">Venues</button>
       <button class="filter-pill" data-filter="kids">Kids</button>
+      <button class="filter-pill" data-filter="music">Music</button>
+      <button class="filter-pill" data-filter="beauty">Beauty</button>
       <button class="filter-pill" data-filter="travel">Travels</button>
       <button class="filter-pill" data-filter="virtual">Virtual/National</button>
     </div>
@@ -782,7 +751,7 @@
     <section class="section">
       <div class="section-header">
         <h2 class="section-title" id="sectionTitle">Published Listings</h2>
-        <a class="section-link" href="event-builder.html">Plan Event</a>
+        <a class="section-link" href="dashboard.html#myEventsSection" id="planEventLink">Plan Event</a>
       </div>
 
       <div class="listing-list" id="listingList">
@@ -803,7 +772,7 @@
       <span>Home</span>
     </a>
 
-    <a class="nav-item active" href="listings.html">
+    <a class="nav-item active" href="listings.html" id="navListingsLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
         <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -832,7 +801,14 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -845,10 +821,15 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 let allListings = [];
 let activeFilter = "all";
+let currentUser = null;
+let currentUserData = null;
+let currentEventId = "";
+let currentEventData = null;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -883,6 +864,30 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function getUrlParams() {
+  return new URLSearchParams(window.location.search);
+}
+
+function buildUrl(path, params = {}) {
+  const searchParams = new URLSearchParams();
+
+  if (currentEventId) {
+    searchParams.set("eventId", currentEventId);
+  }
+
+  Object.entries(params).forEach(([key, value]) => {
+    const clean = safeText(value, "");
+
+    if (clean) {
+      searchParams.set(key, clean);
+    }
+  });
+
+  const queryString = searchParams.toString();
+
+  return queryString ? `${path}?${queryString}` : path;
+}
+
 function getEventTypes(listing) {
   if (Array.isArray(listing.eventTypes) && listing.eventTypes.length) {
     return listing.eventTypes.map((item) => safeText(item, "")).filter(Boolean);
@@ -907,12 +912,20 @@ function getEventTypesText(listing) {
 function renderEmptyState(title, message) {
   const listingList = document.getElementById("listingList");
 
+  const buttonHref = currentEventId
+    ? buildUrl("event-builder.html")
+    : "dashboard.html#myEventsSection";
+
+  const buttonLabel = currentEventId
+    ? "Back to Event"
+    : "Choose Event";
+
   listingList.innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">+</div>
       <h3>${escapeHtml(title)}</h3>
       <p>${escapeHtml(message)}</p>
-      <a class="btn" href="dashboard.html">Back to Dashboard</a>
+      <a class="btn" href="${escapeHtml(buttonHref)}">${escapeHtml(buttonLabel)}</a>
     </div>
   `;
 }
@@ -967,8 +980,16 @@ function listingMatchesFilter(listing, filter) {
   if (filter === "all") return true;
 
   const searchable = getSearchBlob(listing);
-  const travelAvailable = listing.travelAvailable === true || normalize(listing.travelAvailableValue).includes("yes") || normalize(listing.travelAvailableValue).includes("limited");
-  const nationalService = listing.nationalShipping === true || listing.virtualService === true || normalize(listing.nationalShipping).includes("yes") || normalize(listing.virtualService).includes("yes");
+  const travelAvailable =
+    listing.travelAvailable === true ||
+    normalize(listing.travelAvailableValue).includes("yes") ||
+    normalize(listing.travelAvailableValue).includes("limited");
+
+  const nationalService =
+    listing.nationalShipping === true ||
+    listing.virtualService === true ||
+    normalize(listing.nationalShipping).includes("yes") ||
+    normalize(listing.virtualService).includes("yes");
 
   if (filter === "birthday") {
     return searchable.includes("birthday") || searchable.includes("party") || searchable.includes("cake") || searchable.includes("bounce");
@@ -1004,6 +1025,14 @@ function listingMatchesFilter(listing, filter) {
 
   if (filter === "kids") {
     return searchable.includes("kids") || searchable.includes("children") || searchable.includes("toddler") || searchable.includes("soft play") || searchable.includes("bounce") || searchable.includes("character");
+  }
+
+  if (filter === "music") {
+    return searchable.includes("music") || searchable.includes("dj") || searchable.includes("singer") || searchable.includes("band") || searchable.includes("ceremony") || searchable.includes("acoustic") || searchable.includes("violin") || searchable.includes("emcee") || searchable.includes("karaoke") || searchable.includes("sound") || searchable.includes("lighting");
+  }
+
+  if (filter === "beauty") {
+    return searchable.includes("beauty") || searchable.includes("glam") || searchable.includes("makeup") || searchable.includes("hair") || searchable.includes("bridal") || searchable.includes("skin prep") || searchable.includes("facial") || searchable.includes("spray tan");
   }
 
   if (filter === "travel") {
@@ -1078,6 +1107,22 @@ function renderListings(listings) {
       ? `<div class="listing-image has-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}"></div>`
       : `<div class="listing-image ${imageClass}"></div>`;
 
+    const detailsHref = buildUrl("detail.html", { id: listing.id || "" });
+
+    const addHref = currentEventId
+      ? buildUrl("event-builder.html", { add: listing.id || "" })
+      : "dashboard.html#myEventsSection";
+
+    const addLabel = currentEventId
+      ? "Add to Event"
+      : "Choose Event First";
+
+    const addClass = currentEventId ? "btn-secondary" : "btn-disabled";
+
+    const eventContextPill = currentEventData?.eventName
+      ? `<span class="pill event">${escapeHtml(currentEventData.eventName)}</span>`
+      : "";
+
     return `
       <article class="listing-card">
         ${imageMarkup}
@@ -1089,9 +1134,7 @@ function renderListings(listings) {
 
         <p class="listing-category">${escapeHtml(categoryLine)}</p>
 
-        <p class="listing-description">
-          ${escapeHtml(description)}
-        </p>
+        <p class="listing-description">${escapeHtml(description)}</p>
 
         <div class="listing-meta">
           <span class="pill rating">${escapeHtml(rating)}</span>
@@ -1099,11 +1142,12 @@ function renderListings(listings) {
           ${renderEventTypePills(listing)}
           ${serviceArea ? `<span class="pill location">${escapeHtml(serviceArea)}</span>` : ""}
           <span class="pill available">${escapeHtml(availability)}</span>
+          ${eventContextPill}
         </div>
 
         <div class="listing-actions">
-          <a class="btn" href="detail.html?id=${listingId}">View Details</a>
-          <a class="btn-secondary" href="event-builder.html?add=${listingId}">Add to Event</a>
+          <a class="btn" href="${escapeHtml(detailsHref)}">View Details</a>
+          <a class="${addClass}" href="${escapeHtml(addHref)}">${escapeHtml(addLabel)}</a>
         </div>
       </article>
     `;
@@ -1119,9 +1163,7 @@ function applySearchAndFilter() {
   let filtered = allListings.filter((listing) => listingMatchesFilter(listing, activeFilter));
 
   if (searchQuery) {
-    filtered = filtered.filter((listing) => {
-      return getSearchBlob(listing).includes(searchQuery);
-    });
+    filtered = filtered.filter((listing) => getSearchBlob(listing).includes(searchQuery));
   }
 
   if (locationQuery) {
@@ -1181,7 +1223,9 @@ function setActiveFilter(filterValue) {
 }
 
 function applyUrlParams() {
-  const params = new URLSearchParams(window.location.search);
+  const params = getUrlParams();
+
+  currentEventId = safeText(params.get("eventId"), "");
 
   const search = params.get("search") || params.get("q") || "";
   const location = params.get("location") || params.get("city") || "";
@@ -1189,17 +1233,9 @@ function applyUrlParams() {
   const category = params.get("category") || "";
   const filter = params.get("filter") || "";
 
-  if (search) {
-    document.getElementById("searchInput").value = search;
-  }
-
-  if (location) {
-    document.getElementById("locationInput").value = location;
-  }
-
-  if (state) {
-    document.getElementById("stateInput").value = state.toUpperCase();
-  }
+  if (search) document.getElementById("searchInput").value = search;
+  if (location) document.getElementById("locationInput").value = location;
+  if (state) document.getElementById("stateInput").value = state.toUpperCase();
 
   if (category) {
     const categoryInput = document.getElementById("categoryInput");
@@ -1214,8 +1250,45 @@ function applyUrlParams() {
     }
   }
 
-  if (filter) {
-    setActiveFilter(filter);
+  if (filter) setActiveFilter(filter);
+}
+
+async function loadEventContext() {
+  if (!currentEventId) {
+    document.getElementById("backLink").href = "dashboard.html";
+    document.getElementById("planEventLink").href = "dashboard.html#myEventsSection";
+    document.getElementById("navListingsLink").href = "listings.html";
+    return;
+  }
+
+  document.getElementById("backLink").href = buildUrl("event-builder.html");
+  document.getElementById("planEventLink").href = buildUrl("event-builder.html");
+  document.getElementById("navListingsLink").href = buildUrl("listings.html");
+
+  try {
+    const eventRef = doc(db, "customerEvents", currentEventId);
+    const eventSnap = await getDoc(eventRef);
+
+    if (eventSnap.exists()) {
+      currentEventData = {
+        id: eventSnap.id,
+        ...eventSnap.data()
+      };
+
+      const eventName = safeText(currentEventData.eventName, "This Event");
+      const eventType = safeText(currentEventData.eventType, "Event Project");
+
+      document.getElementById("eventContextCard").classList.add("show");
+      document.getElementById("eventContextCard").textContent =
+        `Browsing for ${eventName}. Vendors you add will return to this event board.`;
+
+      document.getElementById("eventContextPill").textContent = eventType;
+      document.getElementById("heroLabel").textContent = `Browsing for ${eventName}`;
+      document.getElementById("heroSubtitle").textContent =
+        "Search by city, ZIP, category, and event type. Add vendors directly to this event project.";
+    }
+  } catch {
+    currentEventData = null;
   }
 }
 
@@ -1244,8 +1317,6 @@ async function loadListings() {
     });
 
     allListings = listings;
-
-    applyUrlParams();
     applySearchAndFilter();
 
   } catch (error) {
@@ -1261,7 +1332,11 @@ function clearFilters() {
 
   setActiveFilter("all");
 
-  window.history.replaceState({}, document.title, "listings.html");
+  const cleanUrl = currentEventId
+    ? `listings.html?eventId=${encodeURIComponent(currentEventId)}`
+    : "listings.html";
+
+  window.history.replaceState({}, document.title, cleanUrl);
 
   renderListings(allListings);
 }
@@ -1279,7 +1354,41 @@ document.querySelectorAll(".filter-pill").forEach((button) => {
   });
 });
 
-loadListings();
+async function initPage() {
+  applyUrlParams();
+  await loadEventContext();
+  await loadListings();
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  try {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    currentUserData = userSnap.data();
+
+    if (currentUserData.role === "vendor") {
+      window.location.href = "vendor-dashboard.html";
+      return;
+    }
+
+    initPage();
+  } catch {
+    initPage();
+  }
+});
 </script>
 
 </body>
