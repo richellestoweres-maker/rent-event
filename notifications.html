@@ -36,6 +36,8 @@
       --red-text: #c74f4d;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
@@ -259,6 +261,11 @@
       color: var(--blue-text);
     }
 
+    .icon-purple {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
     .notification-content {
       min-width: 0;
       flex: 1;
@@ -331,6 +338,11 @@
     .pill.message {
       background: var(--blue-soft);
       color: var(--blue-text);
+    }
+
+    .pill.request {
+      background: var(--purple-soft);
+      color: var(--purple-text);
     }
 
     .empty-card {
@@ -475,18 +487,14 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">
-        ←
-      </a>
+      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow" id="roleEyebrow">Updates</div>
         <h1 class="page-title">Notifications</h1>
       </div>
 
-      <a href="profile.html" class="icon-btn" id="profileLink" aria-label="Profile">
-        ☺
-      </a>
+      <a href="profile.html" class="icon-btn" id="profileLink" aria-label="Profile">☺</a>
     </header>
 
     <section class="hero-card">
@@ -509,15 +517,13 @@
         <div class="empty-card">
           <div class="empty-icon">…</div>
           <h3>Loading notifications</h3>
-          <p>We’re checking for message updates now.</p>
+          <p>We’re checking for message and booking updates now.</p>
         </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation">
-    <!-- Role navigation renders here -->
-  </nav>
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation"></nav>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -549,7 +555,7 @@ const db = getFirestore(app);
 
 let currentUser = null;
 let currentUserData = null;
-let allConversations = [];
+let allNotifications = [];
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -583,6 +589,14 @@ function formatTime(value) {
   return date.toLocaleDateString();
 }
 
+function getSortTime(item) {
+  const value = item.updatedAt || item.createdAt;
+
+  if (value && value.seconds) return value.seconds;
+
+  return 0;
+}
+
 function getOtherParticipantName(conversation) {
   const participantNames = conversation.participantNames || {};
   const otherIds = (conversation.participantIds || []).filter((id) => id !== currentUser.uid);
@@ -612,7 +626,7 @@ function renderBottomNav(role) {
           <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
           <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         </svg>
-        <span>Add Listing</span>
+        <span>Add</span>
       </a>
 
       <a class="nav-item active" href="notifications.html">
@@ -623,12 +637,13 @@ function renderBottomNav(role) {
         <span>Alerts</span>
       </a>
 
-      <a class="nav-item" href="vendor-profile.html">
+      <a class="nav-item" href="messages.html">
         <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-          <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         </svg>
-        <span>Profile</span>
+        <span>Inbox</span>
       </a>
     `;
     return;
@@ -659,12 +674,13 @@ function renderBottomNav(role) {
       <span>Alerts</span>
     </a>
 
-    <a class="nav-item" href="profile.html">
+    <a class="nav-item" href="my-requests.html">
       <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Profile</span>
+      <span>Requests</span>
     </a>
   `;
 }
@@ -678,7 +694,7 @@ function applyRoleLayout(role) {
     profileLink.href = "vendor-profile.html";
     document.getElementById("roleEyebrow").textContent = "Vendor Updates";
     document.getElementById("heroLabel").textContent = "Stay bookable";
-    document.getElementById("heroSubtitle").textContent = "Keep track of customer inquiries, message replies, and booking-related updates.";
+    document.getElementById("heroSubtitle").textContent = "Keep track of customer inquiries, request changes, and message replies.";
   } else {
     backLink.href = "dashboard.html";
     profileLink.href = "profile.html";
@@ -700,7 +716,7 @@ function renderEmptyState() {
     <div class="empty-card">
       <div class="empty-icon">✓</div>
       <h3>No notifications yet</h3>
-      <p>You’re all caught up. New messages and updates will appear here.</p>
+      <p>You’re all caught up. New messages and booking updates will appear here.</p>
       <div class="empty-actions">
         <a class="btn" href="${href}">${label}</a>
         <a class="btn-secondary" href="messages.html">Open Inbox</a>
@@ -709,45 +725,79 @@ function renderEmptyState() {
   `;
 }
 
-function renderNotifications(conversations) {
+function getNotificationHref(notification) {
+  const type = safeText(notification.type, "");
+
+  if (type === "message") {
+    return `chat-thread.html?id=${encodeURIComponent(notification.sourceId || "")}`;
+  }
+
+  if (type === "vendor_response") {
+    return "my-requests.html";
+  }
+
+  if (type === "request_withdrawn") {
+    return "booking-requests.html";
+  }
+
+  if (type === "booking_request") {
+    return currentUserData?.role === "vendor" ? "booking-requests.html" : "my-requests.html";
+  }
+
+  return currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "dashboard.html";
+}
+
+function getIconClass(notification) {
+  const type = safeText(notification.type, "");
+
+  if (notification.read === false) return "icon-coral";
+  if (type === "vendor_response") return "icon-green";
+  if (type === "request_withdrawn") return "icon-gold";
+  if (type === "booking_request") return "icon-purple";
+  if (type === "message") return "icon-blue";
+
+  return "icon-gold";
+}
+
+function getIconText(notification) {
+  const type = safeText(notification.type, "");
+
+  if (type === "vendor_response") return "✓";
+  if (type === "request_withdrawn") return "!";
+  if (type === "booking_request") return "◎";
+  if (type === "message") return "✉";
+
+  return "•";
+}
+
+function renderNotifications(notifications) {
   const list = document.getElementById("notificationList");
   const sectionTitle = document.getElementById("sectionTitle");
 
-  if (!conversations.length) {
+  if (!notifications.length) {
     sectionTitle.textContent = "Recent Activity";
     renderEmptyState();
     return;
   }
 
-  const unreadCount = conversations.filter((conversation) => {
-    const unreadFor = conversation.unreadFor || {};
-    return !!unreadFor[currentUser.uid];
-  }).length;
+  const unreadCount = notifications.filter((notification) => notification.read === false).length;
 
   sectionTitle.textContent = unreadCount
     ? `${unreadCount} Unread Alert${unreadCount === 1 ? "" : "s"}`
     : "Recent Activity";
 
-  list.innerHTML = conversations.map((conversation) => {
-    const unreadFor = conversation.unreadFor || {};
-    const isUnread = !!unreadFor[currentUser.uid];
-
-    const otherName = getOtherParticipantName(conversation);
-    const listingTitle = safeText(conversation.listingTitle, "Event listing");
-    const lastMessage = safeText(conversation.lastMessage, "Conversation updated.");
-    const updatedAt = conversation.updatedAt || conversation.createdAt;
-    const time = formatTime(updatedAt);
-    const conversationId = encodeURIComponent(conversation.id || "");
-
-    const title = isUnread
-      ? `New message from ${otherName}`
-      : `Message thread with ${otherName}`;
-
-    const text = `${lastMessage} Related to ${listingTitle}.`;
+  list.innerHTML = notifications.map((notification) => {
+    const isUnread = notification.read === false;
+    const title = safeText(notification.title, "Notification");
+    const text = safeText(notification.body || notification.text, "You have a new update.");
+    const time = formatTime(notification.createdAt || notification.updatedAt);
+    const href = getNotificationHref(notification);
+    const typeLabel = safeText(notification.typeLabel || notification.category || "Update", "Update");
+    const sourceLabel = safeText(notification.sourceLabel || notification.listingTitle || notification.eventName, "");
 
     return `
-      <a class="notification-card ${isUnread ? "unread" : ""}" href="chat-thread.html?id=${conversationId}">
-        <div class="notification-icon ${isUnread ? "icon-coral" : "icon-blue"}">✉</div>
+      <a class="notification-card ${isUnread ? "unread" : ""}" href="${escapeHtml(href)}" data-notification-id="${escapeHtml(notification.id || "")}">
+        <div class="notification-icon ${getIconClass(notification)}">${escapeHtml(getIconText(notification))}</div>
 
         <div class="notification-content">
           <div class="notification-top">
@@ -755,50 +805,115 @@ function renderNotifications(conversations) {
             <span class="notification-time">${escapeHtml(time)}</span>
           </div>
 
-          <p class="notification-text">
-            ${escapeHtml(text)}
-          </p>
+          <p class="notification-text">${escapeHtml(text)}</p>
 
           <div class="notification-meta">
-            ${isUnread ? `<span class="pill new">Unread</span>` : `<span class="pill message">Message</span>`}
-            <span class="pill info">${escapeHtml(listingTitle)}</span>
+            ${isUnread ? `<span class="pill new">Unread</span>` : `<span class="pill message">Read</span>`}
+            <span class="pill request">${escapeHtml(typeLabel.replaceAll("_", " "))}</span>
+            ${sourceLabel ? `<span class="pill info">${escapeHtml(sourceLabel)}</span>` : ""}
           </div>
         </div>
       </a>
     `;
   }).join("");
+
+  document.querySelectorAll("[data-notification-id]").forEach((card) => {
+    card.addEventListener("click", async () => {
+      const notificationId = card.dataset.notificationId;
+      const notification = allNotifications.find((item) => item.id === notificationId);
+
+      if (notification && notification.collectionName === "notifications" && notification.read === false) {
+        await updateDoc(doc(db, "notifications", notificationId), {
+          read: true
+        });
+      }
+    });
+  });
+}
+
+function buildConversationNotification(conversation) {
+  const unreadFor = conversation.unreadFor || {};
+  const isUnread = !!unreadFor[currentUser.uid];
+  const otherName = getOtherParticipantName(conversation);
+  const listingTitle = safeText(conversation.listingTitle, "Event listing");
+  const lastMessage = safeText(conversation.lastMessage, "Conversation updated.");
+
+  return {
+    id: `conversation_${conversation.id}`,
+    sourceId: conversation.id,
+    collectionName: "conversations",
+    type: "message",
+    typeLabel: "Message",
+    title: isUnread ? `New message from ${otherName}` : `Message thread with ${otherName}`,
+    body: `${lastMessage} Related to ${listingTitle}.`,
+    sourceLabel: listingTitle,
+    read: !isUnread,
+    createdAt: conversation.updatedAt || conversation.createdAt,
+    updatedAt: conversation.updatedAt || conversation.createdAt,
+    raw: conversation
+  };
+}
+
+async function loadConversationNotifications(user) {
+  const conversationsRef = collection(db, "conversations");
+  const conversationsQuery = query(conversationsRef, where("participantIds", "array-contains", user.uid));
+  const snapshot = await getDocs(conversationsQuery);
+
+  const conversations = [];
+
+  snapshot.forEach((docSnap) => {
+    conversations.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+  });
+
+  return conversations.map(buildConversationNotification);
+}
+
+async function loadAppNotifications(user) {
+  const notificationsRef = collection(db, "notifications");
+  const notificationsQuery = query(notificationsRef, where("recipientId", "==", user.uid));
+  const snapshot = await getDocs(notificationsQuery);
+
+  const notifications = [];
+
+  snapshot.forEach((docSnap) => {
+    notifications.push({
+      id: docSnap.id,
+      collectionName: "notifications",
+      ...docSnap.data()
+    });
+  });
+
+  return notifications;
 }
 
 async function loadNotifications(user) {
   try {
-    const conversationsRef = collection(db, "conversations");
-    const conversationsQuery = query(conversationsRef, where("participantIds", "array-contains", user.uid));
-    const snapshot = await getDocs(conversationsQuery);
+    const [conversationNotifications, appNotifications] = await Promise.all([
+      loadConversationNotifications(user),
+      loadAppNotifications(user)
+    ]);
 
-    const conversations = [];
+    const combined = [
+      ...conversationNotifications,
+      ...appNotifications
+    ];
 
-    snapshot.forEach((docSnap) => {
-      conversations.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
-    });
-
-    conversations.sort((a, b) => {
-      const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
-      const bUnread = b.unreadFor && b.unreadFor[user.uid] ? 1 : 0;
+    combined.sort((a, b) => {
+      const aUnread = a.read === false ? 1 : 0;
+      const bUnread = b.read === false ? 1 : 0;
 
       if (aUnread !== bUnread) {
         return bUnread - aUnread;
       }
 
-      const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : 0;
-      const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : 0;
-      return bTime - aTime;
+      return getSortTime(b) - getSortTime(a);
     });
 
-    allConversations = conversations;
-    renderNotifications(allConversations);
+    allNotifications = combined;
+    renderNotifications(allNotifications);
 
   } catch (error) {
     document.getElementById("notificationList").innerHTML = `
@@ -815,34 +930,46 @@ async function loadNotifications(user) {
 }
 
 async function clearUnread() {
-  if (!currentUser || !allConversations.length) return;
+  if (!currentUser || !allNotifications.length) return;
 
   const clearBtn = document.getElementById("clearUnreadBtn");
   clearBtn.disabled = true;
   clearBtn.textContent = "Clearing...";
 
   try {
-    const unreadConversations = allConversations.filter((conversation) => {
-      const unreadFor = conversation.unreadFor || {};
-      return !!unreadFor[currentUser.uid];
-    });
+    const unreadItems = allNotifications.filter((notification) => notification.read === false);
 
-    for (const conversation of unreadConversations) {
-      const updatedUnreadFor = {
-        ...(conversation.unreadFor || {})
-      };
+    for (const notification of unreadItems) {
+      if (notification.collectionName === "conversations") {
+        const conversation = notification.raw || {};
+        const updatedUnreadFor = {
+          ...(conversation.unreadFor || {})
+        };
 
-      delete updatedUnreadFor[currentUser.uid];
+        delete updatedUnreadFor[currentUser.uid];
 
-      await updateDoc(doc(db, "conversations", conversation.id), {
-        unreadFor: updatedUnreadFor
-      });
+        await updateDoc(doc(db, "conversations", notification.sourceId), {
+          unreadFor: updatedUnreadFor
+        });
+      }
+
+      if (notification.collectionName === "notifications") {
+        await updateDoc(doc(db, "notifications", notification.id), {
+          read: true
+        });
+      }
     }
 
     await loadNotifications(currentUser);
 
   } catch (error) {
-    alert(error.message);
+    document.getElementById("notificationList").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not clear notifications</h3>
+        <p>${escapeHtml(error.message)}</p>
+      </div>
+    `;
   } finally {
     clearBtn.disabled = false;
     clearBtn.textContent = "Clear Unread";
