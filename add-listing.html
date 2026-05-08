@@ -490,7 +490,7 @@
         <div class="hero-label">Create a new service</div>
         <h2 class="hero-title">Showcase your business beautifully.</h2>
         <p class="hero-subtitle">
-          Add a polished listing with clean categories, location details, and every event type your service fits.
+          Add a polished listing with music, glam, rentals, venues, food, planning, beauty, entertainment, and every event type your service fits.
         </p>
       </div>
     </section>
@@ -806,6 +806,7 @@ const serviceOptions = {
     "Balloon Arches",
     "Balloon Garlands",
     "Balloon Mosaics",
+    "Organic Balloon Installations",
     "Backdrop Rentals",
     "Custom Backdrops",
     "Arch Rentals",
@@ -826,12 +827,17 @@ const serviceOptions = {
     "Centerpieces",
     "Floral Design",
     "Wedding Florals",
+    "Bridal Bouquet",
+    "Ceremony Florals",
+    "Reception Florals",
+    "Aisle Décor",
     "Holiday Decorating",
     "Christmas Decorating"
   ],
   "Kids Parties & Activities": [
     "Bounce House Rentals",
     "White Bounce House Rentals",
+    "Combo Bounce House",
     "Water Slide Rentals",
     "Inflatable Obstacle Courses",
     "Soft Play Rentals",
@@ -846,8 +852,10 @@ const serviceOptions = {
     "Game Truck / Mobile Gaming",
     "Princess / Character Appearances",
     "Superhero Parties",
+    "Mascot / Character Rentals",
     "Kids Entertainment",
     "Face Painting",
+    "Balloon Twisting",
     "Magician / Performer",
     "Petting Zoo",
     "Pony Rides",
@@ -855,7 +863,8 @@ const serviceOptions = {
     "Craft Party",
     "Cooking Party",
     "Sports Party",
-    "Pool Party Services"
+    "Pool Party Services",
+    "Sleepover / Teepee Party"
   ],
   "Rentals": [
     "Party Rentals",
@@ -877,6 +886,7 @@ const serviceOptions = {
     "Stage Rentals",
     "Lighting Rentals",
     "Audio / Speaker Rentals",
+    "Microphone Rentals",
     "Generator Rentals",
     "Portable Restroom Rentals",
     "Luxury Restroom Trailer Rentals",
@@ -905,10 +915,12 @@ const serviceOptions = {
     "Rooftop Venue",
     "Hotel Event Space",
     "Country Club Venue",
-    "Waterfront Venue"
+    "Waterfront Venue",
+    "Destination Wedding Venue"
   ],
   "Food & Beverage": [
     "Catering",
+    "Wedding Catering",
     "Private Chef",
     "Food Trucks",
     "Taco Cart",
@@ -942,32 +954,65 @@ const serviceOptions = {
   "Photo, Video & Content": [
     "Photography",
     "Wedding Photography",
+    "Engagement Photography",
+    "Bridal Portraits",
     "Event Photography",
     "Kids Party Photography",
     "Videography",
     "Wedding Videography",
+    "Drone Video",
     "Content Creator",
+    "Wedding Content Creator",
     "Social Media Event Coverage",
     "Photo Booth",
     "360 Photo Booth",
     "Mirror Photo Booth",
+    "Digital Photo Booth",
     "Audio Guestbook",
-    "Guestbook Services"
+    "Guestbook Services",
+    "Live Painting",
+    "Caricature Artist"
   ],
   "Music & Entertainment": [
     "DJ",
     "Wedding DJ",
-    "Live Band",
+    "Reception DJ",
+    "Ceremony DJ",
+    "Club DJ",
+    "Live Singer",
+    "Wedding Singer",
+    "Ceremony Singer",
+    "Cocktail Hour Singer",
+    "Reception Singer",
+    "Worship Singer",
+    "Church Ceremony Singer",
+    "Acoustic Singer",
+    "Acoustic Guitarist",
     "Solo Musician",
-    "Live Ceremony Music",
+    "Pianist",
+    "Violinist",
+    "Cellist",
+    "String Duo",
+    "String Trio",
+    "String Quartet",
+    "Harpist",
+    "Live Band",
+    "Cover Band",
+    "Country Band",
+    "Jazz Band",
     "Mariachi Band",
-    "Karaoke",
+    "Choir / Vocal Group",
+    "Karaoke Host",
     "Emcee / Host",
+    "Comedian",
     "Dancers / Performers",
+    "Fire Performer",
     "Fireworks / Cold Sparks",
+    "Sound & Lighting",
     "Event Lighting",
     "Uplighting",
-    "Special Effects"
+    "Special Effects",
+    "Audio Engineer"
   ],
   "Planning & Staffing": [
     "Event Planner",
@@ -975,6 +1020,7 @@ const serviceOptions = {
     "Day-of Coordinator",
     "Wedding Planner",
     "Wedding Coordinator",
+    "Destination Wedding Planner",
     "Event Assistant",
     "Event Staffing",
     "Servers",
@@ -985,19 +1031,36 @@ const serviceOptions = {
     "Valet / Parking",
     "Security",
     "Coat Check",
-    "Restroom Attendant"
+    "Restroom Attendant",
+    "Vendor Concierge",
+    "Timeline Coordinator"
   ],
   "Beauty & Formalwear": [
     "Hair + Makeup",
     "Bridal Hair",
     "Bridal Makeup",
+    "Bridesmaid Hair",
+    "Bridesmaid Makeup",
+    "Mother of the Bride Makeup",
+    "Flower Girl Styling",
+    "Groom Styling",
     "Bridal Services",
+    "Bridal Glam Team",
+    "Destination Wedding Glam",
+    "On-Site Glam",
+    "Skin Prep Facial",
+    "Bridal Skin Prep",
+    "Facials",
     "Spray Tanning",
-    "Glam Services",
+    "Lash Services",
+    "Brow Services",
     "Nail Services",
+    "Glam Services",
     "Bridal Alterations",
     "Tuxedo / Suit Rentals",
     "Wedding Dress Services",
+    "Bridal Styling",
+    "Formalwear Styling",
     "Wedding Officiant"
   ],
   "Transportation": [
@@ -1006,8 +1069,11 @@ const serviceOptions = {
     "Limo Service",
     "Shuttle Service",
     "Luxury Car Rental",
+    "Vintage Car Rental",
     "Horse Carriage",
-    "Golf Cart Rentals"
+    "Golf Cart Rentals",
+    "Guest Transportation",
+    "Airport Transportation"
   ],
   "Specialty Services": [
     "Corporate Event Services",
@@ -1016,6 +1082,11 @@ const serviceOptions = {
     "Church Event Services",
     "Community Event Services",
     "School Event Services",
+    "Destination Event Services",
+    "Proposal Planning",
+    "Honeymoon / Travel Coordination",
+    "Event Insurance Support",
+    "Permit Support",
     "Other Specialty Service"
   ],
   "Other Event Service": [
@@ -1225,9 +1296,21 @@ window.saveListing = async function(status) {
       title,
       mainCategory,
       category,
+      listingCategory: category,
       customCategory,
       eventTypes,
       eventType,
+      searchableCategoryText: [
+        mainCategory,
+        category,
+        customCategory,
+        eventType,
+        serviceCitiesText,
+        serviceZipCodesText,
+        serviceArea,
+        baseCity,
+        baseState
+      ].join(" ").toLowerCase(),
       startingPrice,
       description,
       availability,
