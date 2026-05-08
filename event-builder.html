@@ -13,9 +13,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -52,9 +50,7 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .page {
       width: 100%;
@@ -89,10 +85,7 @@
       font-weight: 800;
     }
 
-    .topbar-center {
-      flex: 1;
-      text-align: center;
-    }
+    .topbar-center { flex: 1; text-align: center; }
 
     .eyebrow {
       font-size: 0.78rem;
@@ -133,39 +126,11 @@
       background: rgba(255, 255, 255, 0.12);
     }
 
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 310px;
-    }
-
-    .hero-label {
-      font-size: 0.88rem;
-      font-weight: 600;
-      opacity: 0.95;
-      margin-bottom: 8px;
-    }
-
-    .hero-title {
-      margin: 0 0 10px;
-      font-size: 2rem;
-      line-height: 0.98;
-      letter-spacing: -0.05em;
-      font-weight: 800;
-    }
-
-    .hero-subtitle {
-      margin: 0 0 16px;
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: rgba(255, 255, 255, 0.95);
-    }
-
-    .hero-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    .hero-content { position: relative; z-index: 1; max-width: 310px; }
+    .hero-label { font-size: 0.88rem; font-weight: 600; opacity: 0.95; margin-bottom: 8px; }
+    .hero-title { margin: 0 0 10px; font-size: 2rem; line-height: 0.98; letter-spacing: -0.05em; font-weight: 800; }
+    .hero-subtitle { margin: 0 0 16px; font-size: 0.95rem; line-height: 1.45; color: rgba(255,255,255,0.95); }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; }
 
     .hero-pill {
       min-height: 30px;
@@ -176,92 +141,30 @@
       justify-content: center;
       font-size: 0.76rem;
       font-weight: 700;
-      background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.18);
       color: #fff;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
 
-    .section {
-      margin-top: 28px;
-    }
+    .section { margin-top: 28px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .section-title { margin: 0; font-size: 1.45rem; line-height: 1.02; letter-spacing: -0.04em; font-weight: 800; }
+    .section-link { color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 700; white-space: nowrap; }
 
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      margin: 0;
-      font-size: 1.45rem;
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      font-weight: 800;
-    }
-
-    .section-link {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.92rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .summary-card {
-      background: var(--card);
-      border-radius: 22px;
-      padding: 14px 10px;
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-
-    .summary-number {
-      display: block;
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 4px;
-    }
-
-    .summary-label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--muted);
-      font-weight: 700;
-    }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .summary-card { background: var(--card); border-radius: 22px; padding: 14px 10px; box-shadow: var(--shadow); text-align: center; }
+    .summary-number { display: block; font-size: 1.05rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .summary-label { display: block; font-size: 0.78rem; color: var(--muted); font-weight: 700; }
 
     .details-card,
     .note-card,
     .empty-card,
-    .ai-card {
-      background: var(--card);
-      border-radius: 28px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
+    .ai-card { background: var(--card); border-radius: 28px; padding: 18px; box-shadow: var(--shadow); }
 
-    .form-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    .field-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 0.86rem;
-      font-weight: 700;
-      color: #574f47;
-    }
+    .form-grid { display: grid; gap: 14px; }
+    .field-group label { display: block; margin-bottom: 8px; font-size: 0.86rem; font-weight: 700; color: #574f47; }
 
     .input,
     .select,
@@ -278,27 +181,11 @@
     }
 
     .input,
-    .select {
-      min-height: 54px;
-      padding: 0 16px;
-    }
+    .select { min-height: 54px; padding: 0 16px; }
+    .textarea { min-height: 110px; padding: 14px 16px; resize: vertical; }
+    .input::placeholder, .textarea::placeholder { color: #a49a8f; }
 
-    .textarea {
-      min-height: 110px;
-      padding: 14px 16px;
-      resize: vertical;
-    }
-
-    .input::placeholder,
-    .textarea::placeholder {
-      color: #a49a8f;
-    }
-
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
     .save-details-btn,
     .generate-ai-btn {
@@ -315,264 +202,48 @@
       box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
     }
 
-    .generate-ai-btn:disabled {
-      opacity: 0.72;
-      cursor: not-allowed;
-    }
+    .generate-ai-btn:disabled { opacity: 0.72; cursor: not-allowed; }
 
-    .ai-card {
-      overflow: hidden;
-      position: relative;
-    }
+    .ai-card { overflow: hidden; position: relative; }
+    .ai-card::after { content: ""; position: absolute; width: 120px; height: 120px; border-radius: 999px; right: -38px; top: -38px; background: linear-gradient(135deg, rgba(255,154,115,0.14), rgba(111,74,184,0.12)); pointer-events: none; }
+    .ai-card-content { position: relative; z-index: 1; }
+    .ai-kicker { display: inline-flex; min-height: 28px; align-items: center; justify-content: center; padding: 0 10px; border-radius: 999px; background: var(--purple-soft); color: var(--purple-text); font-size: 0.76rem; font-weight: 800; margin-bottom: 10px; }
+    .ai-title { margin: 0 0 8px; font-size: 1.15rem; line-height: 1.08; letter-spacing: -0.03em; font-weight: 800; }
+    .ai-summary { margin: 0 0 14px; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+    .ai-results { display: grid; gap: 12px; margin-top: 14px; }
 
-    .ai-card::after {
-      content: "";
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      border-radius: 999px;
-      right: -38px;
-      top: -38px;
-      background: linear-gradient(135deg, rgba(255, 154, 115, 0.14), rgba(111, 74, 184, 0.12));
-      pointer-events: none;
-    }
+    .suggestion-card { border: 1px solid var(--line); background: #fff; border-radius: 22px; padding: 14px; }
+    .suggestion-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .suggestion-title { margin: 0; font-size: 0.98rem; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; }
+    .priority-pill { min-height: 26px; padding: 0 9px; border-radius: 999px; background: #fff4df; color: #aa6f12; font-size: 0.7rem; font-weight: 800; white-space: nowrap; }
+    .suggestion-category { margin: 0 0 8px; color: var(--blue-text); font-size: 0.82rem; font-weight: 800; }
+    .suggestion-why { margin: 0 0 12px; color: var(--muted); font-size: 0.86rem; line-height: 1.48; }
+    .suggestion-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    .ai-card-content {
-      position: relative;
-      z-index: 1;
-    }
+    .ai-tip { margin-top: 14px; border-radius: 20px; background: var(--soft-2); border: 1px solid var(--line); padding: 14px; }
+    .ai-tip-title { margin: 0 0 6px; font-size: 0.88rem; font-weight: 800; }
+    .ai-tip-text { margin: 0; color: var(--muted); font-size: 0.86rem; line-height: 1.45; }
 
-    .ai-kicker {
-      display: inline-flex;
-      min-height: 28px;
-      align-items: center;
-      justify-content: center;
-      padding: 0 10px;
-      border-radius: 999px;
-      background: var(--purple-soft);
-      color: var(--purple-text);
-      font-size: 0.76rem;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
+    .vendor-list { display: grid; gap: 14px; }
+    .vendor-card { background: var(--card); border-radius: 24px; padding: 14px; box-shadow: var(--shadow); }
+    .vendor-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .vendor-left { display: flex; gap: 12px; align-items: center; min-width: 0; flex: 1; }
+    .vendor-thumb { width: 62px; height: 62px; border-radius: 20px; flex-shrink: 0; background: linear-gradient(135deg, #ffe7c2, #f4a43a); position: relative; overflow: hidden; }
+    .vendor-thumb::before { content: ""; position: absolute; inset: 14px; border-radius: 12px; background: rgba(255,255,255,0.22); }
+    .vendor-thumb.has-photo::before { display: none; }
+    .vendor-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .vendor-info { min-width: 0; }
+    .vendor-name { margin: 0 0 4px; font-size: 1rem; line-height: 1.12; font-weight: 800; letter-spacing: -0.02em; }
+    .vendor-type { margin: 0; font-size: 0.88rem; line-height: 1.4; color: var(--muted); }
+    .vendor-price { font-size: 1rem; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+    .vendor-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 
-    .ai-title {
-      margin: 0 0 8px;
-      font-size: 1.15rem;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-      font-weight: 800;
-    }
+    .pill { min-height: 28px; padding: 0 10px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.76rem; font-weight: 700; }
+    .pill.pending { background: #fff4df; color: #aa6f12; }
+    .pill.note { background: #f6efe4; color: #6a625a; }
+    .pill.available { background: var(--blue-soft); color: var(--blue-text); }
 
-    .ai-summary {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    .ai-results {
-      display: grid;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .suggestion-card {
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 22px;
-      padding: 14px;
-    }
-
-    .suggestion-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .suggestion-title {
-      margin: 0;
-      font-size: 0.98rem;
-      line-height: 1.15;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .priority-pill {
-      min-height: 26px;
-      padding: 0 9px;
-      border-radius: 999px;
-      background: #fff4df;
-      color: #aa6f12;
-      font-size: 0.7rem;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .suggestion-category {
-      margin: 0 0 8px;
-      color: var(--blue-text);
-      font-size: 0.82rem;
-      font-weight: 800;
-    }
-
-    .suggestion-why {
-      margin: 0 0 12px;
-      color: var(--muted);
-      font-size: 0.86rem;
-      line-height: 1.48;
-    }
-
-    .suggestion-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .ai-tip {
-      margin-top: 14px;
-      border-radius: 20px;
-      background: var(--soft-2);
-      border: 1px solid var(--line);
-      padding: 14px;
-    }
-
-    .ai-tip-title {
-      margin: 0 0 6px;
-      font-size: 0.88rem;
-      font-weight: 800;
-    }
-
-    .ai-tip-text {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.86rem;
-      line-height: 1.45;
-    }
-
-    .vendor-list {
-      display: grid;
-      gap: 14px;
-    }
-
-    .vendor-card {
-      background: var(--card);
-      border-radius: 24px;
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .vendor-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .vendor-left {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .vendor-thumb {
-      width: 62px;
-      height: 62px;
-      border-radius: 20px;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .vendor-thumb::before {
-      content: "";
-      position: absolute;
-      inset: 14px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.22);
-    }
-
-    .vendor-thumb.has-photo::before {
-      display: none;
-    }
-
-    .vendor-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .vendor-info {
-      min-width: 0;
-    }
-
-    .vendor-name {
-      margin: 0 0 4px;
-      font-size: 1rem;
-      line-height: 1.12;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .vendor-type {
-      margin: 0;
-      font-size: 0.88rem;
-      line-height: 1.4;
-      color: var(--muted);
-    }
-
-    .vendor-price {
-      font-size: 1rem;
-      font-weight: 800;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .vendor-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .pill {
-      min-height: 28px;
-      padding: 0 10px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.76rem;
-      font-weight: 700;
-    }
-
-    .pill.pending {
-      background: #fff4df;
-      color: #aa6f12;
-    }
-
-    .pill.note {
-      background: #f6efe4;
-      color: #6a625a;
-    }
-
-    .pill.available {
-      background: var(--blue-soft);
-      color: var(--blue-text);
-    }
-
-    .vendor-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .vendor-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .btn,
     .btn-secondary,
@@ -590,209 +261,40 @@
       flex: 1;
       cursor: pointer;
       min-width: 92px;
+      padding: 0 14px;
     }
 
-    .btn {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
-    }
+    .btn { background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%); color: #fff; box-shadow: 0 14px 28px rgba(255,107,97,0.16); }
+    .btn-secondary { background: var(--soft-2); color: #4a433d; }
+    .btn-danger { background: var(--red-soft); color: var(--red-text); }
 
-    .btn-secondary {
-      background: var(--soft-2);
-      color: #4a433d;
-    }
+    .empty-card { text-align: center; padding: 24px 18px; }
+    .empty-icon { width: 64px; height: 64px; border-radius: 22px; margin: 0 auto 14px; background: #fff1dc; color: var(--gold-dark); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 800; }
+    .empty-card h3, .note-title { margin: 0 0 8px; font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; }
+    .empty-card p, .note-text { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--muted); }
+    .empty-card p { margin-bottom: 16px; }
 
-    .btn-danger {
-      background: var(--red-soft);
-      color: var(--red-text);
-    }
+    .status-message { display: none; margin-top: 14px; background: #fff4df; color: #8d5f11; border-radius: 18px; padding: 12px 14px; font-size: 0.85rem; font-weight: 700; line-height: 1.45; }
+    .status-message.info { display: block; background: #fff4df; color: #8d5f11; }
+    .status-message.success { display: block; background: var(--green-soft); color: var(--green-text); }
+    .status-message.error { display: block; background: var(--red-soft); color: var(--red-text); }
 
-    .empty-card {
-      text-align: center;
-      padding: 24px 18px;
-    }
+    .bottom-bar { position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px; width: calc(100% - 24px); max-width: 406px; background: rgba(255,255,255,0.94); border: 1px solid rgba(235,225,211,0.95); border-radius: 999px; padding: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 0 18px 38px rgba(120,96,60,0.14); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 10; }
+    .bottom-info { flex: 1; padding-left: 8px; }
+    .bottom-label { display: block; font-size: 0.74rem; color: var(--muted); margin-bottom: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+    .bottom-value { display: block; font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
+    .bottom-btn, .bottom-btn-secondary { min-height: 54px; border-radius: 999px; border: none; font-size: 0.92rem; font-weight: 800; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 0 16px; white-space: nowrap; }
+    .bottom-btn { background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%); color: #fff; box-shadow: 0 14px 28px rgba(255,107,97,0.18); }
+    .bottom-btn-secondary { background: var(--soft-2); color: #4a433d; }
 
-    .empty-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 22px;
-      margin: 0 auto 14px;
-      background: #fff1dc;
-      color: var(--gold-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      font-weight: 800;
-    }
-
-    .empty-card h3,
-    .note-title {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .empty-card p,
-    .note-text {
-      margin: 0;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      color: var(--muted);
-    }
-
-    .empty-card p {
-      margin-bottom: 16px;
-    }
-
-    .status-message {
-      display: none;
-      margin-top: 14px;
-      background: #fff4df;
-      color: #8d5f11;
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      line-height: 1.45;
-    }
-
-    .status-message.info {
-      display: block;
-      background: #fff4df;
-      color: #8d5f11;
-    }
-
-    .status-message.success {
-      display: block;
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .status-message.error {
-      display: block;
-      background: var(--red-soft);
-      color: var(--red-text);
-    }
-
-    .bottom-bar {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 16px;
-      width: calc(100% - 24px);
-      max-width: 406px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(235, 225, 211, 0.95);
-      border-radius: 999px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 10;
-    }
-
-    .bottom-info {
-      flex: 1;
-      padding-left: 8px;
-    }
-
-    .bottom-label {
-      display: block;
-      font-size: 0.74rem;
-      color: var(--muted);
-      margin-bottom: 3px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .bottom-value {
-      display: block;
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .bottom-btn,
-    .bottom-btn-secondary {
-      min-height: 54px;
-      border-radius: 999px;
-      border: none;
-      font-size: 0.92rem;
-      font-weight: 800;
-      font-family: inherit;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 16px;
-      white-space: nowrap;
-    }
-
-    .bottom-btn {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
-    }
-
-    .bottom-btn-secondary {
-      background: var(--soft-2);
-      color: #4a433d;
-    }
-
-    @media (max-width: 430px) {
-      .row-2 {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 390px) {
-      .bottom-bar {
-        flex-wrap: wrap;
-        border-radius: 28px;
-      }
-
-      .bottom-info {
-        width: 100%;
-        padding-left: 2px;
-      }
-
-      .bottom-btn,
-      .bottom-btn-secondary {
-        flex: 1;
-      }
-    }
-
+    @media (max-width: 430px) { .row-2 { grid-template-columns: 1fr; } }
+    @media (max-width: 390px) { .bottom-bar { flex-wrap: wrap; border-radius: 28px; } .bottom-info { width: 100%; padding-left: 2px; } .bottom-btn, .bottom-btn-secondary { flex: 1; } }
     @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
-      }
-
-      .page {
-        max-width: 960px;
-      }
-
-      .vendor-list,
-      .ai-results {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .event-layout {
-        display: grid;
-        grid-template-columns: 0.95fr 1.05fr;
-        gap: 18px;
-        align-items: start;
-      }
-
-      .bottom-bar {
-        max-width: 520px;
-      }
+      body { padding: 24px 0; }
+      .page { max-width: 960px; }
+      .vendor-list, .ai-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .event-layout { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 18px; align-items: start; }
+      .bottom-bar { max-width: 520px; }
     }
   </style>
 </head>
@@ -814,9 +316,7 @@
       <div class="hero-content">
         <div class="hero-label">Current Event</div>
         <h2 class="hero-title" id="eventTitle">Your Event Board</h2>
-        <p class="hero-subtitle" id="eventSubtitle">
-          Keep your vendors, budget, and planning details all in one beautifully organized place.
-        </p>
+        <p class="hero-subtitle" id="eventSubtitle">Keep your vendors, budget, and planning details all in one beautifully organized place.</p>
 
         <div class="hero-meta">
           <span class="hero-pill" id="heroEventType">Planning in Progress</span>
@@ -973,14 +473,10 @@
             <div class="ai-card-content">
               <div class="ai-kicker">RentEvent Concierge</div>
               <h3 class="ai-title" id="aiHeadline">Get ideas for what your event still needs.</h3>
-              <p class="ai-summary" id="aiSummary">
-                Save your event details, then generate personalized vendor and add-on suggestions based on your event type, location, guest count, budget, style, and selected vendors.
-              </p>
+              <p class="ai-summary" id="aiSummary">Save your event details, then generate personalized vendor and add-on suggestions based on your event type, location, guest count, budget, style, and selected vendors.</p>
 
               <button class="generate-ai-btn" id="generateAiBtn" type="button">Generate AI Ideas</button>
-
               <div class="status-message" id="aiStatus"></div>
-
               <div class="ai-results" id="aiResults"></div>
 
               <div class="ai-tip" id="aiTip" style="display: none;">
@@ -996,7 +492,7 @@
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Selected Vendors</h2>
-            <a class="section-link" href="listings.html">Add More</a>
+            <a class="section-link" id="addMoreTopLink" href="listings.html">Add More</a>
           </div>
 
           <div class="vendor-list" id="selectedVendorList">
@@ -1011,7 +507,7 @@
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Available Vendors</h2>
-            <a class="section-link" href="listings.html">Browse All</a>
+            <a class="section-link" id="browseAllLink" href="listings.html">Browse All</a>
           </div>
 
           <div class="vendor-list" id="availableVendorList">
@@ -1032,9 +528,7 @@
 
       <div class="note-card">
         <h3 class="note-title">Event Reminder</h3>
-        <p class="note-text">
-          Add vendors to your board, save your event details, message vendors for availability, and use the AI Event Planner for ideas on what to add next.
-        </p>
+        <p class="note-text">Add vendors to this specific event board, save your event details, message vendors for availability, and use the AI Event Planner for ideas on what to add next.</p>
       </div>
     </section>
   </main>
@@ -1045,8 +539,8 @@
       <span class="bottom-value" id="bottomTotal">$0</span>
     </div>
 
-    <a href="listings.html" class="bottom-btn-secondary">Add Vendor</a>
-    <a href="checkout.html" class="bottom-btn">Checkout</a>
+    <a href="listings.html" class="bottom-btn-secondary" id="bottomAddVendorLink">Add Vendor</a>
+    <a href="checkout.html" class="bottom-btn" id="checkoutLink">Checkout</a>
   </div>
 
 <script type="module">
@@ -1084,12 +578,26 @@ const AI_PLANNER_FUNCTION_URL = "https://generateplannersuggestions-prhcxdwbdq-u
 
 let currentUser = null;
 let currentUserData = null;
+let currentEventId = "";
 let currentEventData = null;
 let currentAiPlannerResult = null;
 let publishedListings = [];
 let selectedVendors = [];
 let isBusy = false;
 let isGeneratingAi = false;
+
+function getUrlParams() {
+  return new URLSearchParams(window.location.search);
+}
+
+function getEventIdFromUrl() {
+  const params = getUrlParams();
+  return params.get("eventId") || params.get("event") || "";
+}
+
+function getEventUrl(pageName) {
+  return `${pageName}?eventId=${encodeURIComponent(currentEventId)}`;
+}
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -1162,6 +670,13 @@ function showAiStatus(message, type = "info") {
 function hideAiStatus() {
   const status = document.getElementById("aiStatus");
   status.style.display = "none";
+}
+
+function updateEventAwareLinks() {
+  document.getElementById("addMoreTopLink").href = getEventUrl("listings.html");
+  document.getElementById("browseAllLink").href = getEventUrl("listings.html");
+  document.getElementById("bottomAddVendorLink").href = getEventUrl("listings.html");
+  document.getElementById("checkoutLink").href = getEventUrl("checkout.html");
 }
 
 function getEventTypes(source) {
@@ -1316,17 +831,25 @@ function getEventDetailsFromForm() {
 }
 
 async function loadEventDetails() {
-  const eventRef = doc(db, "customerEvents", currentUser.uid);
+  const eventRef = doc(db, "customerEvents", currentEventId);
   const eventSnap = await getDoc(eventRef);
 
-  if (eventSnap.exists()) {
-    currentEventData = {
-      id: eventSnap.id,
-      ...eventSnap.data()
-    };
-  } else {
-    currentEventData = null;
+  if (!eventSnap.exists()) {
+    window.location.href = "dashboard.html";
+    return;
   }
+
+  const data = eventSnap.data();
+
+  if (data.customerId && data.customerId !== currentUser.uid) {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  currentEventData = {
+    id: eventSnap.id,
+    ...data
+  };
 
   populateEventDetailsForm(currentEventData);
   updateHeroFromEventDetails();
@@ -1339,24 +862,29 @@ async function loadEventDetails() {
 }
 
 async function saveEventDetails() {
-  if (!currentUser) return;
+  if (!currentUser || !currentEventId) return;
 
   const eventDetails = getEventDetailsFromForm();
 
   try {
     showStatus("Saving event details...", "info");
 
-    await setDoc(doc(db, "customerEvents", currentUser.uid), {
+    await setDoc(doc(db, "customerEvents", currentEventId), {
       ...eventDetails,
       customerId: currentUser.uid,
+      ownerId: currentUser.uid,
       customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Customer",
+      customerEmail: currentUserData?.email || currentUser.email || "",
+      status: currentEventData?.status || "planning",
+      eventStatus: currentEventData?.eventStatus || "planning",
       updatedAt: serverTimestamp(),
       createdAt: currentEventData?.createdAt || serverTimestamp()
     }, { merge: true });
 
     currentEventData = {
       ...currentEventData,
-      ...eventDetails
+      ...eventDetails,
+      customerId: currentUser.uid
     };
 
     updateHeroFromEventDetails();
@@ -1370,47 +898,19 @@ function getAvailableCategories() {
   const categorySet = new Set();
 
   publishedListings.forEach((listing) => {
-    [
-      listing.mainCategory,
-      listing.category,
-      listing.customCategory,
-      listing.listingCategory
-    ].forEach((value) => {
+    [listing.mainCategory, listing.category, listing.customCategory, listing.listingCategory].forEach((value) => {
       const clean = safeText(value, "");
       if (clean) categorySet.add(clean);
     });
   });
 
   const defaults = [
-    "Wedding Cakes",
-    "Cakes",
-    "Dessert Tables",
-    "Charcuterie Boards",
-    "Grazing Tables",
-    "Catering",
-    "Private Chef",
-    "Florals",
-    "Wedding Florals",
-    "Balloon Décor",
-    "Balloon Arches",
-    "Photo Booth",
-    "360 Photo Booth",
-    "Photography",
-    "Videography",
-    "DJ",
-    "Wedding Officiant",
-    "Hair + Makeup",
-    "Transportation",
-    "Shuttle Service",
-    "Event Planner",
-    "Day-of Coordinator",
-    "Tables and Chairs",
-    "Linen Rentals",
-    "Setup Crew",
-    "Cleanup Crew",
-    "Coffee Cart",
-    "Mocktail Bar",
-    "Mobile Bar"
+    "Wedding Cakes", "Cakes", "Dessert Tables", "Charcuterie Boards", "Grazing Tables", "Catering", "Private Chef",
+    "Florals", "Wedding Florals", "Balloon Décor", "Balloon Arches", "Photo Booth", "360 Photo Booth", "Photography",
+    "Videography", "DJ", "Live Singer", "Live Band", "Acoustic Guitarist", "Violinist", "Emcee", "Sound & Lighting",
+    "Wedding Officiant", "Hair + Makeup", "Bridal Glam", "Skin Prep", "Facials", "Transportation", "Shuttle Service",
+    "Event Planner", "Day-of Coordinator", "Tables and Chairs", "Linen Rentals", "Setup Crew", "Cleanup Crew",
+    "Coffee Cart", "Mocktail Bar", "Mobile Bar"
   ];
 
   defaults.forEach((item) => categorySet.add(item));
@@ -1447,7 +947,7 @@ function renderAiSuggestions(result) {
         : [category, title];
 
       const firstSearch = safeText(searchTerms[0] || category, category);
-      const browseUrl = `listings.html?search=${encodeURIComponent(firstSearch)}`;
+      const browseUrl = `listings.html?eventId=${encodeURIComponent(currentEventId)}&search=${encodeURIComponent(firstSearch)}`;
 
       return `
         <article class="suggestion-card">
@@ -1506,10 +1006,9 @@ async function generateAiIdeas() {
 
     const response = await fetch(AI_PLANNER_FUNCTION_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        eventId: currentEventId,
         eventDetails,
         selectedVendors,
         availableCategories: getAvailableCategories()
@@ -1521,6 +1020,18 @@ async function generateAiIdeas() {
     if (!response.ok || !data.success) {
       throw new Error(data.error || "AI planner could not generate suggestions yet.");
     }
+
+    currentAiPlannerResult = data.result;
+
+    await setDoc(doc(db, "customerEvents", currentEventId), {
+      aiPlannerSuggestions: data.result,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    currentEventData = {
+      ...currentEventData,
+      aiPlannerSuggestions: data.result
+    };
 
     renderAiSuggestions(data.result);
     hideAiStatus();
@@ -1542,7 +1053,7 @@ function renderSelectedVendors() {
       <div class="empty-card">
         <div class="empty-icon">+</div>
         <h3>No vendors added yet</h3>
-        <p>Add vendors from the marketplace below to start building your event board.</p>
+        <p>Add vendors from the marketplace below to start building this event board.</p>
         <a class="btn" href="#availableVendorList">View Available Vendors</a>
       </div>
     `;
@@ -1580,7 +1091,7 @@ function renderSelectedVendors() {
 
         <div class="vendor-actions">
           <button class="btn-secondary" type="button" data-message-id="${listingId}">Message</button>
-          <a class="btn" href="detail.html?id=${listingId}">View</a>
+          <a class="btn" href="detail.html?id=${listingId}&eventId=${encodeURIComponent(currentEventId)}">View</a>
           <button class="btn-danger" type="button" data-remove-id="${boardId}">Remove</button>
         </div>
       </article>
@@ -1588,15 +1099,11 @@ function renderSelectedVendors() {
   }).join("");
 
   document.querySelectorAll("[data-remove-id]").forEach((button) => {
-    button.addEventListener("click", () => {
-      removeVendorFromBoard(button.dataset.removeId);
-    });
+    button.addEventListener("click", () => removeVendorFromBoard(button.dataset.removeId));
   });
 
   document.querySelectorAll("[data-message-id]").forEach((button) => {
-    button.addEventListener("click", () => {
-      openMessageForListing(button.dataset.messageId);
-    });
+    button.addEventListener("click", () => openMessageForListing(button.dataset.messageId));
   });
 
   updateSummary();
@@ -1612,8 +1119,8 @@ function renderAvailableVendors() {
       <div class="empty-card">
         <div class="empty-icon">✓</div>
         <h3>No more vendors to add</h3>
-        <p>All currently published listings have already been added to your event board.</p>
-        <a class="btn" href="listings.html">Browse Marketplace</a>
+        <p>All currently published listings have already been added to this event board.</p>
+        <a class="btn" href="${getEventUrl("listings.html")}">Browse Marketplace</a>
       </div>
     `;
     return;
@@ -1651,16 +1158,14 @@ function renderAvailableVendors() {
 
         <div class="vendor-actions">
           <button class="btn" type="button" data-add-id="${listingId}">Add Vendor</button>
-          <a class="btn-secondary" href="detail.html?id=${listingId}">View</a>
+          <a class="btn-secondary" href="detail.html?id=${listingId}&eventId=${encodeURIComponent(currentEventId)}">View</a>
         </div>
       </article>
     `;
   }).join("");
 
   document.querySelectorAll("[data-add-id]").forEach((button) => {
-    button.addEventListener("click", () => {
-      addVendorToBoard(button.dataset.addId);
-    });
+    button.addEventListener("click", () => addVendorToBoard(button.dataset.addId));
   });
 }
 
@@ -1678,10 +1183,7 @@ async function loadPublishedListings() {
     const data = docSnap.data();
 
     if (data.status === "published") {
-      listings.push({
-        id: docSnap.id,
-        ...data
-      });
+      listings.push({ id: docSnap.id, ...data });
     }
   });
 
@@ -1697,7 +1199,8 @@ async function loadPublishedListings() {
 async function loadSelectedVendors() {
   const q = query(
     collection(db, "eventBoardItems"),
-    where("userId", "==", currentUser.uid)
+    where("userId", "==", currentUser.uid),
+    where("eventId", "==", currentEventId)
   );
 
   const snapshot = await getDocs(q);
@@ -1705,10 +1208,7 @@ async function loadSelectedVendors() {
   const items = [];
 
   snapshot.forEach((docSnap) => {
-    items.push({
-      id: docSnap.id,
-      ...docSnap.data()
-    });
+    items.push({ id: docSnap.id, ...docSnap.data() });
   });
 
   items.sort((a, b) => {
@@ -1732,7 +1232,7 @@ async function addVendorToBoard(listingId) {
   }
 
   if (isSelected(cleanListingId)) {
-    showStatus("This vendor is already on your event board.", "error");
+    showStatus("This vendor is already on this event board.", "error");
     return;
   }
 
@@ -1745,6 +1245,10 @@ async function addVendorToBoard(listingId) {
 
     const newItem = {
       userId: currentUser.uid,
+      customerId: currentUser.uid,
+      eventId: currentEventId,
+      eventName: safeText(currentEventData?.eventName, "Event"),
+
       listingId: cleanListingId,
       listingTitle: safeText(listing.title, "Untitled Listing"),
 
@@ -1787,7 +1291,7 @@ async function addVendorToBoard(listingId) {
     });
 
     renderAll();
-    showStatus("Vendor added to your event board.", "success");
+    showStatus("Vendor added to this event board.", "success");
 
   } catch (error) {
     showStatus(error.message, "error");
@@ -1805,11 +1309,10 @@ async function removeVendorFromBoard(boardId) {
     isBusy = true;
 
     await deleteDoc(doc(db, "eventBoardItems", cleanBoardId));
-
     selectedVendors = selectedVendors.filter((vendor) => vendor.id !== cleanBoardId);
 
     renderAll();
-    showStatus("Vendor removed from your event board.", "success");
+    showStatus("Vendor removed from this event board.", "success");
 
   } catch (error) {
     showStatus(error.message, "error");
@@ -1819,12 +1322,8 @@ async function removeVendorFromBoard(boardId) {
 }
 
 async function findExistingConversation(customerId, vendorId, listingId) {
-  const conversationKey = `${customerId}_${vendorId}_${listingId}`;
-  const q = query(
-    collection(db, "conversations"),
-    where("conversationKey", "==", conversationKey)
-  );
-
+  const conversationKey = `${customerId}_${vendorId}_${listingId}_${currentEventId}`;
+  const q = query(collection(db, "conversations"), where("conversationKey", "==", conversationKey));
   const snapshot = await getDocs(q);
 
   if (snapshot.empty) return null;
@@ -1832,10 +1331,7 @@ async function findExistingConversation(customerId, vendorId, listingId) {
   let conversation = null;
 
   snapshot.forEach((docSnap) => {
-    conversation = {
-      id: docSnap.id,
-      ...docSnap.data()
-    };
+    conversation = { id: docSnap.id, ...docSnap.data() };
   });
 
   return conversation;
@@ -1856,24 +1352,17 @@ async function openMessageForListing(listingId) {
   }
 
   try {
-    const existingConversation = await findExistingConversation(
-      currentUser.uid,
-      vendor.vendorId,
-      cleanListingId
-    );
+    const existingConversation = await findExistingConversation(currentUser.uid, vendor.vendorId, cleanListingId);
 
     if (existingConversation) {
       window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
       return;
     }
 
-    const customerName =
-      currentUserData.name ||
-      currentUser.displayName ||
-      currentUser.email ||
-      "Customer";
-
-    const conversationKey = `${currentUser.uid}_${vendor.vendorId}_${cleanListingId}`;
+    const customerName = currentUserData.name || currentUser.displayName || currentUser.email || "Customer";
+    const conversationKey = `${currentUser.uid}_${vendor.vendorId}_${cleanListingId}_${currentEventId}`;
+    const eventName = safeText(currentEventData?.eventName, "my event");
+    const firstMessage = `Hi! I added ${vendor.listingTitle || "your listing"} to my ${eventName} event board and would like to ask about availability.`;
 
     const conversationRef = await addDoc(collection(db, "conversations"), {
       conversationKey,
@@ -1888,13 +1377,15 @@ async function openMessageForListing(listingId) {
       },
       customerId: currentUser.uid,
       vendorId: vendor.vendorId,
+      eventId: currentEventId,
+      eventName,
       listingId: cleanListingId,
       listingTitle: vendor.listingTitle || "Event Listing",
       listingCategory: vendor.listingCategory || "Event Service",
       listingLocation: vendor.location || "",
       title: vendor.vendorName || "Vendor",
       contextType: "Vendor",
-      lastMessage: `Hi! I added ${vendor.listingTitle || "your listing"} to my event board and would like to ask about availability.`,
+      lastMessage: firstMessage,
       lastSenderId: currentUser.uid,
       unreadFor: {
         [vendor.vendorId]: true
@@ -1904,7 +1395,7 @@ async function openMessageForListing(listingId) {
     });
 
     await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
-      text: `Hi! I added ${vendor.listingTitle || "your listing"} to my event board and would like to ask about availability.`,
+      text: firstMessage,
       senderId: currentUser.uid,
       senderName: customerName,
       senderRole: "customer",
@@ -1919,7 +1410,7 @@ async function openMessageForListing(listingId) {
 }
 
 async function handleUrlAddParam() {
-  const params = new URLSearchParams(window.location.search);
+  const params = getUrlParams();
   const addId = params.get("add") || params.get("listingId") || params.get("id");
 
   if (!addId) return;
@@ -1927,24 +1418,31 @@ async function handleUrlAddParam() {
   const cleanAddId = decodeURIComponent(addId);
 
   if (isSelected(cleanAddId)) {
-    showStatus("That vendor is already on your event board.", "success");
-    window.history.replaceState({}, document.title, "event-builder.html");
+    showStatus("That vendor is already on this event board.", "success");
+    window.history.replaceState({}, document.title, getEventUrl("event-builder.html"));
     return;
   }
 
   await addVendorToBoard(cleanAddId);
-
-  window.history.replaceState({}, document.title, "event-builder.html");
+  window.history.replaceState({}, document.title, getEventUrl("event-builder.html"));
 }
 
 async function loadPage() {
   try {
+    currentEventId = getEventIdFromUrl();
+
+    if (!currentEventId) {
+      window.location.href = "dashboard.html";
+      return;
+    }
+
+    updateEventAwareLinks();
+
     await loadEventDetails();
     await loadPublishedListings();
     await loadSelectedVendors();
 
     renderAll();
-
     await handleUrlAddParam();
 
   } catch (error) {
@@ -1953,6 +1451,7 @@ async function loadPage() {
         <div class="empty-icon">!</div>
         <h3>Could not load event board</h3>
         <p>${escapeHtml(error.message)}</p>
+        <a class="btn" href="dashboard.html">Back to Dashboard</a>
       </div>
     `;
 
@@ -1964,6 +1463,11 @@ async function loadPage() {
       </div>
     `;
   }
+}
+
+function updateLinksAfterEventIdReady() {
+  if (!currentEventId) return;
+  updateEventAwareLinks();
 }
 
 document.getElementById("saveEventDetailsBtn").addEventListener("click", saveEventDetails);
@@ -1992,6 +1496,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  currentEventId = getEventIdFromUrl();
+  updateLinksAfterEventIdReady();
   loadPage();
 });
 </script>
