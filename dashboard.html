@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Booking Requests | RentEvent</title>
+  <title>RentEvent Dashboard</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,21 +25,21 @@
       --line: #ece2d3;
       --soft: #f4ede2;
       --soft-2: #faf5ee;
+      --gold: #f4a43a;
+      --gold-dark: #d88914;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
-      --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
-      --purple-soft: #f0eaff;
-      --purple-text: #6f4ab8;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
-      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.22);
       --radius-xl: 34px;
     }
 
@@ -68,30 +68,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 22px;
     }
 
-    .back-link,
-    .icon-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #222;
-      text-decoration: none;
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
-      flex-shrink: 0;
-      font-weight: 800;
-    }
-
-    .topbar-center {
+    .brand-wrap {
+      min-width: 0;
       flex: 1;
-      text-align: center;
     }
 
     .eyebrow {
@@ -103,7 +86,7 @@
       margin-bottom: 4px;
     }
 
-    .page-title {
+    .brand {
       margin: 0;
       font-size: 1.55rem;
       line-height: 1;
@@ -111,74 +94,165 @@
       font-weight: 800;
     }
 
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn,
+    .logout-btn {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      color: #222;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .logout-btn {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .notification-badge,
+    .nav-badge {
+      position: absolute;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.68rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .notification-badge {
+      top: -5px;
+      right: -5px;
+    }
+
+    .nav-badge {
+      top: 6px;
+      right: 16px;
+      min-width: 18px;
+      height: 18px;
+      line-height: 18px;
+      font-size: 0.64rem;
+    }
+
     .hero-card {
       position: relative;
       overflow: hidden;
       border-radius: var(--radius-xl);
-      padding: 22px 20px;
+      padding: 24px 22px;
       background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
       box-shadow: var(--shadow-strong);
-      margin-bottom: 24px;
+      margin-bottom: 26px;
     }
 
-    .hero-card::after {
+    .hero-card::before {
       content: "";
       position: absolute;
-      width: 170px;
-      height: 170px;
+      width: 190px;
+      height: 190px;
       border-radius: 50%;
-      right: -60px;
-      top: -45px;
+      right: -70px;
+      top: -42px;
       background: rgba(255, 255, 255, 0.12);
     }
 
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 320px;
+      max-width: 315px;
     }
 
     .hero-label {
       font-size: 0.88rem;
       font-weight: 600;
-      opacity: 0.95;
-      margin-bottom: 8px;
+      opacity: 0.94;
+      margin-bottom: 10px;
     }
 
     .hero-title {
-      margin: 0 0 10px;
-      font-size: 2rem;
+      margin: 0 0 12px;
+      font-size: 2.15rem;
       line-height: 0.98;
-      letter-spacing: -0.05em;
+      letter-spacing: -0.06em;
       font-weight: 800;
     }
 
     .hero-subtitle {
-      margin: 0 0 16px;
-      font-size: 0.95rem;
+      margin: 0 0 18px;
+      font-size: 0.96rem;
       line-height: 1.45;
       color: rgba(255, 255, 255, 0.95);
     }
 
-    .hero-meta {
+    .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .hero-pill {
-      min-height: 30px;
-      padding: 0 10px;
+    .hero-btn,
+    .hero-btn-secondary {
+      min-height: 50px;
+      padding: 0 18px;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.76rem;
+      text-decoration: none;
       font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .hero-btn {
+      background: #fff;
+      color: #ff5f67;
+      box-shadow: 0 8px 20px rgba(169, 67, 62, 0.12);
+    }
+
+    .hero-btn-secondary {
       background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .section {
@@ -189,292 +263,311 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 16px;
     }
 
     .section-title {
       margin: 0;
-      font-size: 1.45rem;
+      font-size: 1.6rem;
       line-height: 1.02;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.05em;
       font-weight: 800;
     }
 
     .section-link {
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.92rem;
+      font-size: 0.93rem;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    .request-list {
+    .quick-grid {
       display: grid;
-      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
-    .request-card,
-    .empty-card {
+    .quick-card {
       background: var(--card);
-      border-radius: 28px;
+      border-radius: 26px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      min-height: 158px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .quick-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .quick-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .quick-card h3 {
+      margin: 16px 0 6px;
+      font-size: 1.06rem;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+    }
+
+    .quick-card p {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.42;
+      color: var(--muted);
+    }
+
+    .event-card {
+      background: var(--card);
+      border-radius: 30px;
       padding: 18px;
       box-shadow: var(--shadow);
     }
 
-    .request-card.withdrawn-card {
-      opacity: 0.86;
-    }
-
-    .request-top {
+    .event-top {
       display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 10px;
+      gap: 14px;
+      align-items: center;
     }
 
-    .request-title {
-      margin: 0 0 4px;
-      font-size: 1.08rem;
-      line-height: 1.12;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+    .event-thumb {
+      width: 92px;
+      height: 92px;
+      border-radius: 24px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #ffdca5, #f2a73f 48%, #f48f55 100%);
+      position: relative;
     }
 
-    .request-subtitle {
-      margin: 0;
-      color: var(--muted);
+    .event-thumb::after {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.26);
+    }
+
+    .event-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .event-date {
       font-size: 0.88rem;
-      line-height: 1.4;
+      color: var(--muted);
+      margin-bottom: 6px;
       font-weight: 600;
     }
 
-    .request-total {
-      font-size: 1rem;
+    .event-name {
+      margin: 0 0 8px;
+      font-size: 1.34rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
       font-weight: 800;
-      white-space: nowrap;
-      text-align: right;
     }
 
-    .request-grid {
-      display: grid;
-      gap: 10px;
-      margin: 14px 0;
-      padding: 14px;
-      border: 1px solid var(--line);
-      background: var(--soft-2);
-      border-radius: 22px;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
-      padding-bottom: 8px;
-    }
-
-    .info-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .info-label {
-      font-size: 0.76rem;
-      color: var(--muted);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .info-value {
-      font-size: 0.88rem;
-      text-align: right;
-      font-weight: 700;
-      max-width: 62%;
-    }
-
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .pill {
-      min-height: 28px;
-      padding: 0 10px;
-      border-radius: 999px;
+    .event-status {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-size: 0.76rem;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #fff4e2;
+      color: #a46a14;
+      font-size: 0.84rem;
       font-weight: 700;
-      text-transform: capitalize;
     }
 
-    .pill.pending {
-      background: #fff4df;
-      color: #aa6f12;
-    }
-
-    .pill.info {
-      background: #f6efe4;
-      color: #6a625a;
-    }
-
-    .pill.safe {
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .pill.ai {
-      background: var(--purple-soft);
-      color: var(--purple-text);
-    }
-
-    .pill.type {
-      background: var(--blue-soft);
-      color: var(--blue-text);
-    }
-
-    .pill.declined,
-    .pill.withdrawn {
-      background: var(--red-soft);
-      color: var(--red-text);
-    }
-
-    .vendor-box,
-    .response-box,
-    .withdrawn-box {
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 22px;
-      background: #fff;
-      border: 1px solid var(--line);
-    }
-
-    .vendor-box h4,
-    .response-box h4,
-    .withdrawn-box h4 {
-      margin: 0 0 6px;
-      font-size: 0.95rem;
-      font-weight: 800;
-    }
-
-    .vendor-box p,
-    .response-box p,
-    .withdrawn-box p {
-      margin: 0;
-      font-size: 0.84rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .response-box {
-      background: var(--soft-2);
-    }
-
-    .withdrawn-box {
-      background: var(--red-soft);
-      border-color: rgba(199, 79, 77, 0.18);
-    }
-
-    .withdrawn-box h4,
-    .withdrawn-box p {
-      color: var(--red-text);
-    }
-
-    .response-actions {
+    .event-stats {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 16px;
     }
 
-    .ai-box {
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 22px;
-      background: var(--purple-soft);
-      color: var(--purple-text);
+    .stat-box {
+      background: #faf5ee;
+      border: 1px solid #f2e7d8;
+      border-radius: 20px;
+      padding: 12px 10px;
+      text-align: center;
     }
 
-    .ai-box h4 {
-      margin: 0 0 6px;
-      font-size: 0.9rem;
+    .stat-number {
+      display: block;
+      font-size: 1.02rem;
       font-weight: 800;
+      margin-bottom: 4px;
     }
 
-    .ai-box p {
-      margin: 0;
-      font-size: 0.84rem;
-      line-height: 1.45;
+    .stat-label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
     }
 
-    .request-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
+    .event-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
     }
 
     .btn,
-    .btn-secondary,
-    .btn-safe,
-    .btn-warning,
-    .btn-danger {
-      min-height: 46px;
+    .btn-secondary {
+      min-height: 54px;
       border-radius: 999px;
+      border: none;
+      font-size: 0.97rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 700;
-      font-family: inherit;
-      border: none;
-      flex: 1;
-      cursor: pointer;
-      min-width: 120px;
-      padding: 0 16px;
     }
 
     .btn {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
     }
 
     .btn-secondary {
-      background: var(--soft-2);
       color: #4a433d;
+      background: #f3ebde;
     }
 
-    .btn-safe {
-      background: var(--green-soft);
-      color: var(--green-text);
+    .vendor-list {
+      display: grid;
+      gap: 14px;
     }
 
-    .btn-warning {
-      background: #fff4df;
-      color: #8d5f11;
+    .vendor-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
 
-    .btn-danger {
-      background: var(--red-soft);
-      color: var(--red-text);
+    .vendor-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
     }
 
-    button:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
+    .vendor-avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .vendor-avatar::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vendor-avatar.has-photo::before {
+      display: none;
+    }
+
+    .vendor-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .vendor-info h3 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .vendor-info p {
+      margin: 0 0 5px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .vendor-rating {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #b37619;
+    }
+
+    .vendor-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .vendor-price {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .mini-btn {
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #f7efe2;
+      color: #4c453e;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .empty-card {
-      text-align: center;
+      background: var(--card);
+      border-radius: 28px;
       padding: 24px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
     }
 
     .empty-icon {
@@ -493,7 +586,7 @@
 
     .empty-card h3 {
       margin: 0 0 8px;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
@@ -503,34 +596,6 @@
       color: var(--muted);
       font-size: 0.9rem;
       line-height: 1.45;
-    }
-
-    .status-message {
-      display: none;
-      margin-top: 14px;
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      line-height: 1.45;
-    }
-
-    .status-message.info {
-      display: block;
-      background: #fff4df;
-      color: #8d5f11;
-    }
-
-    .status-message.success {
-      display: block;
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .status-message.error {
-      display: block;
-      background: var(--red-soft);
-      color: var(--red-text);
     }
 
     .bottom-nav {
@@ -587,14 +652,19 @@
 
       .page {
         max-width: 960px;
+        padding: 28px 24px 120px;
       }
 
-      .request-list {
+      .hero-content {
+        max-width: 500px;
+      }
+
+      .quick-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .vendor-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .response-actions {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .bottom-nav {
@@ -607,66 +677,187 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">←</a>
-
-      <div class="topbar-center">
-        <div class="eyebrow">Vendor Portal</div>
-        <h1 class="page-title">Booking Requests</h1>
+      <div class="brand-wrap">
+        <div class="eyebrow">Customer Dashboard</div>
+        <h1 class="brand">RentEvent</h1>
       </div>
 
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+      <div class="top-actions">
+        <a class="icon-btn" href="notifications.html" aria-label="Notifications">
+          <span class="notification-badge" id="topNotificationBadge">0</span>
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+            <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+        </a>
+
+        <a class="icon-btn" href="profile.html" aria-label="Profile">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+            <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+        </a>
+
+        <button class="logout-btn" onclick="logout()">Log Out</button>
+      </div>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Incoming Event Requests</div>
-        <h2 class="hero-title">Review client requests.</h2>
+        <div class="hero-label" id="welcomeText">Welcome back</div>
+        <h2 class="hero-title">Plan your next event beautifully.</h2>
         <p class="hero-subtitle">
-          See event details, selected services, AI planner context, and respond with availability.
+          Keep rentals, vendors, ideas, requests, and event details all in one place.
         </p>
 
-        <div class="hero-meta">
-          <span class="hero-pill" id="requestCountPill">0 Requests</span>
-          <span class="hero-pill" id="pendingCountPill">0 Pending</span>
+        <div class="hero-actions">
+          <a class="hero-btn" href="event-builder.html">Start New Event</a>
+          <a class="hero-btn-secondary" href="my-requests.html">My Requests</a>
+          <a class="hero-btn-secondary" href="listings.html">Browse Listings</a>
+          <a class="hero-btn-secondary" href="notifications.html" id="alertHeroBtn">View Alerts</a>
         </div>
       </div>
     </section>
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title">Requests</h2>
-        <a class="section-link" href="messages.html">Inbox</a>
+        <h2 class="section-title">Quick Actions</h2>
       </div>
 
-      <div class="status-message" id="statusMessage"></div>
+      <div class="quick-grid">
+        <a class="quick-card" href="event-builder.html">
+          <div class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>New Event</h3>
+            <p>Create a fresh event board and start planning from scratch.</p>
+          </div>
+        </a>
 
-      <div class="request-list" id="requestList">
+        <a class="quick-card" href="listings.html">
+          <div class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+              <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>Listings</h3>
+            <p>Explore venues, décor, catering, glam, entertainment, and more.</p>
+          </div>
+        </a>
+
+        <a class="quick-card" href="my-requests.html">
+          <div class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>My Requests</h3>
+            <p>Track submitted event requests, vendors, and estimated totals.</p>
+          </div>
+        </a>
+
+        <a class="quick-card" href="messages.html">
+          <span class="notification-badge" id="messageQuickBadge">0</span>
+          <div class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div>
+            <h3>Messages</h3>
+            <p>Chat with vendors and keep every detail organized.</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">My Current Event</h2>
+        <a class="section-link" href="event-builder.html">View Board</a>
+      </div>
+
+      <article class="event-card">
+        <div class="event-top">
+          <div class="event-thumb"></div>
+
+          <div class="event-meta">
+            <div class="event-date" id="eventDate">Start planning today</div>
+            <h3 class="event-name" id="eventName">Your Event Board</h3>
+            <div class="event-status" id="eventStatus">Planning in Progress</div>
+          </div>
+        </div>
+
+        <div class="event-stats">
+          <div class="stat-box">
+            <span class="stat-number" id="suggestedCount">0</span>
+            <span class="stat-label">Saved</span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-number" id="unreadStat">0</span>
+            <span class="stat-label">Alerts</span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-number">AI</span>
+            <span class="stat-label">Planner</span>
+          </div>
+        </div>
+
+        <div class="event-actions">
+          <a class="btn" href="event-builder.html">Open Event</a>
+          <a class="btn-secondary" href="my-requests.html">My Requests</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Suggested Vendors</h2>
+        <a class="section-link" href="listings.html">See More</a>
+      </div>
+
+      <div class="vendor-list" id="vendorList">
         <div class="empty-card">
           <div class="empty-icon">…</div>
-          <h3>Loading requests</h3>
-          <p>We’re checking for booking requests connected to your vendor account.</p>
+          <h3>Loading vendors</h3>
+          <p>We’re pulling published listings now.</p>
         </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Vendor navigation">
-    <a class="nav-item" href="vendor-dashboard.html">
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a class="nav-item active" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
       </svg>
       <span>Home</span>
     </a>
 
-    <a class="nav-item" href="add-listing.html">
+    <a class="nav-item" href="listings.html">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Add</span>
+      <span>Listings</span>
     </a>
 
-    <a class="nav-item active" href="booking-requests.html">
+    <a class="nav-item" href="my-requests.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -676,6 +867,7 @@
     </a>
 
     <a class="nav-item" href="messages.html">
+      <span class="nav-badge" id="bottomInboxBadge">0</span>
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -687,18 +879,15 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
   getDoc,
   collection,
-  addDoc,
-  getDocs,
   query,
   where,
-  updateDoc,
-  serverTimestamp
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -715,11 +904,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUser = null;
-let currentUserData = null;
-let bookingRequests = [];
-let isBusy = false;
-
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
 }
@@ -733,28 +917,20 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function formatMoney(value) {
-  const number = Number(value || 0);
-  return `$${Math.round(number).toLocaleString()}`;
-}
+function formatPrice(value) {
+  const raw = safeText(value, "");
 
-function formatTime(value) {
-  if (!value || !value.seconds) return "New";
+  if (!raw) return "$0+";
 
-  const date = new Date(value.seconds * 1000);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMinutes = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
+  const numberMatch = raw.match(/\d+(\.\d+)?/);
 
-  if (diffMinutes < 1) return "Now";
-  if (diffMinutes < 60) return `${diffMinutes} min ago`;
-  if (diffHours < 24) return `${diffHours} hr ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
+  if (!numberMatch) return raw;
 
-  return date.toLocaleDateString();
+  const number = Number(numberMatch[0]);
+
+  if (Number.isNaN(number)) return raw;
+
+  return `$${Math.round(number)}+`;
 }
 
 function setText(id, value) {
@@ -762,550 +938,217 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
-function showStatus(message, type = "info") {
-  const status = document.getElementById("statusMessage");
-  status.textContent = message;
-  status.className = `status-message ${type}`;
-  status.style.display = "block";
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
 
-  setTimeout(() => {
-    status.style.display = "none";
-  }, 3500);
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
 }
 
-function getVendorDisplayName() {
-  return (
-    safeText(currentUserData?.businessName, "") ||
-    safeText(currentUserData?.vendorName, "") ||
-    safeText(currentUserData?.name, "") ||
-    "Vendor"
-  );
+function updateNotificationBadges(messageCount, appNotificationCount) {
+  const totalAlerts = Number(messageCount || 0) + Number(appNotificationCount || 0);
+
+  setBadge("topNotificationBadge", totalAlerts);
+  setBadge("bottomInboxBadge", messageCount);
+  setBadge("messageQuickBadge", messageCount);
+  setText("unreadStat", totalAlerts);
+
+  const alertHeroBtn = document.getElementById("alertHeroBtn");
+
+  if (totalAlerts > 0) {
+    alertHeroBtn.textContent = `${totalAlerts} Alert${totalAlerts === 1 ? "" : "s"}`;
+  } else {
+    alertHeroBtn.textContent = "View Alerts";
+  }
 }
 
-function getVendorItemsForRequest(request) {
-  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
-  return vendors.filter((vendor) => vendor.vendorId === currentUser.uid);
+async function loadUnreadCounts(user) {
+  let unreadMessages = 0;
+  let unreadNotifications = 0;
+
+  try {
+    const conversationsQuery = query(
+      collection(db, "conversations"),
+      where("participantIds", "array-contains", user.uid)
+    );
+
+    const conversationSnapshot = await getDocs(conversationsQuery);
+
+    conversationSnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const unreadFor = data.unreadFor || {};
+
+      if (unreadFor[user.uid]) {
+        unreadMessages += 1;
+      }
+    });
+  } catch {
+    unreadMessages = 0;
+  }
+
+  try {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", user.uid),
+      where("read", "==", false)
+    );
+
+    const notificationSnapshot = await getDocs(notificationsQuery);
+    unreadNotifications = notificationSnapshot.size;
+  } catch {
+    unreadNotifications = 0;
+  }
+
+  updateNotificationBadges(unreadMessages, unreadNotifications);
 }
 
-function getEventLocation(eventDetails) {
-  const city = safeText(eventDetails?.eventCity, "");
-  const zip = safeText(eventDetails?.eventZip, "");
-  return [city, zip].filter(Boolean).join(" ") || "Location not listed";
-}
+function renderEmptyVendors() {
+  const vendorList = document.getElementById("vendorList");
 
-function getAiSummary(request) {
-  const ai = request.aiPlannerSuggestions;
-  const suggestions = Array.isArray(ai?.suggestions) ? ai.suggestions : [];
-
-  if (!suggestions.length) return "";
-
-  const titles = suggestions
-    .slice(0, 3)
-    .map((item) => safeText(item.title, "Suggested add-on"))
-    .filter(Boolean);
-
-  return titles.join(", ");
-}
-
-function getRequestStatusLabel(status) {
-  if (status === "withdrawn") return "Withdrawn";
-  if (status === "confirmed") return "Confirmed";
-  if (status === "paid") return "Paid";
-  return "Pending";
-}
-
-function getRequestPillClass(status) {
-  if (status === "withdrawn") return "withdrawn";
-  if (status === "confirmed" || status === "paid") return "safe";
-  return "pending";
-}
-
-function getVendorResponse(request) {
-  const responses = request.vendorResponses || {};
-  return responses[currentUser.uid] || null;
-}
-
-function getResponseLabel(status) {
-  if (status === "available") return "Available";
-  if (status === "needs_info") return "Needs More Info";
-  if (status === "declined") return "Declined";
-  return "No Response Yet";
-}
-
-function getResponsePillClass(status) {
-  if (status === "available") return "safe";
-  if (status === "needs_info") return "pending";
-  if (status === "declined") return "declined";
-  return "info";
-}
-
-function isHiddenForCurrentVendor(request) {
-  const hiddenForVendorIds = request.hiddenForVendorIds || {};
-  return Boolean(hiddenForVendorIds[currentUser.uid]);
-}
-
-function renderEmptyRequests() {
-  document.getElementById("requestList").innerHTML = `
+  vendorList.innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">✉</div>
-      <h3>No booking requests</h3>
-      <p>New active requests and withdrawn requests that still need review will appear here.</p>
-      <a class="btn" href="vendor-dashboard.html">Back to Dashboard</a>
+      <div class="empty-icon">+</div>
+      <h3>No vendors yet</h3>
+      <p>Once vendors publish listings, they’ll show here for customers to browse.</p>
+      <a class="btn" href="listings.html">Browse Listings</a>
     </div>
   `;
 }
 
-function renderRequests() {
-  const container = document.getElementById("requestList");
+function getCategoryLine(listing) {
+  const mainCategory = safeText(listing.mainCategory, "");
+  const category = safeText(listing.category || listing.listingCategory, "Event Service");
+  const customCategory = safeText(listing.customCategory, "");
 
-  const visibleRequests = bookingRequests.filter((request) => !isHiddenForCurrentVendor(request));
+  const typeLine = customCategory
+    ? `${category} · ${customCategory}`
+    : category;
 
-  const pendingCount = visibleRequests.filter((request) => {
-    const status = safeText(request.requestStatus || request.status, "pending");
-    const response = getVendorResponse(request);
-    return status !== "withdrawn" && (!response || safeText(response.status, "") === "");
-  }).length;
+  return mainCategory
+    ? `${mainCategory} · ${typeLine}`
+    : typeLine;
+}
 
-  setText("requestCountPill", `${visibleRequests.length} Request${visibleRequests.length === 1 ? "" : "s"}`);
-  setText("pendingCountPill", `${pendingCount} Pending Response${pendingCount === 1 ? "" : "s"}`);
+function renderVendors(listings) {
+  const vendorList = document.getElementById("vendorList");
 
-  if (!visibleRequests.length) {
-    renderEmptyRequests();
+  if (!listings.length) {
+    renderEmptyVendors();
     return;
   }
 
-  container.innerHTML = visibleRequests.map((request) => {
-    const requestId = encodeURIComponent(request.id || "");
-    const eventDetails = request.eventDetails || {};
-    const eventName = safeText(eventDetails.eventName, "Unnamed Event");
-    const eventType = safeText(eventDetails.eventType, "Event");
-    const eventDate = safeText(eventDetails.eventDate, "Date not listed");
-    const location = getEventLocation(eventDetails);
-    const guestCount = safeText(eventDetails.guestCount, "Not listed");
-    const budget = safeText(eventDetails.eventBudget, "Not listed");
-    const styleVibe = safeText(eventDetails.styleVibe, "Not listed");
-    const customerName = safeText(request.customerName, "Customer");
-    const status = safeText(request.requestStatus || request.status, "pending");
-    const requestStatusLabel = getRequestStatusLabel(status);
-    const requestPillClass = getRequestPillClass(status);
-    const isWithdrawn = status === "withdrawn";
-    const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "Customer withdrew this request.");
-    const time = formatTime(request.createdAt);
-    const total = formatMoney(request.totalDue || 0);
-    const matchingVendorItems = getVendorItemsForRequest(request);
-    const aiSummary = getAiSummary(request);
-    const response = getVendorResponse(request);
-    const responseStatus = safeText(response?.status, "");
-    const responseLabel = getResponseLabel(responseStatus);
-    const responsePillClass = getResponsePillClass(responseStatus);
+  const visibleListings = listings.slice(0, 4);
 
-    const vendorBox = matchingVendorItems.length
-      ? matchingVendorItems.map((vendor) => {
-          const title = safeText(vendor.listingTitle, "Requested Listing");
-          const category = safeText(vendor.category || vendor.mainCategory, "Event Service");
-          const price = formatMoney(vendor.priceNumber || 0);
+  vendorList.innerHTML = visibleListings.map((listing) => {
+    const title = safeText(listing.title, "Untitled Listing");
+    const vendorName = safeText(listing.vendorName, "Vendor");
+    const categoryLine = getCategoryLine(listing);
+    const price = formatPrice(listing.startingPrice);
+    const rating = listing.rating ? `${listing.rating} rating` : "New vendor";
+    const listingId = encodeURIComponent(listing.id || "");
+    const imageUrl = safeText(listing.imageUrl, "");
 
-          return `
-            <div class="vendor-box">
-              <h4>${escapeHtml(title)}</h4>
-              <p>${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
-            </div>
-          `;
-        }).join("")
-      : `
-        <div class="vendor-box">
-          <h4>Your service was included</h4>
-          <p>This request includes your vendor account, but the specific listing details were not found.</p>
-        </div>
-      `;
+    const avatarMarkup = imageUrl
+      ? `<div class="vendor-avatar has-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}"></div>`
+      : `<div class="vendor-avatar"></div>`;
 
     return `
-      <article class="request-card ${isWithdrawn ? "withdrawn-card" : ""}">
-        <div class="request-top">
-          <div>
-            <h3 class="request-title">${escapeHtml(eventName)}</h3>
-            <p class="request-subtitle">${escapeHtml(customerName)} · ${escapeHtml(time)}</p>
-          </div>
+      <article class="vendor-card">
+        <div class="vendor-left">
+          ${avatarMarkup}
 
-          <div class="request-total">${escapeHtml(total)}</div>
-        </div>
-
-        <div class="pill-row">
-          <span class="pill ${requestPillClass}">${escapeHtml(requestStatusLabel)}</span>
-          <span class="pill type">${escapeHtml(eventType)}</span>
-          <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
-          ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
-        </div>
-
-        ${isWithdrawn ? `
-          <div class="withdrawn-box">
-            <h4>Request Withdrawn</h4>
-            <p>The customer has withdrawn this request. Reason: ${escapeHtml(withdrawnReason)}</p>
-          </div>
-        ` : ""}
-
-        <div class="request-grid">
-          <div class="info-row">
-            <span class="info-label">Date</span>
-            <span class="info-value">${escapeHtml(eventDate)}</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Location</span>
-            <span class="info-value">${escapeHtml(location)}</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Guests</span>
-            <span class="info-value">${escapeHtml(guestCount)}</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Budget</span>
-            <span class="info-value">${escapeHtml(budget)}</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Style</span>
-            <span class="info-value">${escapeHtml(styleVibe)}</span>
+          <div class="vendor-info">
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(vendorName)} · ${escapeHtml(categoryLine)}</p>
+            <div class="vendor-rating">${escapeHtml(rating)}</div>
           </div>
         </div>
 
-        ${vendorBox}
-
-        <div class="response-box">
-          <h4>Your Response</h4>
-          <p>
-            ${isWithdrawn
-              ? "This request has been withdrawn, so vendor responses are closed."
-              : `${escapeHtml(responseLabel)}${response?.note ? ` · ${escapeHtml(response.note)}` : ""}`
-            }
-          </p>
-
-          ${isWithdrawn ? "" : `
-            <div class="response-actions">
-              <button class="btn-safe" type="button" data-response-request="${requestId}" data-response-status="available">
-                Mark Available
-              </button>
-
-              <button class="btn-warning" type="button" data-response-request="${requestId}" data-response-status="needs_info">
-                Need More Info
-              </button>
-
-              <button class="btn-danger" type="button" data-response-request="${requestId}" data-response-status="declined">
-                Decline
-              </button>
-            </div>
-          `}
-        </div>
-
-        ${aiSummary ? `
-          <div class="ai-box">
-            <h4>AI Planner Context</h4>
-            <p>${escapeHtml(aiSummary)}</p>
-          </div>
-        ` : ""}
-
-        <div class="request-actions">
-          ${isWithdrawn
-            ? `
-              <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
-              <button class="btn-danger" type="button" data-clear-vendor-request="${requestId}">
-                Clear From Requests
-              </button>
-            `
-            : `
-              <button class="btn" type="button" data-message-request="${requestId}">Message Customer</button>
-              <a class="btn-secondary" href="booking-requests.html?id=${requestId}">View</a>
-            `
-          }
+        <div class="vendor-right">
+          <div class="vendor-price">${escapeHtml(price)}</div>
+          <a class="mini-btn" href="detail.html?id=${listingId}">View</a>
         </div>
       </article>
     `;
   }).join("");
-
-  document.querySelectorAll("[data-message-request]").forEach((button) => {
-    button.addEventListener("click", () => {
-      messageCustomerForRequest(button.dataset.messageRequest);
-    });
-  });
-
-  document.querySelectorAll("[data-response-request]").forEach((button) => {
-    button.addEventListener("click", () => {
-      updateVendorResponse(button.dataset.responseRequest, button.dataset.responseStatus);
-    });
-  });
-
-  document.querySelectorAll("[data-clear-vendor-request]").forEach((button) => {
-    button.addEventListener("click", () => {
-      clearRequestFromVendorView(button.dataset.clearVendorRequest);
-    });
-  });
 }
 
-async function clearRequestFromVendorView(requestId) {
-  if (isBusy) return;
-
-  const cleanRequestId = decodeURIComponent(requestId);
-  const request = bookingRequests.find((item) => item.id === cleanRequestId);
-
-  if (!request) {
-    showStatus("Could not find that booking request.", "error");
-    return;
-  }
-
+async function loadSuggestedVendors() {
   try {
-    isBusy = true;
-    showStatus("Clearing withdrawn request...", "info");
-
-    const requestRef = doc(db, "bookingRequests", cleanRequestId);
-
-    const updatedHiddenForVendorIds = {
-      ...(request.hiddenForVendorIds || {}),
-      [currentUser.uid]: true
-    };
-
-    await updateDoc(requestRef, {
-      hiddenForVendorIds: updatedHiddenForVendorIds,
-      updatedAt: serverTimestamp()
-    });
-
-    request.hiddenForVendorIds = updatedHiddenForVendorIds;
-
-    renderRequests();
-    showStatus("Withdrawn request cleared from your page.", "success");
-
-  } catch (error) {
-    showStatus(error.message, "error");
-  } finally {
-    isBusy = false;
-  }
-}
-
-async function updateVendorResponse(requestId, responseStatus) {
-  if (isBusy) return;
-
-  const cleanRequestId = decodeURIComponent(requestId);
-  const request = bookingRequests.find((item) => item.id === cleanRequestId);
-
-  if (!request) {
-    showStatus("Could not find that booking request.", "error");
-    return;
-  }
-
-  const status = safeText(request.requestStatus || request.status, "pending");
-
-  if (status === "withdrawn") {
-    showStatus("This request has been withdrawn, so you can no longer respond to it.", "error");
-    return;
-  }
-
-  const responseLabel = getResponseLabel(responseStatus);
-  const vendorName = getVendorDisplayName();
-
-  try {
-    isBusy = true;
-    showStatus(`Saving response: ${responseLabel}...`, "info");
-
-    const requestRef = doc(db, "bookingRequests", cleanRequestId);
-
-    const updatedVendorResponses = {
-      ...(request.vendorResponses || {}),
-      [currentUser.uid]: {
-        vendorId: currentUser.uid,
-        vendorName,
-        status: responseStatus,
-        statusLabel: responseLabel,
-        note: responseStatus === "available"
-          ? "Vendor marked themselves as available."
-          : responseStatus === "needs_info"
-            ? "Vendor needs more information before confirming."
-            : "Vendor declined this request.",
-        respondedAt: new Date().toISOString()
-      }
-    };
-
-    await updateDoc(requestRef, {
-      vendorResponses: updatedVendorResponses,
-      updatedAt: serverTimestamp()
-    });
-
-    request.vendorResponses = updatedVendorResponses;
-
-    renderRequests();
-    showStatus(`Response saved: ${responseLabel}`, "success");
-
-  } catch (error) {
-    showStatus(error.message, "error");
-  } finally {
-    isBusy = false;
-  }
-}
-
-async function findExistingConversation(customerId, vendorId, listingId) {
-  const conversationKey = `${customerId}_${vendorId}_${listingId}`;
-  const q = query(
-    collection(db, "conversations"),
-    where("conversationKey", "==", conversationKey)
-  );
-
-  const snapshot = await getDocs(q);
-
-  if (snapshot.empty) return null;
-
-  let conversation = null;
-
-  snapshot.forEach((docSnap) => {
-    conversation = {
-      id: docSnap.id,
-      ...docSnap.data()
-    };
-  });
-
-  return conversation;
-}
-
-async function messageCustomerForRequest(requestId) {
-  if (isBusy) return;
-
-  const cleanRequestId = decodeURIComponent(requestId);
-  const request = bookingRequests.find((item) => item.id === cleanRequestId);
-
-  if (!request) {
-    showStatus("Could not find that booking request.", "error");
-    return;
-  }
-
-  const status = safeText(request.requestStatus || request.status, "pending");
-
-  if (status === "withdrawn") {
-    showStatus("This request has been withdrawn, so messaging from this request is disabled.", "error");
-    return;
-  }
-
-  const matchingVendorItems = getVendorItemsForRequest(request);
-  const firstVendorItem = matchingVendorItems[0] || {};
-  const listingId = safeText(firstVendorItem.listingId, cleanRequestId);
-  const customerId = safeText(request.customerId, "");
-
-  if (!customerId) {
-    showStatus("This request is missing customer information.", "error");
-    return;
-  }
-
-  try {
-    isBusy = true;
-    showStatus("Opening customer conversation...", "info");
-
-    const existingConversation = await findExistingConversation(
-      customerId,
-      currentUser.uid,
-      listingId
+    const listingsQuery = query(
+      collection(db, "listings"),
+      where("status", "==", "published")
     );
 
-    if (existingConversation) {
-      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
-      return;
-    }
+    const snapshot = await getDocs(listingsQuery);
 
-    const customerName = safeText(request.customerName, "Customer");
-    const vendorName = getVendorDisplayName();
-    const eventDetails = request.eventDetails || {};
-    const eventName = safeText(eventDetails.eventName, "your event");
-    const listingTitle = safeText(firstVendorItem.listingTitle, "your requested service");
-    const listingCategory = safeText(firstVendorItem.category || firstVendorItem.mainCategory, "Event Service");
-    const listingLocation = getEventLocation(eventDetails);
-    const conversationKey = `${customerId}_${currentUser.uid}_${listingId}`;
-    const firstMessage = `Hi ${customerName}! I received your RentEvent request for ${eventName} and would love to discuss availability for ${listingTitle}.`;
-
-    const conversationRef = await addDoc(collection(db, "conversations"), {
-      conversationKey,
-      participantIds: [customerId, currentUser.uid],
-      participantNames: {
-        [customerId]: customerName,
-        [currentUser.uid]: vendorName
-      },
-      participantRoles: {
-        [customerId]: "customer",
-        [currentUser.uid]: "vendor"
-      },
-      customerId,
-      vendorId: currentUser.uid,
-      listingId,
-      bookingRequestId: cleanRequestId,
-      listingTitle,
-      listingCategory,
-      listingLocation,
-      title: customerName,
-      contextType: "Booking Request",
-      lastMessage: firstMessage,
-      lastSenderId: currentUser.uid,
-      unreadFor: {
-        [customerId]: true
-      },
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-
-    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
-      text: firstMessage,
-      senderId: currentUser.uid,
-      senderName: vendorName,
-      senderRole: "vendor",
-      createdAt: serverTimestamp()
-    });
-
-    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
-
-  } catch (error) {
-    showStatus(error.message, "error");
-  } finally {
-    isBusy = false;
-  }
-}
-
-async function loadBookingRequests() {
-  try {
-    const q = query(
-      collection(db, "bookingRequests"),
-      where("vendorIds", "array-contains", currentUser.uid)
-    );
-
-    const snapshot = await getDocs(q);
-
-    const requests = [];
+    const listings = [];
 
     snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-
-      const hiddenForVendorIds = data.hiddenForVendorIds || {};
-
-      if (!hiddenForVendorIds[currentUser.uid]) {
-        requests.push({
-          id: docSnap.id,
-          ...data
-        });
-      }
+      listings.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
     });
 
-    requests.sort((a, b) => {
+    listings.sort((a, b) => {
       const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
       const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
       return bTime - aTime;
     });
 
-    bookingRequests = requests;
-    renderRequests();
+    renderVendors(listings);
 
   } catch (error) {
-    document.getElementById("requestList").innerHTML = `
+    document.getElementById("vendorList").innerHTML = `
       <div class="empty-card">
         <div class="empty-icon">!</div>
-        <h3>Could not load requests</h3>
+        <h3>Could not load vendors</h3>
         <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="vendor-dashboard.html">Back to Dashboard</a>
+        <a class="btn" href="listings.html">Open Listings</a>
       </div>
     `;
+  }
+}
+
+async function loadEventBoardCount(user) {
+  try {
+    const boardQuery = query(
+      collection(db, "eventBoardItems"),
+      where("userId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(boardQuery);
+    setText("suggestedCount", snapshot.size);
+  } catch {
+    setText("suggestedCount", "0");
+  }
+}
+
+async function loadCustomerEvent(user) {
+  try {
+    const eventRef = doc(db, "customerEvents", user.uid);
+    const eventSnap = await getDoc(eventRef);
+
+    if (!eventSnap.exists()) return;
+
+    const eventData = eventSnap.data();
+
+    const eventName = safeText(eventData.eventName, "Your Event Board");
+    const eventDate = safeText(eventData.eventDate, "Date not set");
+    const eventType = safeText(eventData.eventType, "Planning in Progress");
+
+    setText("eventName", eventName);
+    setText("eventDate", eventDate);
+    setText("eventStatus", eventType);
+  } catch {
+    return;
   }
 }
 
@@ -1315,8 +1158,6 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  currentUser = user;
-
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
 
@@ -1325,15 +1166,26 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  currentUserData = userSnap.data();
+  const userData = userSnap.data();
 
-  if (currentUserData.role !== "vendor") {
-    window.location.href = "dashboard.html";
+  if (userData.role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
     return;
   }
 
-  loadBookingRequests();
+  const firstName = safeText(userData.name, user.email || "there").split(" ")[0];
+  setText("welcomeText", `Welcome back, ${firstName}`);
+
+  loadUnreadCounts(user);
+  loadEventBoardCount(user);
+  loadCustomerEvent(user);
+  loadSuggestedVendors();
 });
+
+window.logout = async function () {
+  await signOut(auth);
+  window.location.href = "index.html";
+};
 </script>
 
 </body>
