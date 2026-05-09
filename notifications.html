@@ -502,7 +502,7 @@
         <div class="hero-label" id="heroLabel">Stay in the loop</div>
         <h2 class="hero-title">Everything important, all in one place.</h2>
         <p class="hero-subtitle" id="heroSubtitle">
-          Keep track of message replies, booking updates, confirmations, and reminders.
+          Keep track of message replies, event-specific booking updates, confirmations, and reminders.
         </p>
       </div>
     </section>
@@ -700,7 +700,7 @@ function applyRoleLayout(role) {
     profileLink.href = "profile.html";
     document.getElementById("roleEyebrow").textContent = "Updates";
     document.getElementById("heroLabel").textContent = "Stay in the loop";
-    document.getElementById("heroSubtitle").textContent = "Keep track of vendor replies, booking updates, confirmations, and reminders.";
+    document.getElementById("heroSubtitle").textContent = "Keep track of vendor replies, event-specific booking updates, confirmations, and reminders.";
   }
 
   renderBottomNav(role);
@@ -725,23 +725,59 @@ function renderEmptyState() {
   `;
 }
 
+function getNotificationEventId(notification) {
+  return (
+    safeText(notification.eventId, "") ||
+    safeText(notification.raw?.eventId, "") ||
+    safeText(notification.raw?.eventDetails?.eventId, "")
+  );
+}
+
+function getNotificationRequestId(notification) {
+  return (
+    safeText(notification.bookingRequestId, "") ||
+    safeText(notification.requestId, "") ||
+    safeText(notification.sourceId, "")
+  );
+}
+
 function getNotificationHref(notification) {
   const type = safeText(notification.type, "");
+  const eventId = getNotificationEventId(notification);
+  const requestId = getNotificationRequestId(notification);
 
   if (type === "message") {
-    return `chat-thread.html?id=${encodeURIComponent(notification.sourceId || "")}`;
+    const conversationId = safeText(notification.sourceId, "");
+    const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
+    return `chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}`;
   }
 
   if (type === "vendor_response") {
-    return "my-requests.html";
+    return eventId
+      ? `my-requests.html?eventId=${encodeURIComponent(eventId)}`
+      : "my-requests.html";
   }
 
   if (type === "request_withdrawn") {
-    return "booking-requests.html";
+    return requestId
+      ? `booking-requests.html?id=${encodeURIComponent(requestId)}`
+      : "booking-requests.html";
   }
 
   if (type === "booking_request") {
-    return currentUserData?.role === "vendor" ? "booking-requests.html" : "my-requests.html";
+    if (currentUserData?.role === "vendor") {
+      return requestId
+        ? `booking-requests.html?id=${encodeURIComponent(requestId)}`
+        : "booking-requests.html";
+    }
+
+    return eventId
+      ? `my-requests.html?eventId=${encodeURIComponent(eventId)}`
+      : "my-requests.html";
+  }
+
+  if (eventId && currentUserData?.role !== "vendor") {
+    return `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
   }
 
   return currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "dashboard.html";
@@ -836,6 +872,7 @@ function buildConversationNotification(conversation) {
   const isUnread = !!unreadFor[currentUser.uid];
   const otherName = getOtherParticipantName(conversation);
   const listingTitle = safeText(conversation.listingTitle, "Event listing");
+  const eventName = safeText(conversation.eventName, "");
   const lastMessage = safeText(conversation.lastMessage, "Conversation updated.");
 
   return {
@@ -845,8 +882,12 @@ function buildConversationNotification(conversation) {
     type: "message",
     typeLabel: "Message",
     title: isUnread ? `New message from ${otherName}` : `Message thread with ${otherName}`,
-    body: `${lastMessage} Related to ${listingTitle}.`,
-    sourceLabel: listingTitle,
+    body: `${lastMessage} Related to ${listingTitle}${eventName ? ` for ${eventName}` : ""}.`,
+    sourceLabel: eventName || listingTitle,
+    eventId: conversation.eventId || null,
+    eventName: eventName || null,
+    bookingRequestId: conversation.bookingRequestId || null,
+    listingId: conversation.listingId || null,
     read: !isUnread,
     createdAt: conversation.updatedAt || conversation.createdAt,
     updatedAt: conversation.updatedAt || conversation.createdAt,
