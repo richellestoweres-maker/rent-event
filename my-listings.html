@@ -329,6 +329,11 @@
       color: #aa6f12;
     }
 
+    .pill.category {
+      background: #f0eaff;
+      color: #6f4ab8;
+    }
+
     .pill.paused,
     .pill.draft {
       background: var(--red-soft);
@@ -637,6 +642,35 @@ function renderEmptyState() {
   `;
 }
 
+function getCategoryLine(listing) {
+  const mainCategory = safeText(listing.mainCategory, "");
+  const category = safeText(listing.category || listing.listingCategory, "Event Service");
+  const customCategory = safeText(listing.customCategory, "");
+
+  const typeLine = customCategory
+    ? `${category} · ${customCategory}`
+    : category;
+
+  return mainCategory
+    ? `${mainCategory} · ${typeLine}`
+    : typeLine;
+}
+
+function getEventTypes(listing) {
+  if (Array.isArray(listing.eventTypes) && listing.eventTypes.length) {
+    return listing.eventTypes.map((item) => safeText(item, "")).filter(Boolean);
+  }
+
+  const eventType = safeText(listing.eventType, "");
+
+  if (!eventType) return [];
+
+  return eventType
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function renderListings(listings) {
   const listingList = document.getElementById("listingList");
 
@@ -647,31 +681,34 @@ function renderListings(listings) {
 
   listingList.innerHTML = listings.map((listing) => {
     const title = safeText(listing.title, "Untitled Listing");
-    const category = safeText(listing.category, "Event Service");
-    const customCategory = safeText(listing.customCategory, "");
-    const eventType = safeText(listing.eventType, "");
+    const mainCategory = safeText(listing.mainCategory, "Event Service");
+    const categoryLine = getCategoryLine(listing);
+    const eventTypes = getEventTypes(listing);
+    const eventTypePreview = eventTypes.slice(0, 3).join(", ");
+    const moreEventTypes = eventTypes.length > 3 ? ` +${eventTypes.length - 3} more` : "";
     const price = formatPrice(listing.startingPrice);
-    const location = safeText(listing.location, "");
+    const location = safeText(listing.location || listing.serviceArea, "");
     const description = safeText(listing.description, "No description has been added yet.");
     const views = Number(listing.views || 0);
     const saves = Number(listing.saves || 0);
     const status = safeText(listing.status, "draft");
     const imageUrl = safeText(listing.imageUrl, "");
+    const availability = safeText(listing.availability, "");
 
     const listingId = encodeURIComponent(listing.id || "");
 
-    const typeLine = customCategory
-      ? `${category} · ${customCategory}`
-      : category;
-
     const noteParts = [];
 
-    if (eventType) {
-      noteParts.push(`Best for ${eventType.toLowerCase()}.`);
+    if (eventTypes.length) {
+      noteParts.push(`Best for ${eventTypePreview}${moreEventTypes}.`);
     }
 
     if (location) {
       noteParts.push(`Serving ${location}.`);
+    }
+
+    if (availability) {
+      noteParts.push(`${availability}.`);
     }
 
     noteParts.push(description);
@@ -687,7 +724,7 @@ function renderListings(listings) {
 
           <div class="listing-info">
             <h3 class="listing-name">${escapeHtml(title)}</h3>
-            <p class="listing-type">${escapeHtml(typeLine)}</p>
+            <p class="listing-type">${escapeHtml(categoryLine)}</p>
           </div>
 
           <div class="listing-price">${escapeHtml(price)}</div>
@@ -695,6 +732,7 @@ function renderListings(listings) {
 
         <div class="listing-meta">
           <span class="pill ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>
+          <span class="pill category">${escapeHtml(mainCategory)}</span>
           <span class="pill views">${views} Views</span>
           <span class="pill saves">${saves} Saves</span>
         </div>
@@ -705,7 +743,7 @@ function renderListings(listings) {
 
         <div class="listing-actions">
           <a class="btn" href="detail.html?id=${listingId}">View</a>
-         <a class="btn-secondary" href="edit-listing.html?id=${listingId}">Edit</a>
+          <a class="btn-secondary" href="edit-listing.html?id=${listingId}">Edit</a>
         </div>
       </article>
     `;
