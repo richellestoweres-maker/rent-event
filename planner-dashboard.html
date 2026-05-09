@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planner Dashboard | RentEvent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box}
+    :root{--bg:#f7f2e9;--card:#fff;--text:#161616;--muted:#6a625a;--line:#ece2d3;--soft:#faf5ee;--coral1:#ff9a73;--coral2:#ff7a63;--coral3:#ff5f67;--gold:#d88914;--green:#eaf7ef;--greenText:#2d7a49;--blue:#edf4ff;--blueText:#4067b2;--red:#ffe7e2;--redText:#c74f4d;--purple:#f0eaff;--purpleText:#6f4ab8;--shadow:0 18px 40px rgba(123,96,58,.08);--shadowStrong:0 18px 32px rgba(255,108,98,.22);--radius:34px}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,sans-serif}
+    .page{width:100%;max-width:430px;margin:0 auto;min-height:100vh;padding:20px 18px 112px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+    .brand-wrap{min-width:0;flex:1}.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#7b7268;margin-bottom:4px}.brand{margin:0;font-size:1.55rem;line-height:1;letter-spacing:-.04em;font-weight:800}
+    .top-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}.icon-btn,.logout-btn{border:1px solid var(--line);background:rgba(255,255,255,.88);box-shadow:0 8px 20px rgba(140,111,75,.05);color:#222;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-weight:700;position:relative}.icon-btn{width:44px;height:44px;border-radius:50%;flex-shrink:0}.logout-btn{min-height:44px;padding:0 14px;border-radius:999px;font-size:.88rem;cursor:pointer;font-family:inherit}
+    .badge{position:absolute;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:linear-gradient(135deg,var(--coral2),var(--coral3));color:#fff;font-size:.68rem;line-height:20px;font-weight:800;text-align:center;border:2px solid #fff;display:none;align-items:center;justify-content:center;z-index:5;top:-5px;right:-5px}
+    .hero{position:relative;overflow:hidden;border-radius:var(--radius);padding:24px 22px;background:linear-gradient(160deg,var(--coral1),var(--coral2) 52%,var(--coral3));color:#fff;box-shadow:var(--shadowStrong);margin-bottom:26px}.hero:before{content:"";position:absolute;width:190px;height:190px;border-radius:50%;right:-70px;top:-42px;background:rgba(255,255,255,.12)}.hero-content{position:relative;z-index:1;max-width:350px}.hero-label{font-size:.88rem;font-weight:600;opacity:.94;margin-bottom:10px}.hero-title{margin:0 0 12px;font-size:2.15rem;line-height:.98;letter-spacing:-.06em;font-weight:800}.hero-subtitle{margin:0 0 18px;font-size:.96rem;line-height:1.45;color:rgba(255,255,255,.95)}
+    .actions{display:flex;flex-wrap:wrap;gap:10px}.hero-btn,.hero-btn-secondary,.btn,.btn-secondary{min-height:50px;padding:0 18px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700;font-size:.95rem;border:none;font-family:inherit;cursor:pointer}.hero-btn{background:#fff;color:#ff5f67;box-shadow:0 8px 20px rgba(169,67,62,.12)}.hero-btn-secondary{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.2);color:#fff}.btn{color:#fff;background:linear-gradient(135deg,var(--coral1),var(--coral2) 52%,var(--coral3));box-shadow:0 14px 28px rgba(255,107,97,.18)}.btn-secondary{color:#4a433d;background:#f3ebde}
+    .section{margin-top:28px}.section-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}.section-title{margin:0;font-size:1.6rem;line-height:1.02;letter-spacing:-.05em;font-weight:800}.section-link{color:var(--muted);text-decoration:none;font-size:.93rem;font-weight:700;white-space:nowrap;border:none;background:none;font-family:inherit;cursor:pointer;padding:0}
+    .quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.quick-card{background:var(--card);border-radius:26px;padding:16px;box-shadow:var(--shadow);text-decoration:none;color:inherit;min-height:154px;display:flex;flex-direction:column;justify-content:space-between;position:relative;border:none;font-family:inherit;text-align:left;cursor:pointer}.quick-icon{width:56px;height:56px;border-radius:18px;background:#fff1dc;color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.35rem;font-weight:800}.quick-card h3{margin:16px 0 6px;font-size:1.06rem;line-height:1.12;letter-spacing:-.03em;font-weight:700}.quick-card p{margin:0;font-size:.92rem;line-height:1.42;color:var(--muted)}
+    .stats-card,.event-card,.empty-card{background:var(--card);border-radius:30px;padding:18px;box-shadow:var(--shadow)}.stats-grid,.event-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.stat-box{background:#faf5ee;border:1px solid #f2e7d8;border-radius:20px;padding:14px 10px;text-align:center}.stat-number{display:block;font-size:1.25rem;font-weight:800;margin-bottom:4px;letter-spacing:-.04em}.stat-label{display:block;font-size:.78rem;color:var(--muted);font-weight:600;line-height:1.25}
+    .event-list{display:grid;gap:14px}.event-top{display:flex;gap:14px;align-items:center}.event-thumb{width:74px;height:74px;border-radius:24px;flex-shrink:0;background:linear-gradient(135deg,#ffdca5,#f2a73f 48%,#f48f55);position:relative}.event-thumb:after{content:"";position:absolute;left:19px;top:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.26)}.event-meta{min-width:0;flex:1}.client-label{font-size:.78rem;color:var(--muted);margin-bottom:5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}.event-date{font-size:.84rem;color:var(--muted);margin-bottom:6px;font-weight:600}.event-name{margin:0 0 8px;font-size:1.25rem;line-height:1.02;letter-spacing:-.04em;font-weight:800}.event-status{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border-radius:999px;background:#fff4e2;color:#a46a14;font-size:.8rem;font-weight:700;text-transform:capitalize}.event-stats{margin-top:16px}.event-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.empty-card{text-align:center;padding:24px 18px}.empty-icon{width:64px;height:64px;border-radius:22px;margin:0 auto 14px;background:#fff1dc;color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800}.empty-card h3{margin:0 0 8px;font-size:1.1rem;font-weight:800;letter-spacing:-.03em}.empty-card p{margin:0 0 16px;color:var(--muted);font-size:.9rem;line-height:1.45}
+    .modal-overlay{position:fixed;inset:0;background:rgba(22,22,22,.42);display:none;align-items:center;justify-content:center;padding:18px;z-index:80}.modal-overlay.show{display:flex}.modal-card{width:100%;max-width:430px;max-height:calc(100vh - 36px);overflow-y:auto;background:#fff;border-radius:30px;padding:20px;box-shadow:0 24px 70px rgba(22,22,22,.22)}.modal-label{display:inline-flex;min-height:28px;padding:0 10px;border-radius:999px;align-items:center;justify-content:center;background:var(--purple);color:var(--purpleText);font-size:.76rem;font-weight:800;margin-bottom:12px}.modal-title{margin:0 0 8px;font-size:1.45rem;line-height:1.05;letter-spacing:-.04em;font-weight:800}.modal-text{margin:0 0 16px;color:var(--muted);font-size:.92rem;line-height:1.45}.modal-grid{display:grid;gap:12px}.form-field label{display:block;margin-bottom:7px;font-size:.78rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.form-field input,.form-field select,.form-field textarea{width:100%;border:1px solid var(--line);border-radius:18px;padding:12px 14px;font-family:inherit;font-size:.92rem;background:var(--soft);color:var(--text);outline:none}.form-field textarea{min-height:86px;resize:vertical}.modal-actions{display:flex;gap:10px;margin-top:16px}.status-message{display:none;margin-top:14px;border-radius:18px;padding:12px 14px;font-size:.85rem;font-weight:700;line-height:1.45}.status-message.info{display:block;background:#fff4df;color:#8d5f11}.status-message.success{display:block;background:var(--green);color:var(--greenText)}.status-message.error{display:block;background:var(--red);color:var(--redText)}
+    .bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:calc(100% - 24px);max-width:406px;background:rgba(255,255,255,.94);border:1px solid rgba(235,225,211,.95);border-radius:999px;padding:10px 8px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;box-shadow:0 18px 38px rgba(120,96,60,.14);backdrop-filter:blur(10px)}.nav-item{min-height:58px;border-radius:999px;text-decoration:none;color:#6c655d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:.76rem;font-weight:700;text-align:center;padding:0 4px;position:relative}.nav-item.active{background:linear-gradient(135deg,var(--coral1),var(--coral2) 52%,var(--coral3));color:#fff;box-shadow:0 10px 22px rgba(255,107,97,.24)}
+    @media (min-width:768px){body{padding:24px 0}.page{max-width:960px;padding:28px 24px 120px}.quick-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.event-list{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom-nav{max-width:520px}}
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <div class="eyebrow">Planner Pro</div>
+        <h1 class="brand">Dashboard</h1>
+      </div>
+      <div class="top-actions">
+        <a class="icon-btn" href="notifications.html" aria-label="Notifications"><span class="badge" id="topNotificationBadge">0</span>🔔</a>
+        <a class="icon-btn" href="profile.html" aria-label="Profile">☺</a>
+        <button class="logout-btn" onclick="logout()">Log Out</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-label" id="welcomeText">Welcome back</div>
+        <h2 class="hero-title">Manage every client event beautifully.</h2>
+        <p class="hero-subtitle">Keep client events, vendor sourcing, requests, messages, and planning details organized in one professional workspace.</p>
+        <div class="actions">
+          <button class="hero-btn" type="button" id="openCreateEventBtn">Create Client Event</button>
+          <a class="hero-btn-secondary" href="listings.html">Browse Vendors</a>
+          <a class="hero-btn-secondary" href="messages.html">Messages</a>
+          <a class="hero-btn-secondary" href="notifications.html" id="alertHeroBtn">View Alerts</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><h2 class="section-title">Planner Overview</h2></div>
+      <article class="stats-card">
+        <div class="stats-grid">
+          <div class="stat-box"><span class="stat-number" id="clientEventCount">0</span><span class="stat-label">Client Events</span></div>
+          <div class="stat-box"><span class="stat-number" id="requestCount">0</span><span class="stat-label">Requests</span></div>
+          <div class="stat-box"><span class="stat-number" id="alertCount">0</span><span class="stat-label">Alerts</span></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><h2 class="section-title">Quick Actions</h2></div>
+      <div class="quick-grid">
+        <button class="quick-card" type="button" id="openCreateEventQuickBtn"><div class="quick-icon">+</div><div><h3>New Client Event</h3><p>Create a board with client name, event status, and planning details.</p></div></button>
+        <a class="quick-card" href="listings.html"><div class="quick-icon">◎</div><div><h3>Vendor Search</h3><p>Source DJs, singers, glam, venues, rentals, food, and more.</p></div></a>
+        <a class="quick-card" href="my-requests.html"><div class="quick-icon">✉</div><div><h3>Requests</h3><p>Track vendor responses across all client projects.</p></div></a>
+        <a class="quick-card" href="messages.html"><span class="badge" id="messageQuickBadge">0</span><div class="quick-icon">☰</div><div><h3>Messages</h3><p>Keep vendor conversations organized by event.</p></div></a>
+      </div>
+    </section>
+
+    <section class="section" id="clientEventsSection">
+      <div class="section-header">
+        <h2 class="section-title">Client Events</h2>
+        <button class="section-link" type="button" id="openCreateEventSmallBtn">Add Event</button>
+      </div>
+      <div class="event-list" id="eventList">
+        <div class="empty-card"><div class="empty-icon">…</div><h3>Loading events</h3><p>We’re pulling your client event projects now.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="createEventModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="createEventTitle">
+      <div class="modal-label">Planner Pro Event</div>
+      <h2 class="modal-title" id="createEventTitle">Create a client event</h2>
+      <p class="modal-text">Add the client and event details so this project has its own planning board, vendors, requests, and messages.</p>
+      <div class="status-message" id="createEventStatus"></div>
+
+      <div class="modal-grid">
+        <div class="form-field"><label for="clientNameInput">Client Name</label><input id="clientNameInput" type="text" placeholder="Madison Carter, Johnson Family..." /></div>
+        <div class="form-field"><label for="eventNameInput">Event Name</label><input id="eventNameInput" type="text" placeholder="Madison Wedding, Johnson Baby Shower..." /></div>
+        <div class="form-field"><label for="eventTypeInput">Event Type</label><select id="eventTypeInput"><option value="">Select event type</option><option>Wedding</option><option>Destination Wedding</option><option>Bridal Shower</option><option>Baby Shower</option><option>Birthday Party</option><option>Kids Birthday</option><option>Graduation Party</option><option>Corporate Event</option><option>Holiday Party</option><option>Styled Shoot</option><option>Church Event</option><option>Other</option></select></div>
+      </div>
+
+      <div class="modal-grid two" style="margin-top:12px;">
+        <div class="form-field"><label for="eventDateInput">Event Date</label><input id="eventDateInput" type="date" /></div>
+        <div class="form-field"><label for="guestCountInput">Guest Count</label><input id="guestCountInput" type="text" placeholder="75, 150, 250..." /></div>
+        <div class="form-field"><label for="eventCityInput">City</label><input id="eventCityInput" type="text" placeholder="Houston, League City..." /></div>
+        <div class="form-field"><label for="eventZipInput">ZIP Code</label><input id="eventZipInput" type="text" placeholder="77573" /></div>
+        <div class="form-field"><label for="eventBudgetInput">Budget</label><input id="eventBudgetInput" type="text" placeholder="$2,500, $10,000..." /></div>
+        <div class="form-field"><label for="eventStatusInput">Status</label><select id="eventStatusInput"><option>Lead / Inquiry</option><option selected>Vendor Sourcing</option><option>Proposal Stage</option><option>Awaiting Deposit</option><option>Booked</option><option>Final Details</option><option>Completed</option></select></div>
+      </div>
+
+      <div class="form-field" style="margin-top:12px;"><label for="styleVibeInput">Style / Vibe</label><input id="styleVibeInput" type="text" placeholder="Romantic, coastal, luxury, western..." /></div>
+      <div class="form-field" style="margin-top:12px;"><label for="eventNotesInput">Planner Notes</label><textarea id="eventNotesInput" placeholder="Client preferences, colors, vendor notes, venue details, budget notes..."></textarea></div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="cancelCreateEventBtn">Cancel</button>
+        <button class="btn" type="button" id="createEventBtn">Create Event</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Planner navigation">
+    <a class="nav-item active" href="planner-dashboard.html"><span>Home</span></a>
+    <a class="nav-item" href="#clientEventsSection"><span>Events</span></a>
+    <a class="nav-item" href="listings.html"><span>Vendors</span></a>
+    <a class="nav-item" href="messages.html"><span class="badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
+  </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let clientEvents = [];
+let eventBoardCounts = {};
+let requestCounts = {};
+let isCreatingEvent = false;
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatEventDate(value) {
+  const text = safeText(value, "");
+  if (!text) return "Date not set";
+  const date = new Date(`${text}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return text;
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+function showCreateEventStatus(message, type = "info") {
+  const status = document.getElementById("createEventStatus");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
+}
+
+function openCreateEventModal() {
+  const modal = document.getElementById("createEventModal");
+  ["clientNameInput","eventNameInput","eventTypeInput","eventDateInput","guestCountInput","eventCityInput","eventZipInput","eventBudgetInput","styleVibeInput","eventNotesInput"].forEach((id) => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("eventStatusInput").value = "Vendor Sourcing";
+  document.getElementById("createEventStatus").style.display = "none";
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeCreateEventModal() {
+  const modal = document.getElementById("createEventModal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+async function loadUnreadCounts(user) {
+  let unreadMessages = 0;
+  let unreadNotifications = 0;
+
+  try {
+    const conversationsQuery = query(collection(db, "conversations"), where("participantIds", "array-contains", user.uid));
+    const conversationSnapshot = await getDocs(conversationsQuery);
+    conversationSnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      if ((data.unreadFor || {})[user.uid]) unreadMessages += 1;
+    });
+  } catch {}
+
+  try {
+    const notificationsQuery = query(collection(db, "notifications"), where("recipientId", "==", user.uid), where("read", "==", false));
+    const notificationSnapshot = await getDocs(notificationsQuery);
+    unreadNotifications = notificationSnapshot.size;
+  } catch {}
+
+  const totalAlerts = unreadMessages + unreadNotifications;
+  setBadge("topNotificationBadge", totalAlerts);
+  setBadge("bottomInboxBadge", unreadMessages);
+  setBadge("messageQuickBadge", unreadMessages);
+  setText("alertCount", totalAlerts);
+  document.getElementById("alertHeroBtn").textContent = totalAlerts > 0 ? `${totalAlerts} Alert${totalAlerts === 1 ? "" : "s"}` : "View Alerts";
+}
+
+function renderEmptyEvents() {
+  document.getElementById("eventList").innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No client events yet</h3>
+      <p>Create your first client project so vendors, messages, notes, and requests stay organized by event.</p>
+      <button class="btn" type="button" onclick="openPlannerEventModalFromWindow()">Create Client Event</button>
+    </div>
+  `;
+}
+
+function renderEvents() {
+  const eventList = document.getElementById("eventList");
+  if (!clientEvents.length) {
+    renderEmptyEvents();
+    return;
+  }
+
+  eventList.innerHTML = clientEvents.map((eventData) => {
+    const eventId = encodeURIComponent(eventData.id || "");
+    const clientName = safeText(eventData.clientName, "Client");
+    const eventName = safeText(eventData.eventName, "Untitled Event");
+    const eventType = safeText(eventData.eventType, "Event");
+    const eventDate = formatEventDate(eventData.eventDate);
+    const eventCity = safeText(eventData.eventCity, "");
+    const eventZip = safeText(eventData.eventZip, "");
+    const location = [eventCity, eventZip].filter(Boolean).join(" ") || "Location not set";
+    const savedCount = eventBoardCounts[eventData.id] || 0;
+    const requests = requestCounts[eventData.id] || 0;
+    const eventStatus = safeText(eventData.status || eventData.eventStatus, "Vendor Sourcing");
+
+    return `
+      <article class="event-card">
+        <div class="event-top">
+          <div class="event-thumb"></div>
+          <div class="event-meta">
+            <div class="client-label">${escapeHtml(clientName)}</div>
+            <div class="event-date">${escapeHtml(eventDate)} · ${escapeHtml(location)}</div>
+            <h3 class="event-name">${escapeHtml(eventName)}</h3>
+            <div class="event-status">${escapeHtml(eventType)} · ${escapeHtml(eventStatus)}</div>
+          </div>
+        </div>
+        <div class="event-stats">
+          <div class="stat-box"><span class="stat-number">${savedCount}</span><span class="stat-label">Saved</span></div>
+          <div class="stat-box"><span class="stat-number">${requests}</span><span class="stat-label">Requests</span></div>
+          <div class="stat-box"><span class="stat-number">AI</span><span class="stat-label">Planner</span></div>
+        </div>
+        <div class="event-actions">
+          <a class="btn" href="event-builder.html?eventId=${eventId}">Open Event</a>
+          <a class="btn-secondary" href="my-requests.html?eventId=${eventId}">Requests</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadEventBoardCounts(user) {
+  eventBoardCounts = {};
+  try {
+    const boardQuery = query(collection(db, "eventBoardItems"), where("userId", "==", user.uid));
+    const snapshot = await getDocs(boardQuery);
+    snapshot.forEach((docSnap) => {
+      const eventId = safeText(docSnap.data().eventId, "");
+      if (eventId) eventBoardCounts[eventId] = (eventBoardCounts[eventId] || 0) + 1;
+    });
+  } catch {}
+}
+
+async function loadRequestCounts(user) {
+  requestCounts = {};
+  let totalRequests = 0;
+  try {
+    const requestQuery = query(collection(db, "bookingRequests"), where("customerId", "==", user.uid));
+    const snapshot = await getDocs(requestQuery);
+    snapshot.forEach((docSnap) => {
+      const request = docSnap.data();
+      const eventId = safeText(request.eventId, "");
+      if (eventId && !request.hiddenForCustomer) {
+        requestCounts[eventId] = (requestCounts[eventId] || 0) + 1;
+        totalRequests += 1;
+      }
+    });
+  } catch {}
+  setText("requestCount", totalRequests);
+}
+
+async function loadClientEvents(user) {
+  try {
+    const events = [];
+    const eventsQuery = query(collection(db, "customerEvents"), where("customerId", "==", user.uid));
+    const snapshot = await getDocs(eventsQuery);
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      if (data.accountType === "planner" || data.plannerClientEvent === true || data.clientName) {
+        events.push({ id: docSnap.id, ...data });
+      }
+    });
+
+    events.sort((a, b) => {
+      const aTime = a.createdAt?.seconds || 0;
+      const bTime = b.createdAt?.seconds || 0;
+      return bTime - aTime;
+    });
+
+    clientEvents = events;
+    setText("clientEventCount", clientEvents.length);
+    renderEvents();
+  } catch (error) {
+    document.getElementById("eventList").innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">!</div>
+        <h3>Could not load client events</h3>
+        <p>${escapeHtml(error.message)}</p>
+        <button class="btn" type="button" onclick="openPlannerEventModalFromWindow()">Create Client Event</button>
+      </div>
+    `;
+  }
+}
+
+async function createEvent() {
+  if (isCreatingEvent || !currentUser) return;
+
+  const clientName = safeText(document.getElementById("clientNameInput").value, "");
+  const eventName = safeText(document.getElementById("eventNameInput").value, "");
+  const eventType = safeText(document.getElementById("eventTypeInput").value, "");
+  const eventDate = safeText(document.getElementById("eventDateInput").value, "");
+  const guestCount = safeText(document.getElementById("guestCountInput").value, "");
+  const eventCity = safeText(document.getElementById("eventCityInput").value, "");
+  const eventZip = safeText(document.getElementById("eventZipInput").value, "");
+  const eventBudget = safeText(document.getElementById("eventBudgetInput").value, "");
+  const eventStatus = safeText(document.getElementById("eventStatusInput").value, "Vendor Sourcing");
+  const styleVibe = safeText(document.getElementById("styleVibeInput").value, "");
+  const eventNotes = safeText(document.getElementById("eventNotesInput").value, "");
+
+  if (!clientName || !eventName) {
+    showCreateEventStatus("Please add both a client name and event name first.", "error");
+    return;
+  }
+
+  try {
+    isCreatingEvent = true;
+    const button = document.getElementById("createEventBtn");
+    button.disabled = true;
+    button.textContent = "Creating...";
+    showCreateEventStatus("Creating your client event...", "info");
+
+    const eventRef = await addDoc(collection(db, "customerEvents"), {
+      customerId: currentUser.uid,
+      ownerId: currentUser.uid,
+      plannerId: currentUser.uid,
+      accountType: "planner",
+      plannerClientEvent: true,
+      clientName,
+      eventName,
+      eventType,
+      eventDate,
+      guestCount,
+      eventCity,
+      eventZip,
+      eventBudget,
+      styleVibe,
+      eventNotes,
+      status: eventStatus,
+      eventStatus,
+      customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Planner",
+      customerEmail: currentUserData?.email || currentUser.email || "",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    window.location.href = `event-builder.html?eventId=${encodeURIComponent(eventRef.id)}`;
+  } catch (error) {
+    showCreateEventStatus(error.message, "error");
+  } finally {
+    isCreatingEvent = false;
+    const button = document.getElementById("createEventBtn");
+    button.disabled = false;
+    button.textContent = "Create Event";
+  }
+}
+
+document.getElementById("openCreateEventBtn").addEventListener("click", openCreateEventModal);
+document.getElementById("openCreateEventQuickBtn").addEventListener("click", openCreateEventModal);
+document.getElementById("openCreateEventSmallBtn").addEventListener("click", openCreateEventModal);
+document.getElementById("cancelCreateEventBtn").addEventListener("click", closeCreateEventModal);
+document.getElementById("createEventBtn").addEventListener("click", createEvent);
+document.getElementById("createEventModal").addEventListener("click", (event) => {
+  if (event.target.id === "createEventModal") closeCreateEventModal();
+});
+window.openPlannerEventModalFromWindow = openCreateEventModal;
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+  const role = currentUserData.role || "customer";
+
+  if (role === "vendor") {
+    window.location.href = "vendor-dashboard.html";
+    return;
+  }
+
+  if (role === "admin") {
+    window.location.href = "admin-dashboard.html";
+    return;
+  }
+
+  if (role !== "planner" && currentUserData.plannerPro !== true) {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  const firstName = safeText(currentUserData.name, user.email || "there").split(" ")[0];
+  setText("welcomeText", `Welcome back, ${firstName}`);
+
+  await Promise.all([loadUnreadCounts(user), loadEventBoardCounts(user), loadRequestCounts(user)]);
+  await loadClientEvents(user);
+});
+
+window.logout = async function () {
+  await signOut(auth);
+  window.location.href = "index.html";
+};
+</script>
+</body>
+</html>
