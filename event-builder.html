@@ -287,6 +287,58 @@
     .bottom-btn { background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%); color: #fff; box-shadow: 0 14px 28px rgba(255,107,97,0.18); }
     .bottom-btn-secondary { background: var(--soft-2); color: #4a433d; }
 
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      margin: -20px -18px 18px;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media (max-width: 430px) { .row-2 { grid-template-columns: 1fr; } }
     @media (max-width: 390px) { .bottom-bar { flex-wrap: wrap; border-radius: 28px; } .bottom-info { width: 100%; padding-left: 2px; } .bottom-btn, .bottom-btn-secondary { flex: 1; } }
     @media (min-width: 768px) {
@@ -300,9 +352,19 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Preview Mode
+        <span>You are viewing an event board as admin. Editing is disabled.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Planning</div>
@@ -649,6 +711,46 @@ function setValue(id, value) {
   if (el) el.value = value || "";
 }
 
+function isAdminPreview() {
+  return currentUserData?.role === "admin";
+}
+
+function enableAdminPreviewMode() {
+  if (!isAdminPreview()) return;
+
+  const adminPreviewBar = document.getElementById("adminPreviewBar");
+  if (adminPreviewBar) {
+    adminPreviewBar.style.display = "block";
+  }
+
+  const backLink = document.getElementById("backLink");
+  if (backLink) {
+    backLink.href = "admin-dashboard.html";
+  }
+
+  const checkoutLink = document.getElementById("checkoutLink");
+  if (checkoutLink) {
+    checkoutLink.href = "admin-dashboard.html";
+    checkoutLink.textContent = "Back to Admin";
+  }
+
+  const bottomAddVendorLink = document.getElementById("bottomAddVendorLink");
+  if (bottomAddVendorLink) {
+    bottomAddVendorLink.href = "listings.html";
+    bottomAddVendorLink.textContent = "View Listings";
+  }
+
+  const saveBtn = document.getElementById("saveEventDetailsBtn");
+  if (saveBtn) {
+    saveBtn.textContent = "Preview Only";
+  }
+
+  const aiBtn = document.getElementById("generateAiBtn");
+  if (aiBtn) {
+    aiBtn.textContent = "AI Disabled in Preview";
+  }
+}
+
 function showStatus(message, type = "success") {
   const status = document.getElementById("statusMessage");
   status.textContent = message;
@@ -673,6 +775,15 @@ function hideAiStatus() {
 }
 
 function updateEventAwareLinks() {
+  if (isAdminPreview()) {
+    document.getElementById("addMoreTopLink").href = "listings.html";
+    document.getElementById("browseAllLink").href = "listings.html";
+    document.getElementById("bottomAddVendorLink").href = "listings.html";
+    document.getElementById("checkoutLink").href = "admin-dashboard.html";
+    enableAdminPreviewMode();
+    return;
+  }
+
   document.getElementById("addMoreTopLink").href = getEventUrl("listings.html");
   document.getElementById("browseAllLink").href = getEventUrl("listings.html");
   document.getElementById("bottomAddVendorLink").href = getEventUrl("listings.html");
@@ -841,7 +952,7 @@ async function loadEventDetails() {
 
   const data = eventSnap.data();
 
-  if (data.customerId && data.customerId !== currentUser.uid) {
+  if (data.customerId && data.customerId !== currentUser.uid && !isAdminPreview()) {
     window.location.href = "dashboard.html";
     return;
   }
@@ -863,6 +974,11 @@ async function loadEventDetails() {
 
 async function saveEventDetails() {
   if (!currentUser || !currentEventId) return;
+
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a customer or planner test account to edit event details.", "error");
+    return;
+  }
 
   const eventDetails = getEventDetailsFromForm();
 
@@ -980,6 +1096,11 @@ function renderAiSuggestions(result) {
 
 async function generateAiIdeas() {
   if (isGeneratingAi) return;
+
+  if (isAdminPreview()) {
+    showAiStatus("AI generation is disabled in admin preview mode. Use a customer or planner test account to test it.", "error");
+    return;
+  }
 
   const generateBtn = document.getElementById("generateAiBtn");
 
@@ -1197,11 +1318,20 @@ async function loadPublishedListings() {
 }
 
 async function loadSelectedVendors() {
-  const q = query(
-    collection(db, "eventBoardItems"),
-    where("userId", "==", currentUser.uid),
-    where("eventId", "==", currentEventId)
-  );
+  let q;
+
+  if (isAdminPreview()) {
+    q = query(
+      collection(db, "eventBoardItems"),
+      where("eventId", "==", currentEventId)
+    );
+  } else {
+    q = query(
+      collection(db, "eventBoardItems"),
+      where("userId", "==", currentUser.uid),
+      where("eventId", "==", currentEventId)
+    );
+  }
 
   const snapshot = await getDocs(q);
 
@@ -1221,6 +1351,11 @@ async function loadSelectedVendors() {
 }
 
 async function addVendorToBoard(listingId) {
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a customer or planner test account to add vendors.", "error");
+    return;
+  }
+
   if (isBusy) return;
 
   const cleanListingId = decodeURIComponent(listingId);
@@ -1301,6 +1436,11 @@ async function addVendorToBoard(listingId) {
 }
 
 async function removeVendorFromBoard(boardId) {
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a customer or planner test account to remove vendors.", "error");
+    return;
+  }
+
   if (isBusy) return;
 
   const cleanBoardId = decodeURIComponent(boardId);
@@ -1338,6 +1478,11 @@ async function findExistingConversation(customerId, vendorId, listingId) {
 }
 
 async function openMessageForListing(listingId) {
+  if (isAdminPreview()) {
+    showStatus("Messaging is disabled in admin preview mode. Use a customer or planner test account to test conversations.", "error");
+    return;
+  }
+
   const cleanListingId = decodeURIComponent(listingId);
   const vendor = selectedVendors.find((item) => item.listingId === cleanListingId);
 
@@ -1432,7 +1577,7 @@ async function loadPage() {
     currentEventId = getEventIdFromUrl();
 
     if (!currentEventId) {
-      window.location.href = "dashboard.html";
+      window.location.href = isAdminPreview() ? "admin-dashboard.html" : "dashboard.html";
       return;
     }
 
@@ -1451,7 +1596,7 @@ async function loadPage() {
         <div class="empty-icon">!</div>
         <h3>Could not load event board</h3>
         <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="dashboard.html">Back to Dashboard</a>
+        <a class="btn" href="admin-dashboard.html">Back to Admin</a>
       </div>
     `;
 
@@ -1494,6 +1639,10 @@ onAuthStateChanged(auth, async (user) => {
   if (currentUserData.role === "vendor") {
     window.location.href = "vendor-dashboard.html";
     return;
+  }
+
+  if (currentUserData.role === "admin") {
+    enableAdminPreviewMode();
   }
 
   currentEventId = getEventIdFromUrl();
