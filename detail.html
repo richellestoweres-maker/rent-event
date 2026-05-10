@@ -404,6 +404,57 @@
     .action-btn-secondary { background: var(--soft-2); color: #4a433d; }
     .action-btn:disabled, .action-btn-secondary:disabled { opacity: 0.65; cursor: not-allowed; }
 
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media (max-width: 390px) {
       .action-bar { flex-wrap: wrap; border-radius: 28px; }
       .action-info { width: 100%; padding-left: 2px; }
@@ -419,6 +470,16 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Preview Mode
+        <span>You are viewing listing details as admin.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page" id="page">
     <section class="hero" id="hero">
       <div class="hero-topbar">
@@ -622,12 +683,19 @@ function getEventAwareUrl(baseUrl, params = {}) {
 function updateEventAwareLinks() {
   const backBtn = document.getElementById("backToListingsBtn");
   const addBtn = document.getElementById("addToEventBtn");
+  const role = currentUserData?.role || "";
 
   if (backBtn) {
-    backBtn.href = getEventAwareUrl("listings.html");
+    backBtn.href = role === "admin" ? "listings.html" : getEventAwareUrl("listings.html");
   }
 
   if (!addBtn) return;
+
+  if (role === "admin") {
+    addBtn.href = "admin-dashboard.html";
+    addBtn.textContent = "Back to Admin";
+    return;
+  }
 
   if (currentEventId && currentListingId) {
     addBtn.href = getEventAwareUrl("event-builder.html", { add: currentListingId });
@@ -886,6 +954,11 @@ async function startConversation() {
     return;
   }
 
+  if (currentUserData?.role === "admin") {
+    showStatus("Admin preview mode is view-only. Use a customer test account to test messaging.", "error");
+    return;
+  }
+
   if (!currentListing || !currentListingId) {
     showStatus("This listing is still loading. Please try again in a second.", "error");
     return;
@@ -984,6 +1057,19 @@ onAuthStateChanged(auth, async (user) => {
 
     if (userSnap.exists()) {
       currentUserData = userSnap.data();
+
+      if (currentUserData.role === "admin") {
+        const adminPreviewBar = document.getElementById("adminPreviewBar");
+        if (adminPreviewBar) {
+          adminPreviewBar.style.display = "block";
+        }
+
+        const messageBtn = document.getElementById("messageBtn");
+        if (messageBtn) {
+          messageBtn.textContent = "Preview Only";
+          messageBtn.disabled = true;
+        }
+      }
     }
   }
 
