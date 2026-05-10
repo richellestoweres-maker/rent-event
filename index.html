@@ -20,6 +20,14 @@
   --white-soft: rgba(255, 255, 255, 0.9);
   --glass: rgba(255, 255, 255, 0.14);
   --shadow: 0 24px 48px rgba(167, 55, 61, 0.22);
+  --dark: #161616;
+  --muted: #6a625a;
+  --line: #ece2d3;
+  --cream: #faf5ee;
+  --green-soft: #eaf7ef;
+  --green-text: #2d7a49;
+  --red-soft: #ffe7e2;
+  --red-text: #c74f4d;
 }
 
 html, body {
@@ -37,7 +45,7 @@ body {
   justify-content: center;
   color: var(--white);
   padding: 24px;
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
 }
 
@@ -90,6 +98,15 @@ body::after {
   border: 3px solid rgba(255, 255, 255, 0.96);
   border-radius: 22px;
   transform: rotate(8deg);
+  position: relative;
+}
+
+.logo-box::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
 }
 
 h1 {
@@ -144,7 +161,8 @@ h1 {
   transition: background-color 9999s ease-in-out 0s;
 }
 
-.button {
+.button,
+.secondary-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,15 +171,22 @@ h1 {
   padding: 0 18px;
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.22);
   color: var(--white);
   font-size: 1.02rem;
   font-weight: 700;
   margin-top: 8px;
   text-decoration: none;
-  box-shadow: var(--shadow);
   cursor: pointer;
   font-family: inherit;
+}
+
+.button {
+  background: rgba(255,255,255,0.22);
+  box-shadow: var(--shadow);
+}
+
+.secondary-button {
+  background: rgba(255,255,255,0.12);
 }
 
 .message {
@@ -175,15 +200,30 @@ h1 {
   line-height: 1.4;
 }
 
+.message.success {
+  background: rgba(234, 247, 239, 0.22);
+}
+
+.message.error {
+  background: rgba(255, 231, 226, 0.22);
+}
+
 .link {
   margin-top: 18px;
   font-size: 0.95rem;
 }
 
+.link button,
 .link a {
   color: var(--white);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0;
 }
 
 .bottom {
@@ -203,6 +243,130 @@ h1 {
   margin: 0 8px;
   opacity: 0.8;
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 22, 22, 0.44);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 20;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 390px;
+  background: #fff;
+  color: var(--dark);
+  border-radius: 30px;
+  padding: 22px;
+  box-shadow: 0 24px 70px rgba(22, 22, 22, 0.24);
+}
+
+.modal-label {
+  display: inline-flex;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+  background: #fff4df;
+  color: #8d5f11;
+  font-size: 0.76rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 1.45rem;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+.modal-text {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.modal-input {
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 0 15px;
+  font-family: inherit;
+  font-size: 0.96rem;
+  background: var(--cream);
+  color: var(--dark);
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.modal-btn,
+.modal-btn-secondary {
+  min-height: 50px;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.92rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  flex: 1;
+}
+
+.modal-btn {
+  background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+  color: #fff;
+}
+
+.modal-btn-secondary {
+  background: var(--cream);
+  color: #4a433d;
+}
+
+.modal-status {
+  display: none;
+  margin-top: 12px;
+  border-radius: 16px;
+  padding: 11px 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.modal-status.success {
+  display: block;
+  background: var(--green-soft);
+  color: var(--green-text);
+}
+
+.modal-status.error {
+  display: block;
+  background: var(--red-soft);
+  color: var(--red-text);
+}
+
+@media (max-height: 720px) {
+  body {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+}
 </style>
 </head>
 
@@ -215,16 +379,16 @@ h1 {
       <div class="tagline">Plan. Rent. Celebrate.</div>
 
       <div class="form-wrap">
-        <input id="email" class="input" type="email" placeholder="Email" />
-        <input id="password" class="input" type="password" placeholder="Password" />
+        <input id="email" class="input" type="email" placeholder="Email" autocomplete="email" />
+        <input id="password" class="input" type="password" placeholder="Password" autocomplete="current-password" />
 
-        <button class="button" onclick="login()">Sign In</button>
+        <button class="button" id="loginBtn" onclick="login()">Sign In</button>
 
         <div id="message" class="message"></div>
       </div>
 
       <div class="link">
-        <a href="forgot-password.html">Forgot Password?</a>
+        <button type="button" id="forgotPasswordBtn">Forgot Password?</button>
       </div>
 
       <div class="bottom">
@@ -235,9 +399,33 @@ h1 {
     </section>
   </main>
 
+  <div class="modal-overlay" id="forgotPasswordModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="forgotPasswordTitle">
+      <div class="modal-label">Account Help</div>
+
+      <h2 class="modal-title" id="forgotPasswordTitle">Reset your password</h2>
+      <p class="modal-text">
+        Enter the email connected to your RentEvent account. We’ll send a secure password reset link.
+      </p>
+
+      <input id="resetEmail" class="modal-input" type="email" placeholder="Email address" autocomplete="email" />
+
+      <div id="resetStatus" class="modal-status"></div>
+
+      <div class="modal-actions">
+        <button class="modal-btn-secondary" type="button" id="closeResetBtn">Cancel</button>
+        <button class="modal-btn" type="button" id="sendResetBtn">Send Link</button>
+      </div>
+    </div>
+  </div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -254,47 +442,144 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-function showMessage(text) {
+function showMessage(text, type = "") {
   const message = document.getElementById("message");
   message.textContent = text;
+  message.className = type ? `message ${type}` : "message";
   message.style.display = "block";
+}
+
+function showResetStatus(text, type = "success") {
+  const status = document.getElementById("resetStatus");
+  status.textContent = text;
+  status.className = `modal-status ${type}`;
+  status.style.display = "block";
+}
+
+function getDashboardForUser(userData) {
+  const role = userData.role || "customer";
+
+  if (role === "admin") {
+    return "admin-dashboard.html";
+  }
+
+  if (role === "vendor") {
+    return "vendor-dashboard.html";
+  }
+
+  if (role === "planner" || userData.plannerPro === true) {
+    return "planner-dashboard.html";
+  }
+
+  return "dashboard.html";
+}
+
+async function routeUser(user) {
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    showMessage("Account found, but profile data is missing. Please contact support.", "error");
+    return;
+  }
+
+  const userData = userSnap.data();
+  window.location.href = getDashboardForUser(userData);
 }
 
 window.login = async function () {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
+  const loginBtn = document.getElementById("loginBtn");
 
   if (!email || !password) {
-    showMessage("Please enter your email and password.");
+    showMessage("Please enter your email and password.", "error");
     return;
   }
 
   try {
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Signing In...";
     showMessage("Signing you in...");
 
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      showMessage("Account found, but profile data is missing. Please contact support.");
-      return;
-    }
-
-    const userData = userSnap.data();
-
-    if (userData.role === "vendor") {
-      window.location.href = "vendor-dashboard.html";
-    } else {
-      window.location.href = "dashboard.html";
-    }
+    await routeUser(userCredential.user);
 
   } catch (error) {
-    showMessage(error.message);
+    showMessage(error.message, "error");
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Sign In";
   }
 };
+
+function openForgotPasswordModal() {
+  const modal = document.getElementById("forgotPasswordModal");
+  const email = document.getElementById("email").value.trim();
+
+  document.getElementById("resetEmail").value = email;
+  document.getElementById("resetStatus").style.display = "none";
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeForgotPasswordModal() {
+  const modal = document.getElementById("forgotPasswordModal");
+
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+async function sendResetLink() {
+  const email = document.getElementById("resetEmail").value.trim();
+  const sendBtn = document.getElementById("sendResetBtn");
+
+  if (!email) {
+    showResetStatus("Please enter your email address first.", "error");
+    return;
+  }
+
+  try {
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Sending...";
+
+    await sendPasswordResetEmail(auth, email);
+
+    showResetStatus("Password reset email sent. Check your inbox and spam folder.", "success");
+  } catch (error) {
+    showResetStatus(error.message, "error");
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Send Link";
+  }
+}
+
+document.getElementById("forgotPasswordBtn").addEventListener("click", openForgotPasswordModal);
+document.getElementById("closeResetBtn").addEventListener("click", closeForgotPasswordModal);
+document.getElementById("sendResetBtn").addEventListener("click", sendResetLink);
+
+document.getElementById("forgotPasswordModal").addEventListener("click", (event) => {
+  if (event.target.id === "forgotPasswordModal") {
+    closeForgotPasswordModal();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    const modalOpen = document.getElementById("forgotPasswordModal").classList.contains("show");
+
+    if (modalOpen) {
+      sendResetLink();
+    } else {
+      window.login();
+    }
+  }
+
+  if (event.key === "Escape") {
+    closeForgotPasswordModal();
+  }
+});
 </script>
 
 </body>
