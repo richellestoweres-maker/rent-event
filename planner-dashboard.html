@@ -458,17 +458,15 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   if (role === "admin") {
-    window.location.href = "admin-dashboard.html";
-    return;
-  }
-
-  if (role !== "planner" && currentUserData.plannerPro !== true) {
+    const firstName = safeText(currentUserData.name, user.email || "there").split(" ")[0];
+    setText("welcomeText", `Admin preview, ${firstName}`);
+  } else if (role !== "planner" && currentUserData.plannerPro !== true) {
     window.location.href = "dashboard.html";
     return;
+  } else {
+    const firstName = safeText(currentUserData.name, user.email || "there").split(" ")[0];
+    setText("welcomeText", `Welcome back, ${firstName}`);
   }
-
-  const firstName = safeText(currentUserData.name, user.email || "there").split(" ")[0];
-  setText("welcomeText", `Welcome back, ${firstName}`);
 
   await Promise.all([loadUnreadCounts(user), loadEventBoardCounts(user), loadRequestCounts(user)]);
   await loadClientEvents(user);
