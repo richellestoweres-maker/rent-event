@@ -534,6 +534,58 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      margin: -20px -18px 18px;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media (max-width: 390px) {
       .filter-row { grid-template-columns: 1fr; }
       .listing-actions { flex-direction: column; }
@@ -551,6 +603,16 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Preview Mode
+        <span>You are viewing marketplace listings as admin.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
       <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
@@ -1379,7 +1441,17 @@ onAuthStateChanged(auth, async (user) => {
 
     currentUserData = userSnap.data();
 
-    if (currentUserData.role === "vendor") {
+    const role = currentUserData.role || "customer";
+
+    if (role === "admin") {
+      const adminPreviewBar = document.getElementById("adminPreviewBar");
+      if (adminPreviewBar) {
+        adminPreviewBar.style.display = "block";
+      }
+
+      document.getElementById("backLink").href = "admin-dashboard.html";
+      document.getElementById("planEventLink").href = "admin-dashboard.html";
+    } else if (role === "vendor") {
       window.location.href = "vendor-dashboard.html";
       return;
     }
