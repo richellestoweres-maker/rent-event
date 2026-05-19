@@ -408,6 +408,58 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      margin: -20px -18px 18px;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media (min-width: 768px) {
       body {
         padding: 24px 0;
@@ -432,6 +484,16 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Account
+        <span>You are viewing your admin profile.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
       <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
@@ -454,8 +516,8 @@
         <p class="profile-email" id="profileEmail">Checking your account...</p>
 
         <div class="hero-actions">
-          <a class="hero-btn" href="edit-profile.html">Edit Profile</a>
-          <a class="hero-btn-secondary" href="dashboard.html#myEventsSection">My Events</a>
+          <a class="hero-btn" href="edit-profile.html" id="primaryHeroBtn">Edit Profile</a>
+          <a class="hero-btn-secondary" href="dashboard.html#myEventsSection" id="secondaryHeroBtn">My Events</a>
         </div>
       </div>
     </section>
@@ -545,7 +607,7 @@
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Bottom navigation">
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation">
     <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
@@ -653,43 +715,218 @@ function getLocation(userData) {
   return location || zip || "Not added yet";
 }
 
+function getRole(userData) {
+  if (userData.role === "admin") return "admin";
+  if (userData.role === "vendor") return "vendor";
+  if (userData.role === "planner" || userData.plannerPro === true) return "planner";
+  return "customer";
+}
+
+function getRoleLabel(role) {
+  if (role === "admin") return "Admin";
+  if (role === "vendor") return "Vendor";
+  if (role === "planner") return "Event Planner";
+  return "Customer";
+}
+
+function getHomeHref(role) {
+  if (role === "admin") return "admin-dashboard.html";
+  if (role === "vendor") return "vendor-dashboard.html";
+  if (role === "planner") return "planner-dashboard.html";
+  return "dashboard.html";
+}
+
+function renderMenuItem(href, title, subtitle) {
+  return `
+    <a class="menu-item" href="${href}">
+      <span class="menu-copy">
+        <span>${title}</span>
+        <span>${subtitle}</span>
+      </span>
+      <span class="menu-arrow">›</span>
+    </a>
+  `;
+}
+
+function renderQuickAccess(role) {
+  const list = document.getElementById("quickAccessList");
+
+  if (role === "admin") {
+    list.innerHTML = [
+      renderMenuItem("admin-dashboard.html", "Admin Dashboard", "Review users, listings, requests, and launch data."),
+      renderMenuItem("listings.html", "Marketplace", "Preview public listings and vendor categories."),
+      renderMenuItem("messages.html", "Messages", "Review marketplace conversations during testing."),
+      renderMenuItem("notifications.html", "Notifications", "Check app alerts and system messages.")
+    ].join("");
+    return;
+  }
+
+  if (role === "planner") {
+    list.innerHTML = [
+      renderMenuItem("planner-dashboard.html", "Client Events", "Manage client projects and event boards."),
+      renderMenuItem("listings.html", "Browse Vendors", "Source venues, glam, rentals, music, and event services."),
+      renderMenuItem("my-requests.html", "Client Requests", "Track submitted vendor requests across events."),
+      renderMenuItem("messages.html", "Messages", "Keep vendor conversations organized by client event.")
+    ].join("");
+    return;
+  }
+
+  list.innerHTML = [
+    renderMenuItem("dashboard.html#myEventsSection", "My Events", "Open your event project boards."),
+    renderMenuItem("listings.html", "Browse Listings", "Find venues, glam, rentals, music, and vendors."),
+    renderMenuItem("my-requests.html", "My Requests", "Track submitted vendor requests."),
+    renderMenuItem("messages.html", "Messages", "Review vendor conversations.")
+  ].join("");
+}
+
+function renderBottomNav(role) {
+  const bottomNav = document.getElementById("bottomNav");
+
+  if (role === "admin") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="admin-dashboard.html"><span>Admin</span></a>
+      <a class="nav-item" href="listings.html"><span>Listings</span></a>
+      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
+      <a class="nav-item active" href="profile.html"><span>Profile</span></a>
+    `;
+    return;
+  }
+
+  if (role === "planner") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="planner-dashboard.html"><span>Home</span></a>
+      <a class="nav-item" href="listings.html"><span>Vendors</span></a>
+      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
+      <a class="nav-item active" href="profile.html"><span>Profile</span></a>
+    `;
+    return;
+  }
+
+  bottomNav.innerHTML = `
+    <a class="nav-item" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+      </svg>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" href="listings.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Listings</span>
+    </a>
+
+    <a class="nav-item" href="messages.html">
+      <span class="nav-badge" id="bottomInboxBadge">0</span>
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Inbox</span>
+    </a>
+
+    <a class="nav-item active" href="profile.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Profile</span>
+    </a>
+  `;
+}
+
+function applyRoleLayout(role) {
+  const backLink = document.getElementById("backLink");
+  const primaryHeroBtn = document.getElementById("primaryHeroBtn");
+  const secondaryHeroBtn = document.getElementById("secondaryHeroBtn");
+
+  backLink.href = getHomeHref(role);
+
+  if (role === "admin") {
+    const bar = document.getElementById("adminPreviewBar");
+    if (bar) bar.style.display = "block";
+    primaryHeroBtn.href = "admin-dashboard.html";
+    primaryHeroBtn.textContent = "Admin Dashboard";
+    secondaryHeroBtn.href = "notifications.html";
+    secondaryHeroBtn.textContent = "Notifications";
+  } else if (role === "planner") {
+    primaryHeroBtn.href = "edit-profile.html";
+    primaryHeroBtn.textContent = "Edit Profile";
+    secondaryHeroBtn.href = "planner-dashboard.html";
+    secondaryHeroBtn.textContent = "Client Events";
+  } else {
+    primaryHeroBtn.href = "edit-profile.html";
+    primaryHeroBtn.textContent = "Edit Profile";
+    secondaryHeroBtn.href = "dashboard.html#myEventsSection";
+    secondaryHeroBtn.textContent = "My Events";
+  }
+
+  renderQuickAccess(role);
+  renderBottomNav(role);
+}
+
 async function loadCounts(user) {
+  const role = getRole(currentUserData);
+
   let eventCount = 0;
   let requestCount = 0;
   let unreadMessages = 0;
   let unreadNotifications = 0;
 
   try {
-    const eventsQuery = query(
-      collection(db, "customerEvents"),
-      where("customerId", "==", user.uid)
-    );
+    let eventsQuery;
+
+    if (role === "admin") {
+      eventsQuery = query(collection(db, "customerEvents"));
+    } else {
+      eventsQuery = query(
+        collection(db, "customerEvents"),
+        where("customerId", "==", user.uid)
+      );
+    }
 
     const eventSnapshot = await getDocs(eventsQuery);
     eventCount = eventSnapshot.size;
 
-    const legacyRef = doc(db, "customerEvents", user.uid);
-    const legacySnap = await getDoc(legacyRef);
+    if (role !== "admin") {
+      const legacyRef = doc(db, "customerEvents", user.uid);
+      const legacySnap = await getDoc(legacyRef);
 
-    if (legacySnap.exists() && !legacySnap.data().customerId) {
-      eventCount += 1;
+      if (legacySnap.exists() && !legacySnap.data().customerId) {
+        eventCount += 1;
+      }
     }
   } catch {
     eventCount = 0;
   }
 
   try {
-    const requestsQuery = query(
-      collection(db, "bookingRequests"),
-      where("customerId", "==", user.uid)
-    );
+    let requestsQuery;
+
+    if (role === "admin") {
+      requestsQuery = query(collection(db, "bookingRequests"));
+    } else if (role === "vendor") {
+      requestsQuery = query(
+        collection(db, "bookingRequests"),
+        where("vendorIds", "array-contains", user.uid)
+      );
+    } else {
+      requestsQuery = query(
+        collection(db, "bookingRequests"),
+        where("customerId", "==", user.uid)
+      );
+    }
 
     const requestSnapshot = await getDocs(requestsQuery);
 
     requestSnapshot.forEach((docSnap) => {
       const data = docSnap.data();
 
-      if (!data.hiddenForCustomer) {
+      if (role === "admin" || role === "vendor" || !data.hiddenForCustomer) {
         requestCount += 1;
       }
     });
@@ -737,18 +974,23 @@ async function loadCounts(user) {
 }
 
 function renderProfile(user, userData) {
+  const role = getRole(userData);
+
   const displayName =
+    safeText(userData.businessName, "") ||
     safeText(userData.name, "") ||
     safeText(user.displayName, "") ||
-    safeText(user.email, "Customer");
+    safeText(user.email, getRoleLabel(role));
 
   const email = safeText(userData.email, user.email || "No email listed");
 
   setText("profileAvatar", initialsFromName(displayName));
   setText("profileName", displayName);
   setText("profileEmail", email);
-  setText("accountType", "Customer");
+  setText("accountType", getRoleLabel(role));
   setText("profileLocation", getLocation(userData));
+
+  applyRoleLayout(role);
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -773,11 +1015,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   currentUserData = userSnap.data();
-
-  if (currentUserData.role === "vendor") {
-    window.location.href = "vendor-profile.html";
-    return;
-  }
 
   renderProfile(user, currentUserData);
   loadCounts(user);
