@@ -685,6 +685,58 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      margin: -20px -18px 18px;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media (min-width: 768px) {
       body {
         padding: 24px 0;
@@ -706,6 +758,16 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Preview Mode
+        <span>You are viewing customer requests as admin. Actions are disabled.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
       <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
@@ -901,6 +963,40 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function isAdminPreview() {
+  return currentUserData?.role === "admin";
+}
+
+function enableAdminPreviewMode() {
+  if (!isAdminPreview()) return;
+
+  const bar = document.getElementById("adminPreviewBar");
+  if (bar) bar.style.display = "block";
+
+  const backLink = document.getElementById("backLink");
+  if (backLink) backLink.href = "admin-dashboard.html";
+
+  const planEventLink = document.getElementById("planEventLink");
+  if (planEventLink) {
+    planEventLink.href = "admin-dashboard.html";
+    planEventLink.textContent = "Back to Admin";
+  }
+
+  const bottomHomeLink = document.getElementById("bottomHomeLink");
+  if (bottomHomeLink) bottomHomeLink.href = "admin-dashboard.html";
+
+  const bottomListingsLink = document.getElementById("bottomListingsLink");
+  if (bottomListingsLink) bottomListingsLink.href = "listings.html";
+
+  const heroLabel = document.querySelector(".hero-label");
+  const heroTitle = document.querySelector(".hero-title");
+  const heroSubtitle = document.querySelector(".hero-subtitle");
+
+  if (heroLabel) heroLabel.textContent = "Admin Request Review";
+  if (heroTitle) heroTitle.textContent = "Review marketplace requests.";
+  if (heroSubtitle) heroSubtitle.textContent = "Preview submitted booking requests without changing customer or vendor records.";
+}
+
 function withEventParam(path, eventId = currentEventId) {
   const cleanEventId = safeText(eventId, "");
 
@@ -915,6 +1011,11 @@ function getRequestEventId(request) {
 }
 
 function updateEventScopedLinks() {
+  if (isAdminPreview()) {
+    enableAdminPreviewMode();
+    return;
+  }
+
   const backLink = document.getElementById("backLink");
   const planEventLink = document.getElementById("planEventLink");
   const bottomHomeLink = document.getElementById("bottomHomeLink");
@@ -1218,7 +1319,12 @@ function renderRequests() {
           </div>
         ` : ""}
 
-        ${isWithdrawn ? `
+        ${isAdminPreview() ? `
+          <div class="request-actions">
+            <a class="btn-secondary" href="admin-dashboard.html">Back to Admin</a>
+            <a class="btn" href="${withEventParam("event-builder.html", getRequestEventId(request))}">Preview Event</a>
+          </div>
+        ` : isWithdrawn ? `
           <div class="request-actions">
             <a class="btn-secondary" href="dashboard.html#myEventsSection">Plan New Event</a>
             <button class="btn-danger" type="button" data-clear-request="${requestId}">Clear From My Requests</button>
@@ -1277,6 +1383,12 @@ function closeWithdrawModal() {
 }
 
 async function confirmWithdrawRequest() {
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a customer or planner test account to withdraw requests.", "error");
+    closeWithdrawModal();
+    return;
+  }
+
   if (isBusy || !pendingWithdrawRequestId) return;
 
   const cleanRequestId = pendingWithdrawRequestId;
@@ -1333,10 +1445,20 @@ async function confirmWithdrawRequest() {
 }
 
 function withdrawRequest(requestId) {
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a customer or planner test account to withdraw requests.", "error");
+    return;
+  }
+
   openWithdrawModal(requestId);
 }
 
 async function clearRequestFromCustomerView(requestId) {
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a customer or planner test account to clear requests.", "error");
+    return;
+  }
+
   if (isBusy) return;
 
   const cleanRequestId = decodeURIComponent(requestId);
@@ -1397,6 +1519,11 @@ async function findExistingConversation(customerId, vendorId, listingId, eventId
 }
 
 async function messageVendorsForRequest(requestId) {
+  if (isAdminPreview()) {
+    showStatus("Messaging is disabled in admin preview mode. Use a customer or planner test account to test messages.", "error");
+    return;
+  }
+
   if (isBusy) return;
 
   const cleanRequestId = decodeURIComponent(requestId);
@@ -1503,10 +1630,16 @@ async function messageVendorsForRequest(requestId) {
 
 async function loadBookingRequests() {
   try {
-    const q = query(
-      collection(db, "bookingRequests"),
-      where("customerId", "==", currentUser.uid)
-    );
+    let q;
+
+    if (isAdminPreview()) {
+      q = query(collection(db, "bookingRequests"));
+    } else {
+      q = query(
+        collection(db, "bookingRequests"),
+        where("customerId", "==", currentUser.uid)
+      );
+    }
 
     const snapshot = await getDocs(q);
 
@@ -1518,7 +1651,7 @@ async function loadBookingRequests() {
       const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
       const matchesCurrentEvent = !currentEventId || requestEventId === currentEventId;
 
-      if (!data.hiddenForCustomer && matchesCurrentEvent) {
+      if ((isAdminPreview() || !data.hiddenForCustomer) && matchesCurrentEvent) {
         requests.push({
           id: docSnap.id,
           ...data
@@ -1541,7 +1674,7 @@ async function loadBookingRequests() {
         <div class="empty-icon">!</div>
         <h3>Could not load requests</h3>
         <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="dashboard.html">Back to Dashboard</a>
+        <a class="btn" href="admin-dashboard.html">Back to Admin</a>
       </div>
     `;
   }
@@ -1577,6 +1710,10 @@ onAuthStateChanged(auth, async (user) => {
   if (currentUserData.role === "vendor") {
     window.location.href = "vendor-dashboard.html";
     return;
+  }
+
+  if (currentUserData.role === "admin") {
+    enableAdminPreviewMode();
   }
 
   updateEventScopedLinks();
