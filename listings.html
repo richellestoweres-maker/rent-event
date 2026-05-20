@@ -869,7 +869,9 @@ import {
   collection,
   getDocs,
   doc,
-  getDoc
+  getDoc,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1357,14 +1359,19 @@ async function loadEventContext() {
 async function loadListings() {
   try {
     const listingsRef = collection(db, "listings");
-    const snapshot = await getDocs(listingsRef);
+
+    const listingsQuery = currentUserData?.role === "admin"
+      ? query(listingsRef)
+      : query(listingsRef, where("status", "==", "published"));
+
+    const snapshot = await getDocs(listingsQuery);
 
     const listings = [];
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
 
-      if (data.status === "published") {
+      if (currentUserData?.role === "admin" || data.status === "published") {
         listings.push({
           id: docSnap.id,
           ...data
@@ -1382,7 +1389,9 @@ async function loadListings() {
     applySearchAndFilter();
 
   } catch (error) {
-    renderEmptyState("Could not load listings", error.message);
+    console.warn("Listings skipped:", error.message);
+    allListings = [];
+    renderEmptyState("No listings available yet", "Listings will appear here once vendors publish their services.");
   }
 }
 
@@ -1457,7 +1466,9 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     initPage();
-  } catch {
+  } catch (error) {
+    console.warn("User profile check skipped:", error.message);
+    currentUserData = { role: "customer" };
     initPage();
   }
 });
