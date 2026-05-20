@@ -417,6 +417,62 @@
       cursor: not-allowed;
     }
 
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      margin: -20px -18px 18px;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .composer.admin-disabled {
+      display: none;
+    }
+
     @media (max-width: 390px) {
       .composer {
         border-radius: 24px;
@@ -445,6 +501,16 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Preview Mode
+        <span>You are previewing this conversation. Sending messages is disabled.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
       <a href="messages.html" class="back-link" id="backLink" aria-label="Go back">←</a>
@@ -578,6 +644,27 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function isAdminPreview() {
+  return currentUserData?.role === "admin";
+}
+
+function isPlannerRole() {
+  return currentUserData?.role === "planner" || currentUserData?.plannerPro === true;
+}
+
+function enableAdminPreviewMode() {
+  if (!isAdminPreview()) return;
+
+  const bar = document.getElementById("adminPreviewBar");
+  if (bar) bar.style.display = "block";
+
+  const composer = document.getElementById("composer");
+  if (composer) composer.classList.add("admin-disabled");
+
+  const backLink = document.getElementById("backLink");
+  if (backLink) backLink.href = "admin-dashboard.html";
+}
+
 function formatMessageTime(value) {
   if (!value || !value.seconds) return "Sending";
 
@@ -596,7 +683,11 @@ function getEventId() {
 function getBackHref() {
   const eventId = getEventId();
 
-  if (currentUserData?.role === "customer" && eventId) {
+  if (isAdminPreview()) {
+    return "admin-dashboard.html";
+  }
+
+  if ((currentUserData?.role === "customer" || isPlannerRole()) && eventId) {
     return `messages.html?eventId=${encodeURIComponent(eventId)}`;
   }
 
@@ -799,19 +890,39 @@ function updateContextCard() {
   const messagesLink = document.getElementById("messagesContextLink");
   const eventLink = document.getElementById("eventContextLink");
 
-  messagesLink.href = currentUserData?.role === "customer" && eventId
-    ? `messages.html?eventId=${encodeURIComponent(eventId)}`
-    : "messages.html";
+  if (isAdminPreview()) {
+    messagesLink.href = "messages.html";
+    messagesLink.textContent = "All Messages";
 
-  if (currentUserData?.role === "customer" && eventId) {
-    eventLink.href = `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
-    eventLink.style.display = "inline-flex";
-  } else if (conversationData.bookingRequestId) {
-    eventLink.href = `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
-    eventLink.textContent = "Open Request";
-    eventLink.style.display = "inline-flex";
+    if (eventId) {
+      eventLink.href = `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
+      eventLink.textContent = "Preview Event";
+      eventLink.style.display = "inline-flex";
+    } else if (conversationData.bookingRequestId) {
+      eventLink.href = `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
+      eventLink.textContent = "Preview Request";
+      eventLink.style.display = "inline-flex";
+    } else {
+      eventLink.href = "admin-dashboard.html";
+      eventLink.textContent = "Back to Admin";
+      eventLink.style.display = "inline-flex";
+    }
   } else {
-    eventLink.style.display = "none";
+    messagesLink.href = (currentUserData?.role === "customer" || isPlannerRole()) && eventId
+      ? `messages.html?eventId=${encodeURIComponent(eventId)}`
+      : "messages.html";
+
+    if ((currentUserData?.role === "customer" || isPlannerRole()) && eventId) {
+      eventLink.href = `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
+      eventLink.textContent = "Open Event";
+      eventLink.style.display = "inline-flex";
+    } else if (conversationData.bookingRequestId) {
+      eventLink.href = `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
+      eventLink.textContent = "Open Request";
+      eventLink.style.display = "inline-flex";
+    } else {
+      eventLink.style.display = "none";
+    }
   }
 
   contextCard.style.display = "grid";
@@ -863,13 +974,15 @@ async function updateHeader() {
       ? `detail.html?id=${encodeURIComponent(conversationData.listingId)}&eventId=${encodeURIComponent(eventId)}`
       : `detail.html?id=${encodeURIComponent(conversationData.listingId)}`;
   } else {
-    listingLink.href = currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "listings.html";
+    listingLink.href = isAdminPreview() ? "admin-dashboard.html" : currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "listings.html";
   }
 
   updateContextCard();
 }
 
 async function markConversationAsRead() {
+  if (isAdminPreview()) return;
+
   if (!conversationData || !currentUser || !conversationId) return;
 
   const unreadFor = {
@@ -913,7 +1026,7 @@ function watchConversation() {
 
     const participantIds = conversationData.participantIds || [];
 
-    if (!participantIds.includes(currentUser.uid)) {
+    if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) {
       renderError("Access denied", "You are not part of this conversation.");
       return;
     }
@@ -947,7 +1060,9 @@ function watchMessages() {
 
     renderMessages();
   }, (error) => {
-    renderError("Could not load messages", error.message);
+    console.warn("Could not load message documents:", error.message);
+    latestMessages = [];
+    renderMessages();
   });
 }
 
@@ -973,7 +1088,7 @@ async function loadConversation() {
 
     const participantIds = conversationData.participantIds || [];
 
-    if (!participantIds.includes(currentUser.uid)) {
+    if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) {
       renderError("Access denied", "You are not part of this conversation.");
       return;
     }
@@ -990,6 +1105,11 @@ async function loadConversation() {
 }
 
 async function sendMessage(text) {
+  if (isAdminPreview()) {
+    alert("Admin preview mode is view-only. Use a customer, planner, or vendor test account to send messages.");
+    return;
+  }
+
   const messageText = safeText(text, "");
 
   if (!messageText || !conversationId || !currentUser || !conversationData) {
@@ -1033,13 +1153,17 @@ async function sendMessage(text) {
 
     const conversationRef = doc(db, "conversations", conversationId);
 
-    await updateDoc(conversationRef, {
-      lastMessage: messageText,
-      lastSenderId: currentUser.uid,
-      eventId: getEventId() || conversationData.eventId || null,
-      updatedAt: serverTimestamp(),
-      unreadFor
-    });
+    try {
+      await updateDoc(conversationRef, {
+        lastMessage: messageText,
+        lastSenderId: currentUser.uid,
+        eventId: getEventId() || conversationData.eventId || null,
+        updatedAt: serverTimestamp(),
+        unreadFor
+      });
+    } catch (updateError) {
+      console.warn("Message sent, but conversation summary could not update:", updateError.message);
+    }
 
     messageInput.value = "";
 
@@ -1082,6 +1206,10 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   currentUserData = userSnap.data();
+
+  if (currentUserData.role === "admin") {
+    enableAdminPreviewMode();
+  }
 
   loadConversation();
 });
