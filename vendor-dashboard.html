@@ -1221,19 +1221,15 @@ async function loadListings(user) {
     renderListings(listings);
 
   } catch (error) {
-    document.getElementById("recentListingList").innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not load listings</h3>
-        <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="my-listings.html">Open My Listings</a>
-      </div>
-    `;
+    console.warn("Vendor listings skipped:", error.message);
+    setText("listingCount", 0);
+    renderEmptyListings();
   }
 }
 
 async function loadRequestsAndBadges(user) {
   let requestCount = 0;
+  let requests = [];
 
   try {
     const requestQuery = query(
@@ -1242,8 +1238,6 @@ async function loadRequestsAndBadges(user) {
     );
 
     const snapshot = await getDocs(requestQuery);
-
-    const requests = [];
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
@@ -1272,21 +1266,14 @@ async function loadRequestsAndBadges(user) {
       return bTime - aTime;
     });
 
-    setText("requestCount", requests.length);
-    renderRequests(requests);
-
   } catch (error) {
+    console.warn("Vendor requests skipped:", error.message);
     requestCount = 0;
-
-    document.getElementById("recentRequestList").innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not load requests</h3>
-        <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="booking-requests.html">Open Requests</a>
-      </div>
-    `;
+    requests = [];
   }
+
+  setText("requestCount", requests.length);
+  renderRequests(requests);
 
   const counts = await loadUnreadCounts(user);
   updateBadges(counts.unreadMessages, counts.unreadNotifications, requestCount);
