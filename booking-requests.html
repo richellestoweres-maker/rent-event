@@ -195,9 +195,34 @@ function closeResponseModal() {
 }
 
 async function createCustomerResponseNotification(request, responseStatus, responseNote) {
-  const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
-  const vendorName = safeText(currentUserData.businessName || currentUserData.name || currentUser.displayName || "A vendor", "A vendor");
-  await addDoc(collection(db, "notifications"), { recipientId: request.customerId, recipientRole: "customer", type: "vendor_response", typeLabel: "Vendor Response", category: "Booking Request", title: "Vendor responded to your request", body: `${vendorName} responded: ${getResponseLabel(responseStatus)}${responseNote ? `. ${responseNote}` : ""}`, sourceId: request.id, sourceCollection: "bookingRequests", sourceLabel: eventName, eventId: request.eventId || "", eventName, vendorId: currentUser.uid, vendorName, read: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+  try {
+    const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
+    const vendorName = safeText(currentUserData.businessName || currentUserData.name || currentUser.displayName || "A vendor", "A vendor");
+
+    if (!request.customerId) return;
+
+    await addDoc(collection(db, "notifications"), {
+      recipientId: request.customerId,
+      recipientRole: "customer",
+      type: "vendor_response",
+      typeLabel: "Vendor Response",
+      category: "Booking Request",
+      title: "Vendor responded to your request",
+      body: `${vendorName} responded: ${getResponseLabel(responseStatus)}${responseNote ? `. ${responseNote}` : ""}`,
+      sourceId: request.id,
+      sourceCollection: "bookingRequests",
+      sourceLabel: eventName,
+      eventId: request.eventId || "",
+      eventName,
+      vendorId: currentUser.uid,
+      vendorName,
+      read: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Response saved, but customer notification could not be created:", error.message);
+  }
 }
 
 async function confirmResponse() {
@@ -215,20 +240,55 @@ async function confirmResponse() {
     request.vendorResponses = updatedResponses;
     await createCustomerResponseNotification(request, responseStatus, responseNote);
     closeResponseModal(); renderRequests(); showStatus("Response saved and customer notified.", "success");
-  } catch (error) { showStatus(error.message, "error"); } finally { isBusy = false; }
+  } catch (error) {
+    showStatus(`Could not save response: ${error.message}`, "error");
+  } finally {
+    isBusy = false;
+  }
 }
 
 async function loadBookingRequests() {
   try {
-    const q = isAdminPreview() ? query(collection(db, "bookingRequests")) : query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", currentUser.uid));
-    const snapshot = await getDocs(q);
+    let requestQuery;
+
+    if (isAdminPreview()) {
+      requestQuery = query(collection(db, "bookingRequests"));
+    } else {
+      requestQuery = query(
+        collection(db, "bookingRequests"),
+        where("vendorIds", "array-contains", currentUser.uid)
+      );
+    }
+
+    const snapshot = await getDocs(requestQuery);
     const requests = [];
-    snapshot.forEach((docSnap) => requests.push({ id: docSnap.id, ...docSnap.data() }));
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (isAdminPreview()) {
+        requests.push({ id: docSnap.id, ...data });
+        return;
+      }
+
+      const vendorIds = Array.isArray(data.vendorIds) ? data.vendorIds : [];
+      const hiddenForVendorIds = data.hiddenForVendorIds || {};
+
+      if (vendorIds.includes(currentUser.uid) && !hiddenForVendorIds[currentUser.uid]) {
+        requests.push({ id: docSnap.id, ...data });
+      }
+    });
+
     requests.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
     bookingRequests = requests;
     renderRequests();
+
   } catch (error) {
-    document.getElementById("requestList").innerHTML = `<div class="empty-card"><div class="empty-icon">!</div><h3>Could not load requests</h3><p>${escapeHtml(error.message)}</p><a class="btn" href="${isAdminPreview() ? "admin-dashboard.html" : "vendor-dashboard.html"}">${isAdminPreview() ? "Back to Admin" : "Back to Dashboard"}</a></div>`;
+    console.warn("Booking requests skipped:", error.message);
+    bookingRequests = [];
+    renderEmptyRequests();
+    showStatus("No connected booking requests could be loaded yet. Confirm this vendor UID is inside the request vendorIds array.", "info");
   }
 }
 
