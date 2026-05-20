@@ -991,9 +991,13 @@ function renderNotifications(notifications) {
       const notification = allNotifications.find((item) => item.id === notificationId);
 
       if (notification && notification.collectionName === "notifications" && notification.read === false) {
-        await updateDoc(doc(db, "notifications", notificationId), {
-          read: true
-        });
+        try {
+          await updateDoc(doc(db, "notifications", notificationId), {
+            read: true
+          });
+        } catch (error) {
+          console.warn("Could not mark notification read:", error.message);
+        }
       }
     });
   });
@@ -1028,80 +1032,76 @@ function buildConversationNotification(conversation) {
 }
 
 async function loadConversationNotifications(user) {
-  const conversationsRef = collection(db, "conversations");
-  const conversationsQuery = isAdminRole()
-    ? query(conversationsRef)
-    : query(conversationsRef, where("participantIds", "array-contains", user.uid));
-  const snapshot = await getDocs(conversationsQuery);
+  try {
+    const conversationsRef = collection(db, "conversations");
+    const conversationsQuery = isAdminRole()
+      ? query(conversationsRef)
+      : query(conversationsRef, where("participantIds", "array-contains", user.uid));
+    const snapshot = await getDocs(conversationsQuery);
 
-  const conversations = [];
+    const conversations = [];
 
-  snapshot.forEach((docSnap) => {
-    conversations.push({
-      id: docSnap.id,
-      ...docSnap.data()
+    snapshot.forEach((docSnap) => {
+      conversations.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
     });
-  });
 
-  return conversations.map(buildConversationNotification);
+    return conversations.map(buildConversationNotification);
+  } catch (error) {
+    console.warn("Conversation notifications skipped:", error.message);
+    return [];
+  }
 }
 
 async function loadAppNotifications(user) {
-  const notificationsRef = collection(db, "notifications");
-  const notificationsQuery = query(notificationsRef, where("recipientId", "==", user.uid));
-  const snapshot = await getDocs(notificationsQuery);
+  try {
+    const notificationsRef = collection(db, "notifications");
+    const notificationsQuery = query(notificationsRef, where("recipientId", "==", user.uid));
+    const snapshot = await getDocs(notificationsQuery);
 
-  const notifications = [];
+    const notifications = [];
 
-  snapshot.forEach((docSnap) => {
-    notifications.push({
-      id: docSnap.id,
-      collectionName: "notifications",
-      ...docSnap.data()
+    snapshot.forEach((docSnap) => {
+      notifications.push({
+        id: docSnap.id,
+        collectionName: "notifications",
+        ...docSnap.data()
+      });
     });
-  });
 
-  return notifications;
+    return notifications;
+  } catch (error) {
+    console.warn("App notifications skipped:", error.message);
+    return [];
+  }
 }
 
 async function loadNotifications(user) {
-  try {
-    const [conversationNotifications, appNotifications] = await Promise.all([
-      loadConversationNotifications(user),
-      loadAppNotifications(user)
-    ]);
+  const [conversationNotifications, appNotifications] = await Promise.all([
+    loadConversationNotifications(user),
+    loadAppNotifications(user)
+  ]);
 
-    const combined = [
-      ...conversationNotifications,
-      ...appNotifications
-    ];
+  const combined = [
+    ...conversationNotifications,
+    ...appNotifications
+  ];
 
-    combined.sort((a, b) => {
-      const aUnread = a.read === false ? 1 : 0;
-      const bUnread = b.read === false ? 1 : 0;
+  combined.sort((a, b) => {
+    const aUnread = a.read === false ? 1 : 0;
+    const bUnread = b.read === false ? 1 : 0;
 
-      if (aUnread !== bUnread) {
-        return bUnread - aUnread;
-      }
+    if (aUnread !== bUnread) {
+      return bUnread - aUnread;
+    }
 
-      return getSortTime(b) - getSortTime(a);
-    });
+    return getSortTime(b) - getSortTime(a);
+  });
 
-    allNotifications = combined;
-    renderNotifications(allNotifications);
-
-  } catch (error) {
-    document.getElementById("notificationList").innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not load notifications</h3>
-        <p>${escapeHtml(error.message)}</p>
-        <div class="empty-actions">
-          <a class="btn" href="messages.html">Open Inbox</a>
-        </div>
-      </div>
-    `;
-  }
+  allNotifications = combined;
+  renderNotifications(allNotifications);
 }
 
 async function clearUnread() {
@@ -1115,27 +1115,31 @@ async function clearUnread() {
     const unreadItems = allNotifications.filter((notification) => notification.read === false);
 
     for (const notification of unreadItems) {
-      if (isAdminRole() && notification.collectionName === "conversations") {
-        continue;
-      }
+      try {
+        if (isAdminRole() && notification.collectionName === "conversations") {
+          continue;
+        }
 
-      if (notification.collectionName === "conversations") {
-        const conversation = notification.raw || {};
-        const updatedUnreadFor = {
-          ...(conversation.unreadFor || {})
-        };
+        if (notification.collectionName === "conversations") {
+          const conversation = notification.raw || {};
+          const updatedUnreadFor = {
+            ...(conversation.unreadFor || {})
+          };
 
-        delete updatedUnreadFor[currentUser.uid];
+          delete updatedUnreadFor[currentUser.uid];
 
-        await updateDoc(doc(db, "conversations", notification.sourceId), {
-          unreadFor: updatedUnreadFor
-        });
-      }
+          await updateDoc(doc(db, "conversations", notification.sourceId), {
+            unreadFor: updatedUnreadFor
+          });
+        }
 
-      if (notification.collectionName === "notifications") {
-        await updateDoc(doc(db, "notifications", notification.id), {
-          read: true
-        });
+        if (notification.collectionName === "notifications") {
+          await updateDoc(doc(db, "notifications", notification.id), {
+            read: true
+          });
+        }
+      } catch (error) {
+        console.warn("Could not clear one notification:", error.message);
       }
     }
 
