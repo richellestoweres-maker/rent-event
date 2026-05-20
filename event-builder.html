@@ -1296,58 +1296,74 @@ function renderAll() {
 }
 
 async function loadPublishedListings() {
-  const snapshot = await getDocs(collection(db, "listings"));
+  try {
+    const listingsRef = collection(db, "listings");
 
-  const listings = [];
+    const listingsQuery = isAdminPreview()
+      ? query(listingsRef)
+      : query(listingsRef, where("status", "==", "published"));
 
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data();
+    const snapshot = await getDocs(listingsQuery);
 
-    if (data.status === "published") {
-      listings.push({ id: docSnap.id, ...data });
-    }
-  });
+    const listings = [];
 
-  listings.sort((a, b) => {
-    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
-    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
-    return bTime - aTime;
-  });
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
 
-  publishedListings = listings;
+      if (isAdminPreview() || data.status === "published") {
+        listings.push({ id: docSnap.id, ...data });
+      }
+    });
+
+    listings.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    publishedListings = listings;
+  } catch (error) {
+    console.warn("Published listings skipped:", error.message);
+    publishedListings = [];
+  }
 }
 
 async function loadSelectedVendors() {
-  let q;
+  try {
+    let boardQuery;
 
-  if (isAdminPreview()) {
-    q = query(
-      collection(db, "eventBoardItems"),
-      where("eventId", "==", currentEventId)
-    );
-  } else {
-    q = query(
-      collection(db, "eventBoardItems"),
-      where("userId", "==", currentUser.uid),
-      where("eventId", "==", currentEventId)
-    );
+    if (isAdminPreview()) {
+      boardQuery = query(
+        collection(db, "eventBoardItems"),
+        where("eventId", "==", currentEventId)
+      );
+    } else {
+      boardQuery = query(
+        collection(db, "eventBoardItems"),
+        where("userId", "==", currentUser.uid),
+        where("eventId", "==", currentEventId)
+      );
+    }
+
+    const snapshot = await getDocs(boardQuery);
+
+    const items = [];
+
+    snapshot.forEach((docSnap) => {
+      items.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    items.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
+
+    selectedVendors = items;
+  } catch (error) {
+    console.warn("Selected vendors skipped:", error.message);
+    selectedVendors = [];
   }
-
-  const snapshot = await getDocs(q);
-
-  const items = [];
-
-  snapshot.forEach((docSnap) => {
-    items.push({ id: docSnap.id, ...docSnap.data() });
-  });
-
-  items.sort((a, b) => {
-    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
-    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
-    return bTime - aTime;
-  });
-
-  selectedVendors = items;
 }
 
 async function addVendorToBoard(listingId) {
@@ -1461,20 +1477,19 @@ async function removeVendorFromBoard(boardId) {
   }
 }
 
-async function findExistingConversation(customerId, vendorId, listingId) {
-  const conversationKey = `${customerId}_${vendorId}_${listingId}_${currentEventId}`;
-  const q = query(collection(db, "conversations"), where("conversationKey", "==", conversationKey));
-  const snapshot = await getDocs(q);
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
 
-  if (snapshot.empty) return null;
-
-  let conversation = null;
-
-  snapshot.forEach((docSnap) => {
-    conversation = { id: docSnap.id, ...docSnap.data() };
-  });
-
-  return conversation;
+function buildConversationId(customerId, vendorId, listingId, eventId) {
+  return [
+    makeSafeId(customerId),
+    makeSafeId(vendorId),
+    makeSafeId(listingId),
+    makeSafeId(eventId || "general")
+  ].join("__");
 }
 
 async function openMessageForListing(listingId) {
@@ -1491,37 +1506,34 @@ async function openMessageForListing(listingId) {
     return;
   }
 
-  if (!vendor.vendorId) {
+  const vendorId = safeText(vendor.vendorId, "");
+
+  if (!vendorId) {
     showStatus("This vendor listing is missing vendor information.", "error");
     return;
   }
 
   try {
-    const existingConversation = await findExistingConversation(currentUser.uid, vendor.vendorId, cleanListingId);
-
-    if (existingConversation) {
-      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
-      return;
-    }
+    showStatus("Opening vendor conversation...", "info");
 
     const customerName = currentUserData.name || currentUser.displayName || currentUser.email || "Customer";
-    const conversationKey = `${currentUser.uid}_${vendor.vendorId}_${cleanListingId}_${currentEventId}`;
     const eventName = safeText(currentEventData?.eventName, "my event");
-    const firstMessage = `Hi! I added ${vendor.listingTitle || "your listing"} to my ${eventName} event board and would like to ask about availability.`;
+    const conversationId = buildConversationId(currentUser.uid, vendorId, cleanListingId, currentEventId);
+    const firstMessage = `Conversation opened for ${eventName}. You can message ${vendor.vendorName || "this vendor"} here.`;
 
-    const conversationRef = await addDoc(collection(db, "conversations"), {
-      conversationKey,
-      participantIds: [currentUser.uid, vendor.vendorId],
+    await setDoc(doc(db, "conversations", conversationId), {
+      conversationKey: conversationId,
+      participantIds: [currentUser.uid, vendorId],
       participantNames: {
         [currentUser.uid]: customerName,
-        [vendor.vendorId]: vendor.vendorName || "Vendor"
+        [vendorId]: vendor.vendorName || "Vendor"
       },
       participantRoles: {
         [currentUser.uid]: "customer",
-        [vendor.vendorId]: "vendor"
+        [vendorId]: "vendor"
       },
       customerId: currentUser.uid,
-      vendorId: vendor.vendorId,
+      vendorId,
       eventId: currentEventId,
       eventName,
       listingId: cleanListingId,
@@ -1532,25 +1544,15 @@ async function openMessageForListing(listingId) {
       contextType: "Vendor",
       lastMessage: firstMessage,
       lastSenderId: currentUser.uid,
-      unreadFor: {
-        [vendor.vendorId]: true
-      },
+      unreadFor: {},
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
-    });
+    }, { merge: true });
 
-    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
-      text: firstMessage,
-      senderId: currentUser.uid,
-      senderName: customerName,
-      senderRole: "customer",
-      createdAt: serverTimestamp()
-    });
-
-    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(currentEventId)}`;
 
   } catch (error) {
-    showStatus(error.message, "error");
+    showStatus(`Could not open messages: ${error.message}`, "error");
   }
 }
 
@@ -1573,40 +1575,30 @@ async function handleUrlAddParam() {
 }
 
 async function loadPage() {
+  currentEventId = getEventIdFromUrl();
+
+  if (!currentEventId) {
+    window.location.href = isAdminPreview() ? "admin-dashboard.html" : "dashboard.html";
+    return;
+  }
+
+  updateEventAwareLinks();
+
   try {
-    currentEventId = getEventIdFromUrl();
-
-    if (!currentEventId) {
-      window.location.href = isAdminPreview() ? "admin-dashboard.html" : "dashboard.html";
-      return;
-    }
-
-    updateEventAwareLinks();
-
     await loadEventDetails();
-    await loadPublishedListings();
-    await loadSelectedVendors();
-
-    renderAll();
-    await handleUrlAddParam();
-
   } catch (error) {
-    document.getElementById("selectedVendorList").innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not load event board</h3>
-        <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="admin-dashboard.html">Back to Admin</a>
-      </div>
-    `;
+    console.warn("Event details skipped:", error.message);
+  }
 
-    document.getElementById("availableVendorList").innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not load vendors</h3>
-        <p>${escapeHtml(error.message)}</p>
-      </div>
-    `;
+  await loadPublishedListings();
+  await loadSelectedVendors();
+
+  renderAll();
+
+  try {
+    await handleUrlAddParam();
+  } catch (error) {
+    showStatus(error.message, "error");
   }
 }
 
