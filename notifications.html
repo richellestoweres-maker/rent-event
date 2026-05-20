@@ -460,6 +460,58 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      margin: -20px -18px 18px;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media (min-width: 768px) {
       body {
         padding: 24px 0;
@@ -485,6 +537,16 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Account
+        <span>You are viewing notifications with admin access.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
       <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
@@ -609,8 +671,51 @@ function getOtherParticipantName(conversation) {
   return safeText(conversation.title, "Conversation");
 }
 
+function getRole(userData) {
+  if (userData.role === "admin") return "admin";
+  if (userData.role === "vendor") return "vendor";
+  if (userData.role === "planner" || userData.plannerPro === true) return "planner";
+  return "customer";
+}
+
+function isAdminRole() {
+  return getRole(currentUserData || {}) === "admin";
+}
+
+function getHomeHref(role) {
+  if (role === "admin") return "admin-dashboard.html";
+  if (role === "vendor") return "vendor-dashboard.html";
+  if (role === "planner") return "planner-dashboard.html";
+  return "dashboard.html";
+}
+
+function enableAdminView() {
+  const bar = document.getElementById("adminPreviewBar");
+  if (bar) bar.style.display = "block";
+}
+
 function renderBottomNav(role) {
   const bottomNav = document.getElementById("bottomNav");
+
+  if (role === "admin") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="admin-dashboard.html"><span>Admin</span></a>
+      <a class="nav-item" href="listings.html"><span>Listings</span></a>
+      <a class="nav-item active" href="notifications.html"><span>Alerts</span></a>
+      <a class="nav-item" href="messages.html"><span>Inbox</span></a>
+    `;
+    return;
+  }
+
+  if (role === "planner") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="planner-dashboard.html"><span>Home</span></a>
+      <a class="nav-item" href="listings.html"><span>Vendors</span></a>
+      <a class="nav-item active" href="notifications.html"><span>Alerts</span></a>
+      <a class="nav-item" href="messages.html"><span>Inbox</span></a>
+    `;
+    return;
+  }
 
   if (role === "vendor") {
     bottomNav.innerHTML = `
@@ -689,12 +794,25 @@ function applyRoleLayout(role) {
   const backLink = document.getElementById("backLink");
   const profileLink = document.getElementById("profileLink");
 
-  if (role === "vendor") {
+  if (role === "admin") {
+    enableAdminView();
+    backLink.href = "admin-dashboard.html";
+    profileLink.href = "profile.html";
+    document.getElementById("roleEyebrow").textContent = "Admin Updates";
+    document.getElementById("heroLabel").textContent = "Marketplace activity";
+    document.getElementById("heroSubtitle").textContent = "Review notifications and alerts connected to your admin account.";
+  } else if (role === "vendor") {
     backLink.href = "vendor-dashboard.html";
-    profileLink.href = "vendor-profile.html";
+    profileLink.href = "profile.html";
     document.getElementById("roleEyebrow").textContent = "Vendor Updates";
     document.getElementById("heroLabel").textContent = "Stay bookable";
     document.getElementById("heroSubtitle").textContent = "Keep track of customer inquiries, request changes, and message replies.";
+  } else if (role === "planner") {
+    backLink.href = "planner-dashboard.html";
+    profileLink.href = "profile.html";
+    document.getElementById("roleEyebrow").textContent = "Planner Updates";
+    document.getElementById("heroLabel").textContent = "Keep every client event moving";
+    document.getElementById("heroSubtitle").textContent = "Track vendor replies, event-specific booking updates, confirmations, and reminders.";
   } else {
     backLink.href = "dashboard.html";
     profileLink.href = "profile.html";
@@ -708,9 +826,21 @@ function applyRoleLayout(role) {
 
 function renderEmptyState() {
   const list = document.getElementById("notificationList");
-  const role = currentUserData?.role || "customer";
-  const href = role === "vendor" ? "vendor-dashboard.html" : "listings.html";
-  const label = role === "vendor" ? "Back to Dashboard" : "Browse Listings";
+  const role = getRole(currentUserData || {});
+  const href = role === "admin"
+    ? "admin-dashboard.html"
+    : role === "vendor"
+      ? "vendor-dashboard.html"
+      : role === "planner"
+        ? "planner-dashboard.html"
+        : "listings.html";
+  const label = role === "admin"
+    ? "Back to Admin"
+    : role === "vendor"
+      ? "Back to Dashboard"
+      : role === "planner"
+        ? "Planner Dashboard"
+        : "Browse Listings";
 
   list.innerHTML = `
     <div class="empty-card">
@@ -765,7 +895,7 @@ function getNotificationHref(notification) {
   }
 
   if (type === "booking_request") {
-    if (currentUserData?.role === "vendor") {
+    if (getRole(currentUserData || {}) === "vendor") {
       return requestId
         ? `booking-requests.html?id=${encodeURIComponent(requestId)}`
         : "booking-requests.html";
@@ -776,11 +906,13 @@ function getNotificationHref(notification) {
       : "my-requests.html";
   }
 
-  if (eventId && currentUserData?.role !== "vendor") {
+  const role = getRole(currentUserData || {});
+
+  if (eventId && role !== "vendor") {
     return `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
   }
 
-  return currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "dashboard.html";
+  return getHomeHref(role);
 }
 
 function getIconClass(notification) {
@@ -897,7 +1029,9 @@ function buildConversationNotification(conversation) {
 
 async function loadConversationNotifications(user) {
   const conversationsRef = collection(db, "conversations");
-  const conversationsQuery = query(conversationsRef, where("participantIds", "array-contains", user.uid));
+  const conversationsQuery = isAdminRole()
+    ? query(conversationsRef)
+    : query(conversationsRef, where("participantIds", "array-contains", user.uid));
   const snapshot = await getDocs(conversationsQuery);
 
   const conversations = [];
@@ -981,6 +1115,10 @@ async function clearUnread() {
     const unreadItems = allNotifications.filter((notification) => notification.read === false);
 
     for (const notification of unreadItems) {
+      if (isAdminRole() && notification.collectionName === "conversations") {
+        continue;
+      }
+
       if (notification.collectionName === "conversations") {
         const conversation = notification.raw || {};
         const updatedUnreadFor = {
@@ -1037,7 +1175,7 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUserData = userSnap.data();
 
-  applyRoleLayout(currentUserData.role);
+  applyRoleLayout(getRole(currentUserData));
   loadNotifications(user);
 });
 </script>
