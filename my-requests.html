@@ -890,11 +890,11 @@ import {
   doc,
   getDoc,
   collection,
-  addDoc,
   getDocs,
   query,
   where,
   updateDoc,
+  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -1494,39 +1494,31 @@ async function clearRequestFromCustomerView(requestId) {
   }
 }
 
-async function findExistingConversation(customerId, vendorId, listingId, eventId) {
-  const cleanEventId = safeText(eventId, "general");
-  const conversationKey = `${customerId}_${vendorId}_${listingId}_${cleanEventId}`;
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
 
-  const conversationsQuery = query(
-    collection(db, "conversations"),
-    where("participantIds", "array-contains", customerId)
-  );
+function buildConversationId(customerId, vendorId, listingId, eventId) {
+  return [
+    makeSafeId(customerId),
+    makeSafeId(vendorId),
+    makeSafeId(listingId),
+    makeSafeId(eventId || "general")
+  ].join("__");
+}
 
-  const snapshot = await getDocs(conversationsQuery);
+async function findExistingConversationById(conversationId) {
+  const conversationRef = doc(db, "conversations", conversationId);
+  const conversationSnap = await getDoc(conversationRef);
 
-  let conversation = null;
+  if (!conversationSnap.exists()) return null;
 
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data();
-
-    if (
-      data.conversationKey === conversationKey ||
-      (
-        data.customerId === customerId &&
-        data.vendorId === vendorId &&
-        data.listingId === listingId &&
-        safeText(data.eventId, "general") === cleanEventId
-      )
-    ) {
-      conversation = {
-        id: docSnap.id,
-        ...data
-      };
-    }
-  });
-
-  return conversation;
+  return {
+    id: conversationSnap.id,
+    ...conversationSnap.data()
+  };
 }
 
 async function messageVendorsForRequest(requestId) {
@@ -1557,7 +1549,7 @@ async function messageVendorsForRequest(requestId) {
   const firstVendor = vendors.find((vendor) => safeText(vendor.vendorId, "")) || null;
 
   if (!firstVendor) {
-    showStatus("This request does not have a vendor to message yet.", "error");
+    showStatus("This request does not have a vendor account connected yet, so messaging cannot open.", "error");
     return;
   }
 
@@ -1569,6 +1561,13 @@ async function messageVendorsForRequest(requestId) {
     return;
   }
 
+  const conversationId = buildConversationId(
+    currentUser.uid,
+    vendorId,
+    listingId,
+    requestEventId
+  );
+
   try {
     isBusy = true;
 
@@ -1578,15 +1577,10 @@ async function messageVendorsForRequest(requestId) {
 
     showStatus("Opening vendor conversation...", "info");
 
-    const existingConversation = await findExistingConversation(
-      currentUser.uid,
-      vendorId,
-      listingId,
-      requestEventId
-    );
+    const existingConversation = await findExistingConversationById(conversationId);
 
     if (existingConversation) {
-      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}&eventId=${encodeURIComponent(requestEventId)}`;
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(requestEventId)}`;
       return;
     }
 
@@ -1601,8 +1595,8 @@ async function messageVendorsForRequest(requestId) {
     const listingCategory = safeText(firstVendor.category || firstVendor.mainCategory, "Event Service");
     const eventDetails = request.eventDetails || {};
     const eventName = safeText(eventDetails.eventName || request.eventName, "my event");
-    const conversationKey = `${currentUser.uid}_${vendorId}_${listingId}_${requestEventId}`;
-    const firstMessage = `Hi! I submitted a RentEvent request for ${eventName} and wanted to ask about availability for ${listingTitle}.`;
+    const conversationKey = conversationId;
+    const firstMessage = `Conversation opened for ${eventName}. You can send a message to ${vendorName} here.`;
 
     const conversationPayload = {
       conversationKey,
@@ -1628,24 +1622,14 @@ async function messageVendorsForRequest(requestId) {
       contextType: "Booking Request",
       lastMessage: firstMessage,
       lastSenderId: currentUser.uid,
-      unreadFor: {
-        [vendorId]: true
-      },
+      unreadFor: {},
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
 
-    const conversationRef = await addDoc(collection(db, "conversations"), conversationPayload);
+    await setDoc(doc(db, "conversations", conversationId), conversationPayload);
 
-    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
-      text: firstMessage,
-      senderId: currentUser.uid,
-      senderName: customerName,
-      senderRole: "customer",
-      createdAt: serverTimestamp()
-    });
-
-    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}&eventId=${encodeURIComponent(requestEventId)}`;
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(requestEventId)}`;
 
   } catch (error) {
     showStatus(`Could not open messages: ${error.message}`, "error");
