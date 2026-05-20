@@ -1509,18 +1509,6 @@ function buildConversationId(customerId, vendorId, listingId, eventId) {
   ].join("__");
 }
 
-async function findExistingConversationById(conversationId) {
-  const conversationRef = doc(db, "conversations", conversationId);
-  const conversationSnap = await getDoc(conversationRef);
-
-  if (!conversationSnap.exists()) return null;
-
-  return {
-    id: conversationSnap.id,
-    ...conversationSnap.data()
-  };
-}
-
 async function messageVendorsForRequest(requestId) {
   if (isAdminPreview()) {
     showStatus("Messaging is disabled in admin preview mode. Use a customer or planner test account to test messages.", "error");
@@ -1577,13 +1565,6 @@ async function messageVendorsForRequest(requestId) {
 
     showStatus("Opening vendor conversation...", "info");
 
-    const existingConversation = await findExistingConversationById(conversationId);
-
-    if (existingConversation) {
-      window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(requestEventId)}`;
-      return;
-    }
-
     const customerName =
       currentUserData.name ||
       currentUser.displayName ||
@@ -1627,7 +1608,7 @@ async function messageVendorsForRequest(requestId) {
       updatedAt: serverTimestamp()
     };
 
-    await setDoc(doc(db, "conversations", conversationId), conversationPayload);
+    await setDoc(doc(db, "conversations", conversationId), conversationPayload, { merge: true });
 
     window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(requestEventId)}`;
 
