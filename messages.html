@@ -1059,25 +1059,9 @@ async function loadConversations(user) {
     renderConversations(allConversations);
 
   } catch (error) {
-    const role = currentUserData?.role || "customer";
-    const homeHref = role === "admin"
-      ? "admin-dashboard.html"
-      : role === "vendor"
-        ? "vendor-dashboard.html"
-        : currentEventId
-          ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}`
-          : getHomeHref(role);
-
-    messageList.innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not load messages</h3>
-        <p>${escapeHtml(error.message)}</p>
-        <div class="empty-actions">
-          <a class="btn" href="${homeHref}">Back Home</a>
-        </div>
-      </div>
-    `;
+    console.warn("Conversations skipped:", error.message);
+    allConversations = [];
+    renderConversations(allConversations);
   }
 }
 
@@ -1100,7 +1084,11 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   currentUserData = userSnap.data();
 
-  applyRoleLayout(currentUserData.role);
+  const role = currentUserData.role === "planner" || currentUserData.plannerPro === true
+    ? "planner"
+    : currentUserData.role || "customer";
+
+  applyRoleLayout(role);
   loadUnreadAppNotifications(user);
   loadConversations(user);
 });
