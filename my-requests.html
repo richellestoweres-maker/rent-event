@@ -1497,22 +1497,33 @@ async function clearRequestFromCustomerView(requestId) {
 async function findExistingConversation(customerId, vendorId, listingId, eventId) {
   const cleanEventId = safeText(eventId, "general");
   const conversationKey = `${customerId}_${vendorId}_${listingId}_${cleanEventId}`;
-  const q = query(
+
+  const conversationsQuery = query(
     collection(db, "conversations"),
-    where("conversationKey", "==", conversationKey)
+    where("participantIds", "array-contains", customerId)
   );
 
-  const snapshot = await getDocs(q);
-
-  if (snapshot.empty) return null;
+  const snapshot = await getDocs(conversationsQuery);
 
   let conversation = null;
 
   snapshot.forEach((docSnap) => {
-    conversation = {
-      id: docSnap.id,
-      ...docSnap.data()
-    };
+    const data = docSnap.data();
+
+    if (
+      data.conversationKey === conversationKey ||
+      (
+        data.customerId === customerId &&
+        data.vendorId === vendorId &&
+        data.listingId === listingId &&
+        safeText(data.eventId, "general") === cleanEventId
+      )
+    ) {
+      conversation = {
+        id: docSnap.id,
+        ...data
+      };
+    }
   });
 
   return conversation;
@@ -1542,27 +1553,40 @@ async function messageVendorsForRequest(requestId) {
   }
 
   const vendors = Array.isArray(request.vendors) ? request.vendors : [];
-  const requestEventId = getRequestEventId(request);
-  const firstVendor = vendors.find((vendor) => vendor.vendorId) || null;
+  const requestEventId = getRequestEventId(request) || cleanRequestId;
+  const firstVendor = vendors.find((vendor) => safeText(vendor.vendorId, "")) || null;
 
   if (!firstVendor) {
     showStatus("This request does not have a vendor to message yet.", "error");
     return;
   }
 
+  const vendorId = safeText(firstVendor.vendorId, "");
+  const listingId = safeText(firstVendor.listingId, cleanRequestId);
+
+  if (!vendorId) {
+    showStatus("This vendor is missing an account ID, so messaging cannot open yet.", "error");
+    return;
+  }
+
   try {
     isBusy = true;
+
+    document.querySelectorAll("[data-message-request]").forEach((button) => {
+      button.disabled = true;
+    });
+
     showStatus("Opening vendor conversation...", "info");
 
     const existingConversation = await findExistingConversation(
       currentUser.uid,
-      firstVendor.vendorId,
-      firstVendor.listingId || cleanRequestId,
-      requestEventId || cleanRequestId
+      vendorId,
+      listingId,
+      requestEventId
     );
 
     if (existingConversation) {
-      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}&eventId=${encodeURIComponent(requestEventId)}`;
       return;
     }
 
@@ -1573,43 +1597,45 @@ async function messageVendorsForRequest(requestId) {
       "Customer";
 
     const vendorName = safeText(firstVendor.vendorName, "Vendor");
-    const listingId = safeText(firstVendor.listingId, cleanRequestId);
     const listingTitle = safeText(firstVendor.listingTitle, "your listing");
     const listingCategory = safeText(firstVendor.category || firstVendor.mainCategory, "Event Service");
     const eventDetails = request.eventDetails || {};
-    const eventName = safeText(eventDetails.eventName, "my event");
-    const conversationKey = `${currentUser.uid}_${firstVendor.vendorId}_${listingId}_${requestEventId || cleanRequestId}`;
+    const eventName = safeText(eventDetails.eventName || request.eventName, "my event");
+    const conversationKey = `${currentUser.uid}_${vendorId}_${listingId}_${requestEventId}`;
     const firstMessage = `Hi! I submitted a RentEvent request for ${eventName} and wanted to ask about availability for ${listingTitle}.`;
 
-    const conversationRef = await addDoc(collection(db, "conversations"), {
+    const conversationPayload = {
       conversationKey,
-      participantIds: [currentUser.uid, firstVendor.vendorId],
+      participantIds: [currentUser.uid, vendorId],
       participantNames: {
         [currentUser.uid]: customerName,
-        [firstVendor.vendorId]: vendorName
+        [vendorId]: vendorName
       },
       participantRoles: {
         [currentUser.uid]: "customer",
-        [firstVendor.vendorId]: "vendor"
+        [vendorId]: "vendor"
       },
       customerId: currentUser.uid,
-      vendorId: firstVendor.vendorId,
+      vendorId,
       listingId,
-      eventId: requestEventId || cleanRequestId,
+      eventId: requestEventId,
       bookingRequestId: cleanRequestId,
       listingTitle,
       listingCategory,
       listingLocation: getEventLocation(eventDetails),
+      eventName,
       title: vendorName,
       contextType: "Booking Request",
       lastMessage: firstMessage,
       lastSenderId: currentUser.uid,
       unreadFor: {
-        [firstVendor.vendorId]: true
+        [vendorId]: true
       },
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
-    });
+    };
+
+    const conversationRef = await addDoc(collection(db, "conversations"), conversationPayload);
 
     await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
       text: firstMessage,
@@ -1619,12 +1645,16 @@ async function messageVendorsForRequest(requestId) {
       createdAt: serverTimestamp()
     });
 
-    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}&eventId=${encodeURIComponent(requestEventId)}`;
 
   } catch (error) {
-    showStatus(error.message, "error");
+    showStatus(`Could not open messages: ${error.message}`, "error");
   } finally {
     isBusy = false;
+
+    document.querySelectorAll("[data-message-request]").forEach((button) => {
+      button.disabled = false;
+    });
   }
 }
 
