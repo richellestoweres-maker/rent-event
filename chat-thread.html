@@ -580,6 +580,7 @@ import {
   collection,
   addDoc,
   updateDoc,
+  setDoc,
   serverTimestamp,
   query,
   orderBy,
@@ -678,6 +679,167 @@ function formatMessageTime(value) {
 
 function getEventId() {
   return safeText(conversationData?.eventId, "") || safeText(urlEventId, "");
+}
+
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
+
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
+function parseBookingConversationId(id) {
+  const parts = safeText(id, "").split("__");
+
+  if (parts.length >= 4 && parts[0] === "booking") {
+    return {
+      requestId: parts[1],
+      customerId: parts[2],
+      vendorId: parts.slice(3).join("__")
+    };
+  }
+
+  return null;
+}
+
+function buildBookingConversationId(requestId, customerId, vendorId) {
+  return [
+    "booking",
+    makeSafeId(requestId),
+    makeSafeId(customerId),
+    makeSafeId(vendorId)
+  ].join("__");
+}
+
+function getVendorItemsForParticipant(request, vendorId) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+
+  if (!vendorId) return vendors;
+
+  return vendors.filter((vendor) => safeText(vendor.vendorId, "") === vendorId);
+}
+
+async function repairConversationFromBookingRequest() {
+  const parsed = parseBookingConversationId(conversationId);
+
+  if (!parsed || !parsed.requestId || !parsed.customerId || !parsed.vendorId) return false;
+
+  try {
+    const requestSnap = await getDoc(doc(db, "bookingRequests", parsed.requestId));
+
+    if (!requestSnap.exists()) return false;
+
+    const request = {
+      id: requestSnap.id,
+      ...requestSnap.data()
+    };
+
+    const customerId = safeText(request.customerId || parsed.customerId, parsed.customerId);
+    const vendorId = parsed.vendorId;
+    const participantIds = [customerId, vendorId];
+
+    if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) return false;
+
+    const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
+    const customerName = safeText(request.customerName, "Customer");
+    const vendorItem = getVendorItemsForParticipant(request, vendorId)[0] || (Array.isArray(request.vendors) ? request.vendors[0] : {}) || {};
+    const vendorName = safeText(vendorItem.vendorName || request.vendorName || "Vendor", "Vendor");
+    const vendorResponses = request.vendorResponses || {};
+    const vendorResponse = vendorResponses[vendorId] || null;
+    const listingTitle = safeText(vendorItem.listingTitle || vendorItem.title, "Event Request");
+    const listingCategory = normalizeProfessionalLabel(safeText(vendorItem.category || vendorItem.listingCategory || vendorItem.mainCategory, "Event Service"));
+    const eventId = safeText(request.eventId || request.eventDetails?.id, "");
+    const messageText = vendorResponse?.note
+      ? `${safeText(vendorResponse.status, "Response")}: ${vendorResponse.note}`
+      : `Booking request for ${eventName}.`;
+
+    const repairedConversation = {
+      conversationKey: conversationId,
+      participantIds,
+      participantNames: {
+        [customerId]: customerName,
+        [vendorId]: vendorName
+      },
+      participantRoles: {
+        [customerId]: "customer",
+        [vendorId]: "vendor"
+      },
+      customerId,
+      vendorId,
+      bookingRequestId: request.id,
+      eventId,
+      eventName,
+      listingId: safeText(vendorItem.listingId, ""),
+      listingTitle,
+      listingCategory,
+      title: currentUser.uid === vendorId ? customerName : vendorName,
+      contextType: "Booking Request",
+      lastMessage: messageText,
+      lastSenderId: vendorResponse ? vendorId : customerId,
+      unreadFor: {},
+      repairedFromBookingRequest: true,
+      createdAt: request.createdAt || serverTimestamp(),
+      updatedAt: request.updatedAt || serverTimestamp()
+    };
+
+    await setDoc(doc(db, "conversations", conversationId), repairedConversation, { merge: true });
+
+    if (vendorResponse?.note) {
+      try {
+        await addDoc(collection(db, "conversations", conversationId, "messages"), {
+          text: messageText,
+          senderId: vendorId,
+          senderName: vendorName,
+          senderRole: "vendor",
+          bookingRequestId: request.id,
+          eventId,
+          responseStatus: vendorResponse.status || "",
+          createdAt: serverTimestamp()
+        });
+      } catch (messageError) {
+        console.warn("Conversation repaired, but fallback message was not added:", messageError.message);
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.warn("Could not repair conversation from booking request:", error.message);
+    return false;
+  }
 }
 
 function getBackHref() {
@@ -917,7 +1079,9 @@ function updateContextCard() {
       eventLink.textContent = "Open Event";
       eventLink.style.display = "inline-flex";
     } else if (conversationData.bookingRequestId) {
-      eventLink.href = `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
+      eventLink.href = currentUserData?.role === "vendor"
+        ? `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`
+        : `my-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
       eventLink.textContent = "Open Request";
       eventLink.style.display = "inline-flex";
     } else {
@@ -938,7 +1102,7 @@ async function updateHeader() {
 
   const otherName = getOtherParticipantName();
   const listingTitle = safeText(conversationData.listingTitle, "Event listing");
-  const listingCategory = safeText(conversationData.listingCategory, "Event service");
+  const listingCategory = normalizeProfessionalLabel(safeText(conversationData.listingCategory, "Event service"));
   const listingLocation = safeText(conversationData.listingLocation, "");
   const eventId = getEventId();
 
@@ -1015,6 +1179,13 @@ function watchConversation() {
 
   unsubscribeConversation = onSnapshot(conversationRef, async (conversationSnap) => {
     if (!conversationSnap.exists()) {
+      const repaired = await repairConversationFromBookingRequest();
+
+      if (repaired) {
+        loadConversation();
+        return;
+      }
+
       renderError("Conversation not found", "This conversation may have been removed or the link may be outdated.");
       return;
     }
@@ -1104,6 +1275,46 @@ async function loadConversation() {
   }
 }
 
+async function createMessageNotification(messageText, unreadFor) {
+  const recipientIds = Object.keys(unreadFor || {});
+  if (!recipientIds.length || !conversationData) return;
+
+  const senderName =
+    currentUserData.businessName ||
+    currentUserData.vendorName ||
+    currentUserData.name ||
+    currentUser.displayName ||
+    currentUser.email ||
+    "RentEvent User";
+
+  for (const recipientId of recipientIds) {
+    try {
+      await addDoc(collection(db, "notifications"), {
+        recipientId,
+        recipientRole: conversationData.participantRoles?.[recipientId] || "user",
+        type: "message",
+        typeLabel: "New Message",
+        category: "Message",
+        title: "New message",
+        body: `${senderName}: ${messageText}`,
+        sourceId: conversationId,
+        sourceCollection: "conversations",
+        sourceLabel: conversationData.eventName || conversationData.listingTitle || "Conversation",
+        bookingRequestId: conversationData.bookingRequestId || "",
+        eventId: getEventId() || "",
+        eventName: conversationData.eventName || "",
+        senderId: currentUser.uid,
+        senderName,
+        read: false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.warn("Message sent, but notification failed:", error.message);
+    }
+  }
+}
+
 async function sendMessage(text) {
   if (isAdminPreview()) {
     alert("Admin preview mode is view-only. Use a customer, planner, or vendor test account to send messages.");
@@ -1164,6 +1375,8 @@ async function sendMessage(text) {
     } catch (updateError) {
       console.warn("Message sent, but conversation summary could not update:", updateError.message);
     }
+
+    await createMessageNotification(messageText, unreadFor);
 
     messageInput.value = "";
 
