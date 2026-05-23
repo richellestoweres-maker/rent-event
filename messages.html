@@ -18,7 +18,7 @@
     }
 
     :root {
-      --bg: #ffffff;
+      --bg: #f7f2e9;
       --card: #ffffff;
       --text: #161616;
       --muted: #6a625a;
@@ -61,7 +61,7 @@
       margin: 0 auto;
       min-height: 100vh;
       padding: 72px 24px 112px;
-      background: #fff;
+      background: var(--bg);
     }
 
     .topbar {
@@ -81,13 +81,15 @@
       height: 56px;
       border-radius: 50%;
       border: none;
-      background: #f4f4f4;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
       text-decoration: none;
-      box-shadow: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 800;
       position: relative;
@@ -128,7 +130,7 @@
       padding: 0 25px;
       border-radius: 999px;
       border: none;
-      background: #f4f4f4;
+      background: #f4ede2;
       color: #222;
       font-family: inherit;
       font-size: 1.02rem;
@@ -149,6 +151,11 @@
 
     .mobile-search-bar.show {
       display: block;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
     }
 
     .notification-badge {
@@ -205,7 +212,7 @@
       min-height: 58px;
       border-radius: 999px;
       border: none;
-      background: #f4f4f4;
+      background: #f4ede2;
       padding: 0 20px;
       font-family: inherit;
       font-size: 0.95rem;
@@ -242,7 +249,7 @@
       align-items: center;
       text-decoration: none;
       color: inherit;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
       position: relative;
     }
 
@@ -258,7 +265,7 @@
     }
 
     .message-card.unread {
-      border-color: #f0f0f0;
+      border-color: rgba(236, 226, 211, 0.9);
       background: transparent;
     }
 
@@ -284,7 +291,7 @@
     .avatar {
       width: 76px;
       height: 76px;
-      border-radius: 18px;
+      border-radius: 999px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -625,7 +632,10 @@
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
-        🔔
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
       </a>
     </header>
 
