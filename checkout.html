@@ -366,6 +366,31 @@
       color: var(--muted);
     }
 
+    .notice-card {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+      border-radius: 24px;
+      padding: 14px 16px;
+      margin-top: 14px;
+      border: 1px solid rgba(64, 103, 178, 0.12);
+      box-shadow: var(--shadow);
+    }
+
+    .notice-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .notice-card p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      font-weight: 700;
+      color: inherit;
+    }
+
     .empty-card { text-align: center; padding: 24px 18px; }
 
     .empty-icon, .success-icon {
@@ -629,6 +654,13 @@
           This creates a pending booking request. Later, this request can connect to vendor availability, messages, confirmations, Stripe Embedded Checkout, and RentEvent’s platform fee.
         </p>
       </div>
+
+      <div class="notice-card">
+        <h3>Transportation & Safety Notice</h3>
+        <p>
+          RentEvent is not a rideshare platform. Transportation, valet, security, lifeguard, and safety-related requests are intended for professional event businesses/providers only, such as shuttle companies, party bus companies, limo/chauffeur companies, valet companies, licensed security providers, off-duty officer services, and certified lifeguard providers.
+        </p>
+      </div>
     </section>
   </main>
 
@@ -825,9 +857,49 @@ function renderEventTypePills(source, max = 2) {
   return `${pills}${morePill}`;
 }
 
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
 function getCategoryLine(source) {
-  const mainCategory = safeText(source.mainCategory, "");
-  const category = safeText(source.listingCategory || source.category, "Event Service");
+  const mainCategory = normalizeProfessionalLabel(safeText(source.mainCategory, ""));
+  const category = normalizeProfessionalLabel(safeText(source.listingCategory || source.category, "Event Service"));
   const customCategory = safeText(source.customCategory, "");
 
   const typeLine = customCategory
@@ -1128,8 +1200,8 @@ function sanitizeVendorForRequest(vendor) {
     boardItemId: safeText(vendor.id, ""),
     listingId: safeText(vendor.listingId, ""),
     listingTitle: safeText(vendor.listingTitle || vendor.title, "Requested Listing"),
-    mainCategory: safeText(vendor.mainCategory, ""),
-    category: safeText(vendor.category || vendor.listingCategory, "Event Service"),
+    mainCategory: normalizeProfessionalLabel(safeText(vendor.mainCategory, "")),
+    category: normalizeProfessionalLabel(safeText(vendor.category || vendor.listingCategory, "Event Service")),
     customCategory: safeText(vendor.customCategory, ""),
     eventTypes: getEventTypes(vendor),
     startingPrice: safeText(vendor.startingPrice, ""),
@@ -1180,6 +1252,9 @@ function buildBookingRequestPayload() {
     requestStatus: "pending",
     status: "pending",
     hiddenForCustomer: false,
+
+    transportationSafetyPositioning: "RentEvent is not a rideshare platform. Transportation, valet, security, lifeguard, and safety-related requests are for professional event businesses/providers only, not individual on-demand ride listings.",
+    professionalProviderNotice: "Transportation-related vendors should be shuttle companies, party bus companies, limo/chauffeur companies, wedding guest transportation companies, venue transportation providers, valet/parking companies, or similar professional event logistics providers.",
 
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
