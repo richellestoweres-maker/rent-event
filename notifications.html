@@ -181,22 +181,34 @@
       font-weight: 800;
     }
 
-    .clear-link {
-      min-height: 34px;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: #fff;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      text-decoration: none;
+    .filter-tabs {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-size: 0.82rem;
-      font-weight: 700;
-      white-space: nowrap;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.04);
+    }
+
+    .filter-tab {
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
       font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
       cursor: pointer;
+    }
+
+    .filter-tab.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 8px 18px rgba(120, 96, 60, 0.08);
     }
 
     .notification-list {
@@ -591,7 +603,10 @@
     <section class="section">
       <div class="section-header">
         <h2 class="section-title" id="sectionTitle">Recent Activity</h2>
-        <button class="clear-link" id="clearUnreadBtn" type="button">Clear Unread</button>
+        <div class="filter-tabs" aria-label="Notification filters">
+          <button class="filter-tab active" id="allFilterBtn" type="button">All</button>
+          <button class="filter-tab" id="unreadFilterBtn" type="button">Unread</button>
+        </div>
       </div>
 
       <div class="notification-list" id="notificationList">
@@ -639,6 +654,7 @@ const db = getFirestore(app);
 let currentUser = null;
 let currentUserData = null;
 let allNotifications = [];
+let activeFilter = "all";
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -1028,8 +1044,8 @@ function renderEmptyState() {
   list.innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">✓</div>
-      <h3>No notifications yet</h3>
-      <p>You’re all caught up. New messages and booking updates will appear here.</p>
+      <h3>${activeFilter === "unread" ? "No unread notifications" : "No notifications yet"}</h3>
+      <p>${activeFilter === "unread" ? "Once you click an unread alert, it will unhighlight but stay in All so you can open it again later." : "You’re all caught up. New messages and booking updates will appear here."}</p>
       <div class="empty-actions">
         <a class="btn" href="${href}">${label}</a>
         <a class="btn-secondary" href="messages.html">Open Inbox</a>
@@ -1126,23 +1142,50 @@ function getIconText(notification) {
   return "•";
 }
 
+
+function updateFilterButtons() {
+  const allBtn = document.getElementById("allFilterBtn");
+  const unreadBtn = document.getElementById("unreadFilterBtn");
+
+  if (allBtn) allBtn.classList.toggle("active", activeFilter === "all");
+  if (unreadBtn) unreadBtn.classList.toggle("active", activeFilter === "unread");
+}
+
+function getVisibleNotifications() {
+  if (activeFilter === "unread") {
+    return allNotifications.filter((notification) => notification.read === false);
+  }
+
+  return allNotifications;
+}
+
+function setNotificationFilter(filter) {
+  activeFilter = filter === "unread" ? "unread" : "all";
+  renderNotifications(allNotifications);
+}
+
 function renderNotifications(notifications) {
   const list = document.getElementById("notificationList");
   const sectionTitle = document.getElementById("sectionTitle");
 
-  if (!notifications.length) {
-    sectionTitle.textContent = "Recent Activity";
+  updateFilterButtons();
+
+  const unreadCount = allNotifications.filter((notification) => notification.read === false).length;
+  const visibleNotifications = activeFilter === "unread"
+    ? notifications.filter((notification) => notification.read === false)
+    : notifications;
+
+  if (!visibleNotifications.length) {
+    sectionTitle.textContent = activeFilter === "unread" ? "No Unread Alerts" : "Recent Activity";
     renderEmptyState();
     return;
   }
-
-  const unreadCount = notifications.filter((notification) => notification.read === false).length;
 
   sectionTitle.textContent = unreadCount
     ? `${unreadCount} Unread Alert${unreadCount === 1 ? "" : "s"}`
     : "Recent Activity";
 
-  list.innerHTML = notifications.map((notification) => {
+  list.innerHTML = visibleNotifications.map((notification) => {
     const isUnread = notification.read === false;
     const title = safeText(notification.title, "Notification");
     const text = safeText(notification.body || notification.text, "You have a new update.");
@@ -1164,7 +1207,7 @@ function renderNotifications(notifications) {
           <p class="notification-text">${escapeHtml(text)}</p>
 
           <div class="notification-meta">
-            ${isUnread ? `<span class="pill new">Unread</span>` : `<span class="pill message">Read</span>`}
+            ${isUnread ? `<span class="pill new">Unread</span>` : ""}
             <span class="pill request">${escapeHtml(typeLabel.replaceAll("_", " "))}</span>
             ${sourceLabel ? `<span class="pill info">${escapeHtml(sourceLabel)}</span>` : ""}
           </div>
@@ -1325,41 +1368,14 @@ async function loadNotifications(user) {
   renderNotifications(allNotifications);
 }
 
-async function clearUnread() {
-  if (!currentUser || !allNotifications.length) return;
+document.getElementById("allFilterBtn").addEventListener("click", () => {
+  setNotificationFilter("all");
+});
 
-  const clearBtn = document.getElementById("clearUnreadBtn");
-  clearBtn.disabled = true;
-  clearBtn.textContent = "Clearing...";
+document.getElementById("unreadFilterBtn").addEventListener("click", () => {
+  setNotificationFilter("unread");
+});
 
-  try {
-    const unreadItems = allNotifications.filter((notification) => notification.read === false);
-
-    for (const notification of unreadItems) {
-      if (isAdminRole() && notification.collectionName === "conversations") {
-        continue;
-      }
-
-      await markNotificationRead(notification);
-    }
-
-    await loadNotifications(currentUser);
-
-  } catch (error) {
-    document.getElementById("notificationList").innerHTML = `
-      <div class="empty-card">
-        <div class="empty-icon">!</div>
-        <h3>Could not clear notifications</h3>
-        <p>${escapeHtml(error.message)}</p>
-      </div>
-    `;
-  } finally {
-    clearBtn.disabled = false;
-    clearBtn.textContent = "Clear Unread";
-  }
-}
-
-document.getElementById("clearUnreadBtn").addEventListener("click", clearUnread);
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
