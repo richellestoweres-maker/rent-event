@@ -13,33 +13,19 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
-      --bg: #f7f2e9;
+      --bg: #ffffff;
       --card: #ffffff;
       --text: #161616;
-      --muted: #6a625a;
-      --line: #ece2d3;
-      --soft: #f4ede2;
-      --soft-2: #faf5ee;
+      --muted: #666666;
+      --line: #eeeeee;
+      --soft: #f6f6f6;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold-dark: #d88914;
-      --green-soft: #eaf7ef;
-      --green-text: #2d7a49;
-      --blue-soft: #edf4ff;
-      --blue-text: #4067b2;
-      --red-soft: #ffe7e2;
-      --red-text: #c74f4d;
-      --purple-soft: #f0eaff;
-      --purple-text: #6f4ab8;
-      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
-      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
-      --radius-xl: 34px;
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.07);
     }
 
     html,
@@ -51,16 +37,15 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .page {
       width: 100%;
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 112px;
+      padding: 86px 24px 112px;
+      background: #fff;
     }
 
     .topbar {
@@ -68,47 +53,35 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 22px;
+      margin-bottom: 28px;
     }
 
-    .back-link,
+    .back-link { display: none; }
+
+    .page-title {
+      margin: 0;
+      font-size: clamp(3rem, 11vw, 4.35rem);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+      font-weight: 800;
+    }
+
     .icon-btn {
-      width: 44px;
-      height: 44px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      background: #f4f4f4;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
       text-decoration: none;
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      box-shadow: none;
       flex-shrink: 0;
       font-weight: 800;
       position: relative;
-    }
-
-    .topbar-center {
-      flex: 1;
-      text-align: center;
-    }
-
-    .eyebrow {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #7b7268;
-      margin-bottom: 4px;
-    }
-
-    .page-title {
-      margin: 0;
-      font-size: 1.55rem;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      font-weight: 800;
+      font-size: 1.1rem;
     }
 
     .notification-badge,
@@ -146,275 +119,281 @@
       font-size: 0.64rem;
     }
 
-    .hero-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--radius-xl);
-      padding: 24px 22px;
-      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: var(--shadow-strong);
-      margin-bottom: 26px;
-      text-align: center;
-    }
-
-    .hero-card::after {
-      content: "";
-      position: absolute;
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      right: -60px;
-      top: -45px;
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
+    .profile-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 24px;
     }
 
     .avatar {
-      width: 92px;
-      height: 92px;
+      width: 112px;
+      height: 112px;
       border-radius: 50%;
-      margin: 0 auto 15px;
-      background: rgba(255, 255, 255, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: #f3f3f3;
+      border: 1px solid #eeeeee;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 2rem;
       font-weight: 800;
-      color: #fff;
-      box-shadow: 0 14px 28px rgba(133, 54, 48, 0.14);
+      color: #161616;
     }
 
     .profile-name {
       margin: 0 0 6px;
-      font-size: 1.65rem;
+      font-size: 2rem;
       line-height: 1;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.06em;
       font-weight: 800;
     }
 
     .profile-email {
-      margin: 0 0 16px;
-      font-size: 0.92rem;
-      line-height: 1.4;
-      color: rgba(255, 255, 255, 0.9);
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.35;
+      color: var(--muted);
+      word-break: break-word;
     }
 
-    .hero-actions {
+    .profile-role-line {
+      margin-top: 8px;
+      color: #666;
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    .profile-stats {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-top: 1px solid #ededed;
+      padding-top: 18px;
+    }
+
+    .profile-stat {
+      padding-right: 16px;
+      border-right: 1px solid #ededed;
+    }
+
+    .profile-stat:last-child {
+      border-right: none;
+      padding-left: 16px;
+      padding-right: 0;
+    }
+
+    .profile-stat strong {
+      display: block;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .profile-stat span {
+      display: block;
+      margin-top: 5px;
+      color: #555;
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .promo-card {
+      min-height: 124px;
+      border-radius: 28px;
+      background: #fff;
+      border: 1px solid #eeeeee;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.05);
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 1fr 76px;
+      align-items: center;
+      gap: 16px;
+      margin: 0 0 32px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .promo-card h3 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      letter-spacing: -0.04em;
+    }
+
+    .promo-card p {
+      margin: 0;
+      color: #666;
+      font-size: 0.98rem;
+      line-height: 1.35;
+    }
+
+    .promo-art {
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
       display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .hero-btn,
-    .hero-btn-secondary {
-      min-height: 46px;
-      padding: 0 16px;
-      border-radius: 999px;
-      display: inline-flex;
       align-items: center;
       justify-content: center;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.9rem;
-      border: none;
-      font-family: inherit;
-      cursor: pointer;
-    }
-
-    .hero-btn {
-      background: #fff;
-      color: #ff5f67;
-      box-shadow: 0 8px 20px rgba(169, 67, 62, 0.12);
-    }
-
-    .hero-btn-secondary {
-      background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
+      font-size: 2rem;
     }
 
     .section {
-      margin-top: 28px;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 14px;
+      margin-top: 32px;
     }
 
     .section-title {
-      margin: 0;
-      font-size: 1.45rem;
+      margin: 0 0 14px;
+      font-size: 1.35rem;
       line-height: 1.02;
       letter-spacing: -0.04em;
       font-weight: 800;
     }
 
-    .card {
-      background: var(--card);
-      border-radius: 28px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .info-row:first-child {
-      padding-top: 0;
-    }
-
-    .info-row:last-child {
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-
-    .info-label {
-      font-size: 0.78rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-    }
-
-    .info-value {
-      font-size: 0.9rem;
-      font-weight: 700;
-      text-align: right;
-      max-width: 62%;
-    }
-
     .menu-list {
       display: grid;
-      gap: 10px;
+      gap: 0;
+      border-top: 1px solid #eeeeee;
     }
 
     .menu-item {
-      min-height: 58px;
-      border-radius: 20px;
-      background: var(--card);
-      box-shadow: var(--shadow);
+      min-height: 76px;
+      border-radius: 0;
+      background: #fff;
+      box-shadow: none;
       color: var(--text);
       text-decoration: none;
-      padding: 0 16px;
-      display: flex;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 52px 1fr 24px;
       align-items: center;
-      justify-content: space-between;
       gap: 14px;
-      font-size: 0.95rem;
+      font-size: 1.18rem;
+      font-weight: 500;
+      border-bottom: 1px solid #eeeeee;
+      font-family: inherit;
+      text-align: left;
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #161616;
+      font-size: 1.25rem;
       font-weight: 800;
     }
 
     .menu-copy {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 4px;
       min-width: 0;
     }
 
+    .menu-copy span:first-child {
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
     .menu-copy span:last-child {
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 600;
-      line-height: 1.3;
+      color: #666;
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.32;
     }
 
     .menu-arrow {
-      color: #9a9084;
+      color: #9a9a9a;
       font-weight: 800;
       flex-shrink: 0;
+      font-size: 1.7rem;
     }
 
     .logout-btn {
       width: 100%;
-      min-height: 52px;
-      border-radius: 999px;
+      min-height: 76px;
+      border-radius: 0;
       border: none;
-      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
-      color: #fff;
+      border-bottom: 1px solid #eeeeee;
+      background: #fff;
+      color: #161616;
       font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 800;
+      font-size: 1.18rem;
+      font-weight: 500;
       cursor: pointer;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
-    }
-
-    .session-copy {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.45;
+      text-align: left;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 52px 1fr 24px;
+      align-items: center;
+      gap: 14px;
     }
 
     .bottom-nav {
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
-      bottom: 16px;
-      width: calc(100% - 24px);
-      max-width: 406px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(235, 225, 211, 0.95);
-      border-radius: 999px;
-      padding: 10px 8px;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255, 255, 255, 0.96);
+      border-top: 1px solid #eeeeee;
+      padding: 9px 6px 14px;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+      gap: 2px;
+      box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.04);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 50;
     }
 
     .nav-item {
       min-height: 58px;
-      border-radius: 999px;
+      border-radius: 18px;
       text-decoration: none;
-      color: #6c655d;
+      color: #666;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       text-align: center;
-      padding: 0 4px;
+      padding: 0 3px;
       position: relative;
     }
 
     .nav-item svg {
-      width: 20px;
-      height: 20px;
+      width: 23px;
+      height: 23px;
     }
 
     .nav-item.active {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+      color: #e31c5f;
     }
 
+    .nav-item.active svg {
+      stroke: #e31c5f;
+    }
 
     .admin-preview-bar {
       display: none;
       position: sticky;
       top: 0;
       z-index: 90;
-      margin: -20px -18px 18px;
       padding: 12px 18px;
       background: #161616;
       color: #fff;
@@ -460,6 +439,23 @@
       justify-content: center;
     }
 
+    @media (max-width: 390px) {
+      .profile-card {
+        grid-template-columns: 96px 1fr;
+        gap: 18px;
+        padding: 24px 18px;
+      }
+
+      .avatar {
+        width: 96px;
+        height: 96px;
+      }
+
+      .profile-name {
+        font-size: 1.7rem;
+      }
+    }
+
     @media (min-width: 768px) {
       body {
         padding: 24px 0;
@@ -467,17 +463,39 @@
 
       .page {
         max-width: 960px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .profile-card,
+      .promo-card,
+      .section {
+        max-width: 880px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .profile-grid {
         display: grid;
         grid-template-columns: 0.9fr 1.1fr;
-        gap: 18px;
+        gap: 28px;
         align-items: start;
+        max-width: 880px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .bottom-nav {
-        max-width: 520px;
+        max-width: 560px;
+        bottom: 16px;
+        border: 1px solid #eeeeee;
+        border-radius: 999px;
+        padding: 10px 8px;
+        box-shadow: 0 18px 38px rgba(120, 96, 60, 0.12);
+      }
+
+      .nav-item.active {
+        background: #fff5f7;
       }
     }
   </style>
@@ -496,12 +514,7 @@
 
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
-
-      <div class="topbar-center">
-        <div class="eyebrow">Account</div>
-        <h1 class="page-title">Profile</h1>
-      </div>
+      <h1 class="page-title">Profile</h1>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
@@ -509,139 +522,147 @@
       </a>
     </header>
 
-    <section class="hero-card">
-      <div class="hero-content">
-        <div class="avatar" id="profileAvatar">RE</div>
+    <section class="profile-card">
+      <div class="avatar" id="profileAvatar">RE</div>
+
+      <div>
         <h2 class="profile-name" id="profileName">Loading...</h2>
         <p class="profile-email" id="profileEmail">Checking your account...</p>
+        <div class="profile-role-line" id="profileRoleLine">Account</div>
+      </div>
 
-        <div class="hero-actions">
-          <a class="hero-btn" href="edit-profile.html" id="primaryHeroBtn">Edit Profile</a>
-          <a class="hero-btn-secondary" href="dashboard.html#myEventsSection" id="secondaryHeroBtn">My Events</a>
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <strong id="tripStat">0</strong>
+          <span id="tripStatLabel">Events</span>
+        </div>
+        <div class="profile-stat">
+          <strong id="requestStat">0</strong>
+          <span>Requests</span>
+        </div>
+        <div class="profile-stat">
+          <strong id="messageStat">0</strong>
+          <span>Unread</span>
         </div>
       </div>
     </section>
 
+    <a class="promo-card" href="vendor-onboarding.html" id="rolePromoCard">
+      <div>
+        <h3 id="rolePromoTitle">Become a vendor</h3>
+        <p id="rolePromoText">List your event services and connect with customers planning real events.</p>
+      </div>
+      <div class="promo-art" id="rolePromoIcon">✨</div>
+    </a>
+
     <div class="profile-grid">
       <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">Account Details</h2>
-        </div>
+        <h2 class="section-title">Account</h2>
 
-        <div class="card">
-          <div class="info-row">
-            <span class="info-label">Account Type</span>
-            <span class="info-value" id="accountType">Customer</span>
-          </div>
+        <div class="menu-list">
+          <a class="menu-item" href="edit-profile.html">
+            <span class="menu-icon">⚙</span>
+            <span class="menu-copy">
+              <span>Account settings</span>
+              <span>Edit your profile, location, and account details.</span>
+            </span>
+            <span class="menu-arrow">›</span>
+          </a>
 
-          <div class="info-row">
-            <span class="info-label">Location</span>
-            <span class="info-value" id="profileLocation">Not added yet</span>
-          </div>
+          <a class="menu-item" href="profile-public.html">
+            <span class="menu-icon">○</span>
+            <span class="menu-copy">
+              <span>View profile</span>
+              <span>Preview how your profile appears in RentEvent.</span>
+            </span>
+            <span class="menu-arrow">›</span>
+          </a>
 
-          <div class="info-row">
-            <span class="info-label">Events</span>
-            <span class="info-value" id="eventCount">0</span>
-          </div>
-
-          <div class="info-row">
-            <span class="info-label">Requests</span>
-            <span class="info-value" id="requestCount">0</span>
-          </div>
+          <a class="menu-item" href="notifications.html">
+            <span class="menu-icon">🔔</span>
+            <span class="menu-copy">
+              <span>Notifications</span>
+              <span>See all alerts, replies, and message updates.</span>
+            </span>
+            <span class="menu-arrow">›</span>
+          </a>
         </div>
       </section>
 
       <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">Quick Access</h2>
-        </div>
+        <h2 class="section-title">Trips & Events</h2>
 
         <div class="menu-list" id="quickAccessList">
-          <a class="menu-item" href="dashboard.html#myEventsSection">
-            <span class="menu-copy">
-              <span>My Events</span>
-              <span>Open your event project boards.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
-
-          <a class="menu-item" href="listings.html">
-            <span class="menu-copy">
-              <span>Browse Listings</span>
-              <span>Find venues, glam, rentals, music, and vendors.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
-
-          <a class="menu-item" href="my-requests.html">
-            <span class="menu-copy">
-              <span>My Requests</span>
-              <span>Track submitted vendor requests.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
-
-          <a class="menu-item" href="messages.html">
-            <span class="menu-copy">
-              <span>Messages</span>
-              <span>Review vendor conversations.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
+          <!-- Quick access renders here -->
         </div>
       </section>
     </div>
 
     <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Session</h2>
+      <h2 class="section-title">Support & Legal</h2>
+
+      <div class="menu-list">
+        <a class="menu-item" href="support.html">
+          <span class="menu-icon">?</span>
+          <span class="menu-copy">
+            <span>Get help</span>
+            <span>Contact RentEvent support or open a help request.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+
+        <a class="menu-item" href="report.html">
+          <span class="menu-icon">!</span>
+          <span class="menu-copy">
+            <span>Report a concern</span>
+            <span>Report a listing, message, vendor, customer, or safety issue.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+
+        <a class="menu-item" href="terms.html">
+          <span class="menu-icon">▣</span>
+          <span class="menu-copy">
+            <span>Terms of Service</span>
+            <span>Review marketplace rules, policies, and responsibilities.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+
+        <a class="menu-item" href="privacy.html">
+          <span class="menu-icon">◷</span>
+          <span class="menu-copy">
+            <span>Privacy Policy</span>
+            <span>Learn how RentEvent handles account and event information.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+
+        <a class="menu-item" href="safety.html">
+          <span class="menu-icon">◇</span>
+          <span class="menu-copy">
+            <span>Safety & marketplace guidelines</span>
+            <span>Professional vendor expectations, prohibited listings, and reporting.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
       </div>
+    </section>
 
-      <div class="card">
-        <p class="session-copy">
-          Logging out will return you to the sign-in page. Your events, requests, and saved vendors will stay connected to your account.
-        </p>
+    <section class="section">
+      <h2 class="section-title">Session</h2>
 
-        <button class="logout-btn" type="button" id="logoutBtn">Log Out</button>
+      <div class="menu-list">
+        <button class="logout-btn" type="button" id="logoutBtn">
+          <span class="menu-icon">▯</span>
+          <span>Log out</span>
+          <span class="menu-arrow">›</span>
+        </button>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation">
-    <a class="nav-item" href="dashboard.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
-      </svg>
-      <span>Home</span>
-    </a>
-
-    <a class="nav-item" href="listings.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
-        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Listings</span>
-    </a>
-
-    <a class="nav-item" href="messages.html">
-      <span class="nav-badge" id="bottomInboxBadge">0</span>
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Inbox</span>
-    </a>
-
-    <a class="nav-item active" href="profile.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Profile</span>
-    </a>
-  </nav>
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation"></nav>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -729,16 +750,10 @@ function getRoleLabel(role) {
   return "Customer";
 }
 
-function getHomeHref(role) {
-  if (role === "admin") return "admin-dashboard.html";
-  if (role === "vendor") return "vendor-dashboard.html";
-  if (role === "planner") return "planner-dashboard.html";
-  return "dashboard.html";
-}
-
-function renderMenuItem(href, title, subtitle) {
+function renderMenuItem(href, title, subtitle, icon = "›") {
   return `
     <a class="menu-item" href="${href}">
+      <span class="menu-icon">${icon}</span>
       <span class="menu-copy">
         <span>${title}</span>
         <span>${subtitle}</span>
@@ -753,34 +768,54 @@ function renderQuickAccess(role) {
 
   if (role === "admin") {
     list.innerHTML = [
-      renderMenuItem("admin-dashboard.html", "Admin Dashboard", "Review users, listings, requests, and launch data."),
-      renderMenuItem("listings.html", "Marketplace", "Preview public listings and vendor categories."),
-      renderMenuItem("messages.html", "Messages", "Review marketplace conversations during testing."),
-      renderMenuItem("notifications.html", "Notifications", "Check app alerts and system messages.")
+      renderMenuItem("admin-dashboard.html", "Admin Dashboard", "Review users, listings, requests, and launch data.", "▦"),
+      renderMenuItem("listings.html", "Marketplace", "Preview public listings and vendor categories.", "⌕"),
+      renderMenuItem("messages.html", "Messages", "Review marketplace conversations during testing.", "☏"),
+      renderMenuItem("notifications.html", "Notifications", "Check app alerts and system messages.", "🔔")
+    ].join("");
+    return;
+  }
+
+  if (role === "vendor") {
+    list.innerHTML = [
+      renderMenuItem("vendor-dashboard.html", "Vendor dashboard", "Manage listings, requests, and booking activity.", "▦"),
+      renderMenuItem("my-listings.html", "My listings", "Edit services, pricing, categories, and photos.", "□"),
+      renderMenuItem("booking-requests.html", "Booking requests", "Review customer requests and respond quickly.", "✉"),
+      renderMenuItem("messages.html", "Messages", "Keep customer conversations organized.", "☏")
     ].join("");
     return;
   }
 
   if (role === "planner") {
     list.innerHTML = [
-      renderMenuItem("planner-dashboard.html", "Client Events", "Manage client projects and event boards."),
-      renderMenuItem("listings.html", "Browse Vendors", "Source venues, glam, rentals, music, and event services."),
-      renderMenuItem("my-requests.html", "Client Requests", "Track submitted vendor requests across events."),
-      renderMenuItem("messages.html", "Messages", "Keep vendor conversations organized by client event.")
+      renderMenuItem("planner-dashboard.html", "Client Events", "Manage client projects and event boards.", "▦"),
+      renderMenuItem("listings.html", "Browse Vendors", "Source venues, glam, rentals, music, and event services.", "⌕"),
+      renderMenuItem("my-requests.html", "Client Requests", "Track submitted vendor requests across events.", "□"),
+      renderMenuItem("messages.html", "Messages", "Keep vendor conversations organized by client event.", "☏")
     ].join("");
     return;
   }
 
   list.innerHTML = [
-    renderMenuItem("dashboard.html#myEventsSection", "My Events", "Open your event project boards."),
-    renderMenuItem("listings.html", "Browse Listings", "Find venues, glam, rentals, music, and vendors."),
-    renderMenuItem("my-requests.html", "My Requests", "Track submitted vendor requests."),
-    renderMenuItem("messages.html", "Messages", "Review vendor conversations.")
+    renderMenuItem("dashboard.html#myEventsSection", "My Events", "Open your event project boards.", "▦"),
+    renderMenuItem("listings.html", "Explore vendors", "Find venues, glam, rentals, music, and event services.", "⌕"),
+    renderMenuItem("my-requests.html", "My Requests", "Track submitted vendor requests.", "□"),
+    renderMenuItem("messages.html", "Messages", "Review vendor conversations.", "☏")
   ].join("");
 }
 
 function renderBottomNav(role) {
   const bottomNav = document.getElementById("bottomNav");
+
+  if (role === "vendor") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="vendor-dashboard.html"><span>Home</span></a>
+      <a class="nav-item" href="add-listing.html"><span>Add</span></a>
+      <a class="nav-item" href="booking-requests.html"><span>Requests</span></a>
+      <a class="nav-item active" href="profile.html"><span>Profile</span></a>
+    `;
+    return;
+  }
 
   if (role === "admin") {
     bottomNav.innerHTML = `
@@ -792,41 +827,36 @@ function renderBottomNav(role) {
     return;
   }
 
-  if (role === "planner") {
-    bottomNav.innerHTML = `
-      <a class="nav-item" href="planner-dashboard.html"><span>Home</span></a>
-      <a class="nav-item" href="listings.html"><span>Vendors</span></a>
-      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
-      <a class="nav-item active" href="profile.html"><span>Profile</span></a>
-    `;
-    return;
-  }
-
   bottomNav.innerHTML = `
-    <a class="nav-item" href="dashboard.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
-      </svg>
-      <span>Home</span>
-    </a>
-
     <a class="nav-item" href="listings.html">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
-        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Listings</span>
+      <span>Explore</span>
+    </a>
+
+    <a class="nav-item" href="event-builder.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 21C12 21 5 16.8 5 10.8C5 7.7 7 6 9.2 6C10.6 6 11.5 6.7 12 7.5C12.5 6.7 13.4 6 14.8 6C17 6 19 7.7 19 10.8C19 16.8 12 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+      </svg>
+      <span>Saved</span>
+    </a>
+
+    <a class="nav-item" href="my-requests.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M5 5H19V19H5V5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Requests</span>
     </a>
 
     <a class="nav-item" href="messages.html">
       <span class="nav-badge" id="bottomInboxBadge">0</span>
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Inbox</span>
+      <span>Messages</span>
     </a>
 
     <a class="nav-item active" href="profile.html">
@@ -840,29 +870,33 @@ function renderBottomNav(role) {
 }
 
 function applyRoleLayout(role) {
-  const backLink = document.getElementById("backLink");
-  const primaryHeroBtn = document.getElementById("primaryHeroBtn");
-  const secondaryHeroBtn = document.getElementById("secondaryHeroBtn");
-
-  backLink.href = getHomeHref(role);
+  const promoCard = document.getElementById("rolePromoCard");
+  const promoTitle = document.getElementById("rolePromoTitle");
+  const promoText = document.getElementById("rolePromoText");
+  const promoIcon = document.getElementById("rolePromoIcon");
 
   if (role === "admin") {
     const bar = document.getElementById("adminPreviewBar");
     if (bar) bar.style.display = "block";
-    primaryHeroBtn.href = "admin-dashboard.html";
-    primaryHeroBtn.textContent = "Admin Dashboard";
-    secondaryHeroBtn.href = "notifications.html";
-    secondaryHeroBtn.textContent = "Notifications";
+    promoCard.href = "admin-dashboard.html";
+    promoTitle.textContent = "Admin dashboard";
+    promoText.textContent = "Review users, listings, support items, and launch data.";
+    promoIcon.textContent = "▦";
+  } else if (role === "vendor") {
+    promoCard.href = "my-listings.html";
+    promoTitle.textContent = "Manage your vendor profile";
+    promoText.textContent = "Keep your services, pricing, verification details, and booking settings up to date.";
+    promoIcon.textContent = "□";
   } else if (role === "planner") {
-    primaryHeroBtn.href = "edit-profile.html";
-    primaryHeroBtn.textContent = "Edit Profile";
-    secondaryHeroBtn.href = "planner-dashboard.html";
-    secondaryHeroBtn.textContent = "Client Events";
+    promoCard.href = "planner-dashboard.html";
+    promoTitle.textContent = "Manage client events";
+    promoText.textContent = "Organize vendor requests, event boards, and client conversations.";
+    promoIcon.textContent = "▦";
   } else {
-    primaryHeroBtn.href = "edit-profile.html";
-    primaryHeroBtn.textContent = "Edit Profile";
-    secondaryHeroBtn.href = "dashboard.html#myEventsSection";
-    secondaryHeroBtn.textContent = "My Events";
+    promoCard.href = "vendor-onboarding.html";
+    promoTitle.textContent = "Become a vendor";
+    promoText.textContent = "List your event services and connect with customers planning real events.";
+    promoIcon.textContent = "✨";
   }
 
   renderQuickAccess(role);
@@ -883,10 +917,7 @@ async function loadCounts(user) {
     if (role === "admin") {
       eventsQuery = query(collection(db, "customerEvents"));
     } else {
-      eventsQuery = query(
-        collection(db, "customerEvents"),
-        where("customerId", "==", user.uid)
-      );
+      eventsQuery = query(collection(db, "customerEvents"), where("customerId", "==", user.uid));
     }
 
     const eventSnapshot = await getDocs(eventsQuery);
@@ -910,15 +941,9 @@ async function loadCounts(user) {
     if (role === "admin") {
       requestsQuery = query(collection(db, "bookingRequests"));
     } else if (role === "vendor") {
-      requestsQuery = query(
-        collection(db, "bookingRequests"),
-        where("vendorIds", "array-contains", user.uid)
-      );
+      requestsQuery = query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", user.uid));
     } else {
-      requestsQuery = query(
-        collection(db, "bookingRequests"),
-        where("customerId", "==", user.uid)
-      );
+      requestsQuery = query(collection(db, "bookingRequests"), where("customerId", "==", user.uid));
     }
 
     const requestSnapshot = await getDocs(requestsQuery);
@@ -967,8 +992,9 @@ async function loadCounts(user) {
     unreadNotifications = 0;
   }
 
-  setText("eventCount", eventCount);
-  setText("requestCount", requestCount);
+  setText("tripStat", eventCount);
+  setText("requestStat", requestCount);
+  setText("messageStat", unreadMessages);
   setBadge("bottomInboxBadge", unreadMessages);
   setBadge("topNotificationBadge", unreadMessages + unreadNotifications);
 }
@@ -983,12 +1009,12 @@ function renderProfile(user, userData) {
     safeText(user.email, getRoleLabel(role));
 
   const email = safeText(userData.email, user.email || "No email listed");
+  const location = getLocation(userData);
 
   setText("profileAvatar", initialsFromName(displayName));
   setText("profileName", displayName);
   setText("profileEmail", email);
-  setText("accountType", getRoleLabel(role));
-  setText("profileLocation", getLocation(userData));
+  setText("profileRoleLine", `${getRoleLabel(role)} · ${location}`);
 
   applyRoleLayout(role);
 }
