@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #666666;
+      --line: #eeeeee;
+      --soft: #f6f6f6;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.07);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body { min-height: 100vh; }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 24px 112px;
+      background: #fff;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: none;
+      flex-shrink: 0;
+      font-weight: 800;
+      position: relative;
+      font-size: 1.1rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .notification-badge,
+    .nav-badge {
+      position: absolute;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.68rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .notification-badge {
+      top: -5px;
+      right: -5px;
+    }
+
+    .nav-badge {
+      top: 6px;
+      right: 16px;
+      min-width: 18px;
+      height: 18px;
+      line-height: 18px;
+      font-size: 0.64rem;
+    }
+
+    .hero {
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #777;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .page-title {
+      margin: 0 0 14px;
+      font-size: clamp(3.1rem, 12vw, 4.65rem);
+      line-height: 0.9;
+      letter-spacing: -0.08em;
+      font-weight: 800;
+    }
+
+    .hero-copy {
+      margin: 0;
+      color: #666;
+      font-size: 1.05rem;
+      line-height: 1.45;
+      max-width: 680px;
+    }
+
+    .quick-help {
+      display: grid;
+      gap: 12px;
+      margin: 26px 0 34px;
+    }
+
+    .quick-card {
+      min-height: 82px;
+      border-radius: 24px;
+      border: 1px solid #eeeeee;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.045);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .quick-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: #f6f6f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .quick-card h3 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    .quick-card p {
+      margin: 0;
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .section {
+      margin-top: 34px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.4rem;
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+    }
+
+    .support-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #222;
+    }
+
+    .field small {
+      color: #777;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      font-weight: 600;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: none;
+      background: #f4f4f4;
+      color: #161616;
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      border-radius: 20px;
+    }
+
+    .input,
+    .select {
+      min-height: 58px;
+      padding: 0 18px;
+    }
+
+    .textarea {
+      min-height: 148px;
+      padding: 17px 18px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .select {
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, #777 50%), linear-gradient(135deg, #777 50%, transparent 50%);
+      background-position: calc(100% - 20px) calc(50% - 3px), calc(100% - 15px) calc(50% - 3px);
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    .two-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .checkbox-card {
+      border-radius: 22px;
+      background: #f8f8f8;
+      border: 1px solid #eeeeee;
+      padding: 15px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .check-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: #555;
+      font-size: 0.88rem;
+      line-height: 1.38;
+      font-weight: 650;
+    }
+
+    .check-row input {
+      margin-top: 2px;
+      accent-color: #e31c5f;
+    }
+
+    .status-card {
+      display: none;
+      border-radius: 22px;
+      padding: 15px 16px;
+      font-size: 0.9rem;
+      line-height: 1.42;
+      font-weight: 750;
+    }
+
+    .status-card.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-card.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .submit-btn {
+      min-height: 60px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .menu-list {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid #eeeeee;
+    }
+
+    .menu-item {
+      min-height: 76px;
+      border-radius: 0;
+      background: #fff;
+      color: var(--text);
+      text-decoration: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 52px 1fr 24px;
+      align-items: center;
+      gap: 14px;
+      font-size: 1.18rem;
+      font-weight: 500;
+      border-bottom: 1px solid #eeeeee;
+      font-family: inherit;
+      text-align: left;
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #161616;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .menu-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .menu-copy span:first-child {
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .menu-copy span:last-child {
+      color: #666;
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.32;
+    }
+
+    .menu-arrow {
+      color: #9a9a9a;
+      font-weight: 800;
+      flex-shrink: 0;
+      font-size: 1.7rem;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255, 255, 255, 0.96);
+      border-top: 1px solid #eeeeee;
+      padding: 9px 6px 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+      gap: 2px;
+      box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 50;
+    }
+
+    .nav-item {
+      min-height: 58px;
+      border-radius: 18px;
+      text-decoration: none;
+      color: #666;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0 3px;
+      position: relative;
+    }
+
+    .nav-item svg {
+      width: 23px;
+      height: 23px;
+    }
+
+    .nav-item.active {
+      color: #e31c5f;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .hero,
+      .quick-help,
+      .section {
+        max-width: 840px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .quick-help {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .two-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .bottom-nav {
+        max-width: 560px;
+        bottom: 16px;
+        border: 1px solid #eeeeee;
+        border-radius: 999px;
+        padding: 10px 8px;
+        box-shadow: 0 18px 38px rgba(120, 96, 60, 0.12);
+      }
+
+      .nav-item.active {
+        background: #fff5f7;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="profile.html" class="back-link" aria-label="Go back">←</a>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <span class="notification-badge" id="topNotificationBadge">0</span>
+        🔔
+      </a>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">RentEvent Support</p>
+      <h1 class="page-title">How can we help?</h1>
+      <p class="hero-copy">
+        Tell us what happened and we’ll route your request to the right place. For urgent safety concerns, contact local emergency services first.
+      </p>
+    </section>
+
+    <section class="quick-help" aria-label="Quick help topics">
+      <article class="quick-card">
+        <div class="quick-icon">☏</div>
+        <div>
+          <h3>Messages & requests</h3>
+          <p>Help with vendor replies, booking requests, or missing conversations.</p>
+        </div>
+      </article>
+
+      <article class="quick-card">
+        <div class="quick-icon">!</div>
+        <div>
+          <h3>Report an issue</h3>
+          <p>Report a listing, user, message, safety concern, or policy violation.</p>
+        </div>
+      </article>
+
+      <article class="quick-card">
+        <div class="quick-icon">▣</div>
+        <div>
+          <h3>Policies</h3>
+          <p>Questions about cancellations, refunds, marketplace rules, or vendor terms.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Contact support</h2>
+
+      <form class="support-form" id="supportForm">
+        <div class="two-grid">
+          <div class="field">
+            <label for="supportName">Name</label>
+            <input class="input" id="supportName" name="name" type="text" placeholder="Your name" autocomplete="name" />
+          </div>
+
+          <div class="field">
+            <label for="supportEmail">Email</label>
+            <input class="input" id="supportEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="two-grid">
+          <div class="field">
+            <label for="supportType">What do you need help with?</label>
+            <select class="select" id="supportType" name="type" required>
+              <option value="">Choose a topic</option>
+              <option value="booking_request">Booking request</option>
+              <option value="messages">Messages or chat thread</option>
+              <option value="vendor_issue">Issue with a vendor</option>
+              <option value="customer_issue">Issue with a customer</option>
+              <option value="listing_report">Report a listing</option>
+              <option value="safety_concern">Safety concern</option>
+              <option value="payment_refund">Payment, cancellation, or refund</option>
+              <option value="account">Account or profile help</option>
+              <option value="vendor_verification">Vendor verification</option>
+              <option value="general">General question</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="supportPriority">Priority</label>
+            <select class="select" id="supportPriority" name="priority">
+              <option value="normal">Normal</option>
+              <option value="time_sensitive">Time-sensitive event issue</option>
+              <option value="urgent_safety">Urgent safety concern</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="relatedInfo">Related listing, request, or conversation</label>
+          <input class="input" id="relatedInfo" name="relatedInfo" type="text" placeholder="Optional listing name, request ID, vendor/customer name, or event name" />
+          <small>This helps us find the right event, vendor, or message thread faster.</small>
+        </div>
+
+        <div class="field">
+          <label for="supportMessage">Message</label>
+          <textarea class="textarea" id="supportMessage" name="message" required placeholder="Please describe what happened and what you need help with."></textarea>
+        </div>
+
+        <div class="checkbox-card">
+          <label class="check-row">
+            <input type="checkbox" id="safetyAcknowledge" />
+            <span>I understand RentEvent is a marketplace platform. Vendors and customers are independent users/businesses, and urgent safety emergencies should be handled through local emergency services first.</span>
+          </label>
+
+          <label class="check-row">
+            <input type="checkbox" id="contactConsent" checked />
+            <span>I agree RentEvent may contact me by email or in-app message about this support request.</span>
+          </label>
+        </div>
+
+        <div class="status-card" id="statusCard"></div>
+
+        <button class="submit-btn" id="submitBtn" type="submit">Submit support request</button>
+      </form>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Helpful links</h2>
+
+      <div class="menu-list">
+        <a class="menu-item" href="report.html">
+          <span class="menu-icon">!</span>
+          <span class="menu-copy">
+            <span>Report a concern</span>
+            <span>Report a listing, user, message, or safety concern.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+
+        <a class="menu-item" href="terms.html">
+          <span class="menu-icon">▣</span>
+          <span class="menu-copy">
+            <span>Terms of Service</span>
+            <span>Review marketplace rules, policies, and responsibilities.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+
+        <a class="menu-item" href="privacy.html">
+          <span class="menu-icon">◷</span>
+          <span class="menu-copy">
+            <span>Privacy Policy</span>
+            <span>Learn how RentEvent handles account and event information.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+
+        <a class="menu-item" href="safety.html">
+          <span class="menu-icon">◇</span>
+          <span class="menu-copy">
+            <span>Safety & marketplace guidelines</span>
+            <span>Professional vendor expectations, prohibited listings, and reporting.</span>
+          </span>
+          <span class="menu-arrow">›</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation"></nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+function getRole(userData) {
+  if (userData?.role === "admin") return "admin";
+  if (userData?.role === "vendor") return "vendor";
+  if (userData?.role === "planner" || userData?.plannerPro === true) return "planner";
+  return "customer";
+}
+
+function getHomeHref(role) {
+  if (role === "admin") return "admin-dashboard.html";
+  if (role === "vendor") return "vendor-dashboard.html";
+  if (role === "planner") return "planner-dashboard.html";
+  return "dashboard.html";
+}
+
+function showStatus(message, type = "success") {
+  const card = document.getElementById("statusCard");
+  card.className = `status-card ${type}`;
+  card.textContent = message;
+}
+
+function renderBottomNav(role) {
+  const bottomNav = document.getElementById("bottomNav");
+
+  if (role === "vendor") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="vendor-dashboard.html"><span>Home</span></a>
+      <a class="nav-item" href="add-listing.html"><span>Add</span></a>
+      <a class="nav-item" href="booking-requests.html"><span>Requests</span></a>
+      <a class="nav-item" href="profile.html"><span>Profile</span></a>
+    `;
+    return;
+  }
+
+  if (role === "admin") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="admin-dashboard.html"><span>Admin</span></a>
+      <a class="nav-item" href="listings.html"><span>Listings</span></a>
+      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
+      <a class="nav-item" href="profile.html"><span>Profile</span></a>
+    `;
+    return;
+  }
+
+  bottomNav.innerHTML = `
+    <a class="nav-item" href="listings.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Explore</span>
+    </a>
+
+    <a class="nav-item" href="event-builder.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 21C12 21 5 16.8 5 10.8C5 7.7 7 6 9.2 6C10.6 6 11.5 6.7 12 7.5C12.5 6.7 13.4 6 14.8 6C17 6 19 7.7 19 10.8C19 16.8 12 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+      </svg>
+      <span>Saved</span>
+    </a>
+
+    <a class="nav-item" href="my-requests.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M5 5H19V19H5V5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Requests</span>
+    </a>
+
+    <a class="nav-item" href="messages.html">
+      <span class="nav-badge" id="bottomInboxBadge">0</span>
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+      </svg>
+      <span>Messages</span>
+    </a>
+
+    <a class="nav-item active" href="profile.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Profile</span>
+    </a>
+  `;
+}
+
+async function loadUnreadCounts(user) {
+  let unreadMessages = 0;
+  let unreadNotifications = 0;
+
+  try {
+    const conversationsQuery = query(
+      collection(db, "conversations"),
+      where("participantIds", "array-contains", user.uid)
+    );
+
+    const conversationSnapshot = await getDocs(conversationsQuery);
+
+    conversationSnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const unreadFor = data.unreadFor || {};
+
+      if (unreadFor[user.uid]) unreadMessages += 1;
+    });
+  } catch {
+    unreadMessages = 0;
+  }
+
+  try {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", user.uid),
+      where("read", "==", false)
+    );
+
+    const notificationSnapshot = await getDocs(notificationsQuery);
+    unreadNotifications = notificationSnapshot.size;
+  } catch {
+    unreadNotifications = 0;
+  }
+
+  setBadge("bottomInboxBadge", unreadMessages);
+  setBadge("topNotificationBadge", unreadMessages + unreadNotifications);
+}
+
+function fillUserFields(user, userData) {
+  const nameField = document.getElementById("supportName");
+  const emailField = document.getElementById("supportEmail");
+
+  const name =
+    safeText(userData?.businessName, "") ||
+    safeText(userData?.name, "") ||
+    safeText(user?.displayName, "");
+
+  const email = safeText(userData?.email, user?.email || "");
+
+  if (name && !nameField.value) nameField.value = name;
+  if (email && !emailField.value) emailField.value = email;
+}
+
+document.getElementById("supportForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const submitBtn = document.getElementById("submitBtn");
+  const type = safeText(document.getElementById("supportType").value, "");
+  const priority = safeText(document.getElementById("supportPriority").value, "normal");
+  const name = safeText(document.getElementById("supportName").value, "");
+  const email = safeText(document.getElementById("supportEmail").value, "");
+  const relatedInfo = safeText(document.getElementById("relatedInfo").value, "");
+  const message = safeText(document.getElementById("supportMessage").value, "");
+  const safetyAcknowledge = document.getElementById("safetyAcknowledge").checked;
+  const contactConsent = document.getElementById("contactConsent").checked;
+
+  if (!type || !message) {
+    showStatus("Please choose a topic and describe what you need help with.", "error");
+    return;
+  }
+
+  if (priority === "urgent_safety" && !safetyAcknowledge) {
+    showStatus("Please acknowledge the safety notice before submitting an urgent safety concern.", "error");
+    return;
+  }
+
+  if (!contactConsent) {
+    showStatus("Please allow RentEvent to contact you about this support request so we can follow up.", "error");
+    return;
+  }
+
+  try {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
+    const role = getRole(currentUserData || {});
+
+    await addDoc(collection(db, "supportTickets"), {
+      type,
+      priority,
+      name,
+      email,
+      relatedInfo,
+      message,
+      safetyAcknowledge,
+      contactConsent,
+      status: "open",
+      source: "support.html",
+      userId: currentUser?.uid || "",
+      userRole: currentUser ? role : "guest",
+      userEmail: currentUser?.email || email || "",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    showStatus("Your support request has been submitted. RentEvent will review it and follow up as soon as possible.", "success");
+
+    document.getElementById("relatedInfo").value = "";
+    document.getElementById("supportMessage").value = "";
+    document.getElementById("supportType").value = "";
+    document.getElementById("supportPriority").value = "normal";
+    document.getElementById("safetyAcknowledge").checked = false;
+
+  } catch (error) {
+    showStatus(`Could not submit your support request: ${error.message}`, "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit support request";
+  }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user || null;
+  currentUserData = null;
+
+  if (!user) {
+    renderBottomNav("customer");
+    return;
+  }
+
+  try {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      currentUserData = userSnap.data();
+    }
+
+    fillUserFields(user, currentUserData || {});
+    renderBottomNav(getRole(currentUserData || {}));
+    loadUnreadCounts(user);
+  } catch {
+    fillUserFields(user, {});
+    renderBottomNav("customer");
+  }
+});
+</script>
+
+</body>
+</html>
