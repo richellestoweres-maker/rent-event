@@ -16,7 +16,7 @@
     * { box-sizing: border-box; }
 
     :root {
-      --bg: #f7f2e9;
+      --bg: #ffffff;
       --card: #ffffff;
       --text: #161616;
       --muted: #6a625a;
@@ -32,7 +32,7 @@
       --blue-text: #4067b2;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
-      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
     }
@@ -49,18 +49,20 @@
 
     .page {
       width: 100%;
-      max-width: 430px;
+      max-width: 1120px;
       margin: 0 auto;
       min-height: 100vh;
-      padding-bottom: 112px;
+      padding-bottom: 120px;
+      background: #fff;
     }
 
     .hero {
       position: relative;
-      min-height: 340px;
+      min-height: 360px;
       background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       overflow: hidden;
       color: #fff;
+      border-radius: 0 0 28px 28px;
     }
 
     .hero.has-photo {
@@ -179,7 +181,11 @@
       z-index: 4;
       border-radius: 32px 32px 0 0;
       background: var(--bg);
-      padding: 0 18px;
+      padding: 0 22px 24px;
+    }
+
+    .desktop-layout {
+      display: block;
     }
 
     .summary-card, .photo-card, .card, .empty-card, .status-card {
@@ -318,6 +324,45 @@
     .vendor-info { min-width: 0; flex: 1; }
     .vendor-rating { font-size: 0.8rem; font-weight: 700; color: #b37619; }
 
+    .vendor-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .vendor-message-btn {
+      min-height: 46px;
+      border-radius: 999px;
+      border: 1px solid #161616;
+      background: #fff;
+      color: #161616;
+      padding: 0 18px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .vendor-message-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .vendor-profile-note {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
     .detail-row {
       display: flex;
       justify-content: space-between;
@@ -394,8 +439,8 @@
       transform: translateX(-50%);
       bottom: 16px;
       width: calc(100% - 24px);
-      max-width: 406px;
-      background: rgba(255, 255, 255, 0.94);
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.96);
       border: 1px solid rgba(235, 225, 211, 0.95);
       border-radius: 999px;
       padding: 10px;
@@ -490,9 +535,77 @@
     }
 
     @media (min-width: 768px) {
-      body { padding: 24px 0; }
-      .page { max-width: 430px; }
-      .action-bar { max-width: 406px; }
+      body {
+        padding: 24px 0 110px;
+        background: #fff;
+      }
+
+      .page {
+        max-width: 1120px;
+        padding: 0 24px 120px;
+      }
+
+      .hero {
+        min-height: 520px;
+        border-radius: 24px;
+      }
+
+      .hero-topbar {
+        top: 20px;
+        left: 20px;
+        right: 20px;
+      }
+
+      .hero-bottom {
+        left: 28px;
+        right: 28px;
+        bottom: 32px;
+        max-width: 620px;
+      }
+
+      .hero-title {
+        font-size: 3rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1.04rem;
+        max-width: 620px;
+      }
+
+      .content {
+        margin-top: 28px;
+        border-radius: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 28px;
+        align-items: start;
+      }
+
+      .summary-card {
+        grid-column: 1 / -1;
+      }
+
+      .summary-name {
+        font-size: 1.75rem;
+      }
+
+      .section {
+        grid-column: 1;
+      }
+
+      .section:nth-of-type(4),
+      .section:nth-of-type(5) {
+        grid-column: 2;
+      }
+
+      .photo-card img {
+        height: 320px;
+      }
+
+      .action-bar {
+        max-width: 780px;
+      }
     }
   </style>
 </head>
@@ -575,6 +688,14 @@
               <div class="vendor-rating" id="vendorRating">★ New vendor listing</div>
             </div>
           </div>
+
+          <div class="vendor-actions">
+            <button class="vendor-message-btn" id="vendorSectionMessageBtn" type="button">Message Vendor</button>
+          </div>
+
+          <div class="vendor-profile-note">
+            Ask availability questions, confirm details, or share event notes before adding this vendor to your event plan.
+          </div>
         </div>
       </section>
 
@@ -602,7 +723,7 @@
       <span class="action-value" id="bottomPrice">$0+</span>
     </div>
 
-    <button class="action-btn-secondary" id="messageBtn" type="button">Message</button>
+    <button class="action-btn-secondary" id="messageBtn" type="button">Message Vendor</button>
     <a href="dashboard.html#myEventsSection" class="action-btn" id="addToEventBtn">Choose Event</a>
   </div>
 
@@ -992,6 +1113,22 @@ function renderListing(listing) {
   setText("zipValue", zipCode);
   setText("statusValue", titleCase(status));
   setText("bottomPrice", price);
+
+  const isOwnListing = currentUser && safeText(listing.vendorId, "") === currentUser.uid;
+  const bottomMessageBtn = document.getElementById("messageBtn");
+  const vendorSectionMessageBtn = document.getElementById("vendorSectionMessageBtn");
+
+  if (isOwnListing) {
+    if (bottomMessageBtn) {
+      bottomMessageBtn.textContent = "Your Listing";
+      bottomMessageBtn.disabled = true;
+    }
+
+    if (vendorSectionMessageBtn) {
+      vendorSectionMessageBtn.textContent = "Your Listing";
+      vendorSectionMessageBtn.disabled = true;
+    }
+  }
 }
 
 async function loadListing() {
@@ -1064,6 +1201,37 @@ async function findExistingConversation(customerId, vendorId, listingId, eventId
   return conversation;
 }
 
+
+async function notifyVendorOfMessage(conversationId, vendorId, customerName, listingTitle, messageText) {
+  if (!conversationId || !vendorId) return;
+
+  try {
+    await addDoc(collection(db, "notifications"), {
+      recipientId: vendorId,
+      recipientRole: "vendor",
+      type: "message",
+      typeLabel: "New Message",
+      category: "Message",
+      title: "New message",
+      body: `${customerName}: ${messageText}`,
+      sourceId: conversationId,
+      sourceCollection: "conversations",
+      conversationId,
+      listingId: currentListingId || "",
+      listingTitle,
+      eventId: currentEventId || "",
+      eventName: "",
+      senderId: currentUser.uid,
+      senderName: customerName,
+      read: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Message created, but vendor notification failed:", error.message);
+  }
+}
+
 async function startConversation() {
   const messageBtn = document.getElementById("messageBtn");
 
@@ -1095,8 +1263,15 @@ async function startConversation() {
   }
 
   try {
+    const vendorSectionMessageBtn = document.getElementById("vendorSectionMessageBtn");
+
     messageBtn.disabled = true;
     messageBtn.textContent = "Opening...";
+
+    if (vendorSectionMessageBtn) {
+      vendorSectionMessageBtn.disabled = true;
+      vendorSectionMessageBtn.textContent = "Opening...";
+    }
 
     const customerId = currentUser.uid;
     const listingId = currentListingId;
@@ -1107,7 +1282,8 @@ async function startConversation() {
     const existingConversation = await findExistingConversation(customerId, vendorId, listingId, currentEventId);
 
     if (existingConversation) {
-      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}`;
+      const eventPart = currentEventId ? `&eventId=${encodeURIComponent(currentEventId)}` : "";
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(existingConversation.id)}${eventPart}`;
       return;
     }
 
@@ -1116,6 +1292,8 @@ async function startConversation() {
     const listingTitle = safeText(currentListing.title, "Event Listing");
     const listingCategory = normalizeProfessionalLabel(safeText(currentListing.category, "Event Service"));
     const listingLocation = getLocationText(currentListing);
+
+    const initialMessage = `Hi! I’m interested in ${listingTitle}.`;
 
     const conversationRef = await addDoc(collection(db, "conversations"), {
       conversationKey,
@@ -1137,7 +1315,7 @@ async function startConversation() {
       listingLocation,
       title: vendorName,
       contextType: currentEventId ? "Event Vendor" : "Vendor",
-      lastMessage: `Hi! I’m interested in ${listingTitle}.`,
+      lastMessage: initialMessage,
       lastSenderId: customerId,
       unreadFor: {
         [vendorId]: true
@@ -1147,23 +1325,33 @@ async function startConversation() {
     });
 
     await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
-      text: `Hi! I’m interested in ${listingTitle}.`,
+      text: initialMessage,
       senderId: customerId,
       senderName: customerName,
       senderRole: "customer",
       createdAt: serverTimestamp()
     });
 
-    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}`;
+    await notifyVendorOfMessage(conversationRef.id, vendorId, customerName, listingTitle, initialMessage);
+
+    const eventPart = currentEventId ? `&eventId=${encodeURIComponent(currentEventId)}` : "";
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}${eventPart}`;
 
   } catch (error) {
     showStatus(error.message, "error");
     messageBtn.disabled = false;
-    messageBtn.textContent = "Message";
+    messageBtn.textContent = "Message Vendor";
+
+    const vendorSectionMessageBtn = document.getElementById("vendorSectionMessageBtn");
+    if (vendorSectionMessageBtn) {
+      vendorSectionMessageBtn.disabled = false;
+      vendorSectionMessageBtn.textContent = "Message Vendor";
+    }
   }
 }
 
 document.getElementById("messageBtn").addEventListener("click", startConversation);
+document.getElementById("vendorSectionMessageBtn").addEventListener("click", startConversation);
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user || null;
@@ -1186,6 +1374,12 @@ onAuthStateChanged(auth, async (user) => {
         if (messageBtn) {
           messageBtn.textContent = "Preview Only";
           messageBtn.disabled = true;
+        }
+
+        const vendorSectionMessageBtn = document.getElementById("vendorSectionMessageBtn");
+        if (vendorSectionMessageBtn) {
+          vendorSectionMessageBtn.textContent = "Preview Only";
+          vendorSectionMessageBtn.disabled = true;
         }
       }
     }
