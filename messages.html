@@ -1155,6 +1155,101 @@ async function loadConversationFallbacksFromNotifications(user, existingIds = []
   return conversations;
 }
 
+function buildConversationFromNotification(notification) {
+  if (!notification || !currentUser) return null;
+
+  const sourceCollection = safeText(notification.sourceCollection, "");
+  const sourceId = safeText(notification.sourceId, "");
+  const conversationId = safeText(notification.conversationId, "") ||
+    (sourceCollection === "conversations" ? sourceId : "");
+
+  if (!conversationId) return null;
+
+  const senderId = safeText(notification.senderId, "");
+  const senderName = safeText(notification.senderName || notification.fromName || notification.title, "RentEvent User");
+  const eventId = safeText(notification.eventId, currentEventId);
+  const eventName = safeText(notification.eventName || notification.sourceLabel, "");
+  const listingTitle = safeText(notification.listingTitle || notification.sourceLabel, "");
+  const bookingRequestId = safeText(notification.bookingRequestId, "");
+  const body = safeText(notification.body || notification.text || notification.lastMessage, "New message.");
+
+  const participantNames = {
+    [currentUser.uid]: safeText(currentUserData?.name || currentUser.displayName || currentUser.email, "Me")
+  };
+
+  if (senderId && senderId !== currentUser.uid) {
+    participantNames[senderId] = senderName;
+  }
+
+  const participantIds = senderId && senderId !== currentUser.uid
+    ? [currentUser.uid, senderId]
+    : [currentUser.uid];
+
+  return {
+    id: conversationId,
+    conversationKey: conversationId,
+    participantIds,
+    participantNames,
+    participantRoles: {
+      [currentUser.uid]: currentUserData?.role || "customer",
+      ...(senderId ? { [senderId]: "user" } : {})
+    },
+    customerId: safeText(notification.customerId, currentUserData?.role === "vendor" ? "" : currentUser.uid),
+    vendorId: safeText(notification.vendorId, currentUserData?.role === "vendor" ? currentUser.uid : ""),
+    bookingRequestId,
+    eventId,
+    eventName,
+    listingId: safeText(notification.listingId, ""),
+    listingTitle,
+    listingCategory: normalizeProfessionalLabel(safeText(notification.listingCategory || notification.category, "Message")),
+    title: senderName,
+    contextType: "Message",
+    lastMessage: body,
+    lastSenderId: senderId,
+    unreadFor: notification.read === false ? { [currentUser.uid]: true } : {},
+    createdAt: notification.createdAt || null,
+    updatedAt: notification.updatedAt || notification.createdAt || null,
+    _fromNotificationOnly: true
+  };
+}
+
+async function loadDirectConversationCardsFromNotifications(user, existingIds = []) {
+  const conversations = [];
+
+  try {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(notificationsQuery);
+
+    snapshot.forEach((docSnap) => {
+      const notification = {
+        id: docSnap.id,
+        ...docSnap.data()
+      };
+
+      const type = safeText(notification.type, "");
+      const sourceCollection = safeText(notification.sourceCollection, "");
+
+      if (type !== "message" && sourceCollection !== "conversations") return;
+
+      const fallbackConversation = buildConversationFromNotification(notification);
+
+      if (!fallbackConversation || existingIds.includes(fallbackConversation.id)) return;
+
+      conversations.push(fallbackConversation);
+      existingIds.push(fallbackConversation.id);
+    });
+  } catch (error) {
+    console.warn("Direct notification inbox fallback skipped:", error.message);
+  }
+
+  return conversations;
+}
+
+
 async function loadBookingRequestConversationFallbacks(user, existingIds = []) {
   const conversations = [];
 
@@ -1370,6 +1465,10 @@ async function loadConversations(user) {
 
     const notificationFallbacks = await loadConversationFallbacksFromNotifications(user, existingIds);
     conversations = [...conversations, ...notificationFallbacks];
+    existingIds = conversations.map((conversation) => conversation.id);
+
+    const directNotificationFallbacks = await loadDirectConversationCardsFromNotifications(user, existingIds);
+    conversations = [...conversations, ...directNotificationFallbacks];
     existingIds = conversations.map((conversation) => conversation.id);
 
     const bookingRequestFallbacks = await loadBookingRequestConversationFallbacks(user, existingIds);
