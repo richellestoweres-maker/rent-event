@@ -18,7 +18,7 @@
     }
 
     :root {
-      --bg: #f7f2e9;
+      --bg: #ffffff;
       --card: #ffffff;
       --text: #161616;
       --muted: #6a625a;
@@ -38,7 +38,7 @@
       --purple-text: #6f4ab8;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
-      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
     }
 
@@ -60,32 +60,95 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 112px;
+      padding: 72px 24px 112px;
+      background: #fff;
     }
 
     .topbar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 22px;
+      justify-content: flex-end;
+      gap: 14px;
+      margin-bottom: 28px;
     }
 
-    .back-link,
+    .back-link {
+      display: none;
+    }
+
     .icon-btn {
-      width: 44px;
-      height: 44px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      background: #f4f4f4;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
       text-decoration: none;
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      box-shadow: none;
       flex-shrink: 0;
       font-weight: 800;
+      position: relative;
+      font-size: 1.15rem;
+    }
+
+    .topbar-center {
+      display: none;
+    }
+
+    .messages-header {
+      margin-bottom: 24px;
+    }
+
+    .messages-title {
+      margin: 0;
+      font-size: clamp(3.2rem, 12vw, 4.7rem);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+      font-weight: 800;
+    }
+
+    .message-tabs {
+      display: flex;
+      gap: 12px;
+      margin: 26px 0 26px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .message-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .message-tab {
+      min-height: 58px;
+      padding: 0 25px;
+      border-radius: 999px;
+      border: none;
+      background: #f4f4f4;
+      color: #222;
+      font-family: inherit;
+      font-size: 1.02rem;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .message-tab.active {
+      background: #161616;
+      color: #fff;
+    }
+
+    .mobile-search-bar {
+      display: none;
+      margin: -8px 0 22px;
+    }
+
+    .mobile-search-bar.show {
+      display: block;
     }
 
     .notification-badge {
@@ -132,55 +195,6 @@
       font-weight: 800;
     }
 
-    .hero-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 34px;
-      padding: 22px 20px;
-      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: var(--shadow-strong);
-      margin-bottom: 24px;
-    }
-
-    .hero-card::after {
-      content: "";
-      position: absolute;
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      right: -60px;
-      top: -45px;
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 280px;
-    }
-
-    .hero-label {
-      font-size: 0.88rem;
-      font-weight: 600;
-      opacity: 0.95;
-      margin-bottom: 8px;
-    }
-
-    .hero-title {
-      margin: 0 0 10px;
-      font-size: 2rem;
-      line-height: 0.98;
-      letter-spacing: -0.05em;
-      font-weight: 800;
-    }
-
-    .hero-subtitle {
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.45;
-      color: rgba(255, 255, 255, 0.95);
-    }
 
     .search-wrap {
       margin-bottom: 22px;
@@ -188,11 +202,11 @@
 
     .search-input {
       width: 100%;
-      min-height: 56px;
+      min-height: 58px;
       border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.88);
-      padding: 0 18px;
+      border: none;
+      background: #f4f4f4;
+      padding: 0 20px;
       font-family: inherit;
       font-size: 0.95rem;
       color: var(--text);
@@ -205,43 +219,58 @@
     }
 
     .section {
-      margin-top: 28px;
+      margin-top: 8px;
     }
 
     .section-title {
-      margin: 0 0 14px;
-      font-size: 1.45rem;
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      font-weight: 800;
+      display: none;
     }
 
     .message-list {
       display: grid;
-      gap: 14px;
+      gap: 0;
     }
 
     .message-card {
-      background: var(--card);
-      border-radius: 24px;
-      padding: 14px;
-      box-shadow: var(--shadow);
-      display: flex;
-      gap: 12px;
+      background: transparent;
+      border-radius: 0;
+      padding: 16px 0;
+      box-shadow: none;
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 16px;
       align-items: center;
       text-decoration: none;
       color: inherit;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      border-bottom: 1px solid #f0f0f0;
+      position: relative;
     }
 
     .message-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 20px 42px rgba(123, 96, 58, 0.1);
+      transform: none;
+      box-shadow: none;
+      background: #fafafa;
+      margin: 0 -12px;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-radius: 20px;
+      border-bottom-color: transparent;
     }
 
     .message-card.unread {
-      border: 1px solid rgba(255, 95, 103, 0.26);
-      background: #fffaf7;
+      border-color: #f0f0f0;
+      background: transparent;
+    }
+
+    .message-card.unread::after {
+      content: "";
+      position: absolute;
+      top: 24px;
+      right: 2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
     }
 
     .message-card.thread-ready {
@@ -253,8 +282,8 @@
     }
 
     .avatar {
-      width: 58px;
-      height: 58px;
+      width: 76px;
+      height: 76px;
       border-radius: 18px;
       flex-shrink: 0;
       display: flex;
@@ -271,9 +300,12 @@
     .avatar::before {
       content: "";
       position: absolute;
-      inset: 14px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.22);
+      inset: auto -4px -4px auto;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: 3px solid #fff;
     }
 
     .avatar span {
@@ -284,49 +316,56 @@
     .message-content {
       min-width: 0;
       flex: 1;
+      padding-right: 18px;
     }
 
     .message-top {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 4px;
     }
 
     .message-name {
       margin: 0;
-      font-size: 1rem;
-      line-height: 1.12;
-      letter-spacing: -0.02em;
-      font-weight: 800;
+      font-size: 1.45rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 500;
     }
 
     .message-time {
-      font-size: 0.76rem;
-      color: #9a9084;
-      font-weight: 700;
+      font-size: 0.95rem;
+      color: #6f6f6f;
+      font-weight: 500;
       white-space: nowrap;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      text-transform: none;
+      letter-spacing: -0.01em;
     }
 
     .message-preview {
+      margin: 0 0 4px;
+      font-size: 1.02rem;
+      line-height: 1.35;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .message-detail-line {
       margin: 0;
-      font-size: 0.88rem;
-      line-height: 1.45;
-      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.35;
+      color: #777;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .message-meta {
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      display: none;
     }
 
     .pill {
@@ -366,20 +405,20 @@
     }
 
     .empty-card {
-      background: var(--card);
-      border-radius: 28px;
-      padding: 24px 18px;
-      box-shadow: var(--shadow);
+      background: transparent;
+      border-radius: 0;
+      padding: 120px 18px 24px;
+      box-shadow: none;
       text-align: center;
     }
 
     .empty-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 22px;
-      margin: 0 auto 14px;
-      background: #fff1dc;
-      color: var(--gold-dark);
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      margin: 0 auto 22px;
+      background: transparent;
+      color: #161616;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -389,15 +428,15 @@
 
     .empty-card h3 {
       margin: 0 0 8px;
-      font-size: 1.1rem;
+      font-size: 1.65rem;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
 
     .empty-card p {
       margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 0.9rem;
+      color: #666;
+      font-size: 1.1rem;
       line-height: 1.45;
     }
 
@@ -446,7 +485,7 @@
       border-radius: 999px;
       padding: 10px 8px;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
       gap: 4px;
       box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
@@ -546,7 +585,18 @@
       }
 
       .message-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .messages-header,
+      .topbar,
+      .search-wrap,
+      .mobile-search-bar {
+        max-width: 760px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .bottom-nav {
@@ -569,14 +619,9 @@
 
   <main class="page">
     <header class="topbar">
-      <a id="backLink" href="dashboard.html" class="back-link" aria-label="Go back">
-        ←
-      </a>
+      <a id="backLink" href="dashboard.html" class="back-link" aria-label="Go back">←</a>
 
-      <div class="topbar-center">
-        <div class="eyebrow" id="roleEyebrow">Inbox</div>
-        <h1 class="page-title">Messages</h1>
-      </div>
+      <button class="icon-btn" type="button" id="searchToggleBtn" aria-label="Search messages">⌕</button>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
@@ -584,18 +629,20 @@
       </a>
     </header>
 
-    <section class="hero-card">
-      <div class="hero-content">
-        <div class="hero-label" id="heroLabel">Stay connected</div>
-        <h2 class="hero-title">Keep every conversation organized.</h2>
-        <p class="hero-subtitle" id="heroSubtitle">
-          Ask questions, confirm details, and keep all your event communication in one place.
-        </p>
+    <section class="messages-header">
+      <h1 class="messages-title">Messages</h1>
+
+      <div class="message-tabs" aria-label="Message filters">
+        <button class="message-tab active" type="button" data-message-filter="all">All</button>
+        <button class="message-tab" type="button" data-message-filter="primary" id="primaryMessageTab">Vendors</button>
+        <button class="message-tab" type="button" data-message-filter="support">Support</button>
       </div>
     </section>
 
-    <div class="search-wrap">
-      <input id="searchInput" class="search-input" type="text" placeholder="Search messages..." />
+    <div class="mobile-search-bar" id="mobileSearchBar">
+      <div class="search-wrap">
+        <input id="searchInput" class="search-input" type="text" placeholder="Search messages..." />
+      </div>
     </div>
 
     <section class="section">
@@ -637,6 +684,7 @@ const db = getFirestore(app);
 let currentUser = null;
 let currentUserData = null;
 let allConversations = [];
+let activeMessageFilter = "all";
 
 const urlParams = new URLSearchParams(window.location.search);
 const currentEventId = urlParams.get("eventId") || "";
@@ -849,6 +897,11 @@ function renderBottomNav(role) {
 function applyRoleLayout(role) {
   const backLink = document.getElementById("backLink");
 
+  const primaryTab = document.getElementById("primaryMessageTab");
+  if (primaryTab) {
+    primaryTab.textContent = role === "vendor" ? "Customers" : "Vendors";
+  }
+
   if (role === "admin") {
     enableAdminPreviewMode();
   } else if (role === "vendor") {
@@ -901,7 +954,7 @@ function renderEmptyState() {
   messageList.innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">✉</div>
-      <h3>No messages yet</h3>
+      <h3>You don’t have any messages</h3>
       <p>${copy}</p>
       <div class="empty-actions">
         <a class="btn" href="${primaryHref}">${primaryText}</a>
@@ -1400,6 +1453,7 @@ function renderConversations(conversations) {
           </div>
 
           <p class="message-preview">${escapeHtml(lastMessage)}</p>
+          <p class="message-detail-line">${escapeHtml([eventName, listingTitle].filter(Boolean).join(" · ") || roleLabel)}</p>
 
           <div class="message-meta">
             ${isUnread ? `<span class="pill new">New</span>` : ""}
@@ -1414,16 +1468,27 @@ function renderConversations(conversations) {
   }).join("");
 }
 
-function applySearch() {
+function getFilteredConversations() {
   const searchInput = document.getElementById("searchInput");
-  const queryText = searchInput.value.trim().toLowerCase();
+  const queryText = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
-  if (!queryText) {
-    renderConversations(allConversations);
-    return;
-  }
+  return allConversations.filter((conversation) => {
+    const context = safeText(conversation.contextType, "").toLowerCase();
+    const category = safeText(conversation.listingCategory || conversation.category, "").toLowerCase();
+    const title = safeText(conversation.title, "").toLowerCase();
 
-  const filtered = allConversations.filter((conversation) => {
+    if (activeMessageFilter === "support") {
+      const isSupport = context.includes("support") || category.includes("support") || title.includes("support");
+      if (!isSupport) return false;
+    }
+
+    if (activeMessageFilter === "primary") {
+      const isSupport = context.includes("support") || category.includes("support") || title.includes("support");
+      if (isSupport) return false;
+    }
+
+    if (!queryText) return true;
+
     const participantNames = conversation.participantNames || {};
     const searchable = [
       conversation.title,
@@ -1439,8 +1504,20 @@ function applySearch() {
 
     return searchable.includes(queryText);
   });
+}
 
-  renderConversations(filtered);
+function applySearch() {
+  renderConversations(getFilteredConversations());
+}
+
+function setMessageFilter(filter) {
+  activeMessageFilter = filter || "all";
+
+  document.querySelectorAll("[data-message-filter]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.messageFilter === activeMessageFilter);
+  });
+
+  renderConversations(getFilteredConversations());
 }
 
 async function loadConversations(user) {
@@ -1504,7 +1581,7 @@ async function loadConversations(user) {
     });
 
     allConversations = conversations;
-    renderConversations(allConversations);
+    renderConversations(getFilteredConversations());
 
   } catch (error) {
     console.warn("Conversations skipped:", error.message);
@@ -1514,6 +1591,20 @@ async function loadConversations(user) {
 }
 
 document.getElementById("searchInput").addEventListener("input", applySearch);
+
+document.getElementById("searchToggleBtn").addEventListener("click", () => {
+  const bar = document.getElementById("mobileSearchBar");
+  bar.classList.toggle("show");
+  if (bar.classList.contains("show")) {
+    document.getElementById("searchInput").focus();
+  }
+});
+
+document.querySelectorAll("[data-message-filter]").forEach((button) => {
+  button.addEventListener("click", () => {
+    setMessageFilter(button.dataset.messageFilter);
+  });
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
