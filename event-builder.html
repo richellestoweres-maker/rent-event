@@ -274,6 +274,31 @@
     .empty-card p, .note-text { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--muted); }
     .empty-card p { margin-bottom: 16px; }
 
+    .notice-card {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+      border-radius: 24px;
+      padding: 14px 16px;
+      margin-top: 14px;
+      border: 1px solid rgba(64, 103, 178, 0.12);
+      box-shadow: var(--shadow);
+    }
+
+    .notice-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .notice-card p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      font-weight: 700;
+      color: inherit;
+    }
+
     .status-message { display: none; margin-top: 14px; background: #fff4df; color: #8d5f11; border-radius: 18px; padding: 12px 14px; font-size: 0.85rem; font-weight: 700; line-height: 1.45; }
     .status-message.info { display: block; background: #fff4df; color: #8d5f11; }
     .status-message.success { display: block; background: var(--green-soft); color: var(--green-text); }
@@ -592,6 +617,11 @@
         <h3 class="note-title">Event Reminder</h3>
         <p class="note-text">Add vendors to this specific event board, save your event details, message vendors for availability, and use the AI Event Planner for ideas on what to add next.</p>
       </div>
+
+      <div class="notice-card">
+        <h3>Transportation & Safety Notice</h3>
+        <p>RentEvent is not a rideshare platform. Transportation, valet, security, lifeguard, and safety-related recommendations are intended for professional event businesses/providers only, such as shuttle companies, party bus companies, limo/chauffeur companies, valet companies, licensed security providers, and certified lifeguard providers.</p>
+      </div>
     </section>
   </main>
 
@@ -825,9 +855,49 @@ function renderEventTypePills(source, max = 2) {
   return `${pills}${morePill}`;
 }
 
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
 function getCategoryLine(source) {
-  const mainCategory = safeText(source.mainCategory, "");
-  const category = safeText(source.listingCategory || source.category, "Event Service");
+  const mainCategory = normalizeProfessionalLabel(safeText(source.mainCategory, ""));
+  const category = normalizeProfessionalLabel(safeText(source.listingCategory || source.category, "Event Service"));
   const customCategory = safeText(source.customCategory, "");
 
   const typeLine = customCategory
@@ -1024,8 +1094,12 @@ function getAvailableCategories() {
     "Wedding Cakes", "Cakes", "Dessert Tables", "Charcuterie Boards", "Grazing Tables", "Catering", "Private Chef",
     "Florals", "Wedding Florals", "Balloon Décor", "Balloon Arches", "Photo Booth", "360 Photo Booth", "Photography",
     "Videography", "DJ", "Live Singer", "Live Band", "Acoustic Guitarist", "Violinist", "Emcee", "Sound & Lighting",
-    "Wedding Officiant", "Hair + Makeup", "Bridal Glam", "Skin Prep", "Facials", "Transportation", "Shuttle Service",
-    "Event Planner", "Day-of Coordinator", "Tables and Chairs", "Linen Rentals", "Setup Crew", "Cleanup Crew",
+    "Wedding Officiant", "Hair + Makeup", "Bridal Glam", "Skin Prep", "Facials",
+    "Transportation Companies", "Shuttle Companies", "Party Bus Companies", "Limo / Chauffeur Companies",
+    "Wedding Guest Transportation Companies", "Venue Transportation Providers", "Valet / Parking Companies",
+    "Security Companies", "Licensed Security Providers", "Off-Duty Officer Services", "Certified Lifeguard Providers",
+    "Pool Party Lifeguard Companies", "Water Safety Providers", "Event Staffing Companies",
+    "Event Planner", "Day-of Coordinator", "Tables and Chairs", "Linen Rentals", "Setup Crew Companies", "Cleanup Crew Companies",
     "Coffee Cart", "Mocktail Bar", "Mobile Bar"
   ];
 
@@ -1055,7 +1129,7 @@ function renderAiSuggestions(result) {
   } else {
     resultsContainer.innerHTML = suggestions.map((suggestion) => {
       const title = safeText(suggestion.title, "Event Add-On");
-      const category = safeText(suggestion.category, "Event Service");
+      const category = normalizeProfessionalLabel(safeText(suggestion.category, "Event Service"));
       const why = safeText(suggestion.why, "This could help complete the event experience.");
       const priority = safeText(suggestion.priority, "Medium");
       const searchTerms = Array.isArray(suggestion.searchTerms) && suggestion.searchTerms.length
@@ -1132,7 +1206,8 @@ async function generateAiIdeas() {
         eventId: currentEventId,
         eventDetails,
         selectedVendors,
-        availableCategories: getAvailableCategories()
+        availableCategories: getAvailableCategories(),
+        safetyPositioning: "RentEvent is not a rideshare platform. Do not recommend individual on-demand drivers. Transportation recommendations should be professional event transportation providers only, such as shuttle companies, party bus companies, limo/chauffeur companies, wedding guest transportation companies, venue transportation providers, valet/parking companies, licensed security providers, off-duty officer services, and certified lifeguard/water safety providers."
       })
     });
 
@@ -1403,9 +1478,9 @@ async function addVendorToBoard(listingId) {
       listingId: cleanListingId,
       listingTitle: safeText(listing.title, "Untitled Listing"),
 
-      mainCategory: safeText(listing.mainCategory, ""),
-      listingCategory: safeText(listing.category, "Event Service"),
-      category: safeText(listing.category, "Event Service"),
+      mainCategory: normalizeProfessionalLabel(safeText(listing.mainCategory, "")),
+      listingCategory: normalizeProfessionalLabel(safeText(listing.category, "Event Service")),
+      category: normalizeProfessionalLabel(safeText(listing.category, "Event Service")),
       customCategory: safeText(listing.customCategory, ""),
 
       eventTypes,
@@ -1538,7 +1613,7 @@ async function openMessageForListing(listingId) {
       eventName,
       listingId: cleanListingId,
       listingTitle: vendor.listingTitle || "Event Listing",
-      listingCategory: vendor.listingCategory || "Event Service",
+      listingCategory: normalizeProfessionalLabel(vendor.listingCategory || "Event Service"),
       listingLocation: vendor.location || "",
       title: vendor.vendorName || "Vendor",
       contextType: "Vendor",
