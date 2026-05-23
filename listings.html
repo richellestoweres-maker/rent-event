@@ -637,7 +637,7 @@
           <span class="hero-pill" id="eventContextPill">Marketplace</span>
           <span class="hero-pill">Vendors</span>
           <span class="hero-pill">Rentals</span>
-          <span class="hero-pill">Safety & Staffing</span>
+          <span class="hero-pill">Safety & Logistics</span>
         </div>
       </div>
     </section>
@@ -648,7 +648,7 @@
 
     <section class="search-panel">
       <div class="search-wrap">
-        <input id="searchInput" class="search-input" type="text" placeholder="Search DJs, rentals, glam, lifeguards, security, drivers..." />
+        <input id="searchInput" class="search-input" type="text" placeholder="Search DJs, rentals, glam, lifeguards, security, shuttles..." />
 
         <input id="locationInput" class="search-input" type="text" placeholder="City, ZIP, or service area" />
 
@@ -680,7 +680,7 @@
           <option>Photo, Video & Content</option>
           <option>Music & Entertainment</option>
           <option>Planning & Staffing</option>
-          <option>Staffing, Safety & Event Support</option>
+          <option>Staffing, Safety & Event Logistics</option>
           <option>Beauty & Formalwear</option>
           <option>Transportation</option>
           <option>Specialty Services</option>
@@ -763,37 +763,37 @@
           <option>Day-of Coordinator</option>
           <option>Wedding Planner</option>
           <option>Wedding Coordinator</option>
-          <option>Setup Crew</option>
-          <option>Cleanup Crew</option>
+          <option>Setup Crew Companies</option>
+          <option>Cleanup Crew Companies</option>
           <option>Event Staffing</option>
           <option>Guest Check-In Staff</option>
           <option>Registration Staff</option>
           <option>Ushers</option>
           <option>Greeters</option>
-          <option>Security</option>
-          <option>Private Event Security</option>
-          <option>Off-Duty Police Officers</option>
-          <option>Crowd Control</option>
-          <option>Gate / Entry Security</option>
+          <option>Security Companies</option>
+          <option>Private Event Security Companies</option>
+          <option>Off-Duty Officer Services</option>
+          <option>Crowd Control Services</option>
+          <option>Gate / Entry Security Teams</option>
           <option>ID Check Staff</option>
           <option>Bag Check Staff</option>
-          <option>Lifeguards</option>
-          <option>Pool Party Lifeguards</option>
-          <option>Water Safety Attendants</option>
-          <option>Parking Attendants</option>
-          <option>Valet / Parking</option>
-          <option>Traffic Control</option>
-          <option>Drivers / Chauffeurs</option>
-          <option>Private Drivers</option>
-          <option>Chauffeur Service</option>
+          <option>Certified Lifeguard Providers</option>
+          <option>Pool Party Lifeguard Companies</option>
+          <option>Water Safety Providers</option>
+          <option>Parking Attendant Companies</option>
+          <option>Valet / Parking Companies</option>
+          <option>Traffic Control Providers</option>
+          <option>Professional Transportation Companies</option>
+          <option>Shuttle Companies</option>
+          <option>Limo / Chauffeur Companies</option>
           <option>Barbacks</option>
           <option>Servers</option>
           <option>Cocktail Servers</option>
           <option>Catering Staff</option>
           <option>Food Runners</option>
-          <option>Breakdown Crew</option>
+          <option>Breakdown Crew Companies</option>
           <option>Trash / Waste Support</option>
-          <option>Bathroom Attendants</option>
+          <option>Restroom Attendant Staffing</option>
           <option>Event Support Personnel</option>
 
           <option>Hair + Makeup</option>
@@ -807,20 +807,20 @@
           <option>Wedding Officiant</option>
 
           <option>Transportation</option>
-          <option>Drivers / Chauffeurs</option>
-          <option>Private Drivers</option>
-          <option>Chauffeur Service</option>
-          <option>Party Bus</option>
+          <option>Professional Transportation Companies</option>
+          <option>Shuttle Companies</option>
+          <option>Limo / Chauffeur Companies</option>
+          <option>Party Bus Companies</option>
           <option>Limo Service</option>
-          <option>Shuttle Service</option>
-          <option>Guest Transportation</option>
-          <option>Airport Transportation</option>
-          <option>Wedding Transportation</option>
-          <option>Corporate Transportation</option>
-          <option>Luxury Car Rental</option>
-          <option>Vintage Car Rental</option>
-          <option>Getaway Car</option>
-          <option>Golf Cart Rentals</option>
+          <option>Shuttle Companies</option>
+          <option>Wedding Guest Transportation Companies</option>
+          <option>Airport Transportation Companies</option>
+          <option>Wedding Guest Transportation Companies</option>
+          <option>Corporate Transportation Companies</option>
+          <option>Luxury Car Service</option>
+          <option>Vintage Car Rentals</option>
+          <option>Getaway Car Rentals</option>
+          <option>Golf Cart Shuttle Services</option>
 
           <option>Corporate Event Services</option>
           <option>Brand Activation Setup</option>
@@ -832,6 +832,10 @@
         </select>
       </div>
     </section>
+
+    <div class="context-card show" id="transportSafetyNote">
+      Transportation, security, lifeguard, valet, and safety-related listings are intended for professional event businesses/providers only. RentEvent is not a rideshare platform and does not accept individual on-demand ride listings.
+    </div>
 
     <div class="filters">
       <button class="filter-pill active" data-filter="all">All</button>
@@ -1145,11 +1149,14 @@ function listingMatchesFilter(listing, filter) {
   if (filter === "safety") {
     return searchable.includes("safety") ||
       searchable.includes("security") ||
+      searchable.includes("licensed security") ||
       searchable.includes("off-duty") ||
+      searchable.includes("off duty") ||
+      searchable.includes("officer") ||
       searchable.includes("police") ||
       searchable.includes("lifeguard") ||
-      searchable.includes("crowd control") ||
       searchable.includes("water safety") ||
+      searchable.includes("crowd control") ||
       searchable.includes("id check") ||
       searchable.includes("bag check") ||
       searchable.includes("gate") ||
@@ -1177,7 +1184,7 @@ function listingMatchesFilter(listing, filter) {
 
   if (filter === "transportation") {
     return searchable.includes("transportation") ||
-      searchable.includes("driver") ||
+      searchable.includes("transportation company") ||
       searchable.includes("chauffeur") ||
       searchable.includes("shuttle") ||
       searchable.includes("limo") ||
@@ -1185,11 +1192,14 @@ function listingMatchesFilter(listing, filter) {
       searchable.includes("valet") ||
       searchable.includes("parking") ||
       searchable.includes("golf cart") ||
-      searchable.includes("getaway car");
+      searchable.includes("getaway car") ||
+      searchable.includes("guest transportation") ||
+      searchable.includes("venue transportation") ||
+      searchable.includes("driver");
   }
 
   if (filter === "travel") {
-    return travelAvailable || searchable.includes("travel available") || searchable.includes("travels") || searchable.includes("destination") || searchable.includes("shuttle") || searchable.includes("transportation") || searchable.includes("chauffeur") || searchable.includes("driver");
+    return travelAvailable || searchable.includes("travel available") || searchable.includes("travels") || searchable.includes("destination") || searchable.includes("shuttle") || searchable.includes("transportation") || searchable.includes("chauffeur") || searchable.includes("venue transportation");
   }
 
   if (filter === "virtual") {
