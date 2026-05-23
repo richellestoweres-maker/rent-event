@@ -1078,55 +1078,65 @@ async function loadSelectedVendors() {
     return;
   }
 
-  let q;
+  try {
+    let boardQuery;
 
-  if (isAdminPreview()) {
-    q = query(
-      collection(db, "eventBoardItems"),
-      where("eventId", "==", activeEventId)
-    );
-  } else {
-    q = query(
-      collection(db, "eventBoardItems"),
-      where("userId", "==", currentUser.uid),
-      where("eventId", "==", activeEventId)
-    );
-  }
+    if (isAdminPreview()) {
+      boardQuery = query(
+        collection(db, "eventBoardItems"),
+        where("eventId", "==", activeEventId)
+      );
+    } else {
+      boardQuery = query(
+        collection(db, "eventBoardItems"),
+        where("userId", "==", currentUser.uid),
+        where("eventId", "==", activeEventId)
+      );
+    }
 
-  const snapshot = await getDocs(q);
-  const items = [];
+    const snapshot = await getDocs(boardQuery);
+    const items = [];
 
-  snapshot.forEach((docSnap) => {
-    items.push({
-      id: docSnap.id,
-      ...docSnap.data()
+    snapshot.forEach((docSnap) => {
+      items.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
     });
-  });
 
-  items.sort((a, b) => {
-    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
-    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
-    return bTime - aTime;
-  });
+    items.sort((a, b) => {
+      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return bTime - aTime;
+    });
 
-  selectedVendors = items;
-  renderVendors();
+    selectedVendors = items;
+    renderVendors();
+
+  } catch (error) {
+    console.warn("Selected vendors could not load:", error.message);
+    selectedVendors = [];
+    renderVendors();
+    setCheckoutStatus("Could not load this event board yet. Go back to the event board and confirm at least one vendor is selected.", "error");
+  }
 }
 
 function sanitizeVendorForRequest(vendor) {
+  const vendorId = safeText(vendor.vendorId || vendor.ownerId || vendor.userId, "");
+
   return {
     boardItemId: safeText(vendor.id, ""),
     listingId: safeText(vendor.listingId, ""),
-    listingTitle: safeText(vendor.listingTitle, ""),
+    listingTitle: safeText(vendor.listingTitle || vendor.title, "Requested Listing"),
     mainCategory: safeText(vendor.mainCategory, ""),
-    category: safeText(vendor.category || vendor.listingCategory, ""),
+    category: safeText(vendor.category || vendor.listingCategory, "Event Service"),
     customCategory: safeText(vendor.customCategory, ""),
     eventTypes: getEventTypes(vendor),
     startingPrice: safeText(vendor.startingPrice, ""),
     priceNumber: Number(vendor.priceNumber || 0),
-    vendorId: safeText(vendor.vendorId, ""),
-    vendorName: safeText(vendor.vendorName, ""),
-    vendorEmail: safeText(vendor.vendorEmail, ""),
+    vendorId,
+    vendorName: safeText(vendor.vendorName || vendor.businessName || vendor.name, "Vendor"),
+    vendorEmail: safeText(vendor.vendorEmail || vendor.email, ""),
     imageUrl: safeText(vendor.imageUrl, ""),
     location: safeText(vendor.location, ""),
     baseCity: safeText(vendor.baseCity, ""),
@@ -1183,30 +1193,34 @@ async function createVendorBookingNotifications(requestId, payload) {
   if (!uniqueVendorIds.length) return;
 
   for (const vendorId of uniqueVendorIds) {
-    await addDoc(collection(db, "notifications"), {
-      recipientId: vendorId,
-      recipientRole: "vendor",
+    try {
+      await addDoc(collection(db, "notifications"), {
+        recipientId: vendorId,
+        recipientRole: "vendor",
 
-      type: "booking_request",
-      typeLabel: "Booking Request",
-      category: "Booking Request",
+        type: "booking_request",
+        typeLabel: "Booking Request",
+        category: "Booking Request",
 
-      title: "New booking request",
-      body: `${payload.customerName} submitted a request for ${payload.eventName}.`,
+        title: "New booking request",
+        body: `${payload.customerName} submitted a request for ${payload.eventName}.`,
 
-      sourceId: requestId,
-      sourceCollection: "bookingRequests",
-      sourceLabel: payload.eventName,
-      eventId: payload.eventId,
-      eventName: payload.eventName,
+        sourceId: requestId,
+        sourceCollection: "bookingRequests",
+        sourceLabel: payload.eventName,
+        eventId: payload.eventId,
+        eventName: payload.eventName,
 
-      customerId: payload.customerId,
-      customerName: payload.customerName,
+        customerId: payload.customerId,
+        customerName: payload.customerName,
 
-      read: false,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
+        read: false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.warn(`Booking request saved, but notification for vendor ${vendorId} failed:`, error.message);
+    }
   }
 }
 
@@ -1237,6 +1251,11 @@ async function submitBookingRequest() {
     setCheckoutStatus("Submitting your booking request...", "info");
 
     const payload = buildBookingRequestPayload();
+
+    if (!payload.vendorIds.length) {
+      throw new Error("This request cannot submit yet because the selected vendor is missing a vendorId. Confirm the listing and event board item both have the vendor UID attached.");
+    }
+
     const bookingRef = await addDoc(collection(db, "bookingRequests"), payload);
 
     lastBookingRequestId = bookingRef.id;
@@ -1259,7 +1278,7 @@ async function submitBookingRequest() {
   } catch (error) {
     button.disabled = false;
     button.textContent = "Submit Request";
-    setCheckoutStatus(error.message, "error");
+    setCheckoutStatus(`Could not submit request: ${error.message}`, "error");
   } finally {
     isSubmitting = false;
   }
@@ -1267,7 +1286,16 @@ async function submitBookingRequest() {
 
 async function loadPage() {
   applyEventLinks();
-  await loadEventDetails();
+
+  try {
+    await loadEventDetails();
+  } catch (error) {
+    console.warn("Event details could not load:", error.message);
+    currentEventData = null;
+    renderMissingEvent();
+    setCheckoutStatus("Could not load event details. Please open checkout from the event board again.", "error");
+  }
+
   await loadSelectedVendors();
 }
 
