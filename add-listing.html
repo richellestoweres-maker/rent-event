@@ -490,7 +490,7 @@
         <div class="hero-label">Create a new service</div>
         <h2 class="hero-title">Showcase your business beautifully.</h2>
         <p class="hero-subtitle">
-          Add a polished listing with music, glam, rentals, venues, food, planning, staffing, safety, transportation, beauty, entertainment, and every event type your service fits.
+          Add a polished listing with music, glam, rentals, venues, food, planning, professional staffing, event safety providers, transportation companies, beauty, entertainment, and every event type your service fits.
         </p>
       </div>
     </section>
@@ -517,7 +517,7 @@
               <option>Photo, Video & Content</option>
               <option>Music & Entertainment</option>
               <option>Planning & Staffing</option>
-              <option>Staffing, Safety & Event Support</option>
+              <option>Staffing, Safety & Event Logistics</option>
               <option>Beauty & Formalwear</option>
               <option>Transportation</option>
               <option>Specialty Services</option>
@@ -533,11 +533,14 @@
             <p class="helper-text">
               Choose the closest service type. You can add a custom service below if needed.
             </p>
+            <p class="helper-text">
+              Transportation, security, lifeguard, valet, and safety-related vendors should be professional businesses/providers only. RentEvent is not a rideshare platform and does not accept individual on-demand ride listings.
+            </p>
           </div>
 
           <div class="field-group">
             <label for="custom-category">Custom Service / Extra Details</label>
-            <input id="custom-category" class="input" type="text" placeholder="Example: off-duty officer, lifeguard for pool party, shuttle driver, luxury restroom trailer..." />
+            <input id="custom-category" class="input" type="text" placeholder="Example: licensed security team, certified lifeguard provider, shuttle company, luxury restroom trailer..." />
           </div>
 
           <div class="field-group">
@@ -1039,42 +1042,45 @@ const serviceOptions = {
     "Coat Check",
     "Restroom Attendant"
   ],
-  "Staffing, Safety & Event Support": [
-    "Lifeguards",
-    "Pool Party Lifeguards",
-    "Water Safety Attendants",
-    "Security",
-    "Private Event Security",
-    "Off-Duty Police Officers",
-    "Crowd Control",
-    "Gate / Entry Security",
+  "Staffing, Safety & Event Logistics": [
+    "Certified Lifeguard Providers",
+    "Pool Party Lifeguard Companies",
+    "Water Safety Providers",
+    "Security Companies",
+    "Private Event Security Companies",
+    "Off-Duty Officer Services",
+    "Licensed Security Providers",
+    "Event Safety Teams",
+    "Crowd Control Services",
+    "Gate / Entry Security Teams",
     "ID Check Staff",
     "Bag Check Staff",
-    "Event Staff",
+    "Event Staffing Companies",
     "Guest Check-In Staff",
     "Registration Staff",
     "Ushers",
     "Greeters",
-    "Parking Attendants",
-    "Valet / Parking",
-    "Traffic Control",
-    "Drivers / Chauffeurs",
-    "Chauffeur Service",
-    "Private Drivers",
-    "Shuttle Service",
-    "Guest Transportation",
-    "Party Bus Driver",
-    "Bartenders",
-    "Barbacks",
-    "Servers",
-    "Cocktail Servers",
-    "Catering Staff",
-    "Food Runners",
-    "Setup Crew",
-    "Breakdown Crew",
-    "Cleanup Crew",
+    "Parking Attendant Companies",
+    "Valet / Parking Companies",
+    "Traffic Control Providers",
+    "Professional Transportation Companies",
+    "Shuttle Companies",
+    "Party Bus Companies",
+    "Limo / Chauffeur Companies",
+    "Wedding Guest Transportation Companies",
+    "Corporate Transportation Companies",
+    "Venue Transportation Providers",
+    "Bartending Staffing Companies",
+    "Barback Staffing",
+    "Server Staffing",
+    "Cocktail Server Staffing",
+    "Catering Staffing",
+    "Food Runner Staffing",
+    "Setup Crew Companies",
+    "Breakdown Crew Companies",
+    "Cleanup Crew Companies",
     "Trash / Waste Support",
-    "Bathroom Attendants",
+    "Restroom Attendant Staffing",
     "Event Support Personnel"
   ],
   "Beauty & Formalwear": [
@@ -1106,24 +1112,22 @@ const serviceOptions = {
     "Wedding Officiant"
   ],
   "Transportation": [
-    "Transportation",
-    "Drivers / Chauffeurs",
-    "Private Drivers",
-    "Chauffeur Service",
-    "Limo Service",
-    "Party Bus",
-    "Shuttle Service",
-    "Guest Transportation",
-    "Airport Transportation",
-    "Wedding Transportation",
-    "Corporate Transportation",
-    "Luxury Car Rental",
-    "Vintage Car Rental",
-    "Getaway Car",
-    "Horse Carriage",
-    "Golf Cart Rentals",
-    "Valet / Parking",
-    "Parking Attendants"
+    "Transportation Companies",
+    "Shuttle Companies",
+    "Party Bus Companies",
+    "Limo Services",
+    "Chauffeur Companies",
+    "Wedding Guest Transportation Companies",
+    "Corporate Transportation Companies",
+    "Venue Transportation Providers",
+    "Airport Transportation Companies",
+    "Luxury Car Service",
+    "Vintage Car Rentals",
+    "Getaway Car Rentals",
+    "Horse Carriage Companies",
+    "Golf Cart Shuttle Services",
+    "Valet / Parking Companies",
+    "Parking Management Companies"
   ],
   "Specialty Services": [
     "Corporate Event Services",
