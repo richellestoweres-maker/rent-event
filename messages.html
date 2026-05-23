@@ -609,7 +609,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, setDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -873,12 +873,12 @@ function renderEmptyState() {
   const primaryHref = role === "admin"
     ? "admin-dashboard.html"
     : role === "vendor"
-      ? "my-listings.html"
+      ? "booking-requests.html"
       : withEventParam("listings.html");
   const primaryText = role === "admin"
     ? "Back to Admin"
     : role === "vendor"
-      ? "View My Listings"
+      ? "View Booking Requests"
       : "Browse Listings";
   const homeHref = getHomeHref(role);
   const copy = role === "admin"
@@ -924,6 +924,239 @@ function getConversationEventName(conversation) {
     "",
     ""
   );
+}
+
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
+
+function buildBookingConversationId(requestId, customerId, vendorId) {
+  return [
+    "booking",
+    makeSafeId(requestId),
+    makeSafeId(customerId),
+    makeSafeId(vendorId)
+  ].join("__");
+}
+
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
+function getVendorItemsForCurrentUser(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+
+  if (isAdminPreview()) return vendors;
+
+  return vendors.filter((vendor) => {
+    return currentUser && safeText(vendor.vendorId, "") === currentUser.uid;
+  });
+}
+
+function buildConversationFromBookingRequest(request) {
+  if (!currentUser) return null;
+
+  const role = currentUserData?.role || "customer";
+  const requestId = safeText(request.id, "");
+  const customerId = safeText(request.customerId, "");
+  const eventId = safeText(request.eventId, "");
+  const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
+  const customerName = safeText(request.customerName, "Customer");
+
+  let vendorId = "";
+  let vendorName = "Vendor";
+  let firstVendorItem = {};
+
+  if (role === "vendor") {
+    vendorId = currentUser.uid;
+    vendorName = safeText(currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "Vendor", "Vendor");
+    firstVendorItem = getVendorItemsForCurrentUser(request)[0] || {};
+  } else {
+    firstVendorItem = (Array.isArray(request.vendors) ? request.vendors[0] : {}) || {};
+    vendorId = safeText(firstVendorItem.vendorId, "");
+    vendorName = safeText(firstVendorItem.vendorName, "Vendor");
+  }
+
+  if (!requestId || !customerId || !vendorId) return null;
+
+  const conversationId = buildBookingConversationId(requestId, customerId, vendorId);
+  const listingTitle = safeText(firstVendorItem.listingTitle || firstVendorItem.title, "Event Request");
+  const listingCategory = normalizeProfessionalLabel(safeText(firstVendorItem.category || firstVendorItem.listingCategory || firstVendorItem.mainCategory, "Event Service"));
+  const vendorResponses = request.vendorResponses || {};
+  const vendorResponse = vendorResponses[vendorId] || null;
+  const lastMessage = vendorResponse?.note
+    ? `${safeText(vendorResponse.status, "Response")}: ${vendorResponse.note}`
+    : `Booking request for ${eventName}.`;
+
+  return {
+    id: conversationId,
+    conversationKey: conversationId,
+    participantIds: [customerId, vendorId],
+    participantNames: {
+      [customerId]: customerName,
+      [vendorId]: vendorName
+    },
+    participantRoles: {
+      [customerId]: "customer",
+      [vendorId]: "vendor"
+    },
+    customerId,
+    vendorId,
+    bookingRequestId: requestId,
+    eventId,
+    eventName,
+    listingId: safeText(firstVendorItem.listingId, ""),
+    listingTitle,
+    listingCategory,
+    title: role === "vendor" ? customerName : vendorName,
+    contextType: "Booking Request",
+    lastMessage,
+    lastSenderId: vendorResponse ? vendorId : customerId,
+    unreadFor: {},
+    createdAt: request.createdAt || null,
+    updatedAt: request.updatedAt || request.createdAt || null,
+    _needsRepair: true
+  };
+}
+
+async function loadConversationIdsFromNotifications(user) {
+  const ids = [];
+
+  try {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(notificationsQuery);
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const sourceCollection = safeText(data.sourceCollection, "");
+      const sourceId = safeText(data.sourceId, "");
+
+      if (sourceCollection === "conversations" && sourceId) {
+        ids.push(sourceId);
+      }
+    });
+  } catch (error) {
+    console.warn("Conversation notification fallback skipped:", error.message);
+  }
+
+  return Array.from(new Set(ids));
+}
+
+async function loadConversationFallbacksFromNotifications(user, existingIds = []) {
+  const conversations = [];
+  const ids = await loadConversationIdsFromNotifications(user);
+  const uniqueIds = ids.filter((id) => !existingIds.includes(id));
+
+  for (const conversationId of uniqueIds) {
+    try {
+      const conversationSnap = await getDoc(doc(db, "conversations", conversationId));
+
+      if (!conversationSnap.exists()) continue;
+
+      const data = conversationSnap.data();
+      const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+      if (isAdminPreview() || participantIds.includes(user.uid)) {
+        conversations.push({
+          id: conversationSnap.id,
+          ...data
+        });
+      }
+    } catch (error) {
+      console.warn("Could not load conversation notification fallback:", conversationId, error.message);
+    }
+  }
+
+  return conversations;
+}
+
+async function loadBookingRequestConversationFallbacks(user, existingIds = []) {
+  const conversations = [];
+
+  try {
+    let requestQuery;
+
+    if (isAdminPreview()) {
+      requestQuery = query(collection(db, "bookingRequests"));
+    } else if (currentUserData?.role === "vendor") {
+      requestQuery = query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", user.uid));
+    } else {
+      requestQuery = query(collection(db, "bookingRequests"), where("customerId", "==", user.uid));
+    }
+
+    const snapshot = await getDocs(requestQuery);
+
+    for (const requestSnap of snapshot.docs) {
+      const request = {
+        id: requestSnap.id,
+        ...requestSnap.data()
+      };
+
+      const fallbackConversation = buildConversationFromBookingRequest(request);
+
+      if (!fallbackConversation || existingIds.includes(fallbackConversation.id)) continue;
+
+      if (currentEventId) {
+        const requestEventId = safeText(fallbackConversation.eventId, "");
+        if (requestEventId !== currentEventId) continue;
+      }
+
+      conversations.push(fallbackConversation);
+
+      try {
+        await setDoc(doc(db, "conversations", fallbackConversation.id), {
+          ...fallbackConversation,
+          _needsRepair: false,
+          repairedFromBookingRequest: true,
+          updatedAt: fallbackConversation.updatedAt || serverTimestamp(),
+          createdAt: fallbackConversation.createdAt || serverTimestamp()
+        }, { merge: true });
+      } catch (error) {
+        console.warn("Could not repair missing conversation:", fallbackConversation.id, error.message);
+      }
+    }
+  } catch (error) {
+    console.warn("Booking request conversation fallback skipped:", error.message);
+  }
+
+  return conversations;
 }
 
 function renderConversations(conversations) {
@@ -1016,13 +1249,12 @@ function applySearch() {
 }
 
 async function loadConversations(user) {
-  const messageList = document.getElementById("messageList");
-
   try {
     const conversationsRef = collection(db, "conversations");
     const conversationsQuery = isAdminPreview()
       ? query(conversationsRef)
       : query(conversationsRef, where("participantIds", "array-contains", user.uid));
+
     const snapshot = await getDocs(conversationsQuery);
 
     let conversations = [];
@@ -1033,6 +1265,22 @@ async function loadConversations(user) {
         ...docSnap.data()
       });
     });
+
+    let existingIds = conversations.map((conversation) => conversation.id);
+
+    const notificationFallbacks = await loadConversationFallbacksFromNotifications(user, existingIds);
+    conversations = [...conversations, ...notificationFallbacks];
+    existingIds = conversations.map((conversation) => conversation.id);
+
+    const bookingRequestFallbacks = await loadBookingRequestConversationFallbacks(user, existingIds);
+    conversations = [...conversations, ...bookingRequestFallbacks];
+
+    const deduped = new Map();
+    conversations.forEach((conversation) => {
+      if (conversation.id) deduped.set(conversation.id, conversation);
+    });
+
+    conversations = Array.from(deduped.values());
 
     if (currentEventId) {
       conversations = conversations.filter((conversation) => {
