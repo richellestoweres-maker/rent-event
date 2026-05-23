@@ -77,7 +77,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, query, where, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, query, where, updateDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = { apiKey:"AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU", authDomain:"rent-event-f7abd.firebaseapp.com", projectId:"rent-event-f7abd", storageBucket:"rent-event-f7abd.firebasestorage.app", messagingSenderId:"840686040363", appId:"1:840686040363:web:3103c8c5b624deecee416e", measurementId:"G-600Z95K9GX" };
 const app = initializeApp(firebaseConfig);
@@ -122,6 +122,61 @@ function getResponseLabel(status) { if (status === "available") return "Availabl
 function getResponsePillClass(status) { if (status === "available") return "safe"; if (status === "needs_info") return "pending"; if (status === "declined") return "declined"; return "info"; }
 function getVendorItemsForCurrentVendor(request) { const vendors = Array.isArray(request.vendors) ? request.vendors : []; return isAdminPreview() ? vendors : vendors.filter((v) => safeText(v.vendorId, "") === currentUser.uid); }
 
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
+
+function buildBookingConversationId(requestId, customerId, vendorId) {
+  return [
+    "booking",
+    makeSafeId(requestId),
+    makeSafeId(customerId),
+    makeSafeId(vendorId)
+  ].join("__");
+}
+
 function renderEmptyRequests() {
   document.getElementById("requestList").innerHTML = `<div class="empty-card"><div class="empty-icon">+</div><h3>No booking requests yet</h3><p>When customers submit requests that include your listings, they will appear here.</p><a class="btn" href="${isAdminPreview() ? "admin-dashboard.html" : "vendor-dashboard.html"}">${isAdminPreview() ? "Back to Admin" : "Back to Dashboard"}</a></div>`;
 }
@@ -158,7 +213,7 @@ function renderRequests() {
 
     const vendorBox = vendorItems.length ? vendorItems.map((vendor) => {
       const title = safeText(vendor.listingTitle, "Requested Listing");
-      const category = safeText(vendor.category || vendor.mainCategory, "Event Service");
+      const category = normalizeProfessionalLabel(safeText(vendor.category || vendor.mainCategory, "Event Service"));
       const price = formatMoney(vendor.priceNumber || 0);
       const vendorName = safeText(vendor.vendorName, "Vendor");
       return `<div class="vendor-box"><h4>${escapeHtml(title)}</h4><p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p></div>`;
@@ -170,7 +225,7 @@ function renderRequests() {
       ${isWithdrawn ? `<div class="withdrawn-box"><h4>Request Withdrawn</h4><p>The customer withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p></div>` : ""}
       <div class="request-grid"><div class="info-row"><span class="info-label">Date</span><span class="info-value">${escapeHtml(eventDate)}</span></div><div class="info-row"><span class="info-label">Location</span><span class="info-value">${escapeHtml(location)}</span></div><div class="info-row"><span class="info-label">Guests</span><span class="info-value">${escapeHtml(guestCount)}</span></div><div class="info-row"><span class="info-label">Budget</span><span class="info-value">${escapeHtml(budget)}</span></div><div class="info-row"><span class="info-label">Style</span><span class="info-value">${escapeHtml(styleVibe)}</span></div></div>
       ${vendorBox}
-      ${response ? `<div class="response-box"><h4>Your Response</h4><p>${escapeHtml(responseLabel)}${responseNote ? ` · ${escapeHtml(responseNote)}` : ""}</p></div>` : ""}
+      ${response ? `<div class="response-box"><h4>Your Response</h4><p>${escapeHtml(responseLabel)}${responseNote ? ` · ${escapeHtml(responseNote)}` : ""}</p>${response.conversationId ? `<div style="margin-top:12px;"><a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(response.conversationId)}">Open Chat Thread</a></div>` : ""}</div>` : ""}
       ${aiSummary ? `<div class="ai-box"><h4>AI Planner Context</h4><p>${escapeHtml(aiSummary)}</p></div>` : ""}
       ${isAdminPreview() ? `<div class="request-actions"><a class="btn-secondary" href="admin-dashboard.html">Back to Admin</a>${eventId ? `<a class="btn" href="event-builder.html?eventId=${encodeURIComponent(eventId)}">Preview Event</a>` : ""}</div>` : isWithdrawn ? `<div class="request-actions"><a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a></div>` : `<div class="request-actions"><button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">Available</button><button class="btn-warning" type="button" data-respond-request="${requestId}" data-response-status="needs_info">Need Info</button><button class="btn-danger" type="button" data-respond-request="${requestId}" data-response-status="declined">Decline</button></div>`}
     </article>`;
@@ -194,10 +249,78 @@ function closeResponseModal() {
   document.getElementById("responseModal").setAttribute("aria-hidden", "true");
 }
 
-async function createCustomerResponseNotification(request, responseStatus, responseNote) {
+async function createOrOpenCustomerConversation(request, responseStatus, responseNote) {
+  const customerId = safeText(request.customerId, "");
+  const vendorId = currentUser.uid;
+  const requestId = safeText(request.id || pendingResponseRequestId, "");
+  const eventId = safeText(request.eventId, "");
+  const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
+  const customerName = safeText(request.customerName, "Customer");
+  const vendorName = safeText(currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "Vendor", "Vendor");
+  const vendorItems = getVendorItemsForCurrentVendor(request);
+  const firstVendorItem = vendorItems[0] || {};
+  const listingId = safeText(firstVendorItem.listingId, "");
+  const listingTitle = safeText(firstVendorItem.listingTitle || firstVendorItem.title, "Event Request");
+  const listingCategory = normalizeProfessionalLabel(safeText(firstVendorItem.category || firstVendorItem.listingCategory || firstVendorItem.mainCategory, "Event Service"));
+  const conversationId = buildBookingConversationId(requestId, customerId, vendorId);
+  const responseLabel = getResponseLabel(responseStatus);
+
+  if (!customerId || !vendorId || !requestId) {
+    throw new Error("This response cannot open a message thread because the request is missing customer, vendor, or request information.");
+  }
+
+  const messageText = responseNote
+    ? `${responseLabel}: ${responseNote}`
+    : `${responseLabel}.`;
+
+  await setDoc(doc(db, "conversations", conversationId), {
+    conversationKey: conversationId,
+    participantIds: [customerId, vendorId],
+    participantNames: {
+      [customerId]: customerName,
+      [vendorId]: vendorName
+    },
+    participantRoles: {
+      [customerId]: "customer",
+      [vendorId]: "vendor"
+    },
+    customerId,
+    vendorId,
+    bookingRequestId: requestId,
+    eventId,
+    eventName,
+    listingId,
+    listingTitle,
+    listingCategory,
+    title: customerName,
+    contextType: "Booking Request",
+    lastMessage: messageText,
+    lastSenderId: vendorId,
+    unreadFor: {
+      [customerId]: true
+    },
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+
+  await addDoc(collection(db, "conversations", conversationId, "messages"), {
+    text: messageText,
+    senderId: vendorId,
+    senderName: vendorName,
+    senderRole: "vendor",
+    bookingRequestId: requestId,
+    eventId,
+    responseStatus,
+    createdAt: serverTimestamp()
+  });
+
+  return conversationId;
+}
+
+async function createCustomerResponseNotification(request, responseStatus, responseNote, conversationId) {
   try {
     const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
-    const vendorName = safeText(currentUserData.businessName || currentUserData.name || currentUser.displayName || "A vendor", "A vendor");
+    const vendorName = safeText(currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "A vendor", "A vendor");
 
     if (!request.customerId) return;
 
@@ -209,9 +332,10 @@ async function createCustomerResponseNotification(request, responseStatus, respo
       category: "Booking Request",
       title: "Vendor responded to your request",
       body: `${vendorName} responded: ${getResponseLabel(responseStatus)}${responseNote ? `. ${responseNote}` : ""}`,
-      sourceId: request.id,
-      sourceCollection: "bookingRequests",
+      sourceId: conversationId || request.id,
+      sourceCollection: conversationId ? "conversations" : "bookingRequests",
       sourceLabel: eventName,
+      bookingRequestId: request.id,
       eventId: request.eventId || "",
       eventName,
       vendorId: currentUser.uid,
@@ -230,16 +354,47 @@ async function confirmResponse() {
   if (isAdminPreview()) { showStatus("Admin preview mode is view-only. Use a vendor test account to respond to requests.", "error"); closeResponseModal(); return; }
   const request = bookingRequests.find((item) => item.id === pendingResponseRequestId);
   if (!request) { showStatus("Could not find that request.", "error"); closeResponseModal(); return; }
+
   const responseStatus = document.getElementById("responseStatusSelect").value;
   const responseNote = safeText(document.getElementById("responseNote").value, "");
+  const responseLabel = getResponseLabel(responseStatus);
+
   try {
-    isBusy = true; showStatus("Saving response...", "info");
-    const responseData = { status: responseStatus, note: responseNote, vendorId: currentUser.uid, vendorName: currentUserData.businessName || currentUserData.name || currentUser.displayName || "Vendor", respondedAt: new Date().toISOString() };
-    const updatedResponses = { ...(request.vendorResponses || {}), [currentUser.uid]: responseData };
-    await updateDoc(doc(db, "bookingRequests", pendingResponseRequestId), { vendorResponses: updatedResponses, updatedAt: serverTimestamp() });
+    isBusy = true;
+    showStatus("Saving response and opening message thread...", "info");
+
+    const responseData = {
+      status: responseStatus,
+      note: responseNote,
+      vendorId: currentUser.uid,
+      vendorName: currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "Vendor",
+      respondedAt: new Date().toISOString()
+    };
+
+    const conversationId = await createOrOpenCustomerConversation(request, responseStatus, responseNote);
+    const updatedResponses = { ...(request.vendorResponses || {}), [currentUser.uid]: { ...responseData, conversationId } };
+    const updatedConversationIds = { ...(request.vendorConversationIds || {}), [currentUser.uid]: conversationId };
+
+    await updateDoc(doc(db, "bookingRequests", pendingResponseRequestId), {
+      vendorResponses: updatedResponses,
+      vendorConversationIds: updatedConversationIds,
+      requestStatus: responseStatus === "needs_info" ? "needs_more_info" : safeText(request.requestStatus || request.status, "pending"),
+      updatedAt: serverTimestamp()
+    });
+
     request.vendorResponses = updatedResponses;
-    await createCustomerResponseNotification(request, responseStatus, responseNote);
-    closeResponseModal(); renderRequests(); showStatus("Response saved and customer notified.", "success");
+    request.vendorConversationIds = updatedConversationIds;
+
+    await createCustomerResponseNotification(request, responseStatus, responseNote, conversationId);
+
+    closeResponseModal();
+    renderRequests();
+    showStatus(`${responseLabel} response saved. Opening chat thread...`, "success");
+
+    setTimeout(() => {
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}`;
+    }, 500);
+
   } catch (error) {
     showStatus(`Could not save response: ${error.message}`, "error");
   } finally {
