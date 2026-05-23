@@ -360,6 +360,34 @@
 
     .status-card p { color: inherit; font-weight: 700; }
 
+    .notice-card {
+      display: none;
+      background: var(--blue-soft);
+      color: var(--blue-text);
+      border-radius: 24px;
+      padding: 14px 16px;
+      margin: 0 0 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(64, 103, 178, 0.12);
+    }
+
+    .notice-card.show { display: block; }
+
+    .notice-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .notice-card p {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      font-weight: 700;
+      color: inherit;
+    }
+
     .action-bar {
       position: fixed;
       left: 50%;
@@ -511,6 +539,13 @@
       </div>
 
       <div class="status-card" id="statusCard"><p id="statusText"></p></div>
+
+      <div class="notice-card" id="safetyNoticeCard">
+        <h3>Professional Provider Notice</h3>
+        <p id="safetyNoticeText">
+          Transportation, security, lifeguard, valet, and safety-related listings are intended for professional event businesses/providers only. RentEvent is not a rideshare platform and does not accept individual on-demand ride listings.
+        </p>
+      </div>
 
       <section class="section" id="photoSection" style="display: none;">
         <h2 class="section-title">Photo</h2>
@@ -773,6 +808,86 @@ function getTravelText(listing) {
   return parts.join(". ");
 }
 
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
+function isProfessionalSafetyOrTransportListing(listing) {
+  const blob = [
+    listing.mainCategory,
+    listing.category,
+    listing.customCategory,
+    listing.description,
+    listing.included
+  ].join(" ").toLowerCase();
+
+  return blob.includes("transportation") ||
+    blob.includes("shuttle") ||
+    blob.includes("chauffeur") ||
+    blob.includes("limo") ||
+    blob.includes("party bus") ||
+    blob.includes("valet") ||
+    blob.includes("parking") ||
+    blob.includes("security") ||
+    blob.includes("off-duty") ||
+    blob.includes("off duty") ||
+    blob.includes("officer") ||
+    blob.includes("police") ||
+    blob.includes("lifeguard") ||
+    blob.includes("water safety") ||
+    blob.includes("crowd control") ||
+    blob.includes("event safety") ||
+    blob.includes("staffing, safety");
+}
+
+function updateSafetyNotice(listing) {
+  const noticeCard = document.getElementById("safetyNoticeCard");
+  if (!noticeCard) return;
+
+  if (isProfessionalSafetyOrTransportListing(listing)) {
+    noticeCard.classList.add("show");
+    return;
+  }
+
+  noticeCard.classList.remove("show");
+}
+
 function renderMissingListing(message) {
   const page = document.getElementById("page");
   const backUrl = getEventAwareUrl("listings.html");
@@ -825,8 +940,10 @@ function renderEventTypePills(eventTypes) {
 
 function renderListing(listing) {
   const title = safeText(listing.title, "Untitled Listing");
-  const mainCategory = safeText(listing.mainCategory, "Event Services");
-  const category = safeText(listing.category, "Event Service");
+  const rawMainCategory = safeText(listing.mainCategory, "Event Services");
+  const rawCategory = safeText(listing.category, "Event Service");
+  const mainCategory = normalizeProfessionalLabel(rawMainCategory);
+  const category = normalizeProfessionalLabel(rawCategory);
   const customCategory = safeText(listing.customCategory, "");
   const eventTypesText = getEventTypesText(listing);
   const eventTypes = getEventTypes(listing);
@@ -849,6 +966,7 @@ function renderListing(listing) {
   updateEventAwareLinks();
 
   setHeroImage(imageUrl);
+  updateSafetyNotice(listing);
 
   setText("heroPill", mainCategory);
   setText("heroTitle", title);
@@ -863,7 +981,7 @@ function renderListing(listing) {
   setText("travelText", travelText);
   setText("vendorInitials", initialsFromName(vendorName));
   setText("vendorName", vendorName);
-  setText("vendorText", `${vendorName} offers ${typeLine.toLowerCase()} for ${eventTypesText.toLowerCase()} and other event needs.`);
+  setText("vendorText", `${vendorName} offers ${typeLine} for ${eventTypesText} and other event needs through RentEvent.`);
   setText("vendorRating", rating === "★ New" ? "★ New vendor listing" : `${rating} average rating`);
   setText("mainCategoryValue", mainCategory);
   setText("categoryValue", typeLine);
@@ -996,7 +1114,7 @@ async function startConversation() {
     const customerName = currentUserData?.name || currentUser.displayName || currentUser.email || "Customer";
     const vendorName = safeText(currentListing.vendorName, "Vendor");
     const listingTitle = safeText(currentListing.title, "Event Listing");
-    const listingCategory = safeText(currentListing.category, "Event Service");
+    const listingCategory = normalizeProfessionalLabel(safeText(currentListing.category, "Event Service"));
     const listingLocation = getLocationText(currentListing);
 
     const conversationRef = await addDoc(collection(db, "conversations"), {
