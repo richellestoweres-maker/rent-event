@@ -247,7 +247,68 @@ async function confirmResponse() {
   }
 }
 
+
+async function loadRequestIdsFromNotifications() {
+  const requestIds = [];
+
+  try {
+    const notificationQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", currentUser.uid)
+    );
+
+    const snapshot = await getDocs(notificationQuery);
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const sourceCollection = safeText(data.sourceCollection, "");
+      const sourceId = safeText(data.sourceId, "");
+      const type = safeText(data.type, "");
+
+      if (sourceId && (sourceCollection === "bookingRequests" || type === "booking_request")) {
+        requestIds.push(sourceId);
+      }
+    });
+  } catch (error) {
+    console.warn("Could not load booking request notification fallback:", error.message);
+  }
+
+  return Array.from(new Set(requestIds));
+}
+
+async function loadRequestsFromNotificationIds(existingRequestIds = []) {
+  const loadedRequests = [];
+  const notificationRequestIds = await loadRequestIdsFromNotifications();
+  const uniqueIds = notificationRequestIds.filter((requestId) => !existingRequestIds.includes(requestId));
+
+  for (const requestId of uniqueIds) {
+    try {
+      const requestRef = doc(db, "bookingRequests", requestId);
+      const requestSnap = await getDoc(requestRef);
+
+      if (!requestSnap.exists()) continue;
+
+      const data = requestSnap.data();
+      const vendorIds = Array.isArray(data.vendorIds) ? data.vendorIds : [];
+      const hiddenForVendorIds = data.hiddenForVendorIds || {};
+
+      if (isAdminPreview() || (vendorIds.includes(currentUser.uid) && !hiddenForVendorIds[currentUser.uid])) {
+        loadedRequests.push({
+          id: requestSnap.id,
+          ...data
+        });
+      }
+    } catch (error) {
+      console.warn("Could not load booking request from notification fallback:", requestId, error.message);
+    }
+  }
+
+  return loadedRequests;
+}
+
 async function loadBookingRequests() {
+  let requests = [];
+
   try {
     let requestQuery;
 
@@ -261,7 +322,6 @@ async function loadBookingRequests() {
     }
 
     const snapshot = await getDocs(requestQuery);
-    const requests = [];
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
@@ -279,16 +339,22 @@ async function loadBookingRequests() {
       }
     });
 
-    requests.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-    bookingRequests = requests;
-    renderRequests();
-
   } catch (error) {
-    console.warn("Booking requests skipped:", error.message);
-    bookingRequests = [];
-    renderEmptyRequests();
-    showStatus("No connected booking requests could be loaded yet. Confirm this vendor UID is inside the request vendorIds array.", "info");
+    console.warn("Primary booking request query skipped:", error.message);
+  }
+
+  const existingRequestIds = requests.map((request) => request.id);
+  const fallbackRequests = await loadRequestsFromNotificationIds(existingRequestIds);
+
+  requests = [...requests, ...fallbackRequests];
+
+  requests.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+  bookingRequests = requests;
+  renderRequests();
+
+  if (!bookingRequests.length) {
+    showStatus("No connected booking requests found yet. If you see a request notification, hard refresh this page and confirm the notification sourceId matches the bookingRequests document ID.", "info");
   }
 }
 
@@ -309,6 +375,7 @@ onAuthStateChanged(auth, async (user) => {
     else window.location.href = "dashboard.html";
     return;
   }
+  console.log("RentEvent booking requests UID:", currentUser.uid);
   if (selectedRequestId) setText("requestCountPill", "1 Request");
   loadBookingRequests();
 });
