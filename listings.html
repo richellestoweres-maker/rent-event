@@ -637,6 +637,7 @@
           <span class="hero-pill" id="eventContextPill">Marketplace</span>
           <span class="hero-pill">Vendors</span>
           <span class="hero-pill">Rentals</span>
+          <span class="hero-pill">Safety & Staffing</span>
         </div>
       </div>
     </section>
@@ -647,7 +648,7 @@
 
     <section class="search-panel">
       <div class="search-wrap">
-        <input id="searchInput" class="search-input" type="text" placeholder="Search DJs, singers, rentals, glam, décor..." />
+        <input id="searchInput" class="search-input" type="text" placeholder="Search DJs, rentals, glam, lifeguards, security, drivers..." />
 
         <input id="locationInput" class="search-input" type="text" placeholder="City, ZIP, or service area" />
 
@@ -679,6 +680,7 @@
           <option>Photo, Video & Content</option>
           <option>Music & Entertainment</option>
           <option>Planning & Staffing</option>
+          <option>Staffing, Safety & Event Support</option>
           <option>Beauty & Formalwear</option>
           <option>Transportation</option>
           <option>Specialty Services</option>
@@ -764,7 +766,35 @@
           <option>Setup Crew</option>
           <option>Cleanup Crew</option>
           <option>Event Staffing</option>
+          <option>Guest Check-In Staff</option>
+          <option>Registration Staff</option>
+          <option>Ushers</option>
+          <option>Greeters</option>
           <option>Security</option>
+          <option>Private Event Security</option>
+          <option>Off-Duty Police Officers</option>
+          <option>Crowd Control</option>
+          <option>Gate / Entry Security</option>
+          <option>ID Check Staff</option>
+          <option>Bag Check Staff</option>
+          <option>Lifeguards</option>
+          <option>Pool Party Lifeguards</option>
+          <option>Water Safety Attendants</option>
+          <option>Parking Attendants</option>
+          <option>Valet / Parking</option>
+          <option>Traffic Control</option>
+          <option>Drivers / Chauffeurs</option>
+          <option>Private Drivers</option>
+          <option>Chauffeur Service</option>
+          <option>Barbacks</option>
+          <option>Servers</option>
+          <option>Cocktail Servers</option>
+          <option>Catering Staff</option>
+          <option>Food Runners</option>
+          <option>Breakdown Crew</option>
+          <option>Trash / Waste Support</option>
+          <option>Bathroom Attendants</option>
+          <option>Event Support Personnel</option>
 
           <option>Hair + Makeup</option>
           <option>Bridal Hair</option>
@@ -777,10 +807,20 @@
           <option>Wedding Officiant</option>
 
           <option>Transportation</option>
+          <option>Drivers / Chauffeurs</option>
+          <option>Private Drivers</option>
+          <option>Chauffeur Service</option>
           <option>Party Bus</option>
           <option>Limo Service</option>
           <option>Shuttle Service</option>
+          <option>Guest Transportation</option>
+          <option>Airport Transportation</option>
+          <option>Wedding Transportation</option>
+          <option>Corporate Transportation</option>
           <option>Luxury Car Rental</option>
+          <option>Vintage Car Rental</option>
+          <option>Getaway Car</option>
+          <option>Golf Cart Rentals</option>
 
           <option>Corporate Event Services</option>
           <option>Brand Activation Setup</option>
@@ -806,6 +846,9 @@
       <button class="filter-pill" data-filter="kids">Kids</button>
       <button class="filter-pill" data-filter="music">Music</button>
       <button class="filter-pill" data-filter="beauty">Beauty</button>
+      <button class="filter-pill" data-filter="safety">Safety</button>
+      <button class="filter-pill" data-filter="staffing">Staffing</button>
+      <button class="filter-pill" data-filter="transportation">Transportation</button>
       <button class="filter-pill" data-filter="travel">Travels</button>
       <button class="filter-pill" data-filter="virtual">Virtual/National</button>
     </div>
@@ -1099,8 +1142,54 @@ function listingMatchesFilter(listing, filter) {
     return searchable.includes("beauty") || searchable.includes("glam") || searchable.includes("makeup") || searchable.includes("hair") || searchable.includes("bridal") || searchable.includes("skin prep") || searchable.includes("facial") || searchable.includes("spray tan");
   }
 
+  if (filter === "safety") {
+    return searchable.includes("safety") ||
+      searchable.includes("security") ||
+      searchable.includes("off-duty") ||
+      searchable.includes("police") ||
+      searchable.includes("lifeguard") ||
+      searchable.includes("crowd control") ||
+      searchable.includes("water safety") ||
+      searchable.includes("id check") ||
+      searchable.includes("bag check") ||
+      searchable.includes("gate") ||
+      searchable.includes("entry security");
+  }
+
+  if (filter === "staffing") {
+    return searchable.includes("staffing") ||
+      searchable.includes("event staff") ||
+      searchable.includes("check-in") ||
+      searchable.includes("registration") ||
+      searchable.includes("usher") ||
+      searchable.includes("greeter") ||
+      searchable.includes("server") ||
+      searchable.includes("bartender") ||
+      searchable.includes("barback") ||
+      searchable.includes("setup crew") ||
+      searchable.includes("breakdown crew") ||
+      searchable.includes("cleanup crew") ||
+      searchable.includes("catering staff") ||
+      searchable.includes("food runner") ||
+      searchable.includes("bathroom attendant") ||
+      searchable.includes("event support");
+  }
+
+  if (filter === "transportation") {
+    return searchable.includes("transportation") ||
+      searchable.includes("driver") ||
+      searchable.includes("chauffeur") ||
+      searchable.includes("shuttle") ||
+      searchable.includes("limo") ||
+      searchable.includes("party bus") ||
+      searchable.includes("valet") ||
+      searchable.includes("parking") ||
+      searchable.includes("golf cart") ||
+      searchable.includes("getaway car");
+  }
+
   if (filter === "travel") {
-    return travelAvailable || searchable.includes("travel available") || searchable.includes("travels") || searchable.includes("destination") || searchable.includes("shuttle") || searchable.includes("transportation");
+    return travelAvailable || searchable.includes("travel available") || searchable.includes("travels") || searchable.includes("destination") || searchable.includes("shuttle") || searchable.includes("transportation") || searchable.includes("chauffeur") || searchable.includes("driver");
   }
 
   if (filter === "virtual") {
