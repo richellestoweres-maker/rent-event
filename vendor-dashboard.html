@@ -1227,6 +1227,65 @@ async function loadListings(user) {
   }
 }
 
+
+async function loadRequestIdsFromNotifications(user) {
+  const requestIds = [];
+
+  try {
+    const notificationQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(notificationQuery);
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const sourceCollection = safeText(data.sourceCollection, "");
+      const sourceId = safeText(data.sourceId, "");
+      const type = safeText(data.type, "");
+
+      if (sourceId && (sourceCollection === "bookingRequests" || type === "booking_request")) {
+        requestIds.push(sourceId);
+      }
+    });
+  } catch (error) {
+    console.warn("Could not load request notification fallback:", error.message);
+  }
+
+  return Array.from(new Set(requestIds));
+}
+
+async function loadRequestsFromNotificationIds(user, existingRequestIds = []) {
+  const loadedRequests = [];
+  const notificationRequestIds = await loadRequestIdsFromNotifications(user);
+  const uniqueIds = notificationRequestIds.filter((requestId) => !existingRequestIds.includes(requestId));
+
+  for (const requestId of uniqueIds) {
+    try {
+      const requestRef = doc(db, "bookingRequests", requestId);
+      const requestSnap = await getDoc(requestRef);
+
+      if (!requestSnap.exists()) continue;
+
+      const data = requestSnap.data();
+      const vendorIds = Array.isArray(data.vendorIds) ? data.vendorIds : [];
+      const hiddenForVendorIds = data.hiddenForVendorIds || {};
+
+      if (vendorIds.includes(user.uid) && !hiddenForVendorIds[user.uid]) {
+        loadedRequests.push({
+          id: requestSnap.id,
+          ...data
+        });
+      }
+    } catch (error) {
+      console.warn("Could not load booking request from notification fallback:", requestId, error.message);
+    }
+  }
+
+  return loadedRequests;
+}
+
 async function loadRequestsAndBadges(user) {
   let requestCount = 0;
   let requests = [];
@@ -1241,36 +1300,40 @@ async function loadRequestsAndBadges(user) {
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
+      const hiddenForVendorIds = data.hiddenForVendorIds || {};
 
-      if (!data.hiddenForVendorIds?.[user.uid]) {
-        const request = {
+      if (!hiddenForVendorIds[user.uid]) {
+        requests.push({
           id: docSnap.id,
           ...data
-        };
-
-        requests.push(request);
-
-        const status = safeText(request.requestStatus || request.status, "pending");
-        const responses = request.vendorResponses || {};
-        const vendorResponse = responses[user.uid];
-
-        if (status !== "withdrawn" && !vendorResponse) {
-          requestCount += 1;
-        }
+        });
       }
     });
 
-    requests.sort((a, b) => {
-      const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
-      const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
-      return bTime - aTime;
-    });
-
   } catch (error) {
-    console.warn("Vendor requests skipped:", error.message);
-    requestCount = 0;
-    requests = [];
+    console.warn("Vendor request query skipped:", error.message);
   }
+
+  const existingRequestIds = requests.map((request) => request.id);
+  const fallbackRequests = await loadRequestsFromNotificationIds(user, existingRequestIds);
+
+  requests = [...requests, ...fallbackRequests];
+
+  requests.sort((a, b) => {
+    const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+    const bTime = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+    return bTime - aTime;
+  });
+
+  requests.forEach((request) => {
+    const status = safeText(request.requestStatus || request.status, "pending");
+    const responses = request.vendorResponses || {};
+    const vendorResponse = responses[user.uid];
+
+    if (status !== "withdrawn" && !vendorResponse) {
+      requestCount += 1;
+    }
+  });
 
   setText("requestCount", requests.length);
   renderRequests(requests);
@@ -1345,6 +1408,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   setText("welcomeText", `Welcome back, ${firstName}`);
+  console.log("RentEvent vendor dashboard UID:", user.uid);
 
   loadListings(user);
   loadRequestsAndBadges(user);
