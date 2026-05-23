@@ -490,7 +490,7 @@
         <div class="hero-label">Create a new service</div>
         <h2 class="hero-title">Showcase your business beautifully.</h2>
         <p class="hero-subtitle">
-          Add a polished listing with music, glam, rentals, venues, food, planning, beauty, entertainment, and every event type your service fits.
+          Add a polished listing with music, glam, rentals, venues, food, planning, staffing, safety, transportation, beauty, entertainment, and every event type your service fits.
         </p>
       </div>
     </section>
@@ -517,6 +517,7 @@
               <option>Photo, Video & Content</option>
               <option>Music & Entertainment</option>
               <option>Planning & Staffing</option>
+              <option>Staffing, Safety & Event Support</option>
               <option>Beauty & Formalwear</option>
               <option>Transportation</option>
               <option>Specialty Services</option>
@@ -536,7 +537,7 @@
 
           <div class="field-group">
             <label for="custom-category">Custom Service / Extra Details</label>
-            <input id="custom-category" class="input" type="text" placeholder="Example: mobile mini golf, sensory play setup, luxury restroom trailer..." />
+            <input id="custom-category" class="input" type="text" placeholder="Example: off-duty officer, lifeguard for pool party, shuttle driver, luxury restroom trailer..." />
           </div>
 
           <div class="field-group">
@@ -550,6 +551,10 @@
               <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Adult Birthday Parties">Adult Birthday Parties</label>
               <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Backyard Parties">Backyard Parties</label>
               <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Pool Parties">Pool Parties</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Water Events">Water Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Large Public Events">Large Public Events</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Festivals / Markets">Festivals / Markets</label>
+              <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Private Estate Events">Private Estate Events</label>
               <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Sleepovers / Slumber Parties">Sleepovers / Slumber Parties</label>
               <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Weddings">Weddings</label>
               <label class="checkbox-chip"><input type="checkbox" name="event-type" value="Bridal Showers">Bridal Showers</label>
@@ -1021,19 +1026,56 @@ const serviceOptions = {
     "Wedding Planner",
     "Wedding Coordinator",
     "Destination Wedding Planner",
+    "Corporate Event Planner",
+    "Private Event Coordinator",
     "Event Assistant",
     "Event Staffing",
-    "Servers",
+    "Timeline Coordinator",
+    "Vendor Concierge",
+    "Guest Check-In Staff",
+    "Registration Staff",
+    "Ushers",
+    "Greeters",
+    "Coat Check",
+    "Restroom Attendant"
+  ],
+  "Staffing, Safety & Event Support": [
+    "Lifeguards",
+    "Pool Party Lifeguards",
+    "Water Safety Attendants",
+    "Security",
+    "Private Event Security",
+    "Off-Duty Police Officers",
+    "Crowd Control",
+    "Gate / Entry Security",
+    "ID Check Staff",
+    "Bag Check Staff",
+    "Event Staff",
+    "Guest Check-In Staff",
+    "Registration Staff",
+    "Ushers",
+    "Greeters",
+    "Parking Attendants",
+    "Valet / Parking",
+    "Traffic Control",
+    "Drivers / Chauffeurs",
+    "Chauffeur Service",
+    "Private Drivers",
+    "Shuttle Service",
+    "Guest Transportation",
+    "Party Bus Driver",
     "Bartenders",
+    "Barbacks",
+    "Servers",
+    "Cocktail Servers",
+    "Catering Staff",
+    "Food Runners",
     "Setup Crew",
     "Breakdown Crew",
     "Cleanup Crew",
-    "Valet / Parking",
-    "Security",
-    "Coat Check",
-    "Restroom Attendant",
-    "Vendor Concierge",
-    "Timeline Coordinator"
+    "Trash / Waste Support",
+    "Bathroom Attendants",
+    "Event Support Personnel"
   ],
   "Beauty & Formalwear": [
     "Hair + Makeup",
@@ -1065,15 +1107,23 @@ const serviceOptions = {
   ],
   "Transportation": [
     "Transportation",
-    "Party Bus",
+    "Drivers / Chauffeurs",
+    "Private Drivers",
+    "Chauffeur Service",
     "Limo Service",
+    "Party Bus",
     "Shuttle Service",
+    "Guest Transportation",
+    "Airport Transportation",
+    "Wedding Transportation",
+    "Corporate Transportation",
     "Luxury Car Rental",
     "Vintage Car Rental",
+    "Getaway Car",
     "Horse Carriage",
     "Golf Cart Rentals",
-    "Guest Transportation",
-    "Airport Transportation"
+    "Valet / Parking",
+    "Parking Attendants"
   ],
   "Specialty Services": [
     "Corporate Event Services",
