@@ -66,7 +66,7 @@ body::after {
 
 .container {
   width: 100%;
-  max-width: 430px;
+  max-width: 460px;
   position: relative;
   z-index: 1;
 }
@@ -167,9 +167,58 @@ h1 {
   color: #111;
 }
 
+.role-block {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.role-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.96);
+  margin: 2px 0 0;
+}
+
+.role-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.13);
+  text-align: left;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.92);
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.10);
+  transition: 0.2s ease;
+}
+
+.role-card:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-1px);
+}
+
+.role-card input {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: #fff;
+  flex-shrink: 0;
+}
+
+.role-card strong {
+  display: block;
+  color: white;
+  margin-bottom: 2px;
+}
+
 .role-helper {
   display: none;
-  margin: -2px 0 2px;
+  margin: 0;
   padding: 11px 12px;
   border-radius: 14px;
   background: rgba(255,255,255,0.13);
@@ -290,7 +339,7 @@ h1 {
     <h1>Create Account</h1>
 
     <p class="subtitle">
-      Start planning events, save vendors, message businesses, and keep every celebration organized.
+      Create one RentEvent account and choose every role that applies. You can plan events, list services, coordinate client events, or switch between all three.
     </p>
 
     <div class="form-wrap">
@@ -301,14 +350,39 @@ h1 {
 
       <input id="password" class="input" type="password" placeholder="Create Password" autocomplete="new-password">
 
-      <select class="select" id="accountType">
-        <option disabled selected value="">Select Account Type</option>
-        <option value="customer">Customer / Planning My Own Events</option>
-        <option value="planner">Event Planner / Managing Client Events</option>
-        <option value="vendor">Vendor / Event Business</option>
-      </select>
+      <div class="role-block">
+        <p class="role-title">How will you use RentEvent? Select all that apply.</p>
+
+        <label class="role-card">
+          <input class="role-checkbox" type="checkbox" value="customer" data-label="Client / Event Host">
+          <span>
+            <strong>Client / Event Host</strong>
+            Planning my own wedding, birthday, shower, party, school event, church event, company event, or private celebration.
+          </span>
+        </label>
+
+        <label class="role-card">
+          <input class="role-checkbox" type="checkbox" value="vendor" data-label="Vendor / Event Business">
+          <span>
+            <strong>Vendor / Event Business</strong>
+            I offer venues, rentals, decor, glam, catering, photography, staffing, transportation, security, setup, cleanup, or event support.
+          </span>
+        </label>
+
+        <label class="role-card">
+          <input class="role-checkbox" type="checkbox" value="planner" data-label="Event Planner / Coordinator">
+          <span>
+            <strong>Event Planner / Coordinator</strong>
+            I professionally plan, coordinate, or manage events for clients and may need planner tools.
+          </span>
+        </label>
+      </div>
 
       <div class="role-helper" id="roleHelper"></div>
+
+      <select class="select" id="activeRole">
+        <option disabled selected value="">Choose Starting Dashboard</option>
+      </select>
 
       <label class="checkbox-card">
         <input id="emailOptIn" type="checkbox" checked>
@@ -325,7 +399,7 @@ h1 {
     </div>
 
     <p class="tiny-note">
-      By creating an account, you agree to use RentEvent respectfully and understand that vendor bookings, payments, and availability may be confirmed separately as the marketplace grows.
+      By creating an account, you agree to use RentEvent respectfully. Vendor bookings, payments, availability, verification, and marketplace features may be confirmed separately as the platform grows.
     </p>
 
     <div class="bottom-link">
@@ -368,6 +442,22 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const roleCheckboxes = document.querySelectorAll(".role-checkbox");
+const activeRoleSelect = document.getElementById("activeRole");
+const roleHelper = document.getElementById("roleHelper");
+
+const roleLabels = {
+  customer: "Client / Event Host",
+  vendor: "Vendor / Event Business",
+  planner: "Event Planner / Coordinator"
+};
+
+const roleDescriptions = {
+  customer: "Client access lets you create event boards, save vendors, send requests, track messages, and plan personal or business celebrations.",
+  vendor: "Vendor access lets you create listings, receive customer requests, manage messages, upload verification details, and grow your event business.",
+  planner: "Planner access is for event professionals who manage multiple client events, vendor lists, timelines, quotes, and planning workflows."
+};
+
 function showMessage(text, type = "") {
   const messageBox = document.getElementById("messageBox");
   messageBox.textContent = text;
@@ -375,20 +465,44 @@ function showMessage(text, type = "") {
   messageBox.style.display = "block";
 }
 
-function getRoleHelperText(role) {
-  if (role === "customer") {
-    return "Customer accounts are for people planning personal, family, wedding, party, shower, church, or business events.";
+function getSelectedRoles() {
+  return Array.from(roleCheckboxes)
+    .filter((checkbox) => checkbox.checked)
+    .map((checkbox) => checkbox.value);
+}
+
+function updateRoleUi() {
+  const selectedRoles = getSelectedRoles();
+
+  activeRoleSelect.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  placeholder.value = "";
+  placeholder.textContent = "Choose Starting Dashboard";
+  activeRoleSelect.appendChild(placeholder);
+
+  selectedRoles.forEach((role) => {
+    const option = document.createElement("option");
+    option.value = role;
+    option.textContent = roleLabels[role];
+    activeRoleSelect.appendChild(option);
+  });
+
+  if (selectedRoles.length === 1) {
+    activeRoleSelect.value = selectedRoles[0];
   }
 
-  if (role === "planner") {
-    return "Planner accounts are for event planners or coordinators managing multiple client events with client labels and planner tools.";
+  if (selectedRoles.length > 0) {
+    roleHelper.style.display = "block";
+    roleHelper.textContent = selectedRoles
+      .map((role) => roleDescriptions[role])
+      .join(" ");
+  } else {
+    roleHelper.style.display = "none";
+    roleHelper.textContent = "";
   }
-
-  if (role === "vendor") {
-    return "Vendor accounts are for event businesses that want to create listings, receive requests, and message customers.";
-  }
-
-  return "";
 }
 
 function getDashboardForRole(role) {
@@ -398,19 +512,7 @@ function getDashboardForRole(role) {
   return "dashboard.html";
 }
 
-document.getElementById("accountType").addEventListener("change", (event) => {
-  const helper = document.getElementById("roleHelper");
-  const text = getRoleHelperText(event.target.value);
-
-  if (text) {
-    helper.textContent = text;
-    helper.style.display = "block";
-  } else {
-    helper.style.display = "none";
-  }
-});
-
-async function saveMarketingSignup(user, fullName, email, accountType, emailOptIn) {
+async function saveMarketingSignup(user, fullName, email, selectedRoles, activeRole, emailOptIn) {
   if (!emailOptIn) return;
 
   try {
@@ -418,7 +520,9 @@ async function saveMarketingSignup(user, fullName, email, accountType, emailOptI
       userId: user.uid,
       name: fullName,
       email,
-      role: accountType,
+      roles: selectedRoles,
+      role: activeRole,
+      activeRole,
       source: "create-account",
       status: "subscribed",
       topics: ["welcome", "app_updates", "new_features", "marketplace_announcements"],
@@ -430,18 +534,24 @@ async function saveMarketingSignup(user, fullName, email, accountType, emailOptI
   }
 }
 
-async function createWelcomeNotification(user, accountType) {
-  const title = accountType === "vendor"
-    ? "Welcome to RentEvent Vendor Portal"
-    : accountType === "planner"
-      ? "Welcome to RentEvent Planner Pro"
-      : "Welcome to RentEvent";
+async function createWelcomeNotification(user, selectedRoles, activeRole) {
+  const hasMultipleRoles = selectedRoles.length > 1;
 
-  const body = accountType === "vendor"
-    ? "Create your first listing so customers can discover your event services."
-    : accountType === "planner"
-      ? "Create your first client event to start organizing vendors, requests, and messages."
-      : "Create your first event board to start saving vendors and planning beautifully.";
+  const title = hasMultipleRoles
+    ? "Welcome to RentEvent"
+    : activeRole === "vendor"
+      ? "Welcome to RentEvent Vendor Portal"
+      : activeRole === "planner"
+        ? "Welcome to RentEvent Planner Tools"
+        : "Welcome to RentEvent";
+
+  const body = hasMultipleRoles
+    ? "Your account is set up with multiple roles. You’ll be able to switch between dashboards as RentEvent grows."
+    : activeRole === "vendor"
+      ? "Create your first listing so customers can discover your event services."
+      : activeRole === "planner"
+        ? "Create your first client event to start organizing vendors, requests, and messages."
+        : "Create your first event board to start saving vendors and planning beautifully.";
 
   try {
     await addDoc(collection(db, "notifications"), {
@@ -451,6 +561,8 @@ async function createWelcomeNotification(user, accountType) {
       title,
       body,
       read: false,
+      roles: selectedRoles,
+      activeRole,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
@@ -459,21 +571,90 @@ async function createWelcomeNotification(user, accountType) {
   }
 }
 
+async function createRoleProfiles(user, fullName, email, selectedRoles) {
+  const profileWrites = [];
+
+  if (selectedRoles.includes("customer")) {
+    profileWrites.push(
+      setDoc(doc(db, "client_profiles", user.uid), {
+        userId: user.uid,
+        name: fullName,
+        email,
+        eventBoards: [],
+        savedVendors: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true })
+    );
+  }
+
+  if (selectedRoles.includes("vendor")) {
+    profileWrites.push(
+      setDoc(doc(db, "vendor_profiles", user.uid), {
+        userId: user.uid,
+        name: fullName,
+        email,
+        businessName: "",
+        verificationStatus: "not_started",
+        listingStatus: "not_started",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true })
+    );
+  }
+
+  if (selectedRoles.includes("planner")) {
+    profileWrites.push(
+      setDoc(doc(db, "planner_profiles", user.uid), {
+        userId: user.uid,
+        name: fullName,
+        email,
+        plannerBusinessName: "",
+        plannerPro: true,
+        clientEvents: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true })
+    );
+  }
+
+  try {
+    await Promise.all(profileWrites);
+  } catch (error) {
+    console.log("Role profile setup failed:", error.message);
+  }
+}
+
+roleCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener("change", updateRoleUi);
+});
+
 window.createAccount = async function () {
   const fullName = document.getElementById("fullName").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-  const accountType = document.getElementById("accountType").value;
+  const selectedRoles = getSelectedRoles();
+  const activeRole = document.getElementById("activeRole").value;
   const emailOptIn = document.getElementById("emailOptIn").checked;
   const createBtn = document.getElementById("createAccountBtn");
 
-  if (!fullName || !email || !password || !accountType) {
-    showMessage("Please fill out every field before continuing.", "error");
+  if (!fullName || !email || !password) {
+    showMessage("Please fill out your name, email, and password before continuing.", "error");
     return;
   }
 
   if (password.length < 6) {
     showMessage("Password must be at least 6 characters.", "error");
+    return;
+  }
+
+  if (selectedRoles.length === 0) {
+    showMessage("Please select at least one way you want to use RentEvent.", "error");
+    return;
+  }
+
+  if (!activeRole) {
+    showMessage("Please choose which dashboard you want to start with.", "error");
     return;
   }
 
@@ -499,11 +680,21 @@ window.createAccount = async function () {
       uid: user.uid,
       name: fullName,
       email,
-      role: accountType,
 
-      plannerPro: accountType === "planner",
-      vendorAccount: accountType === "vendor",
-      customerAccount: accountType === "customer" || accountType === "planner",
+      roles: selectedRoles,
+      activeRole,
+      role: activeRole,
+
+      plannerPro: selectedRoles.includes("planner"),
+      vendorAccount: selectedRoles.includes("vendor"),
+      customerAccount: selectedRoles.includes("customer") || selectedRoles.includes("planner"),
+
+      permissions: {
+        canUseClientDashboard: selectedRoles.includes("customer") || selectedRoles.includes("planner"),
+        canUseVendorDashboard: selectedRoles.includes("vendor"),
+        canUsePlannerDashboard: selectedRoles.includes("planner"),
+        canSwitchRoles: selectedRoles.length > 1
+      },
 
       location: "",
       phone: "",
@@ -517,13 +708,14 @@ window.createAccount = async function () {
     });
 
     await Promise.all([
-      saveMarketingSignup(user, fullName, email, accountType, emailOptIn),
-      createWelcomeNotification(user, accountType)
+      createRoleProfiles(user, fullName, email, selectedRoles),
+      saveMarketingSignup(user, fullName, email, selectedRoles, activeRole, emailOptIn),
+      createWelcomeNotification(user, selectedRoles, activeRole)
     ]);
 
     showMessage("Account created. Opening your dashboard...", "success");
 
-    window.location.href = getDashboardForRole(accountType);
+    window.location.href = getDashboardForRole(activeRole);
 
   } catch (error) {
     showMessage(error.message, "error");
@@ -538,6 +730,8 @@ document.addEventListener("keydown", (event) => {
     window.createAccount();
   }
 });
+
+updateRoleUi();
 </script>
 
 </body>
