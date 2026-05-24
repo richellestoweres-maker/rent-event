@@ -250,37 +250,8 @@
       font-size: 0.95rem;
     }
 
-    .switcher {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 18px 18px 0;
-    }
-
-    .switch-button {
-      border: 1px solid var(--line);
-      background: var(--white);
-      color: var(--muted);
-      padding: 14px 12px;
-      border-radius: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .switch-button.active {
-      background: var(--black);
-      color: var(--white);
-      border-color: var(--black);
-      box-shadow: 0 12px 26px rgba(17, 17, 17, 0.15);
-    }
-
     form {
       padding: 20px 18px 22px;
-      display: none;
-    }
-
-    form.active {
       display: block;
     }
 
@@ -340,6 +311,78 @@
     textarea:focus {
       border-color: rgba(185, 139, 69, 0.82);
       box-shadow: 0 0 0 4px rgba(185, 139, 69, 0.12);
+    }
+
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin: 16px 0 20px;
+    }
+
+    .role-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .role-option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(185, 139, 69, 0.62);
+      box-shadow: 0 12px 24px rgba(17, 17, 17, 0.05);
+    }
+
+    .role-option input {
+      width: auto;
+      margin-top: 3px;
+      accent-color: var(--black);
+    }
+
+    .role-option strong {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+
+    .role-option span {
+      display: block;
+      font-size: 0.82rem;
+      line-height: 1.42;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .conditional-section {
+      display: none;
+      margin: 18px 0;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+
+    .conditional-section.active {
+      display: block;
+    }
+
+    .section-title {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .section-note {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
     }
 
     .checkbox-group {
@@ -519,10 +562,6 @@
         grid-template-columns: 1fr;
       }
 
-      .switcher {
-        grid-template-columns: 1fr;
-      }
-
       .trust-strip {
         width: min(100% - 28px, 1180px);
         grid-template-columns: 1fr;
@@ -569,28 +608,28 @@
         </p>
 
         <div class="hero-actions">
-          <button class="hero-button primary" type="button" onclick="showForm('vendor')">
-            Join as a Vendor
+          <button class="hero-button primary" type="button" onclick="scrollToWaitlist()">
+            Join Early Access
           </button>
-          <button class="hero-button secondary" type="button" onclick="showForm('host')">
-            Join as an Event Host
+          <button class="hero-button secondary" type="button" onclick="scrollToWaitlist()">
+            Become a Founding Vendor
           </button>
         </div>
 
         <div class="mini-grid">
           <div class="mini-card">
-            <strong>For Vendors</strong>
-            <span>Get considered for early access, profile setup support, and founding vendor visibility.</span>
+            <strong>One account</strong>
+            <span>Use RentEvent as a client, vendor, planner, or all three without creating separate emails.</span>
           </div>
 
           <div class="mini-card">
-            <strong>For Event Hosts</strong>
-            <span>Be notified when RentEvent launches in your area and start planning with less chaos.</span>
+            <strong>Role-based access</strong>
+            <span>Future dashboards can change based on how each person uses RentEvent.</span>
           </div>
 
           <div class="mini-card">
-            <strong>For Local Events</strong>
-            <span>Weddings, birthdays, showers, school events, corporate events, private parties, and more.</span>
+            <strong>Built to scale</strong>
+            <span>The waitlist now supports multi-role users from the very beginning.</span>
           </div>
         </div>
       </section>
@@ -599,266 +638,355 @@
         <div class="card-header">
           <h2>Join the Waitlist</h2>
           <p>
-            Choose the option that fits you best. Your information will be saved directly to the RentEvent database.
+            Select every role that applies. You can use RentEvent as a client, vendor, planner,
+            or all three under one account.
           </p>
         </div>
 
-        <div class="switcher">
-          <button class="switch-button active" id="vendorSwitch" type="button" onclick="showForm('vendor')">
-            I’m a Vendor
-          </button>
-          <button class="switch-button" id="hostSwitch" type="button" onclick="showForm('host')">
-            I’m Planning an Event
-          </button>
-        </div>
-
-        <form id="vendorForm" class="active">
+        <form id="waitlistForm">
           <p class="form-intro">
-            Are you a venue, creative, rental company, event professional, or support provider?
-            Join the founding vendor waitlist for early consideration.
+            Tell us how you want to use RentEvent. This helps us build the right early access experience
+            and shape your future account permissions.
           </p>
 
           <div class="field-grid">
             <div class="field">
-              <label for="businessName">Business Name</label>
-              <input id="businessName" name="businessName" type="text" required />
+              <label for="fullName">Full Name</label>
+              <input id="fullName" name="fullName" type="text" required />
             </div>
 
             <div class="field">
-              <label for="vendorContactName">Contact Name</label>
-              <input id="vendorContactName" name="contactName" type="text" required />
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required />
             </div>
 
             <div class="field">
-              <label for="vendorEmail">Email</label>
-              <input id="vendorEmail" name="email" type="email" required />
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" type="tel" />
             </div>
 
             <div class="field">
-              <label for="vendorPhone">Phone</label>
-              <input id="vendorPhone" name="phone" type="tel" required />
+              <label for="city">City / Main Area</label>
+              <input id="city" name="city" type="text" required />
             </div>
+          </div>
 
-            <div class="field">
-              <label for="vendorCity">City / Main Service Area</label>
-              <input id="vendorCity" name="city" type="text" required />
+          <div class="field full">
+            <label>How would you like to use RentEvent?</label>
+
+            <div class="role-selector">
+              <label class="role-option">
+                <input type="checkbox" id="clientRole" value="client" data-role-toggle="clientSection" />
+                <span>
+                  <strong>I’m planning an event</strong>
+                  <span>I want to find vendors, compare options, save ideas, and plan an event.</span>
+                </span>
+              </label>
+
+              <label class="role-option">
+                <input type="checkbox" id="vendorRole" value="vendor" data-role-toggle="vendorSection" />
+                <span>
+                  <strong>I’m a vendor</strong>
+                  <span>I offer event services, rentals, venues, staffing, transportation, or event support.</span>
+                </span>
+              </label>
+
+              <label class="role-option">
+                <input type="checkbox" id="plannerRole" value="planner" data-role-toggle="plannerSection" />
+                <span>
+                  <strong>I’m an event planner or coordinator</strong>
+                  <span>I professionally plan, coordinate, or manage events for clients.</span>
+                </span>
+              </label>
             </div>
+          </div>
 
-            <div class="field">
-              <label for="vendorWebsite">Website or Social Link</label>
-              <input id="vendorWebsite" name="website" type="url" placeholder="https://" />
-            </div>
+          <div class="conditional-section" id="clientSection">
+            <h3 class="section-title">Event Host Details</h3>
+            <p class="section-note">
+              Fill this out if you are planning an event for yourself, your family, your company, your school, or your community.
+            </p>
 
-            <div class="field">
-              <label for="vendorCategory">Vendor Category</label>
-              <select id="vendorCategory" name="vendorCategory" required>
-                <option value="">Select one</option>
-                <option value="Venue">Venue</option>
-                <option value="Wedding Vendor">Wedding Vendor</option>
-                <option value="Hair Stylist">Hair Stylist</option>
-                <option value="Makeup Artist">Makeup Artist</option>
-                <option value="Skin Prep / Facial Services">Skin Prep / Facial Services</option>
-                <option value="Photographer">Photographer</option>
-                <option value="Videographer">Videographer</option>
-                <option value="Event Decorator">Event Decorator</option>
-                <option value="Balloon Artist">Balloon Artist</option>
-                <option value="Florist">Florist</option>
-                <option value="Catering">Catering</option>
-                <option value="Private Chef">Private Chef</option>
-                <option value="Cake / Desserts">Cake / Desserts</option>
-                <option value="Bounce House / Soft Play">Bounce House / Soft Play</option>
-                <option value="Party Rentals">Party Rentals</option>
-                <option value="Tables / Chairs / Linens">Tables / Chairs / Linens</option>
-                <option value="Bartending / Mobile Bar">Bartending / Mobile Bar</option>
-                <option value="Event Planner / Coordinator">Event Planner / Coordinator</option>
-                <option value="DJ / Entertainment">DJ / Entertainment</option>
-                <option value="Photo Booth">Photo Booth</option>
-                <option value="Event Staffing">Event Staffing</option>
-                <option value="Security / Off-Duty Officer">Security / Off-Duty Officer</option>
-                <option value="Valet / Parking">Valet / Parking</option>
-                <option value="Shuttle / Party Bus / Chauffeur Service">Shuttle / Party Bus / Chauffeur Service</option>
-                <option value="Setup / Cleanup Crew">Setup / Cleanup Crew</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="eventType">Event Type</label>
+                <select id="eventType" name="eventType">
+                  <option value="">Select one</option>
+                  <option value="Wedding">Wedding</option>
+                  <option value="Birthday Party">Birthday Party</option>
+                  <option value="Baby Shower">Baby Shower</option>
+                  <option value="Bridal Shower">Bridal Shower</option>
+                  <option value="Corporate Event">Corporate Event</option>
+                  <option value="Graduation">Graduation</option>
+                  <option value="Quinceanera">Quinceañera</option>
+                  <option value="School Event">School Event</option>
+                  <option value="Church Event">Church Event</option>
+                  <option value="Holiday Party">Holiday Party</option>
+                  <option value="Private Party">Private Party</option>
+                  <option value="Not planning yet">Not planning yet, just interested</option>
+                </select>
+              </div>
 
-            <div class="field">
-              <label for="insuranceStatus">Insurance / Business Verification</label>
-              <select id="insuranceStatus" name="insuranceStatus" required>
-                <option value="">Select one</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-                <option value="Working on it">Working on it</option>
-                <option value="Not applicable">Not applicable for my service</option>
-              </select>
-            </div>
+              <div class="field">
+                <label for="eventTimeframe">Event Timeframe</label>
+                <select id="eventTimeframe" name="eventTimeframe">
+                  <option value="">Select one</option>
+                  <option value="Within 1 month">Within 1 month</option>
+                  <option value="1 to 3 months">1 to 3 months</option>
+                  <option value="3 to 6 months">3 to 6 months</option>
+                  <option value="6 to 12 months">6 to 12 months</option>
+                  <option value="More than 12 months">More than 12 months</option>
+                  <option value="No date yet">No date yet</option>
+                </select>
+              </div>
 
-            <div class="field full">
-              <label>What types of events do you serve?</label>
-              <div class="checkbox-group" data-group="vendorEventTypes">
-                <label class="check-option"><input type="checkbox" value="Weddings" /> Weddings</label>
-                <label class="check-option"><input type="checkbox" value="Birthdays" /> Birthdays</label>
-                <label class="check-option"><input type="checkbox" value="Baby Showers" /> Baby Showers</label>
-                <label class="check-option"><input type="checkbox" value="Bridal Showers" /> Bridal Showers</label>
-                <label class="check-option"><input type="checkbox" value="Corporate Events" /> Corporate Events</label>
-                <label class="check-option"><input type="checkbox" value="School Events" /> School Events</label>
-                <label class="check-option"><input type="checkbox" value="Church Events" /> Church Events</label>
-                <label class="check-option"><input type="checkbox" value="Private Events" /> Private Events</label>
+              <div class="field full">
+                <label>What vendors are you most interested in finding?</label>
+                <div class="checkbox-group" data-group="clientVendorsNeeded">
+                  <label class="check-option"><input type="checkbox" value="Venue" /> Venue</label>
+                  <label class="check-option"><input type="checkbox" value="Decor" /> Decor</label>
+                  <label class="check-option"><input type="checkbox" value="Photography" /> Photography</label>
+                  <label class="check-option"><input type="checkbox" value="Videography" /> Videography</label>
+                  <label class="check-option"><input type="checkbox" value="Hair / Makeup" /> Hair / Makeup</label>
+                  <label class="check-option"><input type="checkbox" value="Skin Prep / Facials" /> Skin Prep / Facials</label>
+                  <label class="check-option"><input type="checkbox" value="Catering" /> Catering</label>
+                  <label class="check-option"><input type="checkbox" value="Desserts" /> Desserts</label>
+                  <label class="check-option"><input type="checkbox" value="Rentals" /> Rentals</label>
+                  <label class="check-option"><input type="checkbox" value="Bounce House / Soft Play" /> Bounce House / Soft Play</label>
+                  <label class="check-option"><input type="checkbox" value="DJ / Entertainment" /> DJ / Entertainment</label>
+                  <label class="check-option"><input type="checkbox" value="Bartending / Mobile Bar" /> Bartending / Mobile Bar</label>
+                  <label class="check-option"><input type="checkbox" value="Event Staff" /> Event Staff</label>
+                  <label class="check-option"><input type="checkbox" value="Professional Event Transportation" /> Professional Event Transportation</label>
+                  <label class="check-option"><input type="checkbox" value="Security" /> Security</label>
+                  <label class="check-option"><input type="checkbox" value="Setup / Cleanup" /> Setup / Cleanup</label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label for="planningPainPoint">What would make event planning easier for you?</label>
+                <textarea
+                  id="planningPainPoint"
+                  name="planningPainPoint"
+                  placeholder="Tell us what feels stressful, confusing, or time-consuming when planning an event."
+                ></textarea>
               </div>
             </div>
+          </div>
 
-            <div class="field full">
-              <label for="profileSetupInterest">Would you like help creating your RentEvent profile?</label>
-              <select id="profileSetupInterest" name="profileSetupInterest" required>
-                <option value="">Select one</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-                <option value="Maybe">Maybe</option>
-              </select>
+          <div class="conditional-section" id="vendorSection">
+            <h3 class="section-title">Vendor Details</h3>
+            <p class="section-note">
+              Fill this out if you offer event services, rentals, venues, staffing, transportation, or support.
+            </p>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="businessName">Business Name</label>
+                <input id="businessName" name="businessName" type="text" />
+              </div>
+
+              <div class="field">
+                <label for="vendorWebsite">Website or Social Link</label>
+                <input id="vendorWebsite" name="vendorWebsite" type="url" placeholder="https://" />
+              </div>
+
+              <div class="field">
+                <label for="vendorCategory">Vendor Category</label>
+                <select id="vendorCategory" name="vendorCategory">
+                  <option value="">Select one</option>
+                  <option value="Venue">Venue</option>
+                  <option value="Wedding Vendor">Wedding Vendor</option>
+                  <option value="Hair Stylist">Hair Stylist</option>
+                  <option value="Makeup Artist">Makeup Artist</option>
+                  <option value="Skin Prep / Facial Services">Skin Prep / Facial Services</option>
+                  <option value="Photographer">Photographer</option>
+                  <option value="Videographer">Videographer</option>
+                  <option value="Event Decorator">Event Decorator</option>
+                  <option value="Balloon Artist">Balloon Artist</option>
+                  <option value="Florist">Florist</option>
+                  <option value="Catering">Catering</option>
+                  <option value="Private Chef">Private Chef</option>
+                  <option value="Cake / Desserts">Cake / Desserts</option>
+                  <option value="Bounce House / Soft Play">Bounce House / Soft Play</option>
+                  <option value="Party Rentals">Party Rentals</option>
+                  <option value="Tables / Chairs / Linens">Tables / Chairs / Linens</option>
+                  <option value="Bartending / Mobile Bar">Bartending / Mobile Bar</option>
+                  <option value="Event Planner / Coordinator">Event Planner / Coordinator</option>
+                  <option value="DJ / Entertainment">DJ / Entertainment</option>
+                  <option value="Photo Booth">Photo Booth</option>
+                  <option value="Event Staffing">Event Staffing</option>
+                  <option value="Security / Off-Duty Officer">Security / Off-Duty Officer</option>
+                  <option value="Valet / Parking">Valet / Parking</option>
+                  <option value="Shuttle / Party Bus / Chauffeur Company">Shuttle / Party Bus / Chauffeur Company</option>
+                  <option value="Setup / Cleanup Crew">Setup / Cleanup Crew</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="insuranceStatus">Insurance / Business Verification</label>
+                <select id="insuranceStatus" name="insuranceStatus">
+                  <option value="">Select one</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                  <option value="Working on it">Working on it</option>
+                  <option value="Not applicable">Not applicable for my service</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label>What types of events do you serve?</label>
+                <div class="checkbox-group" data-group="vendorEventTypes">
+                  <label class="check-option"><input type="checkbox" value="Weddings" /> Weddings</label>
+                  <label class="check-option"><input type="checkbox" value="Birthdays" /> Birthdays</label>
+                  <label class="check-option"><input type="checkbox" value="Baby Showers" /> Baby Showers</label>
+                  <label class="check-option"><input type="checkbox" value="Bridal Showers" /> Bridal Showers</label>
+                  <label class="check-option"><input type="checkbox" value="Corporate Events" /> Corporate Events</label>
+                  <label class="check-option"><input type="checkbox" value="School Events" /> School Events</label>
+                  <label class="check-option"><input type="checkbox" value="Church Events" /> Church Events</label>
+                  <label class="check-option"><input type="checkbox" value="Private Events" /> Private Events</label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label for="profileSetupInterest">Would you like help creating your RentEvent profile?</label>
+                <select id="profileSetupInterest" name="profileSetupInterest">
+                  <option value="">Select one</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                  <option value="Maybe">Maybe</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label for="businessDescription">Short Business Description</label>
+                <textarea
+                  id="businessDescription"
+                  name="businessDescription"
+                  placeholder="Tell us what you offer, where you serve, and what makes your business special."
+                ></textarea>
+              </div>
             </div>
+          </div>
 
-            <div class="field full">
-              <label for="businessDescription">Short Business Description</label>
-              <textarea
-                id="businessDescription"
-                name="businessDescription"
-                placeholder="Tell us what you offer, where you serve, and what makes your business special."
-              ></textarea>
+          <div class="conditional-section" id="plannerSection">
+            <h3 class="section-title">Planner / Coordinator Details</h3>
+            <p class="section-note">
+              Fill this out if you professionally plan, coordinate, or manage events for clients.
+            </p>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="plannerBusinessName">Planner Business Name</label>
+                <input id="plannerBusinessName" name="plannerBusinessName" type="text" />
+              </div>
+
+              <div class="field">
+                <label for="plannerWebsite">Website or Social Link</label>
+                <input id="plannerWebsite" name="plannerWebsite" type="url" placeholder="https://" />
+              </div>
+
+              <div class="field">
+                <label for="plannerType">Planner Type</label>
+                <select id="plannerType" name="plannerType">
+                  <option value="">Select one</option>
+                  <option value="Wedding Planner">Wedding Planner</option>
+                  <option value="Day-of Coordinator">Day-of Coordinator</option>
+                  <option value="Full-Service Event Planner">Full-Service Event Planner</option>
+                  <option value="Corporate Event Planner">Corporate Event Planner</option>
+                  <option value="Kids Party Planner">Kids Party Planner</option>
+                  <option value="Private Event Planner">Private Event Planner</option>
+                  <option value="Venue Coordinator">Venue Coordinator</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="averageEventsPerYear">Average Events Per Year</label>
+                <select id="averageEventsPerYear" name="averageEventsPerYear">
+                  <option value="">Select one</option>
+                  <option value="1 to 5">1 to 5</option>
+                  <option value="6 to 15">6 to 15</option>
+                  <option value="16 to 30">16 to 30</option>
+                  <option value="31 to 50">31 to 50</option>
+                  <option value="50 plus">50+</option>
+                  <option value="Just getting started">Just getting started</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label>What types of events do you manage?</label>
+                <div class="checkbox-group" data-group="plannerEventTypes">
+                  <label class="check-option"><input type="checkbox" value="Weddings" /> Weddings</label>
+                  <label class="check-option"><input type="checkbox" value="Birthdays" /> Birthdays</label>
+                  <label class="check-option"><input type="checkbox" value="Baby Showers" /> Baby Showers</label>
+                  <label class="check-option"><input type="checkbox" value="Bridal Showers" /> Bridal Showers</label>
+                  <label class="check-option"><input type="checkbox" value="Corporate Events" /> Corporate Events</label>
+                  <label class="check-option"><input type="checkbox" value="School Events" /> School Events</label>
+                  <label class="check-option"><input type="checkbox" value="Church Events" /> Church Events</label>
+                  <label class="check-option"><input type="checkbox" value="Private Events" /> Private Events</label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label>What planner tools would help you most?</label>
+                <div class="checkbox-group" data-group="plannerToolsNeeded">
+                  <label class="check-option"><input type="checkbox" value="Multiple event boards" /> Multiple event boards</label>
+                  <label class="check-option"><input type="checkbox" value="Preferred vendor lists" /> Preferred vendor lists</label>
+                  <label class="check-option"><input type="checkbox" value="Budget tracker" /> Budget tracker</label>
+                  <label class="check-option"><input type="checkbox" value="Timeline builder" /> Timeline builder</label>
+                  <label class="check-option"><input type="checkbox" value="Quote request tools" /> Quote request tools</label>
+                  <label class="check-option"><input type="checkbox" value="Client sharing tools" /> Client sharing tools</label>
+                  <label class="check-option"><input type="checkbox" value="AI planning assistant" /> AI planning assistant</label>
+                  <label class="check-option"><input type="checkbox" value="Booking management" /> Booking management</label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label for="plannerDescription">Tell us about your planning work</label>
+                <textarea
+                  id="plannerDescription"
+                  name="plannerDescription"
+                  placeholder="Tell us what you plan, where you serve, and what kind of planner tools would make your work easier."
+                ></textarea>
+              </div>
             </div>
           </div>
 
           <button class="submit-button" type="submit">
-            Submit Vendor Waitlist
+            Join the RentEvent Waitlist
           </button>
 
-          <div id="vendorStatus" class="status-message"></div>
-        </form>
-
-        <form id="hostForm">
-          <p class="form-intro">
-            Planning a wedding, birthday, shower, school event, corporate event, or private celebration?
-            Join early access and be notified when RentEvent opens in your area.
-          </p>
-
-          <div class="field-grid">
-            <div class="field">
-              <label for="hostName">Name</label>
-              <input id="hostName" name="name" type="text" required />
-            </div>
-
-            <div class="field">
-              <label for="hostEmail">Email</label>
-              <input id="hostEmail" name="email" type="email" required />
-            </div>
-
-            <div class="field">
-              <label for="hostPhone">Phone</label>
-              <input id="hostPhone" name="phone" type="tel" />
-            </div>
-
-            <div class="field">
-              <label for="hostCity">City / Area</label>
-              <input id="hostCity" name="city" type="text" required />
-            </div>
-
-            <div class="field">
-              <label for="eventType">Event Type</label>
-              <select id="eventType" name="eventType" required>
-                <option value="">Select one</option>
-                <option value="Wedding">Wedding</option>
-                <option value="Birthday Party">Birthday Party</option>
-                <option value="Baby Shower">Baby Shower</option>
-                <option value="Bridal Shower">Bridal Shower</option>
-                <option value="Corporate Event">Corporate Event</option>
-                <option value="Graduation">Graduation</option>
-                <option value="Quinceanera">Quinceañera</option>
-                <option value="School Event">School Event</option>
-                <option value="Church Event">Church Event</option>
-                <option value="Holiday Party">Holiday Party</option>
-                <option value="Private Party">Private Party</option>
-                <option value="Not planning yet">Not planning yet, just interested</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="eventTimeframe">Event Timeframe</label>
-              <select id="eventTimeframe" name="eventTimeframe" required>
-                <option value="">Select one</option>
-                <option value="Within 1 month">Within 1 month</option>
-                <option value="1 to 3 months">1 to 3 months</option>
-                <option value="3 to 6 months">3 to 6 months</option>
-                <option value="6 to 12 months">6 to 12 months</option>
-                <option value="More than 12 months">More than 12 months</option>
-                <option value="No date yet">No date yet</option>
-              </select>
-            </div>
-
-            <div class="field full">
-              <label>What vendors are you most interested in finding?</label>
-              <div class="checkbox-group" data-group="vendorsNeeded">
-                <label class="check-option"><input type="checkbox" value="Venue" /> Venue</label>
-                <label class="check-option"><input type="checkbox" value="Decor" /> Decor</label>
-                <label class="check-option"><input type="checkbox" value="Photography" /> Photography</label>
-                <label class="check-option"><input type="checkbox" value="Videography" /> Videography</label>
-                <label class="check-option"><input type="checkbox" value="Hair / Makeup" /> Hair / Makeup</label>
-                <label class="check-option"><input type="checkbox" value="Skin Prep / Facials" /> Skin Prep / Facials</label>
-                <label class="check-option"><input type="checkbox" value="Catering" /> Catering</label>
-                <label class="check-option"><input type="checkbox" value="Desserts" /> Desserts</label>
-                <label class="check-option"><input type="checkbox" value="Rentals" /> Rentals</label>
-                <label class="check-option"><input type="checkbox" value="Bounce House / Soft Play" /> Bounce House / Soft Play</label>
-                <label class="check-option"><input type="checkbox" value="DJ / Entertainment" /> DJ / Entertainment</label>
-                <label class="check-option"><input type="checkbox" value="Bartending / Mobile Bar" /> Bartending / Mobile Bar</label>
-                <label class="check-option"><input type="checkbox" value="Event Staff" /> Event Staff</label>
-                <label class="check-option"><input type="checkbox" value="Transportation / Shuttle" /> Transportation / Shuttle</label>
-                <label class="check-option"><input type="checkbox" value="Security" /> Security</label>
-                <label class="check-option"><input type="checkbox" value="Setup / Cleanup" /> Setup / Cleanup</label>
-              </div>
-            </div>
-
-            <div class="field full">
-              <label for="planningPainPoint">What would make event planning easier for you?</label>
-              <textarea
-                id="planningPainPoint"
-                name="planningPainPoint"
-                placeholder="Tell us what feels stressful, confusing, or time-consuming when planning an event."
-              ></textarea>
-            </div>
-          </div>
-
-          <button class="submit-button" type="submit">
-            Submit Event Host Waitlist
-          </button>
-
-          <div id="hostStatus" class="status-message"></div>
+          <div id="waitlistStatus" class="status-message"></div>
         </form>
       </section>
     </main>
 
     <section class="trust-strip">
       <div class="trust-item">
-        <strong>Trusted vendors</strong>
-        <span>Designed around verified businesses, clear profiles, reviews, and safer booking decisions.</span>
+        <strong>One login</strong>
+        <span>Users can eventually switch between client, vendor, and planner access from one account.</span>
       </div>
 
       <div class="trust-item">
-        <strong>Local discovery</strong>
-        <span>Helping customers find nearby vendors for weddings, parties, private events, and more.</span>
+        <strong>Multi-role ready</strong>
+        <span>A vendor can also plan events. A planner can also list services. No duplicate emails needed.</span>
       </div>
 
       <div class="trust-item">
-        <strong>One organized place</strong>
-        <span>No more scattered screenshots, lost messages, and endless vendor search posts.</span>
+        <strong>Organized data</strong>
+        <span>All waitlist submissions save into one clean Firestore collection for easier future conversion.</span>
       </div>
 
       <div class="trust-item">
         <strong>Built for growth</strong>
-        <span>This waitlist connects directly to the future RentEvent vendor and customer platform.</span>
+        <span>This structure supports future dashboards, role permissions, and account switching.</span>
       </div>
     </section>
 
     <footer class="footer">
       <span>© <span id="year"></span> RentEvent. All rights reserved.</span>
-      <span>Early access marketplace for event hosts and vendors.</span>
+      <span>Early access marketplace for event hosts, vendors, and planners.</span>
     </footer>
   </div>
 
@@ -871,11 +999,14 @@
       You can find it here:
       Firebase Console > Project Settings > General > Your apps > Web app > SDK setup and configuration
 
-      This page saves vendor submissions to:
-      waitlist_vendors
+      This page now saves every submission to one collection:
 
-      This page saves event host submissions to:
-      waitlist_hosts
+      waitlist
+
+      Each submission can include:
+      selectedRoles: ["client", "vendor", "planner"]
+
+      This supports one account with multiple future dashboards.
     */
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -898,29 +1029,14 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const vendorForm = document.getElementById("vendorForm");
-    const hostForm = document.getElementById("hostForm");
-    const vendorStatus = document.getElementById("vendorStatus");
-    const hostStatus = document.getElementById("hostStatus");
+    const waitlistForm = document.getElementById("waitlistForm");
+    const waitlistStatus = document.getElementById("waitlistStatus");
+    const submitButton = waitlistForm.querySelector(".submit-button");
+    const roleCheckboxes = document.querySelectorAll("[data-role-toggle]");
 
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    window.showForm = function(type) {
-      const vendorSwitch = document.getElementById("vendorSwitch");
-      const hostSwitch = document.getElementById("hostSwitch");
-
-      if (type === "vendor") {
-        vendorForm.classList.add("active");
-        hostForm.classList.remove("active");
-        vendorSwitch.classList.add("active");
-        hostSwitch.classList.remove("active");
-      } else {
-        hostForm.classList.add("active");
-        vendorForm.classList.remove("active");
-        hostSwitch.classList.add("active");
-        vendorSwitch.classList.remove("active");
-      }
-
+    window.scrollToWaitlist = function() {
       document.getElementById("waitlist").scrollIntoView({
         behavior: "smooth",
         block: "start"
@@ -935,115 +1051,132 @@
         .map((input) => input.value);
     }
 
-    function setStatus(element, type, message) {
-      element.className = `status-message ${type}`;
-      element.textContent = message;
+    function getSelectedRoles() {
+      return Array.from(roleCheckboxes)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => checkbox.value);
     }
 
-    function clearStatus(element) {
-      element.className = "status-message";
-      element.textContent = "";
+    function setStatus(type, message) {
+      waitlistStatus.className = `status-message ${type}`;
+      waitlistStatus.textContent = message;
     }
 
-    function formValue(form, name) {
-      const field = form.elements[name];
+    function clearStatus() {
+      waitlistStatus.className = "status-message";
+      waitlistStatus.textContent = "";
+    }
+
+    function formValue(name) {
+      const field = waitlistForm.elements[name];
       return field ? field.value.trim() : "";
     }
 
-    vendorForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    function toggleConditionalSections() {
+      roleCheckboxes.forEach((checkbox) => {
+        const sectionId = checkbox.getAttribute("data-role-toggle");
+        const section = document.getElementById(sectionId);
 
-      const submitButton = vendorForm.querySelector(".submit-button");
-      submitButton.disabled = true;
-      submitButton.textContent = "Submitting...";
-      clearStatus(vendorStatus);
+        if (!section) return;
 
-      const vendorData = {
-        businessName: formValue(vendorForm, "businessName"),
-        contactName: formValue(vendorForm, "contactName"),
-        email: formValue(vendorForm, "email"),
-        phone: formValue(vendorForm, "phone"),
-        city: formValue(vendorForm, "city"),
-        website: formValue(vendorForm, "website"),
-        vendorCategory: formValue(vendorForm, "vendorCategory"),
-        insuranceStatus: formValue(vendorForm, "insuranceStatus"),
-        eventTypes: getCheckedValues("vendorEventTypes"),
-        profileSetupInterest: formValue(vendorForm, "profileSetupInterest"),
-        businessDescription: formValue(vendorForm, "businessDescription"),
-        status: "new",
-        leadType: "vendor",
-        source: "website_waitlist",
-        submittedAt: serverTimestamp()
-      };
+        if (checkbox.checked) {
+          section.classList.add("active");
+        } else {
+          section.classList.remove("active");
+        }
+      });
+    }
 
-      try {
-        await addDoc(collection(db, "waitlist_vendors"), vendorData);
-
-        vendorForm.reset();
-
-        setStatus(
-          vendorStatus,
-          "success",
-          "You’re on the RentEvent vendor waitlist. We’ll reach out when early access opens."
-        );
-      } catch (error) {
-        console.error("Vendor waitlist error:", error);
-
-        setStatus(
-          vendorStatus,
-          "error",
-          "Something went wrong while submitting your information. Please try again."
-        );
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Submit Vendor Waitlist";
-      }
+    roleCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        clearStatus();
+        toggleConditionalSections();
+      });
     });
 
-    hostForm.addEventListener("submit", async (event) => {
+    waitlistForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+      clearStatus();
 
-      const submitButton = hostForm.querySelector(".submit-button");
+      const selectedRoles = getSelectedRoles();
+
+      if (selectedRoles.length === 0) {
+        setStatus(
+          "error",
+          "Please select at least one way you would like to use RentEvent."
+        );
+        return;
+      }
+
       submitButton.disabled = true;
       submitButton.textContent = "Submitting...";
-      clearStatus(hostStatus);
 
-      const hostData = {
-        name: formValue(hostForm, "name"),
-        email: formValue(hostForm, "email"),
-        phone: formValue(hostForm, "phone"),
-        city: formValue(hostForm, "city"),
-        eventType: formValue(hostForm, "eventType"),
-        eventTimeframe: formValue(hostForm, "eventTimeframe"),
-        vendorsNeeded: getCheckedValues("vendorsNeeded"),
-        planningPainPoint: formValue(hostForm, "planningPainPoint"),
+      const waitlistData = {
+        fullName: formValue("fullName"),
+        email: formValue("email"),
+        phone: formValue("phone"),
+        city: formValue("city"),
+
+        selectedRoles: selectedRoles,
+
+        clientDetails: selectedRoles.includes("client")
+          ? {
+              eventType: formValue("eventType"),
+              eventTimeframe: formValue("eventTimeframe"),
+              vendorsNeeded: getCheckedValues("clientVendorsNeeded"),
+              planningPainPoint: formValue("planningPainPoint")
+            }
+          : null,
+
+        vendorDetails: selectedRoles.includes("vendor")
+          ? {
+              businessName: formValue("businessName"),
+              website: formValue("vendorWebsite"),
+              vendorCategory: formValue("vendorCategory"),
+              insuranceStatus: formValue("insuranceStatus"),
+              eventTypes: getCheckedValues("vendorEventTypes"),
+              profileSetupInterest: formValue("profileSetupInterest"),
+              businessDescription: formValue("businessDescription")
+            }
+          : null,
+
+        plannerDetails: selectedRoles.includes("planner")
+          ? {
+              plannerBusinessName: formValue("plannerBusinessName"),
+              website: formValue("plannerWebsite"),
+              plannerType: formValue("plannerType"),
+              averageEventsPerYear: formValue("averageEventsPerYear"),
+              eventTypesManaged: getCheckedValues("plannerEventTypes"),
+              toolsNeeded: getCheckedValues("plannerToolsNeeded"),
+              plannerDescription: formValue("plannerDescription")
+            }
+          : null,
+
         status: "new",
-        leadType: "event_host",
         source: "website_waitlist",
         submittedAt: serverTimestamp()
       };
 
       try {
-        await addDoc(collection(db, "waitlist_hosts"), hostData);
+        await addDoc(collection(db, "waitlist"), waitlistData);
 
-        hostForm.reset();
+        waitlistForm.reset();
+        toggleConditionalSections();
 
         setStatus(
-          hostStatus,
           "success",
-          "You’re on the RentEvent early access list. We’ll notify you when RentEvent opens in your area."
+          "You’re on the RentEvent early access list. We’ll use your selected role preferences to help shape your account when early access opens."
         );
       } catch (error) {
-        console.error("Event host waitlist error:", error);
+        console.error("Waitlist submission error:", error);
 
         setStatus(
-          hostStatus,
           "error",
           "Something went wrong while submitting your information. Please try again."
         );
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = "Submit Event Host Waitlist";
+        submitButton.textContent = "Join the RentEvent Waitlist";
       }
     });
   </script>
