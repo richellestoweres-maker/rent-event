@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Planner Profile | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --gold-soft: #fff4df;
+      --gold-text: #aa6f12;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 172px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .role-switcher {
+      margin: 12px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140, 111, 75, 0.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120, 96, 60, 0.06);
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .planner-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .planner-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-title {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+      max-width: 310px;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #574f47;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
+      font-family: inherit;
+      font-size: 0.96rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input,
+    .select {
+      min-height: 54px;
+      padding: 0 16px;
+    }
+
+    .textarea {
+      min-height: 112px;
+      padding: 14px 16px;
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #a49a8f;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .helper-text,
+    .status-message {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .status-message {
+      display: none;
+      background: var(--gold-soft);
+      color: #8d5f11;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 700;
+    }
+
+    .status-message.success {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .image-preview-wrap {
+      display: none;
+      margin-top: 12px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .image-preview-wrap img {
+      display: block;
+      width: 100%;
+      height: 210px;
+      object-fit: cover;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .check-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+      font-size: 0.9rem;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .check-card input {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      accent-color: #ff7a63;
+      flex-shrink: 0;
+    }
+
+    .verify-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .verify-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .verify-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .verify-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    .done {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pending {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+    }
+
+    .verify-copy h3 {
+      margin: 0 0 4px;
+      font-size: 0.96rem;
+      line-height: 1.12;
+      font-weight: 800;
+    }
+
+    .verify-copy p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .save-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 92px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      display: flex;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .save-btn,
+    .save-secondary {
+      min-height: 52px;
+      border-radius: 999px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.92rem;
+      flex: 1;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+    }
+
+    .save-btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .save-secondary {
+      color: #4a433d;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 26px rgba(120, 96, 60, 0.12);
+    }
+
+    .save-btn:disabled,
+    .save-secondary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-item {
+      min-height: 58px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+    }
+
+    @media (max-width: 390px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .save-bar {
+        flex-wrap: wrap;
+        bottom: 94px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+      }
+
+      .bottom-nav,
+      .save-bar {
+        max-width: 520px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="planner-dashboard.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Planner Settings</div>
+        <h1 class="page-title">Profile</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
+      </div>
+
+      <a href="messages.html" class="icon-btn" aria-label="Messages">✉</a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="planner-avatar" id="heroAvatar">RE</div>
+        <h2 class="hero-title" id="heroPlannerName">Loading Profile</h2>
+        <p class="hero-subtitle">
+          Manage your planner profile, client event workflow, service areas, and future Planner Pro tools.
+        </p>
+
+        <div class="hero-pills">
+          <span class="hero-pill">Planner Account</span>
+          <span class="hero-pill" id="plannerTypePill">Event Planner</span>
+          <span class="hero-pill" id="heroLocation">Service Area</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Planner Info</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div>
+            <label for="planner-business-name">Planner Business Name</label>
+            <input id="planner-business-name" class="input" type="text" placeholder="Your planning business name" />
+          </div>
+
+          <div>
+            <label for="planner-name">Planner / Contact Name</label>
+            <input id="planner-name" class="input" type="text" placeholder="Your name" />
+          </div>
+
+          <div class="row-2">
+            <div>
+              <label for="email">Email</label>
+              <input id="email" class="input" type="email" placeholder="hello@planner.com" />
+            </div>
+
+            <div>
+              <label for="phone">Phone</label>
+              <input id="phone" class="input" type="text" placeholder="(281) 555-0198" />
+            </div>
+          </div>
+
+          <div>
+            <label for="planner-type">Planner Type</label>
+            <select id="planner-type" class="select">
+              <option value="">Select planner type</option>
+              <option>Wedding Planner</option>
+              <option>Wedding Coordinator</option>
+              <option>Event Planner</option>
+              <option>Corporate Event Planner</option>
+              <option>Party Planner</option>
+              <option>Destination Wedding Planner</option>
+              <option>Venue Coordinator</option>
+              <option>Styled Shoot Coordinator</option>
+              <option>Other Planning Professional</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="website">Website or Social Link</label>
+            <input id="website" class="input" type="url" placeholder="https://www.yourbusiness.com or Instagram link" />
+          </div>
+
+          <div>
+            <label for="photo-url">Logo / Profile Photo URL</label>
+            <input id="photo-url" class="input" type="url" placeholder="Paste a public logo or profile photo link" />
+            <p class="helper-text">
+              For now, paste a public image link. Later, this can become a real upload button.
+            </p>
+
+            <div class="image-preview-wrap" id="photoPreviewWrap">
+              <img id="photoPreview" src="" alt="Planner profile preview">
+            </div>
+          </div>
+
+          <div>
+            <label for="bio">Planner Bio</label>
+            <textarea id="bio" class="textarea" placeholder="Describe your planning style, your experience, your client process, and what events you love to manage."></textarea>
+          </div>
+
+          <div class="status-message" id="statusMessage"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Service Area</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div>
+            <label for="base-city">Base City</label>
+            <input id="base-city" class="input" type="text" placeholder="League City, TX" />
+          </div>
+
+          <div>
+            <label for="service-cities">Service Cities</label>
+            <textarea id="service-cities" class="textarea" placeholder="Houston, League City, Friendswood, Pearland, Galveston, Clear Lake..."></textarea>
+          </div>
+
+          <div>
+            <label for="travel-radius">Travel Radius</label>
+            <input id="travel-radius" class="input" type="text" placeholder="Example: 50 miles, statewide, destination weddings" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Events You Manage</h2>
+
+      <div class="card">
+        <div class="checkbox-grid">
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Weddings" />
+            <span>Weddings</span>
+          </label>
+
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Destination Weddings" />
+            <span>Destination weddings</span>
+          </label>
+
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Bridal Showers" />
+            <span>Bridal showers</span>
+          </label>
+
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Baby Showers" />
+            <span>Baby showers</span>
+          </label>
+
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Birthdays" />
+            <span>Birthdays and private parties</span>
+          </label>
+
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Corporate Events" />
+            <span>Corporate events</span>
+          </label>
+
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Styled Shoots" />
+            <span>Styled shoots</span>
+          </label>
+
+          <label class="check-card">
+            <input type="checkbox" class="event-type-check" value="Church / Community Events" />
+            <span>Church, school, nonprofit, or community events</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Planner Tools</h2>
+
+      <div class="card">
+        <div class="verify-list">
+          <div class="verify-item">
+            <div class="verify-icon done">✓</div>
+            <div class="verify-copy">
+              <h3>Planner Dashboard</h3>
+              <p>Your planner dashboard can manage client events, vendor sourcing, requests, and messages.</p>
+            </div>
+          </div>
+
+          <div class="verify-item">
+            <div class="verify-icon pending">!</div>
+            <div class="verify-copy">
+              <h3>Budget Tracker</h3>
+              <p>Coming soon: track estimated costs, booked totals, deposits, and balances by client event.</p>
+            </div>
+          </div>
+
+          <div class="verify-item">
+            <div class="verify-icon pending">!</div>
+            <div class="verify-copy">
+              <h3>Timeline Builder</h3>
+              <p>Coming soon: create wedding and event timelines for vendors, clients, and setup crews.</p>
+            </div>
+          </div>
+
+          <div class="verify-item">
+            <div class="verify-icon pending">!</div>
+            <div class="verify-copy">
+              <h3>Preferred Vendor Lists</h3>
+              <p>Coming soon: save preferred vendors by event type, budget, location, and client style.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="note">
+          Planner profiles are separate from vendor profiles so a planner can manage client events without mixing planning tools with vendor listings.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="save-bar">
+    <button type="button" class="save-secondary" id="cancelBtn">Cancel</button>
+    <button type="button" class="save-btn" id="saveBtn">Save Profile</button>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Planner navigation">
+    <a class="nav-item" href="planner-dashboard.html">
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" href="planner-dashboard.html#clientEventsSection">
+      <span>Events</span>
+    </a>
+
+    <a class="nav-item" href="listings.html">
+      <span>Vendors</span>
+    </a>
+
+    <a class="nav-item active" href="planner-profile.html">
+      <span>Profile</span>
+    </a>
+  </nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let currentPlannerProfile = null;
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function initialsFromName(name) {
+  const cleanName = safeText(name, "RE");
+  const parts = cleanName.split(" ").filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  return cleanName.slice(0, 2).toUpperCase();
+}
+
+function isValidUrl(url) {
+  if (!url) return true;
+
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = safeText(value, "");
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function showStatus(message, type = "") {
+  const status = document.getElementById("statusMessage");
+  status.textContent = message;
+  status.className = "status-message";
+  if (type) status.classList.add(type);
+  status.style.display = "block";
+}
+
+function setSaving(isSaving) {
+  document.getElementById("saveBtn").disabled = isSaving;
+  document.getElementById("cancelBtn").disabled = isSaving;
+}
+
+function normalizeRole(role) {
+  if (role === "client") return "customer";
+  if (role === "host") return "customer";
+  if (role === "event_host") return "customer";
+  return role || "customer";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      if (role) roleSet.add(normalizeRole(role));
+    });
+  }
+
+  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
+  if (userData.role) roleSet.add(normalizeRole(userData.role));
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    normalizeRole(userData.role) === "admin" ||
+    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+  ) {
+    roleSet.add("admin");
+    roleSet.add("planner");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+
+  if (allowedRoles.includes(requestedRole)) return requestedRole;
+  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
+  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
+
+  return allowedRoles[0] || "customer";
+}
+
+function canAccessPlannerProfile(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+
+  return (
+    allowedRoles.includes("planner") ||
+    allowedRoles.includes("admin") ||
+    userData.plannerPro === true ||
+    userData.permissions?.canUsePlannerDashboard === true
+  );
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const roleSwitcher = document.getElementById("roleSwitcher");
+  const roleSelect = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!roleSwitcher || !roleSelect) return;
+
+  if (allowedRoles.length <= 1) {
+    roleSwitcher.style.display = "none";
+    return;
+  }
+
+  roleSelect.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${escapeHtml(role)}">${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  roleSelect.value = activeRole === "admin" ? "planner" : activeRole;
+  roleSwitcher.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      role: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
+}
+
+function getCheckedEventTypes() {
+  return Array.from(document.querySelectorAll(".event-type-check"))
+    .filter((checkbox) => checkbox.checked)
+    .map((checkbox) => checkbox.value);
+}
+
+function setCheckedEventTypes(eventTypes = []) {
+  const normalized = Array.isArray(eventTypes) ? eventTypes : [];
+
+  document.querySelectorAll(".event-type-check").forEach((checkbox) => {
+    checkbox.checked = normalized.includes(checkbox.value);
+  });
+}
+
+function updateHero(data) {
+  const plannerBusinessName =
+    safeText(data.plannerBusinessName, "") ||
+    safeText(data.businessName, "") ||
+    safeText(data.name, "") ||
+    "RentEvent Planner";
+
+  const plannerType = safeText(data.plannerType, "Event Planner");
+  const baseCity = safeText(data.baseCity, "") || safeText(data.location, "") || "Service Area";
+  const photoUrl = safeText(data.photoUrl, "") || safeText(data.logoUrl, "");
+
+  setText("heroPlannerName", plannerBusinessName);
+  setText("plannerTypePill", plannerType);
+  setText("heroLocation", baseCity);
+
+  const heroAvatar = document.getElementById("heroAvatar");
+
+  if (photoUrl && isValidUrl(photoUrl)) {
+    heroAvatar.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(plannerBusinessName)} profile photo">`;
+  } else {
+    heroAvatar.textContent = initialsFromName(plannerBusinessName);
+  }
+}
+
+function mergePlannerData(userData = {}, plannerProfile = {}) {
+  return {
+    ...userData,
+    ...plannerProfile,
+    plannerBusinessName: safeText(plannerProfile.plannerBusinessName, "") || safeText(userData.plannerBusinessName, "") || safeText(userData.businessName, ""),
+    plannerName: safeText(plannerProfile.plannerName, "") || safeText(userData.plannerName, "") || safeText(userData.name, ""),
+    email: safeText(plannerProfile.email, "") || safeText(userData.email, ""),
+    phone: safeText(plannerProfile.phone, "") || safeText(userData.phone, ""),
+    plannerType: safeText(plannerProfile.plannerType, "") || safeText(userData.plannerType, ""),
+    website: safeText(plannerProfile.website, "") || safeText(userData.website, ""),
+    photoUrl: safeText(plannerProfile.photoUrl, "") || safeText(userData.photoUrl, "") || safeText(userData.logoUrl, ""),
+    bio: safeText(plannerProfile.bio, "") || safeText(userData.bio, ""),
+    baseCity: safeText(plannerProfile.baseCity, "") || safeText(userData.baseCity, "") || safeText(userData.location, ""),
+    serviceCities: safeText(plannerProfile.serviceCities, "") || safeText(userData.serviceCities, "") || safeText(userData.serviceArea, ""),
+    travelRadius: safeText(plannerProfile.travelRadius, "") || safeText(userData.travelRadius, ""),
+    eventTypes: Array.isArray(plannerProfile.eventTypes) ? plannerProfile.eventTypes : Array.isArray(userData.eventTypes) ? userData.eventTypes : []
+  };
+}
+
+function populateForm(data, user) {
+  setValue("planner-business-name", data.plannerBusinessName || data.businessName || "");
+  setValue("planner-name", data.plannerName || data.name || "");
+  setValue("email", data.email || user.email || "");
+  setValue("phone", data.phone || "");
+  setValue("planner-type", data.plannerType || "");
+  setValue("website", data.website || "");
+  setValue("photo-url", data.photoUrl || data.logoUrl || "");
+  setValue("bio", data.bio || "");
+  setValue("base-city", data.baseCity || data.location || "");
+  setValue("service-cities", data.serviceCities || data.serviceArea || "");
+  setValue("travel-radius", data.travelRadius || "");
+
+  setCheckedEventTypes(data.eventTypes || []);
+
+  updateHero(data);
+  updatePhotoPreview();
+}
+
+function updatePhotoPreview() {
+  const photoUrl = document.getElementById("photo-url").value.trim();
+  const photoPreviewWrap = document.getElementById("photoPreviewWrap");
+  const photoPreview = document.getElementById("photoPreview");
+
+  if (!photoUrl || !isValidUrl(photoUrl)) {
+    photoPreviewWrap.style.display = "none";
+    photoPreview.src = "";
+    return;
+  }
+
+  photoPreview.src = photoUrl;
+  photoPreviewWrap.style.display = "block";
+}
+
+function getCurrentRoleArray(userData = {}) {
+  const roles = getAllowedRoles(userData);
+
+  if (!roles.includes("planner")) roles.push("planner");
+
+  return roles.filter((role) => role !== "admin" || getAllowedRoles(userData).includes("admin"));
+}
+
+async function saveProfile() {
+  if (!currentUser || !currentUserData) {
+    showStatus("Still loading your planner account. Please wait a second and try again.", "error");
+    return;
+  }
+
+  const plannerBusinessName = document.getElementById("planner-business-name").value.trim();
+  const plannerName = document.getElementById("planner-name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const plannerType = document.getElementById("planner-type").value.trim();
+  const website = document.getElementById("website").value.trim();
+  const photoUrl = document.getElementById("photo-url").value.trim();
+  const bio = document.getElementById("bio").value.trim();
+  const baseCity = document.getElementById("base-city").value.trim();
+  const serviceCities = document.getElementById("service-cities").value.trim();
+  const travelRadius = document.getElementById("travel-radius").value.trim();
+  const eventTypes = getCheckedEventTypes();
+
+  if (!plannerBusinessName || !plannerName || !email) {
+    showStatus("Please fill in planner business name, planner/contact name, and email before saving.", "error");
+    return;
+  }
+
+  if (!isValidUrl(website)) {
+    showStatus("Please enter a valid website/social URL that starts with http:// or https://, or leave it blank.", "error");
+    return;
+  }
+
+  if (!isValidUrl(photoUrl)) {
+    showStatus("Please enter a valid photo/logo URL that starts with http:// or https://, or leave it blank.", "error");
+    return;
+  }
+
+  try {
+    setSaving(true);
+    showStatus("Saving your planner profile...");
+
+    const userRef = doc(db, "users", currentUser.uid);
+    const plannerProfileRef = doc(db, "planner_profiles", currentUser.uid);
+
+    const plannerProfileData = {
+      userId: currentUser.uid,
+      plannerBusinessName,
+      plannerName,
+      email,
+      phone,
+      plannerType,
+      website,
+      photoUrl,
+      logoUrl: photoUrl,
+      bio,
+      baseCity,
+      location: baseCity,
+      serviceCities,
+      serviceArea: serviceCities,
+      travelRadius,
+      eventTypes,
+      profileStatus: "active",
+      plannerPro: true,
+      updatedAt: serverTimestamp()
+    };
+
+    await setDoc(plannerProfileRef, {
+      createdAt: currentPlannerProfile?.createdAt || serverTimestamp(),
+      ...plannerProfileData
+    }, { merge: true });
+
+    const updatedRoles = getCurrentRoleArray(currentUserData);
+
+    await setDoc(userRef, {
+      name: plannerName,
+      email,
+      phone,
+
+      roles: updatedRoles,
+      activeRole: "planner",
+      role: "planner",
+
+      plannerPro: true,
+      customerAccount: true,
+      vendorAccount: currentUserData.vendorAccount === true || updatedRoles.includes("vendor"),
+
+      permissions: {
+        ...(currentUserData.permissions || {}),
+        canUseClientDashboard: true,
+        canUsePlannerDashboard: true,
+        canSwitchRoles: updatedRoles.length > 1
+      },
+
+      plannerBusinessName,
+      plannerName,
+      plannerType,
+      website,
+      photoUrl,
+      logoUrl: photoUrl,
+      bio,
+      baseCity,
+      location: baseCity,
+      serviceCities,
+      serviceArea: serviceCities,
+      travelRadius,
+      eventTypes,
+
+      profileUpdatedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    currentPlannerProfile = {
+      ...(currentPlannerProfile || {}),
+      ...plannerProfileData
+    };
+
+    currentUserData = {
+      ...currentUserData,
+      name: plannerName,
+      email,
+      phone,
+      roles: updatedRoles,
+      activeRole: "planner",
+      role: "planner",
+      plannerPro: true,
+      customerAccount: true,
+      permissions: {
+        ...(currentUserData.permissions || {}),
+        canUseClientDashboard: true,
+        canUsePlannerDashboard: true,
+        canSwitchRoles: updatedRoles.length > 1
+      },
+      plannerBusinessName,
+      plannerName,
+      plannerType,
+      website,
+      photoUrl,
+      logoUrl: photoUrl,
+      bio,
+      baseCity,
+      location: baseCity,
+      serviceCities,
+      serviceArea: serviceCities,
+      travelRadius,
+      eventTypes
+    };
+
+    updateHero(currentUserData);
+    renderRoleSwitcher(currentUserData);
+    showStatus("Planner profile saved successfully.", "success");
+
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    setSaving(false);
+  }
+}
+
+document.getElementById("saveBtn").addEventListener("click", saveProfile);
+
+document.getElementById("cancelBtn").addEventListener("click", () => {
+  window.location.href = "planner-dashboard.html";
+});
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
+});
+
+document.getElementById("photo-url").addEventListener("input", () => {
+  updatePhotoPreview();
+
+  const plannerBusinessName = document.getElementById("planner-business-name").value.trim() || "RentEvent Planner";
+  const photoUrl = document.getElementById("photo-url").value.trim();
+  const heroAvatar = document.getElementById("heroAvatar");
+
+  if (photoUrl && isValidUrl(photoUrl)) {
+    heroAvatar.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(plannerBusinessName)} profile photo">`;
+  } else {
+    heroAvatar.textContent = initialsFromName(plannerBusinessName);
+  }
+});
+
+document.getElementById("planner-business-name").addEventListener("input", () => {
+  const plannerBusinessName = document.getElementById("planner-business-name").value.trim() || "RentEvent Planner";
+  setText("heroPlannerName", plannerBusinessName);
+
+  const photoUrl = document.getElementById("photo-url").value.trim();
+  const heroAvatar = document.getElementById("heroAvatar");
+
+  if (!photoUrl || !isValidUrl(photoUrl)) {
+    heroAvatar.textContent = initialsFromName(plannerBusinessName);
+  }
+});
+
+document.getElementById("planner-type").addEventListener("input", () => {
+  const plannerType = document.getElementById("planner-type").value.trim() || "Event Planner";
+  setText("plannerTypePill", plannerType);
+});
+
+document.getElementById("base-city").addEventListener("input", () => {
+  const baseCity = document.getElementById("base-city").value.trim() || "Service Area";
+  setText("heroLocation", baseCity);
+});
+
+document.getElementById("photoPreview").addEventListener("error", () => {
+  document.getElementById("photoPreviewWrap").style.display = "none";
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const plannerProfileRef = doc(db, "planner_profiles", user.uid);
+
+  const [userSnap, plannerProfileSnap] = await Promise.all([
+    getDoc(userRef),
+    getDoc(plannerProfileRef)
+  ]);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+  const plannerProfileData = plannerProfileSnap.exists() ? plannerProfileSnap.data() : {};
+
+  if (!canAccessPlannerProfile(userData)) {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  currentUserData = userData;
+  currentPlannerProfile = plannerProfileData;
+
+  const mergedData = mergePlannerData(userData, plannerProfileData);
+
+  renderRoleSwitcher(userData);
+  populateForm(mergedData, user);
+});
+</script>
+
+</body>
+</html>
