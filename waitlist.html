@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Join the Waitlist | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f4ee;
+      --paper: #fffaf2;
+      --ink: #111111;
+      --muted: #6f665c;
+      --soft: #e9dfd1;
+      --line: #ded2c1;
+      --gold: #b98b45;
+      --gold-dark: #8a642f;
+      --black: #111111;
+      --white: #ffffff;
+      --success: #2f7d4f;
+      --error: #a63f3f;
+      --shadow: 0 18px 50px rgba(17, 17, 17, 0.08);
+      --radius: 24px;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(185, 139, 69, 0.16), transparent 34%),
+        linear-gradient(180deg, #fbf7f0 0%, #f7f4ee 55%, #efe7dc 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .nav {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .brand-main {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-sub {
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .nav-pill {
+      background: var(--black);
+      color: var(--white);
+      padding: 11px 17px;
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(17, 17, 17, 0.16);
+    }
+
+    .hero {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 32px 0 70px;
+      display: grid;
+      grid-template-columns: 1.04fr 0.96fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .hero-copy {
+      padding-top: 26px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 13px;
+      border: 1px solid rgba(185, 139, 69, 0.35);
+      background: rgba(255, 250, 242, 0.78);
+      border-radius: 999px;
+      color: var(--gold-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      max-width: 720px;
+      font-size: clamp(2.5rem, 6vw, 5.45rem);
+      line-height: 0.94;
+      letter-spacing: -0.075em;
+      font-weight: 800;
+    }
+
+    .hero-copy p {
+      max-width: 650px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 15px 20px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      transition: 0.22s ease;
+    }
+
+    .hero-button.primary {
+      background: var(--black);
+      color: var(--white);
+      box-shadow: 0 16px 34px rgba(17, 17, 17, 0.18);
+    }
+
+    .hero-button.secondary {
+      background: rgba(255, 250, 242, 0.84);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .hero-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .mini-grid {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 13px;
+      max-width: 680px;
+    }
+
+    .mini-card {
+      background: rgba(255, 250, 242, 0.82);
+      border: 1px solid rgba(222, 210, 193, 0.92);
+      border-radius: 18px;
+      padding: 15px;
+      box-shadow: 0 12px 30px rgba(17, 17, 17, 0.04);
+    }
+
+    .mini-card strong {
+      display: block;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+    }
+
+    .mini-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    .waitlist-card {
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid rgba(222, 210, 193, 0.94);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: sticky;
+      top: 22px;
+    }
+
+    .card-header {
+      padding: 26px;
+      background:
+        linear-gradient(135deg, rgba(17, 17, 17, 0.98), rgba(48, 41, 33, 0.96)),
+        radial-gradient(circle at top right, rgba(185, 139, 69, 0.45), transparent 34%);
+      color: var(--white);
+    }
+
+    .card-header h2 {
+      margin: 0 0 9px;
+      font-size: 1.5rem;
+      letter-spacing: -0.04em;
+    }
+
+    .card-header p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
+
+    .switcher {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 18px 18px 0;
+    }
+
+    .switch-button {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--muted);
+      padding: 14px 12px;
+      border-radius: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .switch-button.active {
+      background: var(--black);
+      color: var(--white);
+      border-color: var(--black);
+      box-shadow: 0 12px 26px rgba(17, 17, 17, 0.15);
+    }
+
+    form {
+      padding: 20px 18px 22px;
+      display: none;
+    }
+
+    form.active {
+      display: block;
+    }
+
+    .form-intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+    }
+
+    .field {
+      margin-bottom: 13px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: #4f473f;
+      margin-bottom: 7px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 13px 13px;
+      font-family: inherit;
+      font-size: 0.94rem;
+      color: var(--ink);
+      outline: none;
+      transition: 0.18s ease;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(185, 139, 69, 0.82);
+      box-shadow: 0 0 0 4px rgba(185, 139, 69, 0.12);
+    }
+
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 8px;
+    }
+
+    .check-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .check-option input {
+      width: auto;
+      margin-top: 1px;
+      accent-color: var(--black);
+    }
+
+    .submit-button {
+      width: 100%;
+      margin-top: 8px;
+      border: 0;
+      border-radius: 16px;
+      background: var(--black);
+      color: var(--white);
+      padding: 15px 16px;
+      font-weight: 900;
+      font-size: 0.98rem;
+      cursor: pointer;
+      box-shadow: 0 15px 30px rgba(17, 17, 17, 0.18);
+      transition: 0.2s ease;
+    }
+
+    .submit-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .submit-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-message {
+      margin-top: 13px;
+      padding: 12px 13px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      display: none;
+    }
+
+    .status-message.success {
+      display: block;
+      background: rgba(47, 125, 79, 0.11);
+      color: var(--success);
+      border: 1px solid rgba(47, 125, 79, 0.22);
+    }
+
+    .status-message.error {
+      display: block;
+      background: rgba(166, 63, 63, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(166, 63, 63, 0.2);
+    }
+
+    .trust-strip {
+      width: min(1180px, calc(100% - 40px));
+      margin: -28px auto 68px;
+      background: rgba(255, 250, 242, 0.82);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 16px 40px rgba(17, 17, 17, 0.05);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .trust-item strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.94rem;
+    }
+
+    .trust-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .footer {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 0 0 34px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 12px;
+      }
+
+      .waitlist-card {
+        position: relative;
+        top: 0;
+      }
+
+      .trust-strip {
+        grid-template-columns: repeat(2, 1fr);
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .nav {
+        width: min(100% - 28px, 1180px);
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        width: min(100% - 28px, 1180px);
+        gap: 24px;
+        padding-bottom: 36px;
+      }
+
+      .hero-copy {
+        padding-top: 8px;
+      }
+
+      h1 {
+        font-size: clamp(2.45rem, 14vw, 4rem);
+      }
+
+      .hero-copy p {
+        font-size: 1rem;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .hero-button {
+        width: 100%;
+      }
+
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .checkbox-group {
+        grid-template-columns: 1fr;
+      }
+
+      .switcher {
+        grid-template-columns: 1fr;
+      }
+
+      .trust-strip {
+        width: min(100% - 28px, 1180px);
+        grid-template-columns: 1fr;
+      }
+
+      .footer {
+        width: min(100% - 28px, 1180px);
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="nav">
+      <a href="index.html" class="brand" aria-label="RentEvent home">
+        <span class="brand-main">RentEvent</span>
+        <span class="brand-sub">Event Marketplace</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="listings.html">Explore</a>
+        <a href="#waitlist" class="nav-pill">Join Waitlist</a>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <section class="hero-copy">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          Early access now open
+        </div>
+
+        <h1>Your event team, all in one place.</h1>
+
+        <p>
+          RentEvent is a new marketplace being built to help people discover trusted local vendors
+          for weddings, birthdays, showers, private parties, corporate events, school events, and more.
+          Instead of searching through endless posts, screenshots, and referrals, RentEvent brings
+          venues, decor, glam, catering, rentals, photography, staffing, transportation, and event support
+          into one easier place.
+        </p>
+
+        <div class="hero-actions">
+          <button class="hero-button primary" type="button" onclick="showForm('vendor')">
+            Join as a Vendor
+          </button>
+          <button class="hero-button secondary" type="button" onclick="showForm('host')">
+            Join as an Event Host
+          </button>
+        </div>
+
+        <div class="mini-grid">
+          <div class="mini-card">
+            <strong>For Vendors</strong>
+            <span>Get considered for early access, profile setup support, and founding vendor visibility.</span>
+          </div>
+
+          <div class="mini-card">
+            <strong>For Event Hosts</strong>
+            <span>Be notified when RentEvent launches in your area and start planning with less chaos.</span>
+          </div>
+
+          <div class="mini-card">
+            <strong>For Local Events</strong>
+            <span>Weddings, birthdays, showers, school events, corporate events, private parties, and more.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="waitlist-card" id="waitlist">
+        <div class="card-header">
+          <h2>Join the Waitlist</h2>
+          <p>
+            Choose the option that fits you best. Your information will be saved directly to the RentEvent database.
+          </p>
+        </div>
+
+        <div class="switcher">
+          <button class="switch-button active" id="vendorSwitch" type="button" onclick="showForm('vendor')">
+            I’m a Vendor
+          </button>
+          <button class="switch-button" id="hostSwitch" type="button" onclick="showForm('host')">
+            I’m Planning an Event
+          </button>
+        </div>
+
+        <form id="vendorForm" class="active">
+          <p class="form-intro">
+            Are you a venue, creative, rental company, event professional, or support provider?
+            Join the founding vendor waitlist for early consideration.
+          </p>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="businessName">Business Name</label>
+              <input id="businessName" name="businessName" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="vendorContactName">Contact Name</label>
+              <input id="vendorContactName" name="contactName" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="vendorEmail">Email</label>
+              <input id="vendorEmail" name="email" type="email" required />
+            </div>
+
+            <div class="field">
+              <label for="vendorPhone">Phone</label>
+              <input id="vendorPhone" name="phone" type="tel" required />
+            </div>
+
+            <div class="field">
+              <label for="vendorCity">City / Main Service Area</label>
+              <input id="vendorCity" name="city" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="vendorWebsite">Website or Social Link</label>
+              <input id="vendorWebsite" name="website" type="url" placeholder="https://" />
+            </div>
+
+            <div class="field">
+              <label for="vendorCategory">Vendor Category</label>
+              <select id="vendorCategory" name="vendorCategory" required>
+                <option value="">Select one</option>
+                <option value="Venue">Venue</option>
+                <option value="Wedding Vendor">Wedding Vendor</option>
+                <option value="Hair Stylist">Hair Stylist</option>
+                <option value="Makeup Artist">Makeup Artist</option>
+                <option value="Skin Prep / Facial Services">Skin Prep / Facial Services</option>
+                <option value="Photographer">Photographer</option>
+                <option value="Videographer">Videographer</option>
+                <option value="Event Decorator">Event Decorator</option>
+                <option value="Balloon Artist">Balloon Artist</option>
+                <option value="Florist">Florist</option>
+                <option value="Catering">Catering</option>
+                <option value="Private Chef">Private Chef</option>
+                <option value="Cake / Desserts">Cake / Desserts</option>
+                <option value="Bounce House / Soft Play">Bounce House / Soft Play</option>
+                <option value="Party Rentals">Party Rentals</option>
+                <option value="Tables / Chairs / Linens">Tables / Chairs / Linens</option>
+                <option value="Bartending / Mobile Bar">Bartending / Mobile Bar</option>
+                <option value="Event Planner / Coordinator">Event Planner / Coordinator</option>
+                <option value="DJ / Entertainment">DJ / Entertainment</option>
+                <option value="Photo Booth">Photo Booth</option>
+                <option value="Event Staffing">Event Staffing</option>
+                <option value="Security / Off-Duty Officer">Security / Off-Duty Officer</option>
+                <option value="Valet / Parking">Valet / Parking</option>
+                <option value="Shuttle / Party Bus / Chauffeur Service">Shuttle / Party Bus / Chauffeur Service</option>
+                <option value="Setup / Cleanup Crew">Setup / Cleanup Crew</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="insuranceStatus">Insurance / Business Verification</label>
+              <select id="insuranceStatus" name="insuranceStatus" required>
+                <option value="">Select one</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Working on it">Working on it</option>
+                <option value="Not applicable">Not applicable for my service</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label>What types of events do you serve?</label>
+              <div class="checkbox-group" data-group="vendorEventTypes">
+                <label class="check-option"><input type="checkbox" value="Weddings" /> Weddings</label>
+                <label class="check-option"><input type="checkbox" value="Birthdays" /> Birthdays</label>
+                <label class="check-option"><input type="checkbox" value="Baby Showers" /> Baby Showers</label>
+                <label class="check-option"><input type="checkbox" value="Bridal Showers" /> Bridal Showers</label>
+                <label class="check-option"><input type="checkbox" value="Corporate Events" /> Corporate Events</label>
+                <label class="check-option"><input type="checkbox" value="School Events" /> School Events</label>
+                <label class="check-option"><input type="checkbox" value="Church Events" /> Church Events</label>
+                <label class="check-option"><input type="checkbox" value="Private Events" /> Private Events</label>
+              </div>
+            </div>
+
+            <div class="field full">
+              <label for="profileSetupInterest">Would you like help creating your RentEvent profile?</label>
+              <select id="profileSetupInterest" name="profileSetupInterest" required>
+                <option value="">Select one</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Maybe">Maybe</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="businessDescription">Short Business Description</label>
+              <textarea
+                id="businessDescription"
+                name="businessDescription"
+                placeholder="Tell us what you offer, where you serve, and what makes your business special."
+              ></textarea>
+            </div>
+          </div>
+
+          <button class="submit-button" type="submit">
+            Submit Vendor Waitlist
+          </button>
+
+          <div id="vendorStatus" class="status-message"></div>
+        </form>
+
+        <form id="hostForm">
+          <p class="form-intro">
+            Planning a wedding, birthday, shower, school event, corporate event, or private celebration?
+            Join early access and be notified when RentEvent opens in your area.
+          </p>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="hostName">Name</label>
+              <input id="hostName" name="name" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="hostEmail">Email</label>
+              <input id="hostEmail" name="email" type="email" required />
+            </div>
+
+            <div class="field">
+              <label for="hostPhone">Phone</label>
+              <input id="hostPhone" name="phone" type="tel" />
+            </div>
+
+            <div class="field">
+              <label for="hostCity">City / Area</label>
+              <input id="hostCity" name="city" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="eventType">Event Type</label>
+              <select id="eventType" name="eventType" required>
+                <option value="">Select one</option>
+                <option value="Wedding">Wedding</option>
+                <option value="Birthday Party">Birthday Party</option>
+                <option value="Baby Shower">Baby Shower</option>
+                <option value="Bridal Shower">Bridal Shower</option>
+                <option value="Corporate Event">Corporate Event</option>
+                <option value="Graduation">Graduation</option>
+                <option value="Quinceanera">Quinceañera</option>
+                <option value="School Event">School Event</option>
+                <option value="Church Event">Church Event</option>
+                <option value="Holiday Party">Holiday Party</option>
+                <option value="Private Party">Private Party</option>
+                <option value="Not planning yet">Not planning yet, just interested</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="eventTimeframe">Event Timeframe</label>
+              <select id="eventTimeframe" name="eventTimeframe" required>
+                <option value="">Select one</option>
+                <option value="Within 1 month">Within 1 month</option>
+                <option value="1 to 3 months">1 to 3 months</option>
+                <option value="3 to 6 months">3 to 6 months</option>
+                <option value="6 to 12 months">6 to 12 months</option>
+                <option value="More than 12 months">More than 12 months</option>
+                <option value="No date yet">No date yet</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label>What vendors are you most interested in finding?</label>
+              <div class="checkbox-group" data-group="vendorsNeeded">
+                <label class="check-option"><input type="checkbox" value="Venue" /> Venue</label>
+                <label class="check-option"><input type="checkbox" value="Decor" /> Decor</label>
+                <label class="check-option"><input type="checkbox" value="Photography" /> Photography</label>
+                <label class="check-option"><input type="checkbox" value="Videography" /> Videography</label>
+                <label class="check-option"><input type="checkbox" value="Hair / Makeup" /> Hair / Makeup</label>
+                <label class="check-option"><input type="checkbox" value="Skin Prep / Facials" /> Skin Prep / Facials</label>
+                <label class="check-option"><input type="checkbox" value="Catering" /> Catering</label>
+                <label class="check-option"><input type="checkbox" value="Desserts" /> Desserts</label>
+                <label class="check-option"><input type="checkbox" value="Rentals" /> Rentals</label>
+                <label class="check-option"><input type="checkbox" value="Bounce House / Soft Play" /> Bounce House / Soft Play</label>
+                <label class="check-option"><input type="checkbox" value="DJ / Entertainment" /> DJ / Entertainment</label>
+                <label class="check-option"><input type="checkbox" value="Bartending / Mobile Bar" /> Bartending / Mobile Bar</label>
+                <label class="check-option"><input type="checkbox" value="Event Staff" /> Event Staff</label>
+                <label class="check-option"><input type="checkbox" value="Transportation / Shuttle" /> Transportation / Shuttle</label>
+                <label class="check-option"><input type="checkbox" value="Security" /> Security</label>
+                <label class="check-option"><input type="checkbox" value="Setup / Cleanup" /> Setup / Cleanup</label>
+              </div>
+            </div>
+
+            <div class="field full">
+              <label for="planningPainPoint">What would make event planning easier for you?</label>
+              <textarea
+                id="planningPainPoint"
+                name="planningPainPoint"
+                placeholder="Tell us what feels stressful, confusing, or time-consuming when planning an event."
+              ></textarea>
+            </div>
+          </div>
+
+          <button class="submit-button" type="submit">
+            Submit Event Host Waitlist
+          </button>
+
+          <div id="hostStatus" class="status-message"></div>
+        </form>
+      </section>
+    </main>
+
+    <section class="trust-strip">
+      <div class="trust-item">
+        <strong>Trusted vendors</strong>
+        <span>Designed around verified businesses, clear profiles, reviews, and safer booking decisions.</span>
+      </div>
+
+      <div class="trust-item">
+        <strong>Local discovery</strong>
+        <span>Helping customers find nearby vendors for weddings, parties, private events, and more.</span>
+      </div>
+
+      <div class="trust-item">
+        <strong>One organized place</strong>
+        <span>No more scattered screenshots, lost messages, and endless vendor search posts.</span>
+      </div>
+
+      <div class="trust-item">
+        <strong>Built for growth</strong>
+        <span>This waitlist connects directly to the future RentEvent vendor and customer platform.</span>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> RentEvent. All rights reserved.</span>
+      <span>Early access marketplace for event hosts and vendors.</span>
+    </footer>
+  </div>
+
+  <script type="module">
+    /*
+      FIREBASE SETUP
+
+      Replace the firebaseConfig object below with your actual Firebase web app config.
+
+      You can find it here:
+      Firebase Console > Project Settings > General > Your apps > Web app > SDK setup and configuration
+
+      This page saves vendor submissions to:
+      waitlist_vendors
+
+      This page saves event host submissions to:
+      waitlist_hosts
+    */
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "PASTE_YOUR_API_KEY_HERE",
+      authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
+      projectId: "PASTE_YOUR_PROJECT_ID_HERE",
+      storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
+      messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+      appId: "PASTE_YOUR_APP_ID_HERE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const vendorForm = document.getElementById("vendorForm");
+    const hostForm = document.getElementById("hostForm");
+    const vendorStatus = document.getElementById("vendorStatus");
+    const hostStatus = document.getElementById("hostStatus");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    window.showForm = function(type) {
+      const vendorSwitch = document.getElementById("vendorSwitch");
+      const hostSwitch = document.getElementById("hostSwitch");
+
+      if (type === "vendor") {
+        vendorForm.classList.add("active");
+        hostForm.classList.remove("active");
+        vendorSwitch.classList.add("active");
+        hostSwitch.classList.remove("active");
+      } else {
+        hostForm.classList.add("active");
+        vendorForm.classList.remove("active");
+        hostSwitch.classList.add("active");
+        vendorSwitch.classList.remove("active");
+      }
+
+      document.getElementById("waitlist").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    };
+
+    function getCheckedValues(groupName) {
+      const group = document.querySelector(`[data-group="${groupName}"]`);
+      if (!group) return [];
+
+      return Array.from(group.querySelectorAll("input[type='checkbox']:checked"))
+        .map((input) => input.value);
+    }
+
+    function setStatus(element, type, message) {
+      element.className = `status-message ${type}`;
+      element.textContent = message;
+    }
+
+    function clearStatus(element) {
+      element.className = "status-message";
+      element.textContent = "";
+    }
+
+    function formValue(form, name) {
+      const field = form.elements[name];
+      return field ? field.value.trim() : "";
+    }
+
+    vendorForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const submitButton = vendorForm.querySelector(".submit-button");
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+      clearStatus(vendorStatus);
+
+      const vendorData = {
+        businessName: formValue(vendorForm, "businessName"),
+        contactName: formValue(vendorForm, "contactName"),
+        email: formValue(vendorForm, "email"),
+        phone: formValue(vendorForm, "phone"),
+        city: formValue(vendorForm, "city"),
+        website: formValue(vendorForm, "website"),
+        vendorCategory: formValue(vendorForm, "vendorCategory"),
+        insuranceStatus: formValue(vendorForm, "insuranceStatus"),
+        eventTypes: getCheckedValues("vendorEventTypes"),
+        profileSetupInterest: formValue(vendorForm, "profileSetupInterest"),
+        businessDescription: formValue(vendorForm, "businessDescription"),
+        status: "new",
+        leadType: "vendor",
+        source: "website_waitlist",
+        submittedAt: serverTimestamp()
+      };
+
+      try {
+        await addDoc(collection(db, "waitlist_vendors"), vendorData);
+
+        vendorForm.reset();
+
+        setStatus(
+          vendorStatus,
+          "success",
+          "You’re on the RentEvent vendor waitlist. We’ll reach out when early access opens."
+        );
+      } catch (error) {
+        console.error("Vendor waitlist error:", error);
+
+        setStatus(
+          vendorStatus,
+          "error",
+          "Something went wrong while submitting your information. Please try again."
+        );
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Vendor Waitlist";
+      }
+    });
+
+    hostForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const submitButton = hostForm.querySelector(".submit-button");
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
+      clearStatus(hostStatus);
+
+      const hostData = {
+        name: formValue(hostForm, "name"),
+        email: formValue(hostForm, "email"),
+        phone: formValue(hostForm, "phone"),
+        city: formValue(hostForm, "city"),
+        eventType: formValue(hostForm, "eventType"),
+        eventTimeframe: formValue(hostForm, "eventTimeframe"),
+        vendorsNeeded: getCheckedValues("vendorsNeeded"),
+        planningPainPoint: formValue(hostForm, "planningPainPoint"),
+        status: "new",
+        leadType: "event_host",
+        source: "website_waitlist",
+        submittedAt: serverTimestamp()
+      };
+
+      try {
+        await addDoc(collection(db, "waitlist_hosts"), hostData);
+
+        hostForm.reset();
+
+        setStatus(
+          hostStatus,
+          "success",
+          "You’re on the RentEvent early access list. We’ll notify you when RentEvent opens in your area."
+        );
+      } catch (error) {
+        console.error("Event host waitlist error:", error);
+
+        setStatus(
+          hostStatus,
+          "error",
+          "Something went wrong while submitting your information. Please try again."
+        );
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Event Host Waitlist";
+      }
+    });
+  </script>
+</body>
+</html>
