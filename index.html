@@ -189,6 +189,12 @@ h1 {
   background: rgba(255,255,255,0.12);
 }
 
+.button:disabled,
+.secondary-button:disabled {
+  opacity: 0.66;
+  cursor: not-allowed;
+}
+
 .message {
   display: none;
   margin-top: 10px;
@@ -339,6 +345,12 @@ h1 {
   color: #4a433d;
 }
 
+.modal-btn:disabled,
+.modal-btn-secondary:disabled {
+  opacity: 0.66;
+  cursor: not-allowed;
+}
+
 .modal-status {
   display: none;
   margin-top: 12px;
@@ -426,7 +438,13 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -456,22 +474,53 @@ function showResetStatus(text, type = "success") {
   status.style.display = "block";
 }
 
-function getDashboardForUser(userData) {
-  const role = userData.role || "customer";
+function normalizeRole(role) {
+  if (role === "client") return "customer";
+  if (role === "host") return "customer";
+  if (role === "event_host") return "customer";
+  return role || "customer";
+}
 
-  if (role === "admin") {
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") {
     return "admin-dashboard.html";
   }
 
-  if (role === "vendor") {
+  if (normalizedRole === "vendor") {
     return "vendor-dashboard.html";
   }
 
-  if (role === "planner" || userData.plannerPro === true) {
+  if (normalizedRole === "planner") {
     return "planner-dashboard.html";
   }
 
   return "dashboard.html";
+}
+
+function getFallbackRole(userData) {
+  if (userData.activeRole) {
+    return normalizeRole(userData.activeRole);
+  }
+
+  if (userData.role) {
+    return normalizeRole(userData.role);
+  }
+
+  if (Array.isArray(userData.roles) && userData.roles.length > 0) {
+    return normalizeRole(userData.roles[0]);
+  }
+
+  if (userData.plannerPro === true) {
+    return "planner";
+  }
+
+  if (userData.vendorAccount === true) {
+    return "vendor";
+  }
+
+  return "customer";
 }
 
 async function routeUser(user) {
@@ -484,7 +533,29 @@ async function routeUser(user) {
   }
 
   const userData = userSnap.data();
-  window.location.href = getDashboardForUser(userData);
+  const activeRole = getFallbackRole(userData);
+  const dashboardUrl = getDashboardForRole(activeRole);
+
+  try {
+    const updates = {
+      lastLoginAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+
+    if (!userData.activeRole) {
+      updates.activeRole = activeRole;
+    }
+
+    if (!userData.role) {
+      updates.role = activeRole;
+    }
+
+    await updateDoc(userRef, updates);
+  } catch (error) {
+    console.log("Login metadata update failed:", error.message);
+  }
+
+  window.location.href = dashboardUrl;
 }
 
 window.login = async function () {
