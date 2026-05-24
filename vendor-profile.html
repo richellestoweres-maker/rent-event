@@ -105,6 +105,44 @@
       font-weight: 800;
     }
 
+    .role-switcher {
+      margin: 12px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140, 111, 75, 0.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120, 96, 60, 0.06);
+    }
+
     .hero-card {
       position: relative;
       overflow: hidden;
@@ -494,6 +532,11 @@
       <div class="topbar-center">
         <div class="eyebrow">Vendor Settings</div>
         <h1 class="page-title">Profile</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
       </div>
 
       <a href="messages.html" class="icon-btn" aria-label="Messages">✉</a>
@@ -564,6 +607,10 @@
               <option>Hair + Makeup</option>
               <option>DJ / Entertainment</option>
               <option>Event Planner</option>
+              <option>Event Staffing</option>
+              <option>Security / Off-Duty Officer</option>
+              <option>Shuttle / Party Bus / Chauffeur Company</option>
+              <option>Setup / Cleanup Crew</option>
               <option>Other Event Service</option>
             </select>
           </div>
@@ -621,7 +668,7 @@
           <div class="verify-item">
             <div class="verify-icon done">✓</div>
             <div class="verify-copy">
-              <h3>Email Verified</h3>
+              <h3>Email Connected</h3>
               <p id="emailVerifiedText">Your vendor email is connected to your RentEvent account.</p>
             </div>
           </div>
@@ -707,7 +754,14 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -725,9 +779,19 @@ const db = getFirestore(app);
 
 let currentUser = null;
 let currentUserData = null;
+let currentVendorProfile = null;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function initialsFromName(name) {
@@ -775,11 +839,146 @@ function setSaving(isSaving) {
   document.getElementById("cancelBtn").disabled = isSaving;
 }
 
+function normalizeRole(role) {
+  if (role === "client") return "customer";
+  if (role === "host") return "customer";
+  if (role === "event_host") return "customer";
+  return role || "customer";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      if (role) roleSet.add(normalizeRole(role));
+    });
+  }
+
+  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
+  if (userData.role) roleSet.add(normalizeRole(userData.role));
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    normalizeRole(userData.role) === "admin" ||
+    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+  ) {
+    roleSet.add("admin");
+    roleSet.add("vendor");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+
+  if (allowedRoles.includes(requestedRole)) return requestedRole;
+  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
+  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
+
+  return allowedRoles[0] || "customer";
+}
+
+function canAccessVendorProfile(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  return (
+    allowedRoles.includes("vendor") ||
+    allowedRoles.includes("admin") ||
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true
+  );
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const roleSwitcher = document.getElementById("roleSwitcher");
+  const roleSelect = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!roleSwitcher || !roleSelect) return;
+
+  if (allowedRoles.length <= 1) {
+    roleSwitcher.style.display = "none";
+    return;
+  }
+
+  roleSelect.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${escapeHtml(role)}">${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  roleSelect.value = activeRole === "admin" ? "vendor" : activeRole;
+  roleSwitcher.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      role: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
+}
+
 function updateHero(data) {
   const businessName =
     safeText(data.businessName, "") ||
-    safeText(data.name, "") ||
     safeText(data.vendorName, "") ||
+    safeText(data.name, "") ||
     "RentEvent Vendor";
 
   const baseCity = safeText(data.baseCity, "") || safeText(data.location, "") || "Service Area";
@@ -791,7 +990,7 @@ function updateHero(data) {
   const heroAvatar = document.getElementById("heroAvatar");
 
   if (logoUrl && isValidUrl(logoUrl)) {
-    heroAvatar.innerHTML = `<img src="${logoUrl}" alt="${businessName} logo">`;
+    heroAvatar.innerHTML = `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(businessName)} logo">`;
   } else {
     heroAvatar.textContent = initialsFromName(businessName);
   }
@@ -800,13 +999,27 @@ function updateHero(data) {
   setText("verificationPill", verificationStatus);
 }
 
-function populateForm(data, user) {
-  const businessName =
-    safeText(data.businessName, "") ||
-    safeText(data.name, "") ||
-    safeText(data.vendorName, "");
+function mergeVendorData(userData = {}, vendorProfile = {}) {
+  return {
+    ...userData,
+    ...vendorProfile,
+    businessName: safeText(vendorProfile.businessName, "") || safeText(userData.businessName, "") || safeText(userData.vendorName, ""),
+    vendorName: safeText(vendorProfile.vendorName, "") || safeText(vendorProfile.businessName, "") || safeText(userData.vendorName, "") || safeText(userData.businessName, ""),
+    ownerName: safeText(vendorProfile.ownerName, "") || safeText(userData.ownerName, "") || safeText(userData.name, ""),
+    email: safeText(vendorProfile.email, "") || safeText(userData.email, ""),
+    phone: safeText(vendorProfile.phone, "") || safeText(userData.phone, ""),
+    mainCategory: safeText(vendorProfile.mainCategory, "") || safeText(userData.mainCategory, "") || safeText(userData.category, ""),
+    website: safeText(vendorProfile.website, "") || safeText(userData.website, ""),
+    logoUrl: safeText(vendorProfile.logoUrl, "") || safeText(userData.logoUrl, ""),
+    bio: safeText(vendorProfile.bio, "") || safeText(userData.bio, ""),
+    baseCity: safeText(vendorProfile.baseCity, "") || safeText(userData.baseCity, "") || safeText(userData.location, ""),
+    serviceCities: safeText(vendorProfile.serviceCities, "") || safeText(userData.serviceCities, "") || safeText(userData.serviceArea, ""),
+    verificationStatus: safeText(vendorProfile.verificationStatus, "") || safeText(userData.verificationStatus, "Pending Verification")
+  };
+}
 
-  setValue("business-name", businessName);
+function populateForm(data, user) {
+  setValue("business-name", data.businessName || data.vendorName || "");
   setValue("owner-name", data.ownerName || data.name || "");
   setValue("email", data.email || user.email || "");
   setValue("phone", data.phone || "");
@@ -817,13 +1030,14 @@ function populateForm(data, user) {
   setValue("base-city", data.baseCity || data.location || "");
   setValue("service-cities", data.serviceCities || data.serviceArea || "");
 
-  setText("emailVerifiedText", user.emailVerified ? "Your vendor email has been verified." : "Your vendor account email is connected, but may not be verified yet.");
+  setText(
+    "emailVerifiedText",
+    user.emailVerified
+      ? "Your vendor email has been verified."
+      : "Your vendor account email is connected, but may not be verified yet."
+  );
 
-  updateHero({
-    ...data,
-    businessName
-  });
-
+  updateHero(data);
   updateLogoPreview();
 }
 
@@ -840,6 +1054,12 @@ function updateLogoPreview() {
 
   logoPreview.src = logoUrl;
   logoPreviewWrap.style.display = "block";
+}
+
+function getCurrentRoleArray(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  if (!allowedRoles.includes("vendor")) allowedRoles.push("vendor");
+  return allowedRoles.filter((role) => role !== "admin" || getAllowedRoles(userData).includes("admin"));
 }
 
 async function saveProfile() {
@@ -879,14 +1099,15 @@ async function saveProfile() {
     showStatus("Saving your vendor profile...");
 
     const userRef = doc(db, "users", currentUser.uid);
+    const vendorProfileRef = doc(db, "vendor_profiles", currentUser.uid);
 
-    await updateDoc(userRef, {
-      name: ownerName,
-      businessName,
-      vendorName: businessName,
+    const vendorProfileData = {
+      userId: currentUser.uid,
       ownerName,
       email,
       phone,
+      businessName,
+      vendorName: businessName,
       mainCategory,
       website,
       logoUrl,
@@ -895,17 +1116,75 @@ async function saveProfile() {
       location: baseCity,
       serviceCities,
       serviceArea: serviceCities,
-      profileUpdatedAt: serverTimestamp()
-    });
+      verificationStatus: safeText(currentVendorProfile?.verificationStatus, "Pending Verification"),
+      profileStatus: "active",
+      updatedAt: serverTimestamp()
+    };
+
+    await setDoc(vendorProfileRef, {
+      createdAt: currentVendorProfile?.createdAt || serverTimestamp(),
+      ...vendorProfileData
+    }, { merge: true });
+
+    const updatedRoles = getCurrentRoleArray(currentUserData);
+
+    await setDoc(userRef, {
+      name: ownerName,
+      email,
+      phone,
+
+      roles: updatedRoles,
+      activeRole: "vendor",
+      role: "vendor",
+
+      vendorAccount: true,
+      customerAccount: currentUserData.customerAccount === true || updatedRoles.includes("customer"),
+      plannerPro: currentUserData.plannerPro === true || updatedRoles.includes("planner"),
+
+      permissions: {
+        ...(currentUserData.permissions || {}),
+        canUseVendorDashboard: true,
+        canSwitchRoles: updatedRoles.length > 1
+      },
+
+      businessName,
+      vendorName: businessName,
+      ownerName,
+      mainCategory,
+      website,
+      logoUrl,
+      bio,
+      baseCity,
+      location: baseCity,
+      serviceCities,
+      serviceArea: serviceCities,
+
+      profileUpdatedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    currentVendorProfile = {
+      ...(currentVendorProfile || {}),
+      ...vendorProfileData
+    };
 
     currentUserData = {
       ...currentUserData,
       name: ownerName,
+      email,
+      phone,
+      roles: updatedRoles,
+      activeRole: "vendor",
+      role: "vendor",
+      vendorAccount: true,
+      permissions: {
+        ...(currentUserData.permissions || {}),
+        canUseVendorDashboard: true,
+        canSwitchRoles: updatedRoles.length > 1
+      },
       businessName,
       vendorName: businessName,
       ownerName,
-      email,
-      phone,
       mainCategory,
       website,
       logoUrl,
@@ -917,6 +1196,7 @@ async function saveProfile() {
     };
 
     updateHero(currentUserData);
+    renderRoleSwitcher(currentUserData);
     showStatus("Vendor profile saved successfully.", "success");
 
   } catch (error) {
@@ -932,6 +1212,10 @@ document.getElementById("cancelBtn").addEventListener("click", () => {
   window.location.href = "vendor-dashboard.html";
 });
 
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
+});
+
 document.getElementById("logo-url").addEventListener("input", () => {
   updateLogoPreview();
 
@@ -940,7 +1224,7 @@ document.getElementById("logo-url").addEventListener("input", () => {
   const heroAvatar = document.getElementById("heroAvatar");
 
   if (logoUrl && isValidUrl(logoUrl)) {
-    heroAvatar.innerHTML = `<img src="${logoUrl}" alt="${businessName} logo">`;
+    heroAvatar.innerHTML = `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(businessName)} logo">`;
   } else {
     heroAvatar.textContent = initialsFromName(businessName);
   }
@@ -976,7 +1260,12 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
   const userRef = doc(db, "users", user.uid);
-  const userSnap = await getDoc(userRef);
+  const vendorProfileRef = doc(db, "vendor_profiles", user.uid);
+
+  const [userSnap, vendorProfileSnap] = await Promise.all([
+    getDoc(userRef),
+    getDoc(vendorProfileRef)
+  ]);
 
   if (!userSnap.exists()) {
     window.location.href = "index.html";
@@ -984,14 +1273,20 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const userData = userSnap.data();
+  const vendorProfileData = vendorProfileSnap.exists() ? vendorProfileSnap.data() : {};
 
-  if (userData.role !== "vendor") {
+  if (!canAccessVendorProfile(userData)) {
     window.location.href = "dashboard.html";
     return;
   }
 
   currentUserData = userData;
-  populateForm(userData, user);
+  currentVendorProfile = vendorProfileData;
+
+  const mergedData = mergeVendorData(userData, vendorProfileData);
+
+  renderRoleSwitcher(userData);
+  populateForm(mergedData, user);
 });
 </script>
 
