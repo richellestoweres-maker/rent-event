@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Messages | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -39,7 +40,6 @@
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
     }
 
     html,
@@ -55,107 +55,157 @@
       min-height: 100vh;
     }
 
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .page {
       width: 100%;
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 72px 24px 112px;
+      padding: 28px 24px 112px;
       background: var(--bg);
     }
 
     .topbar {
       display: flex;
-      align-items: center;
-      justify-content: flex-end;
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 14px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
-    .back-link {
-      display: none;
-    }
-
+    .back-link,
     .icon-btn {
-      width: 56px;
-      height: 56px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
-      border: none;
-      background: rgba(255, 255, 255, 0.88);
       border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
       text-decoration: none;
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 800;
       position: relative;
-      font-size: 1.15rem;
-    }
-
-    .topbar-center {
-      display: none;
-    }
-
-    .messages-header {
-      margin-bottom: 24px;
-    }
-
-    .messages-title {
-      margin: 0;
-      font-size: clamp(3.2rem, 12vw, 4.7rem);
-      line-height: 0.92;
-      letter-spacing: -0.075em;
-      font-weight: 800;
-    }
-
-    .message-tabs {
-      display: flex;
-      gap: 12px;
-      margin: 26px 0 26px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      scrollbar-width: none;
-    }
-
-    .message-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .message-tab {
-      min-height: 58px;
-      padding: 0 25px;
-      border-radius: 999px;
-      border: none;
-      background: #f4ede2;
-      color: #222;
-      font-family: inherit;
-      font-size: 1.02rem;
-      font-weight: 800;
-      white-space: nowrap;
+      font-size: 1rem;
       cursor: pointer;
-    }
-
-    .message-tab.active {
-      background: #161616;
-      color: #fff;
-    }
-
-    .mobile-search-bar {
-      display: none;
-      margin: -8px 0 22px;
-    }
-
-    .mobile-search-bar.show {
-      display: block;
     }
 
     .icon-btn svg {
       width: 20px;
       height: 20px;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .role-switcher {
+      margin: 10px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140,111,75,.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
     .notification-badge {
@@ -180,28 +230,67 @@
       z-index: 3;
     }
 
-    .topbar-center {
-      flex: 1;
-      text-align: center;
+    .messages-header {
+      margin-bottom: 24px;
     }
 
-    .eyebrow {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #7b7268;
-      margin-bottom: 4px;
-    }
-
-    .page-title {
+    .messages-title {
       margin: 0;
-      font-size: 1.55rem;
-      line-height: 1;
-      letter-spacing: -0.04em;
+      font-size: clamp(3.2rem, 12vw, 4.7rem);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
       font-weight: 800;
     }
 
+    .messages-subtitle {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.45;
+      font-weight: 600;
+      max-width: 540px;
+    }
+
+    .message-tabs {
+      display: flex;
+      gap: 12px;
+      margin: 26px 0 22px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .message-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .message-tab {
+      min-height: 54px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: none;
+      background: #f4ede2;
+      color: #222;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .message-tab.active {
+      background: #161616;
+      color: #fff;
+    }
+
+    .mobile-search-bar {
+      display: none;
+      margin: -4px 0 22px;
+    }
+
+    .mobile-search-bar.show {
+      display: block;
+    }
 
     .search-wrap {
       margin-bottom: 22px;
@@ -254,19 +343,12 @@
     }
 
     .message-card:hover {
-      transform: none;
-      box-shadow: none;
-      background: #fafafa;
+      background: rgba(255,255,255,.55);
       margin: 0 -12px;
       padding-left: 12px;
       padding-right: 12px;
       border-radius: 20px;
       border-bottom-color: transparent;
-    }
-
-    .message-card.unread {
-      border-color: rgba(236, 226, 211, 0.9);
-      background: transparent;
     }
 
     .message-card.unread::after {
@@ -278,14 +360,6 @@
       height: 10px;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
-    }
-
-    .message-card.thread-ready {
-      cursor: pointer;
-    }
-
-    .message-card.thread-ready:active {
-      transform: scale(0.992);
     }
 
     .avatar {
@@ -347,8 +421,14 @@
       color: #6f6f6f;
       font-weight: 500;
       white-space: nowrap;
-      text-transform: none;
       letter-spacing: -0.01em;
+    }
+
+    .message-preview,
+    .message-detail-line {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .message-preview {
@@ -356,9 +436,6 @@
       font-size: 1.02rem;
       line-height: 1.35;
       color: #666;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .message-detail-line {
@@ -366,9 +443,6 @@
       font-size: 0.98rem;
       line-height: 1.35;
       color: #777;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .message-meta {
@@ -470,7 +544,7 @@
     }
 
     .btn {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
       color: #fff;
       box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
     }
@@ -521,61 +595,9 @@
     }
 
     .nav-item.active {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
       color: #fff;
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
-    }
-
-
-    .admin-preview-bar {
-      display: none;
-      position: sticky;
-      top: 0;
-      z-index: 90;
-      margin: -20px -18px 18px;
-      padding: 12px 18px;
-      background: #161616;
-      color: #fff;
-      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
-    }
-
-    .admin-preview-inner {
-      width: 100%;
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .admin-preview-text {
-      font-size: 0.82rem;
-      line-height: 1.35;
-      font-weight: 700;
-    }
-
-    .admin-preview-text span {
-      display: block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.72);
-      margin-top: 2px;
-    }
-
-    .admin-preview-btn {
-      min-height: 38px;
-      padding: 0 13px;
-      border-radius: 999px;
-      background: #fff;
-      color: #161616;
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 800;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
     }
 
     @media (min-width: 768px) {
@@ -587,19 +609,9 @@
         max-width: 960px;
       }
 
-      .hero-content {
-        max-width: 420px;
-      }
-
-      .message-list {
-        grid-template-columns: 1fr;
-        max-width: 760px;
-        margin: 0 auto;
-      }
-
+      .message-list,
       .messages-header,
       .topbar,
-      .search-wrap,
       .mobile-search-bar {
         max-width: 760px;
         margin-left: auto;
@@ -628,7 +640,22 @@
     <header class="topbar">
       <a id="backLink" href="dashboard.html" class="back-link" aria-label="Go back">←</a>
 
-      <button class="icon-btn" type="button" id="searchToggleBtn" aria-label="Search messages">⌕</button>
+      <div class="topbar-center">
+        <div class="eyebrow" id="roleEyebrow">Inbox</div>
+        <h1 class="page-title">Messages</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
+      </div>
+
+      <button class="icon-btn" type="button" id="searchToggleBtn" aria-label="Search messages">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M10.8 18.1C14.8 18.1 18.1 14.8 18.1 10.8C18.1 6.8 14.8 3.5 10.8 3.5C6.8 3.5 3.5 6.8 3.5 10.8C3.5 14.8 6.8 18.1 10.8 18.1Z" stroke="currentColor" stroke-width="2"></path>
+          <path d="M16.2 16.2L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </button>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
@@ -641,6 +668,9 @@
 
     <section class="messages-header">
       <h1 class="messages-title">Messages</h1>
+      <p class="messages-subtitle" id="messagesSubtitle">
+        Keep customer, vendor, planner, and booking conversations organized in one place.
+      </p>
 
       <div class="message-tabs" aria-label="Message filters">
         <button class="message-tab active" type="button" data-message-filter="all">All</button>
@@ -668,14 +698,25 @@
     </section>
   </main>
 
-  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation">
-    <!-- Navigation renders here based on user role -->
-  </nav>
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation"></nav>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, setDoc, addDoc, updateDoc, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  updateDoc,
+  orderBy,
+  limit,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -730,7 +771,15 @@ function initialsFromName(name) {
 }
 
 function formatTime(value) {
-  if (!value || !value.seconds) return "New";
+  if (!value || !value.seconds) {
+    if (typeof value === "string") {
+      const parsed = Date.parse(value);
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed).toLocaleDateString();
+      }
+    }
+    return "New";
+  }
 
   const date = new Date(value.seconds * 1000);
   const now = new Date();
@@ -766,19 +815,157 @@ function setBadge(id, count) {
   }
 }
 
-function isAdminPreview() {
-  return currentUserData?.role === "admin";
+function normalizeRole(role) {
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
 }
 
-function isPlannerRole(role) {
-  return role === "planner" || currentUserData?.plannerPro === true;
-}
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
 
-function getHomeHref(role) {
-  if (role === "admin") return "admin-dashboard.html";
-  if (role === "vendor") return "vendor-dashboard.html";
-  if (isPlannerRole(role)) return "planner-dashboard.html";
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
   return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
+    });
+  }
+
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    userData.permissions?.admin === true ||
+    legacy === "admin"
+  ) {
+    roleSet.add("admin");
+    roleSet.add("customer");
+    roleSet.add("vendor");
+    roleSet.add("planner");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
+  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
+
+  return allowedRoles[0] || "customer";
+}
+
+function isAdminPreview() {
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function isPlannerView() {
+  return getActiveRole(currentUserData || {}) === "planner";
+}
+
+function isVendorView() {
+  return getActiveRole(currentUserData || {}) === "vendor";
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (allowedRoles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${escapeHtml(role)}" ${role === activeRole ? "selected" : ""}>${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
+}
+
+function getHomeHref(role = getActiveRole(currentUserData || {})) {
+  return getDashboardForRole(role);
 }
 
 function enableAdminPreviewMode() {
@@ -791,28 +978,21 @@ function enableAdminPreviewMode() {
   if (backLink) backLink.href = "admin-dashboard.html";
 
   setText("roleEyebrow", "Admin Inbox");
-  setText("heroLabel", "Admin message review");
-  setText("heroSubtitle", "Preview conversations across the marketplace and return to the admin dashboard anytime.");
+  setText("messagesSubtitle", "Preview conversations across the marketplace and return to the admin dashboard anytime.");
 }
 
 async function loadUnreadAppNotifications(user) {
   try {
     const notificationsRef = collection(db, "notifications");
-    const notificationsQuery = query(notificationsRef, where("recipientId", "==", user.uid));
+    const notificationsQuery = query(
+      notificationsRef,
+      where("recipientId", "==", user.uid),
+      where("read", "==", false)
+    );
+
     const snapshot = await getDocs(notificationsQuery);
-
-    let unreadCount = 0;
-
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-
-      if (data.read === false) {
-        unreadCount += 1;
-      }
-    });
-
-    setBadge("topNotificationBadge", unreadCount);
-  } catch (error) {
+    setBadge("topNotificationBadge", snapshot.size);
+  } catch {
     setBadge("topNotificationBadge", 0);
   }
 }
@@ -839,12 +1019,13 @@ function renderBottomNav(role) {
         <span>Home</span>
       </a>
 
-      <a class="nav-item" href="add-listing.html">
+      <a class="nav-item" href="booking-requests.html">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         </svg>
-        <span>Add Listing</span>
+        <span>Requests</span>
       </a>
 
       <a class="nav-item" href="my-listings.html">
@@ -868,8 +1049,46 @@ function renderBottomNav(role) {
     return;
   }
 
+  if (role === "planner") {
+    bottomNav.innerHTML = `
+      <a class="nav-item" href="planner-dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
+        </svg>
+        <span>Planner</span>
+      </a>
+
+      <a class="nav-item" href="${withEventParam("listings.html")}">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+          <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Listings</span>
+      </a>
+
+      <a class="nav-item active" href="${withEventParam("messages.html")}">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Inbox</span>
+      </a>
+
+      <a class="nav-item" href="planner-profile.html">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+          <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span>Profile</span>
+      </a>
+    `;
+    return;
+  }
+
   bottomNav.innerHTML = `
-    <a class="nav-item" href="${getHomeHref(role)}">
+    <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
       </svg>
@@ -885,7 +1104,7 @@ function renderBottomNav(role) {
       <span>Listings</span>
     </a>
 
-    <a class="nav-item active" href="messages.html">
+    <a class="nav-item active" href="${withEventParam("messages.html")}">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -906,8 +1125,8 @@ function renderBottomNav(role) {
 
 function applyRoleLayout(role) {
   const backLink = document.getElementById("backLink");
-
   const primaryTab = document.getElementById("primaryMessageTab");
+
   if (primaryTab) {
     primaryTab.textContent = role === "vendor" ? "Customers" : "Vendors";
   }
@@ -917,20 +1136,17 @@ function applyRoleLayout(role) {
   } else if (role === "vendor") {
     backLink.href = "vendor-dashboard.html";
     setText("roleEyebrow", currentEventId ? "Event Inbox" : "Vendor Inbox");
-    setText("heroLabel", "Stay bookable");
-    setText("heroSubtitle", "Reply to client questions, confirm details, and keep your booking conversations organized.");
-  } else if (isPlannerRole(role)) {
+    setText("messagesSubtitle", "Reply to client questions, confirm details, and keep booking conversations organized.");
+  } else if (role === "planner") {
     backLink.href = currentEventId ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}` : "planner-dashboard.html";
     setText("roleEyebrow", currentEventId ? "Planner Event Inbox" : "Planner Inbox");
-    setText("heroLabel", "Keep client conversations polished.");
-    setText("heroSubtitle", currentEventId
+    setText("messagesSubtitle", currentEventId
       ? "Keep every vendor conversation for this client event in one place."
       : "Manage vendor conversations across client events without losing the thread.");
   } else {
     backLink.href = currentEventId ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}` : "dashboard.html";
-    setText("roleEyebrow", currentEventId ? "Event Inbox" : "Inbox");
-    setText("heroLabel", "Stay connected");
-    setText("heroSubtitle", currentEventId
+    setText("roleEyebrow", currentEventId ? "Event Inbox" : "Customer Inbox");
+    setText("messagesSubtitle", currentEventId
       ? "Keep every vendor conversation for this event project in one place."
       : "Ask questions, confirm details, and keep all your event communication in one place.");
   }
@@ -940,35 +1156,44 @@ function applyRoleLayout(role) {
 
 function renderEmptyState() {
   const messageList = document.getElementById("messageList");
-  const role = currentUserData?.role || "customer";
+  const role = getActiveRole(currentUserData || {});
 
   const primaryHref = role === "admin"
     ? "admin-dashboard.html"
     : role === "vendor"
       ? "booking-requests.html"
       : withEventParam("listings.html");
+
   const primaryText = role === "admin"
     ? "Back to Admin"
     : role === "vendor"
       ? "View Booking Requests"
       : "Browse Listings";
+
   const homeHref = getHomeHref(role);
+
   const copy = role === "admin"
     ? "Conversations across the marketplace will appear here once customers, planners, and vendors begin messaging."
     : role === "vendor"
-      ? "When customers message you about a listing or event request, those conversations will appear here."
+      ? "When customers or planners message you about a listing or event request, those conversations will appear here."
       : currentEventId
         ? "When you message vendors for this event, those conversations will appear here."
         : "When you message vendors about listings, those conversations will appear here.";
 
   messageList.innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">✉</div>
+      <div class="empty-icon">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
+          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </div>
       <h3>You don’t have any messages</h3>
-      <p>${copy}</p>
+      <p>${escapeHtml(copy)}</p>
       <div class="empty-actions">
-        <a class="btn" href="${primaryHref}">${primaryText}</a>
-        <a class="btn-secondary" href="${homeHref}">Back Home</a>
+        <a class="btn" href="${escapeHtml(primaryHref)}">${escapeHtml(primaryText)}</a>
+        <a class="btn-secondary" href="${escapeHtml(homeHref)}">Back Home</a>
       </div>
     </div>
   `;
@@ -979,6 +1204,7 @@ function getConversationTitle(conversation) {
   const otherIds = Array.isArray(conversation.participantIds)
     ? conversation.participantIds.filter((id) => currentUser && id !== currentUser.uid)
     : [];
+
   const otherId = otherIds[0];
 
   if (otherId && participantNames[otherId]) {
@@ -1042,20 +1268,15 @@ function normalizeProfessionalLabel(value) {
     "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
     "Water Safety Attendants": "Water Safety Providers",
     "Parking Attendants": "Parking Attendant Companies",
-    "Valet / Parking": "Valet / Parking Companies"
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
   };
 
   return labelMap[clean] || clean;
-}
-
-function getVendorItemsForCurrentUser(request) {
-  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
-
-  if (isAdminPreview()) return vendors;
-
-  return vendors.filter((vendor) => {
-    return currentUser && safeText(vendor.vendorId, "") === currentUser.uid;
-  });
 }
 
 function getVendorConversationId(request, vendorId) {
@@ -1065,21 +1286,42 @@ function getVendorConversationId(request, vendorId) {
 
   return safeText(response.conversationId, "") ||
     safeText(conversationIds[vendorId], "") ||
-    buildBookingConversationId(request.id, request.customerId, vendorId);
+    buildBookingConversationId(request.id, request.requestOwnerId || request.customerId || request.plannerId, vendorId);
+}
+
+function canSeeRequest(request) {
+  if (isAdminPreview()) return true;
+
+  const uid = currentUser.uid;
+  const role = getActiveRole(currentUserData || {});
+  const vendorIds = Array.isArray(request.vendorIds) ? request.vendorIds : [];
+
+  if (role === "vendor") {
+    return vendorIds.includes(uid);
+  }
+
+  if (role === "planner") {
+    return request.plannerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
+  }
+
+  return request.customerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
 }
 
 function buildConversationsFromBookingRequest(request) {
-  if (!currentUser) return [];
+  if (!currentUser || !canSeeRequest(request)) return [];
 
-  const role = currentUserData?.role || "customer";
+  const role = getActiveRole(currentUserData || {});
   const requestId = safeText(request.id, "");
   const customerId = safeText(request.customerId, "");
+  const plannerId = safeText(request.plannerId, "");
+  const requestOwnerId = safeText(request.requestOwnerId || plannerId || customerId, "");
   const eventId = safeText(request.eventId, "") || safeText(request.eventDetails?.id, "");
   const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
   const customerName = safeText(request.customerName, "Customer");
+  const plannerName = safeText(request.plannerName, "Planner");
   const vendors = Array.isArray(request.vendors) ? request.vendors : [];
 
-  if (!requestId || !customerId || !vendors.length) return [];
+  if (!requestId || !vendors.length) return [];
 
   let visibleVendors = vendors;
 
@@ -1087,26 +1329,18 @@ function buildConversationsFromBookingRequest(request) {
     visibleVendors = vendors.filter((vendor) => safeText(vendor.vendorId, "") === currentUser.uid);
   }
 
-  if (role !== "vendor" && !isAdminPreview()) {
-    if (customerId !== currentUser.uid) return [];
-  }
-
   return visibleVendors.map((vendor) => {
     const vendorId = safeText(vendor.vendorId, "");
     if (!vendorId) return null;
 
-    const vendorName = safeText(
-      vendor.vendorName ||
-      (role === "vendor" ? currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName : "") ||
-      "Vendor",
-      "Vendor"
-    );
-
+    const vendorName = safeText(vendor.vendorName, "Vendor");
+    const ownerIdForConversation = requestOwnerId || customerId || plannerId || currentUser.uid;
     const conversationId = getVendorConversationId(request, vendorId);
     const listingTitle = safeText(vendor.listingTitle || vendor.title, "Event Request");
     const listingCategory = normalizeProfessionalLabel(safeText(vendor.category || vendor.listingCategory || vendor.mainCategory, "Event Service"));
     const vendorResponses = request.vendorResponses || {};
     const vendorResponse = vendorResponses[vendorId] || null;
+
     const responseStatus = safeText(vendorResponse?.status, "");
     const responseLabel = responseStatus === "needs_info"
       ? "Needs More Info"
@@ -1115,23 +1349,28 @@ function buildConversationsFromBookingRequest(request) {
         : responseStatus === "declined"
           ? "Declined"
           : "Booking Request";
+
     const lastMessage = vendorResponse?.note
       ? `${responseLabel}: ${vendorResponse.note}`
       : `Booking request for ${eventName}.`;
 
+    const ownerName = plannerId ? plannerName : customerName;
+    const ownerRole = plannerId ? "planner" : "customer";
+
     return {
       id: conversationId,
       conversationKey: conversationId,
-      participantIds: [customerId, vendorId],
+      participantIds: [ownerIdForConversation, vendorId].filter(Boolean),
       participantNames: {
-        [customerId]: customerName,
+        [ownerIdForConversation]: ownerName,
         [vendorId]: vendorName
       },
       participantRoles: {
-        [customerId]: "customer",
+        [ownerIdForConversation]: ownerRole,
         [vendorId]: "vendor"
       },
       customerId,
+      plannerId,
       vendorId,
       bookingRequestId: requestId,
       eventId,
@@ -1140,20 +1379,16 @@ function buildConversationsFromBookingRequest(request) {
       listingTitle,
       listingCategory,
       listingLocation: safeText(vendor.location || request.eventDetails?.eventCity || "", ""),
-      title: role === "vendor" ? customerName : vendorName,
+      title: role === "vendor" ? ownerName : vendorName,
       contextType: "Booking Request",
       lastMessage,
-      lastSenderId: vendorResponse ? vendorId : customerId,
+      lastSenderId: vendorResponse ? vendorId : ownerIdForConversation,
       unreadFor: {},
       createdAt: request.createdAt || null,
       updatedAt: vendorResponse?.respondedAt || request.updatedAt || request.createdAt || null,
       _needsRepair: true
     };
   }).filter(Boolean);
-}
-
-function buildConversationFromBookingRequest(request) {
-  return buildConversationsFromBookingRequest(request)[0] || null;
 }
 
 async function loadConversationIdsFromNotifications(user) {
@@ -1173,7 +1408,7 @@ async function loadConversationIdsFromNotifications(user) {
       const sourceId = safeText(data.sourceId, "");
       const conversationId = safeText(data.conversationId, "");
       const bookingRequestId = safeText(data.bookingRequestId, "");
-      const customerId = safeText(data.customerId, "");
+      const customerId = safeText(data.customerId || data.plannerId || data.requestOwnerId, "");
       const vendorId = safeText(data.vendorId, "");
 
       if (conversationId) ids.push(conversationId);
@@ -1198,7 +1433,6 @@ async function loadConversationFallbacksFromNotifications(user, existingIds = []
   for (const conversationId of uniqueIds) {
     try {
       const conversationSnap = await getDoc(doc(db, "conversations", conversationId));
-
       if (!conversationSnap.exists()) continue;
 
       const data = conversationSnap.data();
@@ -1235,6 +1469,7 @@ function buildConversationFromNotification(notification) {
   const listingTitle = safeText(notification.listingTitle || notification.sourceLabel, "");
   const bookingRequestId = safeText(notification.bookingRequestId, "");
   const body = safeText(notification.body || notification.text || notification.lastMessage, "New message.");
+  const myRole = getActiveRole(currentUserData || {});
 
   const participantNames = {
     [currentUser.uid]: safeText(currentUserData?.name || currentUser.displayName || currentUser.email, "Me")
@@ -1254,11 +1489,12 @@ function buildConversationFromNotification(notification) {
     participantIds,
     participantNames,
     participantRoles: {
-      [currentUser.uid]: currentUserData?.role || "customer",
+      [currentUser.uid]: myRole,
       ...(senderId ? { [senderId]: "user" } : {})
     },
-    customerId: safeText(notification.customerId, currentUserData?.role === "vendor" ? "" : currentUser.uid),
-    vendorId: safeText(notification.vendorId, currentUserData?.role === "vendor" ? currentUser.uid : ""),
+    customerId: safeText(notification.customerId, myRole === "vendor" ? "" : currentUser.uid),
+    plannerId: safeText(notification.plannerId, myRole === "planner" ? currentUser.uid : ""),
+    vendorId: safeText(notification.vendorId, myRole === "vendor" ? currentUser.uid : ""),
     bookingRequestId,
     eventId,
     eventName,
@@ -1312,17 +1548,19 @@ async function loadDirectConversationCardsFromNotifications(user, existingIds = 
   return conversations;
 }
 
-
 async function loadBookingRequestConversationFallbacks(user, existingIds = []) {
   const conversations = [];
 
   try {
     let requestQuery;
+    const role = getActiveRole(currentUserData || {});
 
     if (isAdminPreview()) {
       requestQuery = query(collection(db, "bookingRequests"));
-    } else if (currentUserData?.role === "vendor") {
+    } else if (role === "vendor") {
       requestQuery = query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", user.uid));
+    } else if (role === "planner") {
+      requestQuery = query(collection(db, "bookingRequests"), where("plannerId", "==", user.uid));
     } else {
       requestQuery = query(collection(db, "bookingRequests"), where("customerId", "==", user.uid));
     }
@@ -1361,6 +1599,26 @@ async function loadBookingRequestConversationFallbacks(user, existingIds = []) {
         }
       }
     }
+
+    if (role === "planner" && !isAdminPreview()) {
+      const ownerQuery = query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid));
+      const ownerSnapshot = await getDocs(ownerQuery);
+
+      for (const requestSnap of ownerSnapshot.docs) {
+        const request = {
+          id: requestSnap.id,
+          ...requestSnap.data()
+        };
+
+        const fallbackConversations = buildConversationsFromBookingRequest(request);
+
+        for (const fallbackConversation of fallbackConversations) {
+          if (!fallbackConversation || existingIds.includes(fallbackConversation.id)) continue;
+          conversations.push(fallbackConversation);
+          existingIds.push(fallbackConversation.id);
+        }
+      }
+    }
   } catch (error) {
     console.warn("Booking request conversation fallback skipped:", error.message);
   }
@@ -1379,7 +1637,6 @@ async function syncConversationWithLatestMessage(conversation) {
     );
 
     const snapshot = await getDocs(messagesQuery);
-
     if (snapshot.empty) return conversation;
 
     const latestDoc = snapshot.docs[0];
@@ -1441,7 +1698,7 @@ function renderConversations(conversations) {
     const title = getConversationTitle(conversation);
     const lastMessage = safeText(conversation.lastMessage, "No messages yet.");
     const time = formatTime(conversation.updatedAt || conversation.createdAt);
-    const roleLabel = safeText(conversation.contextType, currentUserData?.role === "vendor" ? "Customer" : "Vendor");
+    const roleLabel = safeText(conversation.contextType, isVendorView() ? "Customer" : "Vendor");
     const listingTitle = safeText(conversation.listingTitle, "");
     const eventName = getConversationEventName(conversation);
     const bookingRequestId = safeText(conversation.bookingRequestId, "");
@@ -1538,7 +1795,6 @@ async function loadConversations(user) {
       : query(conversationsRef, where("participantIds", "array-contains", user.uid));
 
     const snapshot = await getDocs(conversationsQuery);
-
     let conversations = [];
 
     snapshot.forEach((docSnap) => {
@@ -1587,6 +1843,7 @@ async function loadConversations(user) {
 
       const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : Date.parse(a.updatedAt || "") / 1000 || 0;
       const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : Date.parse(b.updatedAt || "") / 1000 || 0;
+
       return bTime - aTime;
     });
 
@@ -1605,6 +1862,7 @@ document.getElementById("searchInput").addEventListener("input", applySearch);
 document.getElementById("searchToggleBtn").addEventListener("click", () => {
   const bar = document.getElementById("mobileSearchBar");
   bar.classList.toggle("show");
+
   if (bar.classList.contains("show")) {
     document.getElementById("searchInput").focus();
   }
@@ -1614,6 +1872,10 @@ document.querySelectorAll("[data-message-filter]").forEach((button) => {
   button.addEventListener("click", () => {
     setMessageFilter(button.dataset.messageFilter);
   });
+});
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
 });
 
 onAuthStateChanged(auth, async (user) => {
@@ -1633,13 +1895,15 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   currentUserData = userSnap.data();
 
-  const role = currentUserData.role === "planner" || currentUserData.plannerPro === true
-    ? "planner"
-    : currentUserData.role || "customer";
+  const activeRole = getActiveRole(currentUserData);
 
-  applyRoleLayout(role);
-  loadUnreadAppNotifications(user);
-  loadConversations(user);
+  renderRoleSwitcher(currentUserData);
+  applyRoleLayout(activeRole);
+
+  await Promise.all([
+    loadUnreadAppNotifications(user),
+    loadConversations(user)
+  ]);
 });
 </script>
 
