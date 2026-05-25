@@ -822,9 +822,9 @@
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </header>
@@ -850,10 +850,11 @@
         <div class="success-icon">✓</div>
         <h3>Request submitted</h3>
         <p id="successMessage">
-          Your request was submitted successfully. You can track updates from your My Requests page.
+          Your request was submitted successfully. Your vendor conversations were created in Messages.
         </p>
-        <div style="margin-top:14px;">
-          <a class="btn" id="successRequestsLink" href="my-requests.html">View My Requests</a>
+        <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn" id="successMessagesLink" href="messages.html">Go to Messages</a>
+          <a class="btn-secondary" id="successRequestsLink" href="my-requests.html">View My Requests</a>
         </div>
       </div>
     </section>
@@ -927,7 +928,7 @@
           </div>
 
           <div class="status-message info" id="checkoutStatus">
-            This MVP saves a booking request first. Stripe payments can be connected after the request flow is working.
+            Submit Request will save the booking request, create vendor message threads, and notify each vendor.
           </div>
         </div>
       </section>
@@ -942,7 +943,7 @@
         <div class="payment-icon">◎</div>
         <h3>No payment collected yet</h3>
         <p>
-          Clicking Submit Request saves this event request in Firebase so vendors can review the event details, selected services, and estimated total.
+          Clicking Submit Request saves this event request in Firebase and creates a Messages thread for each selected vendor.
         </p>
       </div>
     </section>
@@ -955,7 +956,7 @@
       <div class="note-card">
         <h3 class="note-title">Important MVP Note</h3>
         <p class="note-text">
-          This creates a pending booking request. Later, this request can connect to vendor availability, messages, confirmations, Stripe Embedded Checkout, and RentEvent’s platform fee.
+          This creates a pending booking request and a real in-app conversation thread. Later, Stripe Embedded Checkout can be connected after the request and messaging flow is working.
         </p>
       </div>
 
@@ -991,6 +992,7 @@ import {
   query,
   where,
   updateDoc,
+  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -1179,6 +1181,16 @@ function getActorRole() {
   return "customer";
 }
 
+function getCurrentUserDisplayName() {
+  return currentUserData?.plannerName ||
+    currentUserData?.businessName ||
+    currentUserData?.vendorName ||
+    currentUserData?.name ||
+    currentUser?.displayName ||
+    currentUser?.email ||
+    "RentEvent User";
+}
+
 function renderRoleSwitcher(userData = {}) {
   const wrapper = document.getElementById("roleSwitcher");
   const select = document.getElementById("roleSelect");
@@ -1252,6 +1264,12 @@ function myRequestsHref() {
     : "my-requests.html";
 }
 
+function messagesHref() {
+  return activeEventId
+    ? `messages.html?eventId=${encodeURIComponent(activeEventId)}`
+    : "messages.html";
+}
+
 function applyEventLinks() {
   const builderLink = isAdminPreview()
     ? "admin-dashboard.html"
@@ -1267,9 +1285,14 @@ function applyEventLinks() {
     if (el) el.href = builderLink;
   });
 
-  const successLink = document.getElementById("successRequestsLink");
-  if (successLink) {
-    successLink.href = isAdminPreview() ? "admin-dashboard.html" : myRequestsHref();
+  const successRequestsLink = document.getElementById("successRequestsLink");
+  if (successRequestsLink) {
+    successRequestsLink.href = isAdminPreview() ? "admin-dashboard.html" : myRequestsHref();
+  }
+
+  const successMessagesLink = document.getElementById("successMessagesLink");
+  if (successMessagesLink) {
+    successMessagesLink.href = isAdminPreview() ? "admin-dashboard.html" : messagesHref();
   }
 
   if (isPlannerView() && !isAdminPreview()) {
@@ -1782,12 +1805,16 @@ function buildBookingRequestPayload() {
     payload.customerEmail = currentEventData?.clientEmail || currentEventData?.customerEmail || "";
 
     payload.requestOwnerId = payload.plannerId;
+    payload.requestOwnerName = payload.plannerName;
+    payload.requestOwnerRole = "planner";
     payload.accountType = "planner";
   } else {
     payload.customerId = existingCustomerId || currentUser.uid;
     payload.customerName = currentUserData?.name || currentUser.displayName || currentUser.email || "Customer";
     payload.customerEmail = currentUserData?.email || currentUser.email || "";
     payload.requestOwnerId = payload.customerId;
+    payload.requestOwnerName = payload.customerName;
+    payload.requestOwnerRole = "customer";
     payload.accountType = currentEventData?.accountType || "customer";
 
     if (existingPlannerId) {
@@ -1800,13 +1827,145 @@ function buildBookingRequestPayload() {
   return payload;
 }
 
-async function createVendorBookingNotifications(requestId, payload) {
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
+
+function buildBookingConversationId(requestId, ownerId, vendorId) {
+  return [
+    "booking",
+    makeSafeId(requestId),
+    makeSafeId(ownerId),
+    makeSafeId(vendorId)
+  ].join("__");
+}
+
+function getOwnerNameFromPayload(payload) {
+  return safeText(
+    payload.requestOwnerName ||
+    payload.plannerName ||
+    payload.customerName ||
+    getCurrentUserDisplayName(),
+    "Customer"
+  );
+}
+
+function getOwnerRoleFromPayload(payload) {
+  if (payload.requestOwnerRole) return payload.requestOwnerRole;
+  if (payload.plannerId && payload.requestOwnerId === payload.plannerId) return "planner";
+  return "customer";
+}
+
+function getInitialConversationMessage(payload, vendor) {
+  const eventName = safeText(payload.eventName, "this event");
+  const listingTitle = safeText(vendor.listingTitle, "your listing");
+  const guestCount = safeText(payload.eventDetails?.guestCount, "");
+  const eventDate = safeText(payload.eventDetails?.eventDate, "");
+  const eventCity = safeText(payload.eventDetails?.eventCity, "");
+  const styleVibe = safeText(payload.eventDetails?.styleVibe, "");
+
+  const details = [];
+
+  if (eventDate) details.push(`Date: ${eventDate}`);
+  if (eventCity) details.push(`Location: ${eventCity}`);
+  if (guestCount) details.push(`Guests: ${guestCount}`);
+  if (styleVibe) details.push(`Style: ${styleVibe}`);
+
+  return `New booking request for ${eventName} regarding ${listingTitle}.${details.length ? "\n\n" + details.join("\n") : ""}`;
+}
+
+async function createConversationForVendor(requestId, payload, vendor) {
+  const ownerId = safeText(payload.requestOwnerId || payload.plannerId || payload.customerId, "");
+  const ownerName = getOwnerNameFromPayload(payload);
+  const ownerRole = getOwnerRoleFromPayload(payload);
+  const vendorId = safeText(vendor.vendorId, "");
+  const vendorName = safeText(vendor.vendorName, "Vendor");
+
+  if (!requestId || !ownerId || !vendorId) {
+    return "";
+  }
+
+  const conversationId = buildBookingConversationId(requestId, ownerId, vendorId);
+  const firstMessage = getInitialConversationMessage(payload, vendor);
+
+  const conversationPayload = {
+    conversationKey: conversationId,
+    participantIds: [ownerId, vendorId],
+    participantNames: {
+      [ownerId]: ownerName,
+      [vendorId]: vendorName
+    },
+    participantRoles: {
+      [ownerId]: ownerRole,
+      [vendorId]: "vendor"
+    },
+
+    customerId: payload.customerId || "",
+    customerName: payload.customerName || "",
+    plannerId: payload.plannerId || "",
+    plannerName: payload.plannerName || "",
+    requestOwnerId: ownerId,
+    requestOwnerName: ownerName,
+    requestOwnerRole: ownerRole,
+
+    vendorId,
+    vendorName,
+
+    bookingRequestId: requestId,
+    eventId: payload.eventId,
+    eventName: payload.eventName,
+
+    listingId: vendor.listingId || "",
+    listingTitle: vendor.listingTitle || "Event Service",
+    listingCategory: vendor.category || vendor.mainCategory || "Event Service",
+    listingLocation: vendor.location || payload.eventDetails?.eventCity || "",
+
+    title: ownerRole === "vendor" ? ownerName : vendorName,
+    contextType: "Booking Request",
+
+    lastMessage: firstMessage,
+    lastSenderId: ownerId,
+    lastSenderName: ownerName,
+    lastSenderRole: ownerRole,
+
+    unreadFor: {
+      [vendorId]: true
+    },
+
+    source: "checkout",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  await setDoc(doc(db, "conversations", conversationId), conversationPayload, { merge: true });
+
+  await addDoc(collection(db, "conversations", conversationId, "messages"), {
+    text: firstMessage,
+    senderId: ownerId,
+    senderName: ownerName,
+    senderRole: ownerRole,
+    systemGenerated: true,
+    messageType: "booking_request",
+    bookingRequestId: requestId,
+    eventId: payload.eventId,
+    listingId: vendor.listingId || "",
+    createdAt: serverTimestamp()
+  });
+
+  return conversationId;
+}
+
+async function createVendorBookingNotifications(requestId, payload, conversationMap = {}) {
   const vendorIds = Array.isArray(payload.vendorIds) ? payload.vendorIds : [];
   const uniqueVendorIds = Array.from(new Set(vendorIds.filter(Boolean)));
 
   if (!uniqueVendorIds.length) return;
 
   for (const vendorId of uniqueVendorIds) {
+    const conversationId = conversationMap[vendorId] || "";
+
     try {
       await addDoc(collection(db, "notifications"), {
         recipientId: vendorId,
@@ -1817,11 +1976,14 @@ async function createVendorBookingNotifications(requestId, payload) {
         category: "Booking Request",
 
         title: "New booking request",
-        body: `${payload.plannerId ? payload.plannerName || "A planner" : payload.customerName} submitted a request for ${payload.eventName}.`,
+        body: `${payload.plannerId ? payload.plannerName || "A planner" : payload.customerName || "A customer"} submitted a request for ${payload.eventName}.`,
 
-        sourceId: requestId,
-        sourceCollection: "bookingRequests",
+        sourceId: conversationId || requestId,
+        sourceCollection: conversationId ? "conversations" : "bookingRequests",
         sourceLabel: payload.eventName,
+
+        conversationId,
+        bookingRequestId: requestId,
         eventId: payload.eventId,
         eventName: payload.eventName,
 
@@ -1829,6 +1991,8 @@ async function createVendorBookingNotifications(requestId, payload) {
         customerName: payload.customerName || "",
         plannerId: payload.plannerId || "",
         plannerName: payload.plannerName || "",
+        requestOwnerId: payload.requestOwnerId || "",
+        vendorId,
 
         read: false,
         createdAt: serverTimestamp(),
@@ -1838,6 +2002,86 @@ async function createVendorBookingNotifications(requestId, payload) {
       console.warn(`Booking request saved, but notification for vendor ${vendorId} failed:`, error.message);
     }
   }
+}
+
+async function createRequesterConfirmationNotification(requestId, payload) {
+  const ownerId = safeText(payload.requestOwnerId || payload.customerId || payload.plannerId, "");
+
+  if (!ownerId) return;
+
+  try {
+    await addDoc(collection(db, "notifications"), {
+      recipientId: ownerId,
+      recipientRole: payload.requestOwnerRole || payload.accountType || "customer",
+
+      type: "booking_request_submitted",
+      typeLabel: "Request Submitted",
+      category: "Booking Request",
+
+      title: "Request submitted",
+      body: `Your request for ${payload.eventName} was submitted and vendor message threads were created.`,
+
+      sourceId: requestId,
+      sourceCollection: "bookingRequests",
+      sourceLabel: payload.eventName,
+
+      bookingRequestId: requestId,
+      eventId: payload.eventId,
+      eventName: payload.eventName,
+
+      customerId: payload.customerId || "",
+      plannerId: payload.plannerId || "",
+      requestOwnerId: ownerId,
+
+      read: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Requester confirmation notification failed:", error.message);
+  }
+}
+
+async function createConversationsForBookingRequest(requestId, payload) {
+  const vendors = Array.isArray(payload.vendors) ? payload.vendors : [];
+  const conversationMap = {};
+  const updatedVendors = [];
+
+  for (const vendor of vendors) {
+    const vendorId = safeText(vendor.vendorId, "");
+
+    if (!vendorId) {
+      updatedVendors.push(vendor);
+      continue;
+    }
+
+    try {
+      const conversationId = await createConversationForVendor(requestId, payload, vendor);
+
+      if (conversationId) {
+        conversationMap[vendorId] = conversationId;
+        updatedVendors.push({
+          ...vendor,
+          conversationId
+        });
+      } else {
+        updatedVendors.push(vendor);
+      }
+    } catch (error) {
+      console.warn(`Conversation creation failed for vendor ${vendorId}:`, error.message);
+      updatedVendors.push(vendor);
+    }
+  }
+
+  await updateDoc(doc(db, "bookingRequests", requestId), {
+    vendors: updatedVendors,
+    vendorConversationIds: conversationMap,
+    conversationsCreated: true,
+    conversationsCreatedAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+
+  return conversationMap;
 }
 
 async function submitBookingRequest() {
@@ -1869,7 +2113,7 @@ async function submitBookingRequest() {
     isSubmitting = true;
     button.disabled = true;
     button.textContent = "Submitting...";
-    setCheckoutStatus("Submitting your booking request...", "info");
+    setCheckoutStatus("Submitting your booking request and creating message threads...", "info");
 
     const payload = buildBookingRequestPayload();
 
@@ -1880,15 +2124,20 @@ async function submitBookingRequest() {
     const bookingRef = await addDoc(collection(db, "bookingRequests"), payload);
     lastBookingRequestId = bookingRef.id;
 
-    await createVendorBookingNotifications(bookingRef.id, payload);
+    const conversationMap = await createConversationsForBookingRequest(bookingRef.id, payload);
+
+    await Promise.all([
+      createVendorBookingNotifications(bookingRef.id, payload, conversationMap),
+      createRequesterConfirmationNotification(bookingRef.id, payload)
+    ]);
 
     document.getElementById("successSection").style.display = "block";
     document.getElementById("successMessage").textContent =
       isPlannerView()
-        ? "Your client request was submitted successfully. You can track updates from the request page."
-        : "Your request was submitted successfully. You can track updates from your My Requests page.";
+        ? "Your client request was submitted successfully. Vendor conversations were created in Messages."
+        : "Your request was submitted successfully. Vendor conversations were created in Messages.";
 
-    setCheckoutStatus("Booking request submitted successfully. Vendors have been notified.", "success");
+    setCheckoutStatus("Request submitted. Vendor message threads were created and vendors were notified.", "success");
 
     document.getElementById("successSection").scrollIntoView({
       behavior: "smooth",
