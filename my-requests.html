@@ -14,9 +14,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -51,9 +49,7 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .page {
       width: 100%;
@@ -65,7 +61,7 @@
 
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 22px;
@@ -119,6 +115,7 @@
     .topbar-center {
       flex: 1;
       text-align: center;
+      min-width: 0;
     }
 
     .eyebrow {
@@ -246,9 +243,7 @@
       color: #fff;
     }
 
-    .section {
-      margin-top: 28px;
-    }
+    .section { margin-top: 28px; }
 
     .section-header {
       display: flex;
@@ -341,36 +336,13 @@
       text-transform: capitalize;
     }
 
-    .pill.pending {
-      background: #fff4df;
-      color: #aa6f12;
-    }
-
-    .pill.info {
-      background: #f6efe4;
-      color: #6a625a;
-    }
-
-    .pill.safe {
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .pill.ai {
-      background: var(--purple-soft);
-      color: var(--purple-text);
-    }
-
-    .pill.type {
-      background: var(--blue-soft);
-      color: var(--blue-text);
-    }
-
+    .pill.pending { background: #fff4df; color: #aa6f12; }
+    .pill.info { background: #f6efe4; color: #6a625a; }
+    .pill.safe { background: var(--green-soft); color: var(--green-text); }
+    .pill.ai { background: var(--purple-soft); color: var(--purple-text); }
+    .pill.type { background: var(--blue-soft); color: var(--blue-text); }
     .pill.declined,
-    .pill.withdrawn {
-      background: var(--red-soft);
-      color: var(--red-text);
-    }
+    .pill.withdrawn { background: var(--red-soft); color: var(--red-text); }
 
     .request-grid {
       display: grid;
@@ -563,7 +535,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.2rem;
       font-weight: 800;
     }
 
@@ -591,23 +563,9 @@
       line-height: 1.45;
     }
 
-    .status-message.info {
-      display: block;
-      background: #fff4df;
-      color: #8d5f11;
-    }
-
-    .status-message.success {
-      display: block;
-      background: var(--green-soft);
-      color: var(--green-text);
-    }
-
-    .status-message.error {
-      display: block;
-      background: var(--red-soft);
-      color: var(--red-text);
-    }
+    .status-message.info { display: block; background: #fff4df; color: #8d5f11; }
+    .status-message.success { display: block; background: var(--green-soft); color: var(--green-text); }
+    .status-message.error { display: block; background: var(--red-soft); color: var(--red-text); }
 
     .modal-overlay {
       position: fixed;
@@ -705,53 +663,6 @@
       min-width: 0;
     }
 
-    .bottom-nav {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 16px;
-      width: calc(100% - 24px);
-      max-width: 406px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(235, 225, 211, 0.95);
-      border-radius: 999px;
-      padding: 10px 8px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .nav-item {
-      min-height: 58px;
-      border-radius: 999px;
-      text-decoration: none;
-      color: #6c655d;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      font-size: 0.76rem;
-      font-weight: 700;
-      text-align: center;
-      padding: 0 4px;
-      position: relative;
-    }
-
-    .nav-item svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .nav-item.active {
-      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
-    }
-
     .admin-preview-bar {
       display: none;
       position: sticky;
@@ -803,22 +714,63 @@
       justify-content: center;
     }
 
-    @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
-      }
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(235, 225, 211, 0.95);
+      border-radius: 999px;
+      padding: 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
 
-      .page {
-        max-width: 960px;
-      }
+    .nav-item {
+      min-height: 58px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #6c655d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0 4px;
+      position: relative;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+    }
+
+    @media (min-width: 768px) {
+      body { padding: 24px 0; }
+
+      .page { max-width: 960px; }
 
       .request-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .bottom-nav {
-        max-width: 520px;
-      }
+      .bottom-nav { max-width: 520px; }
     }
   </style>
 </head>
@@ -850,9 +802,9 @@
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </header>
@@ -882,7 +834,7 @@
 
       <div class="request-list" id="requestList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon">...</div>
           <h3>Loading requests</h3>
           <p>We’re checking your submitted event requests now.</p>
         </div>
@@ -923,7 +875,7 @@
     </div>
   </div>
 
-  <nav class="bottom-nav" aria-label="Customer navigation" id="bottomNav">
+  <nav class="bottom-nav" aria-label="Navigation" id="bottomNav">
     <a class="nav-item" href="dashboard.html" id="bottomHomeLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
@@ -933,7 +885,7 @@
 
     <a class="nav-item" href="listings.html" id="bottomListingsLink">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 16.1 4 15V7.5Z" stroke="currentColor" stroke-width="2"></path>
         <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
@@ -972,6 +924,7 @@ import {
   where,
   updateDoc,
   setDoc,
+  addDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -1054,10 +1007,12 @@ function setBadge(id, count) {
 }
 
 function normalizeRole(role) {
-  if (role === "client") return "customer";
-  if (role === "host") return "customer";
-  if (role === "event_host") return "customer";
-  return role || "customer";
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
 }
 
 function getDashboardForRole(role) {
@@ -1085,18 +1040,27 @@ function getAllowedRoles(userData = {}) {
 
   if (Array.isArray(userData.roles)) {
     userData.roles.forEach((role) => {
-      if (role) roleSet.add(normalizeRole(role));
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
     });
   }
 
-  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
-  if (userData.role) roleSet.add(normalizeRole(userData.role));
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
 
   if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
     roleSet.add("customer");
   }
 
-  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
     roleSet.add("vendor");
   }
 
@@ -1107,11 +1071,12 @@ function getAllowedRoles(userData = {}) {
   if (
     userData.admin === true ||
     userData.isAdmin === true ||
-    normalizeRole(userData.role) === "admin" ||
-    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+    userData.permissions?.admin === true ||
+    legacy === "admin"
   ) {
     roleSet.add("admin");
     roleSet.add("customer");
+    roleSet.add("planner");
   }
 
   if (!roleSet.size) roleSet.add("customer");
@@ -1122,11 +1087,12 @@ function getAllowedRoles(userData = {}) {
 
 function getActiveRole(userData = {}) {
   const allowedRoles = getAllowedRoles(userData);
-  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
 
-  if (allowedRoles.includes(requestedRole)) return requestedRole;
-  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
-  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
 
   return allowedRoles[0] || "customer";
 }
@@ -1167,10 +1133,9 @@ function renderRoleSwitcher(userData = {}) {
   }
 
   select.innerHTML = roles.map((role) => {
-    return `<option value="${escapeHtml(role)}">${escapeHtml(getRoleLabel(role))}</option>`;
+    return `<option value="${escapeHtml(role)}" ${role === activeRole ? "selected" : ""}>${escapeHtml(getRoleLabel(role))}</option>`;
   }).join("");
 
-  select.value = activeRole;
   wrapper.style.display = "inline-flex";
 }
 
@@ -1180,7 +1145,7 @@ async function switchDashboardRole(nextRole) {
   const normalizedRole = normalizeRole(nextRole);
   const allowedRoles = getAllowedRoles(currentUserData);
 
-  if (!allowedRoles.includes(normalizedRole)) {
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
     alert("This dashboard is not enabled on your account yet.");
     renderRoleSwitcher(currentUserData);
     return;
@@ -1273,9 +1238,7 @@ function updateEventScopedLinks() {
   } else {
     setText("pageEyebrow", "Customer Portal");
 
-    if (backLink) {
-      backLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html";
-    }
+    if (backLink) backLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html";
 
     if (planEventLink) {
       planEventLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html#myEventsSection";
@@ -1320,12 +1283,11 @@ function getAiSummary(request) {
 
   if (!suggestions.length) return "";
 
-  const titles = suggestions
+  return suggestions
     .slice(0, 3)
     .map((item) => safeText(item.title, "Suggested add-on"))
-    .filter(Boolean);
-
-  return titles.join(", ");
+    .filter(Boolean)
+    .join(", ");
 }
 
 function getStatusLabel(status) {
@@ -1367,12 +1329,7 @@ function getVendorResponseSummary(request) {
   const responses = request.vendorResponses || {};
 
   if (!vendors.length) {
-    return {
-      available: 0,
-      needsInfo: 0,
-      declined: 0,
-      waiting: 0
-    };
+    return { available: 0, needsInfo: 0, declined: 0, waiting: 0 };
   }
 
   return vendors.reduce((summary, vendor) => {
@@ -1385,12 +1342,7 @@ function getVendorResponseSummary(request) {
     else summary.waiting += 1;
 
     return summary;
-  }, {
-    available: 0,
-    needsInfo: 0,
-    declined: 0,
-    waiting: 0
-  });
+  }, { available: 0, needsInfo: 0, declined: 0, waiting: 0 });
 }
 
 function makeSafeId(value) {
@@ -1399,13 +1351,21 @@ function makeSafeId(value) {
     .slice(0, 180);
 }
 
-function buildBookingConversationId(requestId, customerId, vendorId) {
+function buildBookingConversationId(requestId, ownerId, vendorId) {
   return [
     "booking",
     makeSafeId(requestId),
-    makeSafeId(customerId),
+    makeSafeId(ownerId),
     makeSafeId(vendorId)
   ].join("__");
+}
+
+function getRequestOwnerId(request) {
+  if (isPlannerView()) {
+    return safeText(request.requestOwnerId || request.plannerId || currentUser.uid, currentUser.uid);
+  }
+
+  return safeText(request.requestOwnerId || request.customerId || currentUser.uid, currentUser.uid);
 }
 
 function normalizeProfessionalLabel(value) {
@@ -1466,7 +1426,7 @@ function renderEmptyRequests() {
       <div class="empty-icon">+</div>
       <h3>No requests yet</h3>
       <p>When you submit an event request from checkout, it will appear here.</p>
-      <a class="btn" href="${actionHref}">${actionLabel}</a>
+      <a class="btn" href="${escapeHtml(actionHref)}">${escapeHtml(actionLabel)}</a>
     </div>
   `;
 }
@@ -1563,7 +1523,6 @@ function renderRequests() {
             const responseLabel = getResponseLabel(responseStatus);
             const responsePillClass = getResponsePillClass(responseStatus);
             const responseNote = safeText(response?.note, responseStatus ? "" : "This vendor has not responded yet.");
-
             const vendorId = safeText(vendor.vendorId, "");
 
             return `
@@ -1653,7 +1612,7 @@ function renderRequests() {
         ${isAdminPreview() ? `
           <div class="request-actions">
             <a class="btn-secondary" href="admin-dashboard.html">Back to Admin</a>
-            <a class="btn" href="${withEventParam("event-builder.html", getRequestEventId(request))}">Preview Event</a>
+            <a class="btn" href="${escapeHtml(withEventParam("event-builder.html", getRequestEventId(request)))}">Preview Event</a>
           </div>
         ` : isWithdrawn ? `
           <div class="request-actions">
@@ -1663,7 +1622,7 @@ function renderRequests() {
         ` : `
           <div class="request-actions">
             <button class="btn" type="button" data-message-request="${requestId}">Message Vendors</button>
-            <a class="btn-secondary" href="${withEventParam("event-builder.html", getRequestEventId(request))}">Edit Event</a>
+            <a class="btn-secondary" href="${escapeHtml(withEventParam("event-builder.html", getRequestEventId(request)))}">Edit Event</a>
             <button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>
           </div>
         `}
@@ -1719,6 +1678,38 @@ function closeWithdrawModal() {
   modal.setAttribute("aria-hidden", "true");
 }
 
+async function createWithdrawNotifications(request, requestId, finalReason) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const uniqueVendorIds = Array.from(new Set(vendors.map((vendor) => safeText(vendor.vendorId, "")).filter(Boolean)));
+
+  for (const vendorId of uniqueVendorIds) {
+    try {
+      await addDoc(collection(db, "notifications"), {
+        recipientId: vendorId,
+        recipientRole: "vendor",
+        type: "request_withdrawn",
+        typeLabel: "Request Withdrawn",
+        category: "Booking Request",
+        title: "Request withdrawn",
+        body: `${isPlannerView() ? "A planner" : "A customer"} withdrew a request. Reason: ${finalReason}`,
+        sourceId: requestId,
+        sourceCollection: "bookingRequests",
+        sourceLabel: request.eventDetails?.eventName || request.eventName || "Event Request",
+        eventId: getRequestEventId(request),
+        bookingRequestId: requestId,
+        customerId: request.customerId || "",
+        plannerId: request.plannerId || "",
+        vendorId,
+        read: false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.warn("Withdraw notification failed:", error.message);
+    }
+  }
+}
+
 async function confirmWithdrawRequest() {
   if (isAdminPreview()) {
     showStatus("Admin preview mode is view-only. Use a customer or planner test account to withdraw requests.", "error");
@@ -1752,22 +1743,25 @@ async function confirmWithdrawRequest() {
     showStatus("Withdrawing request...", "info");
 
     const withdrawRole = isPlannerView() ? "planner" : "customer";
-
     const requestRef = doc(db, "bookingRequests", cleanRequestId);
 
     await updateDoc(requestRef, {
       status: "withdrawn",
       requestStatus: "withdrawn",
-      withdrawnBy: withdrawRole,
+      withdrawnBy: currentUser.uid,
+      withdrawnByRole: withdrawRole,
       withdrawnReason: finalReason,
       withdrawReason: finalReason,
       withdrawnAt: new Date().toISOString(),
       updatedAt: serverTimestamp()
     });
 
+    await createWithdrawNotifications(request, cleanRequestId, finalReason);
+
     request.status = "withdrawn";
     request.requestStatus = "withdrawn";
-    request.withdrawnBy = withdrawRole;
+    request.withdrawnBy = currentUser.uid;
+    request.withdrawnByRole = withdrawRole;
     request.withdrawnReason = finalReason;
     request.withdrawReason = finalReason;
     request.withdrawnAt = new Date().toISOString();
@@ -1813,10 +1807,7 @@ async function clearRequestFromCustomerView(requestId) {
     showStatus("Clearing request from your page...", "info");
 
     const requestRef = doc(db, "bookingRequests", cleanRequestId);
-
-    const updates = {
-      updatedAt: serverTimestamp()
-    };
+    const updates = { updatedAt: serverTimestamp() };
 
     if (isPlannerView()) {
       updates.hiddenForPlanner = true;
@@ -1874,7 +1865,7 @@ async function openVendorChatForRequest(requestId, vendorId) {
   const vendors = Array.isArray(request.vendors) ? request.vendors : [];
   const vendor = vendors.find((item) => safeText(item.vendorId, "") === cleanVendorId) || vendors[0] || {};
   const requestEventId = getRequestEventId(request) || cleanRequestId;
-  const ownerId = request.customerId || request.plannerId || currentUser.uid;
+  const ownerId = getRequestOwnerId(request);
   const conversationId = buildBookingConversationId(cleanRequestId, ownerId, cleanVendorId);
   const eventDetails = request.eventDetails || {};
   const eventName = safeText(eventDetails.eventName || request.eventName, "my event");
@@ -1882,7 +1873,7 @@ async function openVendorChatForRequest(requestId, vendorId) {
   const listingTitle = safeText(vendor.listingTitle || vendor.title, "your listing");
   const listingCategory = normalizeProfessionalLabel(safeText(vendor.category || vendor.listingCategory || vendor.mainCategory, "Event Service"));
   const senderRole = isPlannerView() ? "planner" : "customer";
-  const customerName = currentUserData.name || currentUser.displayName || currentUser.email || "Customer";
+  const senderName = currentUserData.plannerName || currentUserData.name || currentUser.displayName || currentUser.email || "Customer";
   const response = getVendorResponse(request, cleanVendorId);
   const responseNote = safeText(response?.note, "");
   const responseStatus = safeText(response?.status, "");
@@ -1896,16 +1887,16 @@ async function openVendorChatForRequest(requestId, vendorId) {
 
     await setDoc(doc(db, "conversations", conversationId), {
       conversationKey: conversationId,
-      participantIds: [currentUser.uid, cleanVendorId],
+      participantIds: [ownerId, cleanVendorId],
       participantNames: {
-        [currentUser.uid]: customerName,
+        [ownerId]: senderName,
         [cleanVendorId]: vendorName
       },
       participantRoles: {
-        [currentUser.uid]: senderRole,
+        [ownerId]: senderRole,
         [cleanVendorId]: "vendor"
       },
-      customerId: request.customerId || currentUser.uid,
+      customerId: request.customerId || "",
       plannerId: request.plannerId || (isPlannerView() ? currentUser.uid : ""),
       vendorId: cleanVendorId,
       listingId: safeText(vendor.listingId, ""),
@@ -1918,39 +1909,37 @@ async function openVendorChatForRequest(requestId, vendorId) {
       title: vendorName,
       contextType: "Booking Request",
       lastMessage: firstMessage,
-      lastSenderId: response ? cleanVendorId : currentUser.uid,
+      lastSenderId: response ? cleanVendorId : ownerId,
       unreadFor: {},
       createdAt: request.createdAt || serverTimestamp(),
       updatedAt: serverTimestamp()
     }, { merge: true });
 
-    if (response?.conversationId !== conversationId) {
-      const updatedResponses = {
-        ...(request.vendorResponses || {}),
-        [cleanVendorId]: {
-          ...(response || {}),
-          conversationId
-        }
-      };
+    const updatedResponses = {
+      ...(request.vendorResponses || {}),
+      [cleanVendorId]: {
+        ...(response || {}),
+        conversationId
+      }
+    };
 
-      try {
-        await updateDoc(doc(db, "bookingRequests", cleanRequestId), {
-          vendorResponses: updatedResponses,
-          vendorConversationIds: {
-            ...(request.vendorConversationIds || {}),
-            [cleanVendorId]: conversationId
-          },
-          updatedAt: serverTimestamp()
-        });
-
-        request.vendorResponses = updatedResponses;
-        request.vendorConversationIds = {
+    try {
+      await updateDoc(doc(db, "bookingRequests", cleanRequestId), {
+        vendorResponses: updatedResponses,
+        vendorConversationIds: {
           ...(request.vendorConversationIds || {}),
           [cleanVendorId]: conversationId
-        };
-      } catch (updateError) {
-        console.warn("Chat opened, but request conversation ID could not be updated:", updateError.message);
-      }
+        },
+        updatedAt: serverTimestamp()
+      });
+
+      request.vendorResponses = updatedResponses;
+      request.vendorConversationIds = {
+        ...(request.vendorConversationIds || {}),
+        [cleanVendorId]: conversationId
+      };
+    } catch (updateError) {
+      console.warn("Chat opened, but request conversation ID could not be updated:", updateError.message);
     }
 
     window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(requestEventId)}`;
@@ -2006,86 +1995,96 @@ async function loadUnreadNotifications() {
   setBadge("topNotificationBadge", unreadNotifications);
 }
 
+function requestMatchesEvent(data) {
+  const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
+  return !currentEventId || requestEventId === currentEventId;
+}
+
+function addUniqueRequest(list, seen, docSnap, hiddenField) {
+  if (seen.has(docSnap.id)) return;
+
+  const data = docSnap.data();
+
+  if (hiddenField && data[hiddenField]) return;
+  if (!requestMatchesEvent(data)) return;
+
+  seen.add(docSnap.id);
+
+  list.push({
+    id: docSnap.id,
+    ...data
+  });
+}
+
 async function loadBookingRequests() {
   try {
     let requests = [];
+    const seen = new Set();
 
     if (isAdminPreview()) {
       const adminQuery = query(collection(db, "bookingRequests"));
       const snapshot = await getDocs(adminQuery);
 
       snapshot.forEach((docSnap) => {
-        requests.push({
-          id: docSnap.id,
-          ...docSnap.data()
-        });
+        addUniqueRequest(requests, seen, docSnap, "");
       });
 
     } else if (isPlannerView()) {
-      const plannerQuery = query(
+      const plannerIdQuery = query(
         collection(db, "bookingRequests"),
         where("plannerId", "==", currentUser.uid)
       );
 
-      const ownerQuery = query(
+      const requestOwnerQuery = query(
         collection(db, "bookingRequests"),
-        where("customerId", "==", currentUser.uid)
+        where("requestOwnerId", "==", currentUser.uid)
       );
 
-      const [plannerSnapshot, ownerSnapshot] = await Promise.all([
-        getDocs(plannerQuery).catch(() => ({ forEach: () => {} })),
-        getDocs(ownerQuery).catch(() => ({ forEach: () => {} }))
+      const submittedByQuery = query(
+        collection(db, "bookingRequests"),
+        where("submittedBy", "==", currentUser.uid)
+      );
+
+      const snapshots = await Promise.all([
+        getDocs(plannerIdQuery).catch(() => ({ forEach: () => {} })),
+        getDocs(requestOwnerQuery).catch(() => ({ forEach: () => {} })),
+        getDocs(submittedByQuery).catch(() => ({ forEach: () => {} }))
       ]);
 
-      const seen = new Set();
-
-      function addRequest(docSnap) {
-        if (seen.has(docSnap.id)) return;
-        seen.add(docSnap.id);
-
-        const data = docSnap.data();
-
-        const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
-        const matchesCurrentEvent = !currentEventId || requestEventId === currentEventId;
-
-        if (!data.hiddenForPlanner && matchesCurrentEvent) {
-          requests.push({
-            id: docSnap.id,
-            ...data
-          });
-        }
-      }
-
-      plannerSnapshot.forEach(addRequest);
-      ownerSnapshot.forEach(addRequest);
+      snapshots.forEach((snapshot) => {
+        snapshot.forEach((docSnap) => {
+          addUniqueRequest(requests, seen, docSnap, "hiddenForPlanner");
+        });
+      });
 
     } else {
-      const customerQuery = query(
+      const customerIdQuery = query(
         collection(db, "bookingRequests"),
         where("customerId", "==", currentUser.uid)
       );
 
-      const snapshot = await getDocs(customerQuery);
+      const requestOwnerQuery = query(
+        collection(db, "bookingRequests"),
+        where("requestOwnerId", "==", currentUser.uid)
+      );
 
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
+      const submittedByQuery = query(
+        collection(db, "bookingRequests"),
+        where("submittedBy", "==", currentUser.uid)
+      );
 
-        const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
-        const matchesCurrentEvent = !currentEventId || requestEventId === currentEventId;
+      const snapshots = await Promise.all([
+        getDocs(customerIdQuery).catch(() => ({ forEach: () => {} })),
+        getDocs(requestOwnerQuery).catch(() => ({ forEach: () => {} })),
+        getDocs(submittedByQuery).catch(() => ({ forEach: () => {} }))
+      ]);
 
-        if (!data.hiddenForCustomer && matchesCurrentEvent) {
-          requests.push({
-            id: docSnap.id,
-            ...data
-          });
-        }
+      snapshots.forEach((snapshot) => {
+        snapshot.forEach((docSnap) => {
+          addUniqueRequest(requests, seen, docSnap, "hiddenForCustomer");
+        });
       });
     }
-
-    requests = requests.filter((request) => {
-      const requestEventId = safeText(request.eventId, "") || safeText(request.eventDetails?.id, "");
-      return !currentEventId || requestEventId === currentEventId;
-    });
 
     requests.sort((a, b) => {
       const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
