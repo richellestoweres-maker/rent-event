@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Chat Thread | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,6 +56,56 @@
       min-height: 100vh;
     }
 
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .page {
       width: 100%;
       max-width: 430px;
@@ -85,6 +136,11 @@
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 800;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
     }
 
     .chat-head {
@@ -146,6 +202,46 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .role-switcher {
+      margin-top: 8px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140,111,75,.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 9px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .role-select {
+      min-height: 30px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 800;
+      padding: 0 24px 0 10px;
+      outline: none;
+      cursor: pointer;
+      max-width: 150px;
+      box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
     .banner {
@@ -343,6 +439,11 @@
       font-weight: 800;
     }
 
+    .empty-icon svg {
+      width: 34px;
+      height: 34px;
+    }
+
     .empty-card h3 {
       margin: 0 0 8px;
       font-size: 1.1rem;
@@ -417,59 +518,8 @@
       cursor: not-allowed;
     }
 
-
-    .admin-preview-bar {
-      display: none;
-      position: sticky;
-      top: 0;
-      z-index: 90;
-      margin: -20px -18px 18px;
-      padding: 12px 18px;
-      background: #161616;
-      color: #fff;
-      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
-    }
-
-    .admin-preview-inner {
-      width: 100%;
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .admin-preview-text {
-      font-size: 0.82rem;
-      line-height: 1.35;
-      font-weight: 700;
-    }
-
-    .admin-preview-text span {
-      display: block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.72);
-      margin-top: 2px;
-    }
-
-    .admin-preview-btn {
-      min-height: 38px;
-      padding: 0 13px;
-      border-radius: 999px;
-      background: #fff;
-      color: #161616;
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 800;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .composer.admin-disabled {
+    .composer.admin-disabled,
+    .composer.inactive-disabled {
       display: none;
     }
 
@@ -481,6 +531,14 @@
       .send-btn {
         min-width: 78px;
         padding: 0 14px;
+      }
+
+      .role-switcher {
+        max-width: 190px;
+      }
+
+      .role-switcher-label {
+        display: none;
       }
     }
 
@@ -521,10 +579,21 @@
         <div class="chat-meta">
           <h1 class="chat-name" id="chatName">Loading conversation...</h1>
           <p class="chat-sub" id="chatSub">Please wait while we load this thread.</p>
+
+          <div class="role-switcher" id="roleSwitcher">
+            <span class="role-switcher-label">Viewing as</span>
+            <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+          </div>
         </div>
       </div>
 
-      <a href="listings.html" class="icon-btn" id="listingLink" aria-label="View listing">★</a>
+      <a href="listings.html" class="icon-btn" id="listingLink" aria-label="View listing">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+          <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </a>
     </header>
 
     <section class="banner">
@@ -645,12 +714,176 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
-function isAdminPreview() {
-  return currentUserData?.role === "admin";
+function normalizeRole(role) {
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
 }
 
-function isPlannerRole() {
-  return currentUserData?.role === "planner" || currentUserData?.plannerPro === true;
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
+    });
+  }
+
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    userData.permissions?.admin === true ||
+    legacy === "admin"
+  ) {
+    roleSet.add("admin");
+    roleSet.add("customer");
+    roleSet.add("vendor");
+    roleSet.add("planner");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
+  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
+
+  return allowedRoles[0] || "customer";
+}
+
+function isAdminPreview() {
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function isPlannerView() {
+  return getActiveRole(currentUserData || {}) === "planner";
+}
+
+function isVendorView() {
+  return getActiveRole(currentUserData || {}) === "vendor";
+}
+
+function isCustomerView() {
+  return getActiveRole(currentUserData || {}) === "customer";
+}
+
+function getCurrentSenderRole() {
+  if (isAdminPreview()) return "admin";
+  if (isVendorView()) return "vendor";
+  if (isPlannerView()) return "planner";
+  return "customer";
+}
+
+function getDisplayNameForCurrentUser() {
+  return currentUserData.businessName ||
+    currentUserData.vendorName ||
+    currentUserData.plannerName ||
+    currentUserData.name ||
+    currentUser.displayName ||
+    currentUser.email ||
+    "RentEvent User";
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (allowedRoles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${escapeHtml(role)}" ${role === activeRole ? "selected" : ""}>${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  const eventId = getEventId();
+  const suffix = eventId ? `?eventId=${encodeURIComponent(eventId)}` : "";
+  window.location.href = `${getDashboardForRole(normalizedRole)}`;
 }
 
 function enableAdminPreviewMode() {
@@ -664,6 +897,15 @@ function enableAdminPreviewMode() {
 
   const backLink = document.getElementById("backLink");
   if (backLink) backLink.href = "admin-dashboard.html";
+}
+
+function disableComposerForInactiveAccount() {
+  const composer = document.getElementById("composer");
+  if (!composer || !currentUserData) return;
+
+  if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
+    composer.classList.add("inactive-disabled");
+  }
 }
 
 function formatMessageTime(value) {
@@ -716,7 +958,12 @@ function normalizeProfessionalLabel(value) {
     "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
     "Water Safety Attendants": "Water Safety Providers",
     "Parking Attendants": "Parking Attendant Companies",
-    "Valet / Parking": "Valet / Parking Companies"
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
   };
 
   return labelMap[clean] || clean;
@@ -728,7 +975,7 @@ function parseBookingConversationId(id) {
   if (parts.length >= 4 && parts[0] === "booking") {
     return {
       requestId: parts[1],
-      customerId: parts[2],
+      ownerId: parts[2],
       vendorId: parts.slice(3).join("__")
     };
   }
@@ -736,11 +983,11 @@ function parseBookingConversationId(id) {
   return null;
 }
 
-function buildBookingConversationId(requestId, customerId, vendorId) {
+function buildBookingConversationId(requestId, ownerId, vendorId) {
   return [
     "booking",
     makeSafeId(requestId),
-    makeSafeId(customerId),
+    makeSafeId(ownerId),
     makeSafeId(vendorId)
   ].join("__");
 }
@@ -753,10 +1000,48 @@ function getVendorItemsForParticipant(request, vendorId) {
   return vendors.filter((vendor) => safeText(vendor.vendorId, "") === vendorId);
 }
 
+function getRequestOwnerForConversation(request, parsedOwnerId) {
+  const plannerId = safeText(request.plannerId, "");
+  const customerId = safeText(request.customerId, "");
+  const requestOwnerId = safeText(request.requestOwnerId, "");
+
+  if (requestOwnerId) {
+    return {
+      id: requestOwnerId,
+      role: requestOwnerId === plannerId ? "planner" : "customer",
+      name: requestOwnerId === plannerId
+        ? safeText(request.plannerName, "Planner")
+        : safeText(request.customerName, "Customer")
+    };
+  }
+
+  if (plannerId && parsedOwnerId === plannerId) {
+    return {
+      id: plannerId,
+      role: "planner",
+      name: safeText(request.plannerName, "Planner")
+    };
+  }
+
+  if (customerId) {
+    return {
+      id: customerId,
+      role: "customer",
+      name: safeText(request.customerName, "Customer")
+    };
+  }
+
+  return {
+    id: parsedOwnerId,
+    role: "customer",
+    name: "Customer"
+  };
+}
+
 async function repairConversationFromBookingRequest() {
   const parsed = parseBookingConversationId(conversationId);
 
-  if (!parsed || !parsed.requestId || !parsed.customerId || !parsed.vendorId) return false;
+  if (!parsed || !parsed.requestId || !parsed.ownerId || !parsed.vendorId) return false;
 
   try {
     const requestSnap = await getDoc(doc(db, "bookingRequests", parsed.requestId));
@@ -768,14 +1053,13 @@ async function repairConversationFromBookingRequest() {
       ...requestSnap.data()
     };
 
-    const customerId = safeText(request.customerId || parsed.customerId, parsed.customerId);
+    const owner = getRequestOwnerForConversation(request, parsed.ownerId);
     const vendorId = parsed.vendorId;
-    const participantIds = [customerId, vendorId];
+    const participantIds = [owner.id, vendorId].filter(Boolean);
 
     if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) return false;
 
     const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
-    const customerName = safeText(request.customerName, "Customer");
     const vendorItem = getVendorItemsForParticipant(request, vendorId)[0] || (Array.isArray(request.vendors) ? request.vendors[0] : {}) || {};
     const vendorName = safeText(vendorItem.vendorName || request.vendorName || "Vendor", "Vendor");
     const vendorResponses = request.vendorResponses || {};
@@ -791,14 +1075,15 @@ async function repairConversationFromBookingRequest() {
       conversationKey: conversationId,
       participantIds,
       participantNames: {
-        [customerId]: customerName,
+        [owner.id]: owner.name,
         [vendorId]: vendorName
       },
       participantRoles: {
-        [customerId]: "customer",
+        [owner.id]: owner.role,
         [vendorId]: "vendor"
       },
-      customerId,
+      customerId: safeText(request.customerId, ""),
+      plannerId: safeText(request.plannerId, ""),
       vendorId,
       bookingRequestId: request.id,
       eventId,
@@ -806,10 +1091,10 @@ async function repairConversationFromBookingRequest() {
       listingId: safeText(vendorItem.listingId, ""),
       listingTitle,
       listingCategory,
-      title: currentUser.uid === vendorId ? customerName : vendorName,
+      title: currentUser.uid === vendorId ? owner.name : vendorName,
       contextType: "Booking Request",
       lastMessage: messageText,
-      lastSenderId: vendorResponse ? vendorId : customerId,
+      lastSenderId: vendorResponse ? vendorId : owner.id,
       unreadFor: {},
       repairedFromBookingRequest: true,
       createdAt: request.createdAt || serverTimestamp(),
@@ -849,7 +1134,7 @@ function getBackHref() {
     return "admin-dashboard.html";
   }
 
-  if ((currentUserData?.role === "customer" || isPlannerRole()) && eventId) {
+  if ((isCustomerView() || isPlannerView()) && eventId) {
     return `messages.html?eventId=${encodeURIComponent(eventId)}`;
   }
 
@@ -878,7 +1163,13 @@ function renderEmptyThread() {
     <div class="day-divider">Start Conversation</div>
 
     <div class="empty-card">
-      <div class="empty-icon">✉</div>
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </div>
       <h3>No messages yet</h3>
       <p>Send the first message to start this event conversation.</p>
     </div>
@@ -1070,16 +1361,16 @@ function updateContextCard() {
       eventLink.style.display = "inline-flex";
     }
   } else {
-    messagesLink.href = (currentUserData?.role === "customer" || isPlannerRole()) && eventId
+    messagesLink.href = (isCustomerView() || isPlannerView()) && eventId
       ? `messages.html?eventId=${encodeURIComponent(eventId)}`
       : "messages.html";
 
-    if ((currentUserData?.role === "customer" || isPlannerRole()) && eventId) {
+    if ((isCustomerView() || isPlannerView()) && eventId) {
       eventLink.href = `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
       eventLink.textContent = "Open Event";
       eventLink.style.display = "inline-flex";
     } else if (conversationData.bookingRequestId) {
-      eventLink.href = currentUserData?.role === "vendor"
+      eventLink.href = isVendorView()
         ? `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`
         : `my-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
       eventLink.textContent = "Open Request";
@@ -1138,7 +1429,11 @@ async function updateHeader() {
       ? `detail.html?id=${encodeURIComponent(conversationData.listingId)}&eventId=${encodeURIComponent(eventId)}`
       : `detail.html?id=${encodeURIComponent(conversationData.listingId)}`;
   } else {
-    listingLink.href = isAdminPreview() ? "admin-dashboard.html" : currentUserData?.role === "vendor" ? "vendor-dashboard.html" : "listings.html";
+    listingLink.href = isAdminPreview()
+      ? "admin-dashboard.html"
+      : isVendorView()
+        ? "vendor-dashboard.html"
+        : "listings.html";
   }
 
   updateContextCard();
@@ -1146,7 +1441,6 @@ async function updateHeader() {
 
 async function markConversationAsRead() {
   if (isAdminPreview()) return;
-
   if (!conversationData || !currentUser || !conversationId) return;
 
   const unreadFor = {
@@ -1168,6 +1462,14 @@ async function markConversationAsRead() {
   } catch (error) {
     console.log("Could not mark conversation as read:", error.message);
   }
+}
+
+function canCurrentUserAccessConversation(data = {}) {
+  if (isAdminPreview()) return true;
+
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return participantIds.includes(currentUser.uid);
 }
 
 function watchConversation() {
@@ -1195,16 +1497,13 @@ function watchConversation() {
       ...conversationSnap.data()
     };
 
-    const participantIds = conversationData.participantIds || [];
-
-    if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) {
+    if (!canCurrentUserAccessConversation(conversationData)) {
       renderError("Access denied", "You are not part of this conversation.");
       return;
     }
 
     await updateHeader();
     renderMessages();
-
     await markConversationAsRead();
   }, (error) => {
     renderError("Could not watch conversation", error.message);
@@ -1248,6 +1547,13 @@ async function loadConversation() {
     const conversationSnap = await getDoc(conversationRef);
 
     if (!conversationSnap.exists()) {
+      const repaired = await repairConversationFromBookingRequest();
+
+      if (repaired) {
+        loadConversation();
+        return;
+      }
+
       renderError("Conversation not found", "This conversation may have been removed or the link may be outdated.");
       return;
     }
@@ -1257,9 +1563,7 @@ async function loadConversation() {
       ...conversationSnap.data()
     };
 
-    const participantIds = conversationData.participantIds || [];
-
-    if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) {
+    if (!canCurrentUserAccessConversation(conversationData)) {
       renderError("Access denied", "You are not part of this conversation.");
       return;
     }
@@ -1279,13 +1583,7 @@ async function createMessageNotification(messageText, unreadFor) {
   const recipientIds = Object.keys(unreadFor || {});
   if (!recipientIds.length || !conversationData) return;
 
-  const senderName =
-    currentUserData.businessName ||
-    currentUserData.vendorName ||
-    currentUserData.name ||
-    currentUser.displayName ||
-    currentUser.email ||
-    "RentEvent User";
+  const senderName = getDisplayNameForCurrentUser();
 
   for (const recipientId of recipientIds) {
     try {
@@ -1300,11 +1598,18 @@ async function createMessageNotification(messageText, unreadFor) {
         sourceId: conversationId,
         sourceCollection: "conversations",
         sourceLabel: conversationData.eventName || conversationData.listingTitle || "Conversation",
+        conversationId,
         bookingRequestId: conversationData.bookingRequestId || "",
         eventId: getEventId() || "",
         eventName: conversationData.eventName || "",
+        listingId: conversationData.listingId || "",
+        listingTitle: conversationData.listingTitle || "",
         senderId: currentUser.uid,
         senderName,
+        senderRole: getCurrentSenderRole(),
+        customerId: conversationData.customerId || "",
+        plannerId: conversationData.plannerId || "",
+        vendorId: conversationData.vendorId || "",
         read: false,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -1321,9 +1626,19 @@ async function sendMessage(text) {
     return;
   }
 
+  if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
+    alert("This account is not active, so messages cannot be sent right now.");
+    return;
+  }
+
   const messageText = safeText(text, "");
 
   if (!messageText || !conversationId || !currentUser || !conversationData) {
+    return;
+  }
+
+  if (!canCurrentUserAccessConversation(conversationData)) {
+    alert("You are not part of this conversation.");
     return;
   }
 
@@ -1334,20 +1649,14 @@ async function sendMessage(text) {
 
   try {
     const messagesRef = collection(db, "conversations", conversationId, "messages");
-
-    const senderName =
-      currentUserData.businessName ||
-      currentUserData.vendorName ||
-      currentUserData.name ||
-      currentUser.displayName ||
-      currentUser.email ||
-      "RentEvent User";
+    const senderName = getDisplayNameForCurrentUser();
+    const senderRole = getCurrentSenderRole();
 
     await addDoc(messagesRef, {
       text: messageText,
       senderId: currentUser.uid,
       senderName,
-      senderRole: currentUserData.role || "customer",
+      senderRole,
       eventId: getEventId() || null,
       bookingRequestId: conversationData.bookingRequestId || null,
       listingId: conversationData.listingId || null,
@@ -1368,6 +1677,8 @@ async function sendMessage(text) {
       await updateDoc(conversationRef, {
         lastMessage: messageText,
         lastSenderId: currentUser.uid,
+        lastSenderName: senderName,
+        lastSenderRole: senderRole,
         eventId: getEventId() || conversationData.eventId || null,
         updatedAt: serverTimestamp(),
         unreadFor
@@ -1397,6 +1708,10 @@ document.getElementById("composer").addEventListener("submit", (event) => {
   sendMessage(text);
 });
 
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
+});
+
 window.addEventListener("beforeunload", () => {
   if (unsubscribeMessages) unsubscribeMessages();
   if (unsubscribeConversation) unsubscribeConversation();
@@ -1420,9 +1735,13 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUserData = userSnap.data();
 
-  if (currentUserData.role === "admin") {
+  renderRoleSwitcher(currentUserData);
+
+  if (isAdminPreview()) {
     enableAdminPreviewMode();
   }
+
+  disableComposerForInactiveAccount();
 
   loadConversation();
 });
