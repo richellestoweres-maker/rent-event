@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>My Requests | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -85,6 +86,34 @@
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 800;
+      position: relative;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.68rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      top: -5px;
+      right: -5px;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
     }
 
     .topbar-center {
@@ -107,6 +136,44 @@
       line-height: 1;
       letter-spacing: -0.04em;
       font-weight: 800;
+    }
+
+    .role-switcher {
+      margin: 10px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140,111,75,.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
     .hero-card {
@@ -685,7 +752,6 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
-
     .admin-preview-bar {
       display: none;
       position: sticky;
@@ -762,7 +828,7 @@
     <div class="admin-preview-inner">
       <div class="admin-preview-text">
         Admin Preview Mode
-        <span>You are viewing customer requests as admin. Actions are disabled.</span>
+        <span>You are viewing customer and planner requests as admin. Actions are disabled.</span>
       </div>
       <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
     </div>
@@ -773,11 +839,22 @@
       <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Customer Portal</div>
+        <div class="eyebrow" id="pageEyebrow">Customer Portal</div>
         <h1 class="page-title">My Requests</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
       </div>
 
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <span class="notification-badge" id="topNotificationBadge">0</span>
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </a>
     </header>
 
     <section class="hero-card">
@@ -785,7 +862,7 @@
         <div class="hero-label">Submitted Event Requests</div>
         <h2 class="hero-title">Track your event requests.</h2>
         <p class="hero-subtitle">
-          Review your submitted requests, vendor responses, AI planner context, and estimated totals.
+          Review submitted requests, vendor responses, AI planner context, and estimated totals.
         </p>
 
         <div class="hero-meta">
@@ -846,7 +923,7 @@
     </div>
   </div>
 
-  <nav class="bottom-nav" aria-label="Customer navigation">
+  <nav class="bottom-nav" aria-label="Customer navigation" id="bottomNav">
     <a class="nav-item" href="dashboard.html" id="bottomHomeLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
@@ -890,7 +967,6 @@ import {
   doc,
   getDoc,
   collection,
-  addDoc,
   getDocs,
   query,
   where,
@@ -964,8 +1040,162 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+function normalizeRole(role) {
+  if (role === "client") return "customer";
+  if (role === "host") return "customer";
+  if (role === "event_host") return "customer";
+  return role || "customer";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      if (role) roleSet.add(normalizeRole(role));
+    });
+  }
+
+  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
+  if (userData.role) roleSet.add(normalizeRole(userData.role));
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    normalizeRole(userData.role) === "admin" ||
+    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+  ) {
+    roleSet.add("admin");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+
+  if (allowedRoles.includes(requestedRole)) return requestedRole;
+  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
+  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
+
+  return allowedRoles[0] || "customer";
+}
+
 function isAdminPreview() {
-  return currentUserData?.role === "admin";
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function isPlannerView() {
+  return getActiveRole(currentUserData || {}) === "planner";
+}
+
+function canUseCustomerRequests(userData = {}) {
+  const roles = getAllowedRoles(userData);
+
+  return (
+    roles.includes("customer") ||
+    roles.includes("planner") ||
+    roles.includes("admin") ||
+    userData.customerAccount === true ||
+    userData.plannerPro === true ||
+    userData.permissions?.canUseClientDashboard === true ||
+    userData.permissions?.canUsePlannerDashboard === true
+  );
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const roles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (roles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = roles.map((role) => {
+    return `<option value="${escapeHtml(role)}">${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  select.value = activeRole;
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
 }
 
 function enableAdminPreviewMode() {
@@ -989,13 +1219,15 @@ function enableAdminPreviewMode() {
   const bottomListingsLink = document.getElementById("bottomListingsLink");
   if (bottomListingsLink) bottomListingsLink.href = "listings.html";
 
+  setText("pageEyebrow", "Admin Preview");
+
   const heroLabel = document.querySelector(".hero-label");
   const heroTitle = document.querySelector(".hero-title");
   const heroSubtitle = document.querySelector(".hero-subtitle");
 
   if (heroLabel) heroLabel.textContent = "Admin Request Review";
   if (heroTitle) heroTitle.textContent = "Review marketplace requests.";
-  if (heroSubtitle) heroSubtitle.textContent = "Preview submitted booking requests without changing customer or vendor records.";
+  if (heroSubtitle) heroSubtitle.textContent = "Preview submitted booking requests without changing customer, planner, or vendor records.";
 }
 
 function withEventParam(path, eventId = currentEventId) {
@@ -1021,18 +1253,38 @@ function updateEventScopedLinks() {
   const planEventLink = document.getElementById("planEventLink");
   const bottomHomeLink = document.getElementById("bottomHomeLink");
   const bottomListingsLink = document.getElementById("bottomListingsLink");
+  const activeRole = getActiveRole(currentUserData || {});
 
-  if (backLink) {
-    backLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html";
+  if (activeRole === "planner") {
+    setText("pageEyebrow", "Planner Portal");
+
+    if (backLink) backLink.href = currentEventId ? withEventParam("event-builder.html") : "planner-dashboard.html";
+
+    if (planEventLink) {
+      planEventLink.href = currentEventId ? withEventParam("event-builder.html") : "planner-dashboard.html";
+      planEventLink.textContent = currentEventId ? "Back to Event" : "Planner Dashboard";
+    }
+
+    if (bottomHomeLink) bottomHomeLink.href = "planner-dashboard.html";
+    if (bottomListingsLink) bottomListingsLink.href = currentEventId ? withEventParam("listings.html") : "listings.html";
+
+    const bottomHomeText = bottomHomeLink?.querySelector("span");
+    if (bottomHomeText) bottomHomeText.textContent = "Planner";
+  } else {
+    setText("pageEyebrow", "Customer Portal");
+
+    if (backLink) {
+      backLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html";
+    }
+
+    if (planEventLink) {
+      planEventLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html#myEventsSection";
+      planEventLink.textContent = currentEventId ? "Back to Event" : "Plan Event";
+    }
+
+    if (bottomHomeLink) bottomHomeLink.href = "dashboard.html";
+    if (bottomListingsLink) bottomListingsLink.href = currentEventId ? withEventParam("listings.html") : "listings.html";
   }
-
-  if (planEventLink) {
-    planEventLink.href = currentEventId ? withEventParam("event-builder.html") : "dashboard.html#myEventsSection";
-    planEventLink.textContent = currentEventId ? "Back to Event" : "Plan Event";
-  }
-
-  if (bottomHomeLink) bottomHomeLink.href = "dashboard.html";
-  if (bottomListingsLink) bottomListingsLink.href = currentEventId ? withEventParam("listings.html") : "listings.html";
 
   if (currentEventId) {
     const heroLabel = document.querySelector(".hero-label");
@@ -1080,12 +1332,14 @@ function getStatusLabel(status) {
   if (status === "withdrawn") return "Withdrawn";
   if (status === "confirmed") return "Confirmed";
   if (status === "paid") return "Paid";
+  if (status === "needs_more_info") return "Needs More Info";
   return "Pending";
 }
 
 function getStatusPillClass(status) {
   if (status === "withdrawn") return "withdrawn";
   if (status === "confirmed" || status === "paid") return "safe";
+  if (status === "needs_more_info") return "pending";
   return "pending";
 }
 
@@ -1139,13 +1393,80 @@ function getVendorResponseSummary(request) {
   });
 }
 
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
+
+function buildBookingConversationId(requestId, customerId, vendorId) {
+  return [
+    "booking",
+    makeSafeId(requestId),
+    makeSafeId(customerId),
+    makeSafeId(vendorId)
+  ].join("__");
+}
+
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
 function renderEmptyRequests() {
+  const actionHref = isPlannerView()
+    ? "planner-dashboard.html"
+    : currentEventId
+      ? withEventParam("event-builder.html")
+      : "dashboard.html#myEventsSection";
+
+  const actionLabel = isPlannerView()
+    ? "Back to Planner Dashboard"
+    : currentEventId
+      ? "Back to Event"
+      : "Create or Choose Event";
+
   document.getElementById("requestList").innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">+</div>
       <h3>No requests yet</h3>
       <p>When you submit an event request from checkout, it will appear here.</p>
-      ${currentEventId ? `<a class="btn" href="${withEventParam("event-builder.html")}">Back to Event</a>` : `<a class="btn" href="dashboard.html#myEventsSection">Create or Choose Event</a>`}
+      <a class="btn" href="${actionHref}">${actionLabel}</a>
     </div>
   `;
 }
@@ -1153,7 +1474,11 @@ function renderEmptyRequests() {
 function renderRequests() {
   const container = document.getElementById("requestList");
 
-  const visibleRequests = bookingRequests.filter((request) => !request.hiddenForCustomer);
+  const visibleRequests = bookingRequests.filter((request) => {
+    if (isAdminPreview()) return true;
+    if (isPlannerView()) return !request.hiddenForPlanner;
+    return !request.hiddenForCustomer;
+  });
 
   const activeCount = visibleRequests.filter((request) => {
     const status = safeText(request.requestStatus || request.status, "pending");
@@ -1171,13 +1496,13 @@ function renderRequests() {
   container.innerHTML = visibleRequests.map((request) => {
     const requestId = encodeURIComponent(request.id || "");
     const eventDetails = request.eventDetails || {};
-    const eventName = safeText(eventDetails.eventName, "Unnamed Event");
-    const eventType = safeText(eventDetails.eventType, "Event");
-    const eventDate = safeText(eventDetails.eventDate, "Date not listed");
+    const eventName = safeText(eventDetails.eventName || request.eventName, "Unnamed Event");
+    const eventType = safeText(eventDetails.eventType || request.eventType, "Event");
+    const eventDate = safeText(eventDetails.eventDate || request.eventDate, "Date not listed");
     const location = getEventLocation(eventDetails);
-    const guestCount = safeText(eventDetails.guestCount, "Not listed");
-    const budget = safeText(eventDetails.eventBudget, "Not listed");
-    const styleVibe = safeText(eventDetails.styleVibe, "Not listed");
+    const guestCount = safeText(eventDetails.guestCount || request.guestCount, "Not listed");
+    const budget = safeText(eventDetails.eventBudget || request.eventBudget, "Not listed");
+    const styleVibe = safeText(eventDetails.styleVibe || request.styleVibe, "Not listed");
     const status = safeText(request.requestStatus || request.status, "pending");
     const statusLabel = getStatusLabel(status);
     const statusPillClass = getStatusPillClass(status);
@@ -1188,13 +1513,14 @@ function renderRequests() {
     const vendors = Array.isArray(request.vendors) ? request.vendors : [];
     const aiSummary = getAiSummary(request);
     const responseSummary = getVendorResponseSummary(request);
-    const withdrawnReason = safeText(request.withdrawReason, "No reason provided.");
+    const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "No reason provided.");
+    const plannerBadge = request.plannerId ? `<span class="pill ai">Planner Request</span>` : "";
 
     const vendorBox = vendors.length
       ? vendors.map((vendor) => {
-          const title = safeText(vendor.listingTitle, "Requested Listing");
+          const title = safeText(vendor.listingTitle || vendor.title, "Requested Listing");
           const category = normalizeProfessionalLabel(safeText(vendor.category || vendor.mainCategory, "Event Service"));
-          const price = formatMoney(vendor.priceNumber || 0);
+          const price = formatMoney(vendor.priceNumber || vendor.startingPrice || 0);
           const vendorName = safeText(vendor.vendorName, "Vendor");
           const response = getVendorResponse(request, vendor.vendorId);
           const responseStatus = safeText(response?.status, "");
@@ -1231,7 +1557,7 @@ function renderRequests() {
 
           ${vendors.map((vendor) => {
             const vendorName = safeText(vendor.vendorName, "Vendor");
-            const title = safeText(vendor.listingTitle, "Requested Listing");
+            const title = safeText(vendor.listingTitle || vendor.title, "Requested Listing");
             const response = getVendorResponse(request, vendor.vendorId);
             const responseStatus = safeText(response?.status, "");
             const responseLabel = getResponseLabel(responseStatus);
@@ -1239,7 +1565,6 @@ function renderRequests() {
             const responseNote = safeText(response?.note, responseStatus ? "" : "This vendor has not responded yet.");
 
             const vendorId = safeText(vendor.vendorId, "");
-            const conversationId = response?.conversationId || (vendorId ? buildBookingConversationId(request.id, request.customerId || currentUser.uid, vendorId) : "");
 
             return `
               <div class="response-item">
@@ -1276,6 +1601,7 @@ function renderRequests() {
           <span class="pill ${statusPillClass}">${escapeHtml(statusLabel)}</span>
           <span class="pill info">${escapeHtml(paymentStatus.replaceAll("_", " "))}</span>
           <span class="pill type">${escapeHtml(eventType)}</span>
+          ${plannerBadge}
           ${responseSummary.available > 0 ? `<span class="pill safe">${responseSummary.available} Available</span>` : ""}
           ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
         </div>
@@ -1331,7 +1657,7 @@ function renderRequests() {
           </div>
         ` : isWithdrawn ? `
           <div class="request-actions">
-            <a class="btn-secondary" href="dashboard.html#myEventsSection">Plan New Event</a>
+            <a class="btn-secondary" href="${isPlannerView() ? "planner-dashboard.html" : "dashboard.html#myEventsSection"}">Plan New Event</a>
             <button class="btn-danger" type="button" data-clear-request="${requestId}">Clear From My Requests</button>
           </div>
         ` : `
@@ -1425,12 +1751,14 @@ async function confirmWithdrawRequest() {
     isBusy = true;
     showStatus("Withdrawing request...", "info");
 
+    const withdrawRole = isPlannerView() ? "planner" : "customer";
+
     const requestRef = doc(db, "bookingRequests", cleanRequestId);
 
     await updateDoc(requestRef, {
       status: "withdrawn",
       requestStatus: "withdrawn",
-      withdrawnBy: "customer",
+      withdrawnBy: withdrawRole,
       withdrawnReason: finalReason,
       withdrawReason: finalReason,
       withdrawnAt: new Date().toISOString(),
@@ -1439,7 +1767,7 @@ async function confirmWithdrawRequest() {
 
     request.status = "withdrawn";
     request.requestStatus = "withdrawn";
-    request.withdrawnBy = "customer";
+    request.withdrawnBy = withdrawRole;
     request.withdrawnReason = finalReason;
     request.withdrawReason = finalReason;
     request.withdrawnAt = new Date().toISOString();
@@ -1486,14 +1814,23 @@ async function clearRequestFromCustomerView(requestId) {
 
     const requestRef = doc(db, "bookingRequests", cleanRequestId);
 
-    await updateDoc(requestRef, {
-      hiddenForCustomer: true,
-      hiddenForCustomerAt: new Date().toISOString(),
+    const updates = {
       updatedAt: serverTimestamp()
-    });
+    };
 
-    request.hiddenForCustomer = true;
-    request.hiddenForCustomerAt = new Date().toISOString();
+    if (isPlannerView()) {
+      updates.hiddenForPlanner = true;
+      updates.hiddenForPlannerAt = new Date().toISOString();
+      request.hiddenForPlanner = true;
+      request.hiddenForPlannerAt = new Date().toISOString();
+    } else {
+      updates.hiddenForCustomer = true;
+      updates.hiddenForCustomerAt = new Date().toISOString();
+      request.hiddenForCustomer = true;
+      request.hiddenForCustomerAt = new Date().toISOString();
+    }
+
+    await updateDoc(requestRef, updates);
 
     renderRequests();
     showStatus("Request cleared from your page.", "success");
@@ -1503,61 +1840,6 @@ async function clearRequestFromCustomerView(requestId) {
   } finally {
     isBusy = false;
   }
-}
-
-function makeSafeId(value) {
-  return safeText(value, "item")
-    .replace(/[^a-zA-Z0-9_-]/g, "_")
-    .slice(0, 180);
-}
-
-function buildBookingConversationId(requestId, customerId, vendorId) {
-  return [
-    "booking",
-    makeSafeId(requestId),
-    makeSafeId(customerId),
-    makeSafeId(vendorId)
-  ].join("__");
-}
-
-function normalizeProfessionalLabel(value) {
-  const clean = safeText(value, "");
-
-  const labelMap = {
-    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
-    "Drivers / Chauffeurs": "Professional Transportation Companies",
-    "Private Drivers": "Shuttle Companies",
-    "Chauffeur Service": "Limo / Chauffeur Companies",
-    "Party Bus Driver": "Party Bus Companies",
-    "Party Bus": "Party Bus Companies",
-    "Shuttle Service": "Shuttle Companies",
-    "Guest Transportation": "Wedding Guest Transportation Companies",
-    "Airport Transportation": "Airport Transportation Companies",
-    "Wedding Transportation": "Wedding Guest Transportation Companies",
-    "Corporate Transportation": "Corporate Transportation Companies",
-    "Transportation": "Transportation Companies",
-    "Luxury Car Rental": "Luxury Car Service",
-    "Vintage Car Rental": "Vintage Car Rentals",
-    "Getaway Car": "Getaway Car Rentals",
-    "Golf Cart Rentals": "Golf Cart Shuttle Services",
-    "Security": "Security Companies",
-    "Private Event Security": "Private Event Security Companies",
-    "Off-Duty Police Officers": "Off-Duty Officer Services",
-    "Crowd Control": "Crowd Control Services",
-    "Gate / Entry Security": "Gate / Entry Security Teams",
-    "Lifeguards": "Certified Lifeguard Providers",
-    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
-    "Water Safety Attendants": "Water Safety Providers",
-    "Parking Attendants": "Parking Attendant Companies",
-    "Valet / Parking": "Valet / Parking Companies",
-    "Traffic Control": "Traffic Control Providers",
-    "Bathroom Attendants": "Restroom Attendant Staffing",
-    "Setup Crew": "Setup Crew Companies",
-    "Breakdown Crew": "Breakdown Crew Companies",
-    "Cleanup Crew": "Cleanup Crew Companies"
-  };
-
-  return labelMap[clean] || clean;
 }
 
 async function openVendorChatForRequest(requestId, vendorId) {
@@ -1592,12 +1874,14 @@ async function openVendorChatForRequest(requestId, vendorId) {
   const vendors = Array.isArray(request.vendors) ? request.vendors : [];
   const vendor = vendors.find((item) => safeText(item.vendorId, "") === cleanVendorId) || vendors[0] || {};
   const requestEventId = getRequestEventId(request) || cleanRequestId;
-  const conversationId = buildBookingConversationId(cleanRequestId, currentUser.uid, cleanVendorId);
+  const ownerId = request.customerId || request.plannerId || currentUser.uid;
+  const conversationId = buildBookingConversationId(cleanRequestId, ownerId, cleanVendorId);
   const eventDetails = request.eventDetails || {};
   const eventName = safeText(eventDetails.eventName || request.eventName, "my event");
   const vendorName = safeText(vendor.vendorName, "Vendor");
-  const listingTitle = safeText(vendor.listingTitle, "your listing");
+  const listingTitle = safeText(vendor.listingTitle || vendor.title, "your listing");
   const listingCategory = normalizeProfessionalLabel(safeText(vendor.category || vendor.listingCategory || vendor.mainCategory, "Event Service"));
+  const senderRole = isPlannerView() ? "planner" : "customer";
   const customerName = currentUserData.name || currentUser.displayName || currentUser.email || "Customer";
   const response = getVendorResponse(request, cleanVendorId);
   const responseNote = safeText(response?.note, "");
@@ -1618,10 +1902,11 @@ async function openVendorChatForRequest(requestId, vendorId) {
         [cleanVendorId]: vendorName
       },
       participantRoles: {
-        [currentUser.uid]: "customer",
+        [currentUser.uid]: senderRole,
         [cleanVendorId]: "vendor"
       },
-      customerId: currentUser.uid,
+      customerId: request.customerId || currentUser.uid,
+      plannerId: request.plannerId || (isPlannerView() ? currentUser.uid : ""),
       vendorId: cleanVendorId,
       listingId: safeText(vendor.listingId, ""),
       eventId: requestEventId,
@@ -1702,36 +1987,104 @@ async function messageVendorsForRequest(requestId) {
   await openVendorChatForRequest(cleanRequestId, firstVendor.vendorId);
 }
 
+async function loadUnreadNotifications() {
+  let unreadNotifications = 0;
+
+  try {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", currentUser.uid),
+      where("read", "==", false)
+    );
+
+    const snapshot = await getDocs(notificationsQuery);
+    unreadNotifications = snapshot.size;
+  } catch {
+    unreadNotifications = 0;
+  }
+
+  setBadge("topNotificationBadge", unreadNotifications);
+}
 
 async function loadBookingRequests() {
   try {
-    let q;
+    let requests = [];
 
     if (isAdminPreview()) {
-      q = query(collection(db, "bookingRequests"));
-    } else {
-      q = query(
+      const adminQuery = query(collection(db, "bookingRequests"));
+      const snapshot = await getDocs(adminQuery);
+
+      snapshot.forEach((docSnap) => {
+        requests.push({
+          id: docSnap.id,
+          ...docSnap.data()
+        });
+      });
+
+    } else if (isPlannerView()) {
+      const plannerQuery = query(
+        collection(db, "bookingRequests"),
+        where("plannerId", "==", currentUser.uid)
+      );
+
+      const ownerQuery = query(
         collection(db, "bookingRequests"),
         where("customerId", "==", currentUser.uid)
       );
+
+      const [plannerSnapshot, ownerSnapshot] = await Promise.all([
+        getDocs(plannerQuery).catch(() => ({ forEach: () => {} })),
+        getDocs(ownerQuery).catch(() => ({ forEach: () => {} }))
+      ]);
+
+      const seen = new Set();
+
+      function addRequest(docSnap) {
+        if (seen.has(docSnap.id)) return;
+        seen.add(docSnap.id);
+
+        const data = docSnap.data();
+
+        const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
+        const matchesCurrentEvent = !currentEventId || requestEventId === currentEventId;
+
+        if (!data.hiddenForPlanner && matchesCurrentEvent) {
+          requests.push({
+            id: docSnap.id,
+            ...data
+          });
+        }
+      }
+
+      plannerSnapshot.forEach(addRequest);
+      ownerSnapshot.forEach(addRequest);
+
+    } else {
+      const customerQuery = query(
+        collection(db, "bookingRequests"),
+        where("customerId", "==", currentUser.uid)
+      );
+
+      const snapshot = await getDocs(customerQuery);
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+
+        const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
+        const matchesCurrentEvent = !currentEventId || requestEventId === currentEventId;
+
+        if (!data.hiddenForCustomer && matchesCurrentEvent) {
+          requests.push({
+            id: docSnap.id,
+            ...data
+          });
+        }
+      });
     }
 
-    const snapshot = await getDocs(q);
-
-    const requests = [];
-
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-
-      const requestEventId = safeText(data.eventId, "") || safeText(data.eventDetails?.id, "");
-      const matchesCurrentEvent = !currentEventId || requestEventId === currentEventId;
-
-      if ((isAdminPreview() || !data.hiddenForCustomer) && matchesCurrentEvent) {
-        requests.push({
-          id: docSnap.id,
-          ...data
-        });
-      }
+    requests = requests.filter((request) => {
+      const requestEventId = safeText(request.eventId, "") || safeText(request.eventDetails?.id, "");
+      return !currentEventId || requestEventId === currentEventId;
     });
 
     requests.sort((a, b) => {
@@ -1749,7 +2102,7 @@ async function loadBookingRequests() {
         <div class="empty-icon">!</div>
         <h3>Could not load requests</h3>
         <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="admin-dashboard.html">Back to Admin</a>
+        <a class="btn" href="${isAdminPreview() ? "admin-dashboard.html" : isPlannerView() ? "planner-dashboard.html" : "dashboard.html"}">Go Back</a>
       </div>
     `;
   }
@@ -1762,6 +2115,10 @@ document.getElementById("withdrawModal").addEventListener("click", (event) => {
   if (event.target.id === "withdrawModal") {
     closeWithdrawModal();
   }
+});
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
 });
 
 onAuthStateChanged(auth, async (user) => {
@@ -1782,17 +2139,34 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUserData = userSnap.data();
 
-  if (currentUserData.role === "vendor") {
+  const activeRole = getActiveRole(currentUserData);
+
+  if (!canUseCustomerRequests(currentUserData)) {
+    window.location.href = getDashboardForRole(activeRole);
+    return;
+  }
+
+  if (activeRole === "vendor") {
     window.location.href = "vendor-dashboard.html";
     return;
   }
 
-  if (currentUserData.role === "admin") {
+  renderRoleSwitcher(currentUserData);
+
+  if (activeRole === "admin") {
     enableAdminPreviewMode();
   }
 
+  if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
+    showStatus("This account is not currently active. Some actions may be limited.", "error");
+  }
+
   updateEventScopedLinks();
-  loadBookingRequests();
+
+  await Promise.all([
+    loadUnreadNotifications(),
+    loadBookingRequests()
+  ]);
 });
 </script>
 
