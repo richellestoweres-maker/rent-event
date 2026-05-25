@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Checkout | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,7 +37,8 @@
       --radius-xl: 34px;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       background: var(--bg);
@@ -106,29 +108,62 @@
 
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 22px;
     }
 
-    .back-link, .icon-btn {
+    .back-link,
+    .icon-btn {
       width: 44px;
       height: 44px;
       border-radius: 50%;
       border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255,255,255,0.85);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
       text-decoration: none;
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      box-shadow: 0 8px 20px rgba(140,111,75,0.05);
       flex-shrink: 0;
       font-weight: 800;
+      position: relative;
     }
 
-    .topbar-center { flex: 1; text-align: center; }
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.68rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      top: -5px;
+      right: -5px;
+      box-shadow: 0 8px 16px rgba(255,95,103,0.28);
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
 
     .eyebrow {
       font-size: 0.78rem;
@@ -145,6 +180,44 @@
       line-height: 1;
       letter-spacing: -0.04em;
       font-weight: 800;
+    }
+
+    .role-switcher {
+      margin: 10px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140,111,75,.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
     .hero-card {
@@ -166,14 +239,42 @@
       border-radius: 50%;
       right: -60px;
       top: -45px;
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255,255,255,0.12);
     }
 
-    .hero-content { position: relative; z-index: 1; max-width: 330px; }
-    .hero-label { font-size: 0.88rem; font-weight: 600; opacity: 0.95; margin-bottom: 8px; }
-    .hero-title { margin: 0 0 10px; font-size: 2rem; line-height: 0.98; letter-spacing: -0.05em; font-weight: 800; }
-    .hero-subtitle { margin: 0 0 16px; font-size: 0.95rem; line-height: 1.45; color: rgba(255,255,255,0.95); }
-    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 330px;
+    }
+
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.95);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
     .hero-pill {
       min-height: 30px;
@@ -215,14 +316,21 @@
       white-space: nowrap;
     }
 
-    .checkout-card, .empty-card, .note-card, .event-card, .success-card {
+    .checkout-card,
+    .empty-card,
+    .note-card,
+    .event-card,
+    .success-card {
       background: var(--card);
       border-radius: 28px;
       padding: 18px;
       box-shadow: var(--shadow);
     }
 
-    .event-card { display: grid; gap: 12px; }
+    .event-card {
+      display: grid;
+      gap: 12px;
+    }
 
     .event-row {
       display: flex;
@@ -232,11 +340,31 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .event-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .event-label { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-    .event-value { text-align: right; font-size: 0.9rem; font-weight: 700; color: var(--text); max-width: 62%; }
+    .event-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
 
-    .vendor-list { display: grid; gap: 14px; }
+    .event-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .event-value {
+      text-align: right;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      max-width: 62%;
+    }
+
+    .vendor-list {
+      display: grid;
+      gap: 14px;
+    }
 
     .vendor-card {
       background: var(--card);
@@ -253,7 +381,13 @@
       margin-bottom: 12px;
     }
 
-    .vendor-left { display: flex; gap: 12px; align-items: center; min-width: 0; flex: 1; }
+    .vendor-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+      flex: 1;
+    }
 
     .vendor-thumb {
       width: 62px;
@@ -274,12 +408,43 @@
     }
 
     .vendor-thumb.has-photo::before { display: none; }
-    .vendor-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .vendor-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .vendor-info { min-width: 0; }
-    .vendor-name { margin: 0 0 4px; font-size: 1rem; line-height: 1.12; font-weight: 800; letter-spacing: -0.02em; }
-    .vendor-type { margin: 0; font-size: 0.88rem; line-height: 1.4; color: var(--muted); }
-    .vendor-price { font-size: 1rem; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
-    .vendor-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .vendor-name {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .vendor-type {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .vendor-price {
+      font-size: 1rem;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .vendor-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
     .pill {
       min-height: 28px;
@@ -309,10 +474,29 @@
 
     .price-row:first-child { padding-top: 0; }
     .price-row:last-child { border-bottom: none; padding-bottom: 0; }
+
     .price-copy { min-width: 0; }
-    .price-label { margin: 0 0 4px; font-size: 0.94rem; font-weight: 800; letter-spacing: -0.02em; }
-    .price-note { margin: 0; font-size: 0.82rem; color: var(--muted); line-height: 1.42; }
-    .price-value { font-size: 0.98rem; font-weight: 800; white-space: nowrap; text-align: right; }
+
+    .price-label {
+      margin: 0 0 4px;
+      font-size: 0.94rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .price-note {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.42;
+    }
+
+    .price-value {
+      font-size: 0.98rem;
+      font-weight: 800;
+      white-space: nowrap;
+      text-align: right;
+    }
 
     .total-row {
       margin-top: 12px;
@@ -326,9 +510,28 @@
       gap: 14px;
     }
 
-    .total-label { margin: 0 0 4px; font-size: 0.82rem; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
-    .total-note { margin: 0; font-size: 0.82rem; line-height: 1.4; color: var(--muted); }
-    .total-value { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.04em; white-space: nowrap; }
+    .total-label {
+      margin: 0 0 4px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .total-note {
+      margin: 0;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .total-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
 
     .payment-placeholder {
       border: 1px dashed #d7c7b2;
@@ -352,14 +555,20 @@
       font-weight: 800;
     }
 
-    .payment-placeholder h3, .empty-card h3, .note-title, .success-card h3 {
+    .payment-placeholder h3,
+    .empty-card h3,
+    .note-title,
+    .success-card h3 {
       margin: 0 0 8px;
       font-size: 1rem;
       font-weight: 800;
       letter-spacing: -0.02em;
     }
 
-    .payment-placeholder p, .empty-card p, .note-text, .success-card p {
+    .payment-placeholder p,
+    .empty-card p,
+    .note-text,
+    .success-card p {
       margin: 0;
       font-size: 0.9rem;
       line-height: 1.5;
@@ -372,7 +581,7 @@
       border-radius: 24px;
       padding: 14px 16px;
       margin-top: 14px;
-      border: 1px solid rgba(64, 103, 178, 0.12);
+      border: 1px solid rgba(64,103,178,0.12);
       box-shadow: var(--shadow);
     }
 
@@ -391,9 +600,13 @@
       color: inherit;
     }
 
-    .empty-card { text-align: center; padding: 24px 18px; }
+    .empty-card {
+      text-align: center;
+      padding: 24px 18px;
+    }
 
-    .empty-icon, .success-icon {
+    .empty-icon,
+    .success-icon {
       width: 64px;
       height: 64px;
       border-radius: 22px;
@@ -407,10 +620,15 @@
       font-weight: 800;
     }
 
-    .success-icon { background: var(--green-soft); color: var(--green-text); }
+    .success-icon {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
     .empty-card p { margin-bottom: 16px; }
 
-    .btn, .btn-secondary {
+    .btn,
+    .btn-secondary {
       min-height: 46px;
       border-radius: 999px;
       display: inline-flex;
@@ -425,8 +643,16 @@
       cursor: pointer;
     }
 
-    .btn { background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%); color: #fff; box-shadow: 0 14px 28px rgba(255,107,97,0.16); }
-    .btn-secondary { background: var(--soft-2); color: #4a433d; }
+    .btn {
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255,107,97,0.16);
+    }
+
+    .btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
 
     .status-message {
       display: none;
@@ -438,9 +664,23 @@
       line-height: 1.45;
     }
 
-    .status-message.info { display: block; background: #fff4df; color: #8d5f11; }
-    .status-message.success { display: block; background: var(--green-soft); color: var(--green-text); }
-    .status-message.error { display: block; background: var(--red-soft); color: var(--red-text); }
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .status-message.success {
+      display: block;
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
 
     .bottom-bar {
       position: fixed;
@@ -462,10 +702,30 @@
       z-index: 10;
     }
 
-    .bottom-info { flex: 1; padding-left: 8px; }
-    .bottom-label { display: block; font-size: 0.74rem; color: var(--muted); margin-bottom: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-    .bottom-value { display: block; font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
-    .bottom-btn, .bottom-btn-secondary {
+    .bottom-info {
+      flex: 1;
+      padding-left: 8px;
+    }
+
+    .bottom-label {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bottom-value {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .bottom-btn,
+    .bottom-btn-secondary {
       min-height: 54px;
       border-radius: 999px;
       border: none;
@@ -481,21 +741,55 @@
       cursor: pointer;
     }
 
-    .bottom-btn { background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%); color: #fff; box-shadow: 0 14px 28px rgba(255,107,97,0.18); }
-    .bottom-btn-secondary { background: var(--soft-2); color: #4a433d; }
-    .bottom-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+    .bottom-btn {
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(255,107,97,0.18);
+    }
+
+    .bottom-btn-secondary {
+      background: var(--soft-2);
+      color: #4a433d;
+    }
+
+    .bottom-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
 
     @media (max-width: 390px) {
-      .bottom-bar { flex-wrap: wrap; border-radius: 28px; }
-      .bottom-info { width: 100%; padding-left: 2px; }
-      .bottom-btn, .bottom-btn-secondary { flex: 1; }
+      .bottom-bar {
+        flex-wrap: wrap;
+        border-radius: 28px;
+      }
+
+      .bottom-info {
+        width: 100%;
+        padding-left: 2px;
+      }
+
+      .bottom-btn,
+      .bottom-btn-secondary {
+        flex: 1;
+      }
     }
 
     @media (min-width: 768px) {
       body { padding: 24px 0; }
+
       .page { max-width: 960px; }
-      .vendor-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .checkout-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 18px; align-items: start; }
+
+      .vendor-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .checkout-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 18px;
+        align-items: start;
+      }
+
       .bottom-bar { max-width: 520px; }
     }
   </style>
@@ -517,16 +811,27 @@
       <a href="event-builder.html" class="back-link" id="backToEventLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Request Review</div>
+        <div class="eyebrow" id="pageEyebrow">Request Review</div>
         <h1 class="page-title">Checkout</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
       </div>
 
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <span class="notification-badge" id="topNotificationBadge">0</span>
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">RentEvent Checkout</div>
+        <div class="hero-label" id="heroLabel">RentEvent Checkout</div>
         <h2 class="hero-title">Submit your event request.</h2>
         <p class="hero-subtitle">
           Review your vendors, event details, and estimated total before sending your request.
@@ -540,14 +845,14 @@
       </div>
     </section>
 
-    <section class="section" id="successSection" style="display: none;">
+    <section class="section" id="successSection" style="display:none;">
       <div class="success-card">
         <div class="success-icon">✓</div>
         <h3>Request submitted</h3>
         <p id="successMessage">
           Your request was submitted successfully. You can track updates from your My Requests page.
         </p>
-        <div style="margin-top: 14px;">
+        <div style="margin-top:14px;">
           <a class="btn" id="successRequestsLink" href="my-requests.html">View My Requests</a>
         </div>
       </div>
@@ -618,7 +923,6 @@
               <p class="total-label">Estimated Total</p>
               <p class="total-note">This request does not collect payment yet.</p>
             </div>
-
             <div class="total-value" id="totalDue">$0</div>
           </div>
 
@@ -686,6 +990,7 @@ import {
   getDocs,
   query,
   where,
+  updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -743,8 +1048,179 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+function normalizeRole(role) {
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
+    });
+  }
+
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    userData.permissions?.admin === true ||
+    legacy === "admin"
+  ) {
+    roleSet.add("admin");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
+
+  return allowedRoles[0] || "customer";
+}
+
+function canUseCheckout(userData = {}) {
+  const roles = getAllowedRoles(userData);
+
+  return (
+    roles.includes("customer") ||
+    roles.includes("planner") ||
+    roles.includes("admin") ||
+    userData.customerAccount === true ||
+    userData.plannerPro === true ||
+    userData.permissions?.canUseClientDashboard === true ||
+    userData.permissions?.canUsePlannerDashboard === true
+  );
+}
+
 function isAdminPreview() {
-  return currentUserData?.role === "admin";
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function isPlannerView() {
+  return getActiveRole(currentUserData || {}) === "planner";
+}
+
+function getActorRole() {
+  if (isAdminPreview()) return "admin";
+  if (isPlannerView()) return "planner";
+  return "customer";
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (allowedRoles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${escapeHtml(role)}" ${role === activeRole ? "selected" : ""}>${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
 }
 
 function setCheckoutStatus(message, type = "info") {
@@ -757,16 +1233,17 @@ function setCheckoutStatus(message, type = "info") {
 function eventBuilderHref(extraParams = {}) {
   const eventParams = new URLSearchParams();
 
-  if (activeEventId) {
-    eventParams.set("eventId", activeEventId);
-  }
+  if (activeEventId) eventParams.set("eventId", activeEventId);
 
   Object.entries(extraParams).forEach(([key, value]) => {
     if (value) eventParams.set(key, value);
   });
 
   const queryString = eventParams.toString();
-  return queryString ? `event-builder.html?${queryString}` : "dashboard.html";
+
+  if (queryString) return `event-builder.html?${queryString}`;
+
+  return isPlannerView() ? "planner-dashboard.html" : "dashboard.html";
 }
 
 function myRequestsHref() {
@@ -795,9 +1272,17 @@ function applyEventLinks() {
     successLink.href = isAdminPreview() ? "admin-dashboard.html" : myRequestsHref();
   }
 
+  if (isPlannerView() && !isAdminPreview()) {
+    setText("pageEyebrow", "Planner Request Review");
+    setText("heroLabel", "Planner Checkout");
+  }
+
   if (isAdminPreview()) {
     const bar = document.getElementById("adminPreviewBar");
     if (bar) bar.style.display = "block";
+
+    setText("pageEyebrow", "Admin Preview");
+    setText("heroLabel", "Admin Checkout Review");
 
     const button = document.getElementById("continuePaymentBtn");
     if (button) {
@@ -935,6 +1420,7 @@ function calculateTotals() {
 function updateTotals() {
   const totals = calculateTotals();
   const vendorCount = selectedVendors.length;
+  const continueBtn = document.getElementById("continuePaymentBtn");
 
   setText("vendorSubtotal", formatMoney(totals.vendorSubtotal));
   setText("serviceFee", formatMoney(totals.serviceFee));
@@ -943,8 +1429,6 @@ function updateTotals() {
   setText("bottomTotal", formatMoney(totals.totalDue));
   setText("heroVendorCount", `${vendorCount} Vendor${vendorCount === 1 ? "" : "s"}`);
   setText("heroTotal", `${formatMoney(totals.totalDue)} Total`);
-
-  const continueBtn = document.getElementById("continuePaymentBtn");
 
   if (isAdminPreview()) {
     continueBtn.disabled = true;
@@ -958,6 +1442,9 @@ function updateTotals() {
   } else if (lastBookingRequestId) {
     continueBtn.disabled = true;
     continueBtn.textContent = "Request Submitted";
+  } else if (currentUserData?.accountStatus === "deactivated" || currentUserData?.accountStatus === "pending_deletion") {
+    continueBtn.disabled = true;
+    continueBtn.textContent = "Account Inactive";
   } else {
     continueBtn.disabled = false;
     continueBtn.textContent = "Submit Request";
@@ -966,7 +1453,11 @@ function updateTotals() {
 
 function renderMissingEvent() {
   const card = document.getElementById("eventDetailsCard");
-  const backHref = isAdminPreview() ? "admin-dashboard.html" : "dashboard.html#myEventsSection";
+  const backHref = isAdminPreview()
+    ? "admin-dashboard.html"
+    : isPlannerView()
+      ? "planner-dashboard.html"
+      : "dashboard.html#myEventsSection";
 
   card.innerHTML = `
     <div class="event-row">
@@ -1013,11 +1504,13 @@ function renderEventDetails() {
   const eventZip = safeText(currentEventData.eventZip, "");
   const guestCount = safeText(currentEventData.guestCount, "Not listed");
   const eventBudget = safeText(currentEventData.eventBudget, "Not listed");
-  const planningStyle = safeText(currentEventData.planningStyle, "Planning my own event");
+  const planningStyle = safeText(currentEventData.planningStyle, isPlannerView() ? "Planning for a client" : "Planning my own event");
   const destinationEvent = safeText(currentEventData.destinationEvent, "No / local event");
   const styleVibe = safeText(currentEventData.styleVibe, "Not listed");
-
   const location = [eventCity, eventZip].filter(Boolean).join(" ");
+  const plannerBadge = currentEventData.plannerId ? `
+    <div class="event-row"><span class="event-label">Planner</span><span class="event-value">${escapeHtml(currentEventData.plannerName || "Planner-managed event")}</span></div>
+  ` : "";
 
   card.innerHTML = `
     <div class="event-row"><span class="event-label">Event</span><span class="event-value">${escapeHtml(eventName)}</span></div>
@@ -1029,6 +1522,7 @@ function renderEventDetails() {
     <div class="event-row"><span class="event-label">Style</span><span class="event-value">${escapeHtml(styleVibe)}</span></div>
     <div class="event-row"><span class="event-label">Planning</span><span class="event-value">${escapeHtml(planningStyle)}</span></div>
     <div class="event-row"><span class="event-label">Destination</span><span class="event-value">${escapeHtml(destinationEvent)}</span></div>
+    ${plannerBadge}
     ${currentEventData.aiPlannerSuggestions ? `
       <div class="event-row">
         <span class="event-label">AI Planner</span>
@@ -1071,6 +1565,8 @@ function renderVendors() {
     const price = formatMoney(vendor.priceNumber || 0);
     const imageUrl = safeText(vendor.imageUrl, "");
     const status = safeText(vendor.status, "pending");
+    const addedByRole = safeText(vendor.addedByRole, "");
+    const actorPill = addedByRole ? `<span class="pill ai">${escapeHtml(addedByRole)}</span>` : "";
     const detailHref = activeEventId
       ? `detail.html?id=${listingId}&eventId=${encodeURIComponent(activeEventId)}`
       : `detail.html?id=${listingId}`;
@@ -1092,11 +1588,12 @@ function renderVendors() {
         <div class="vendor-meta">
           <span class="pill pending">${escapeHtml(status)}</span>
           <span class="pill info">${escapeHtml(vendorName)}</span>
+          ${actorPill}
           ${eventTypePills}
           <span class="pill safe">Request Review</span>
         </div>
 
-        <div style="margin-top: 12px;">
+        <div style="margin-top:12px;">
           <a class="btn-secondary" href="${escapeHtml(detailHref)}">View Listing</a>
         </div>
       </article>
@@ -1104,6 +1601,19 @@ function renderVendors() {
   }).join("");
 
   updateTotals();
+}
+
+function canAccessEvent(eventData = {}) {
+  if (isAdminPreview()) return true;
+
+  const uid = currentUser.uid;
+
+  return (
+    eventData.customerId === uid ||
+    eventData.ownerId === uid ||
+    eventData.plannerId === uid ||
+    eventData.createdBy === uid
+  );
 }
 
 async function loadEventDetails() {
@@ -1124,14 +1634,10 @@ async function loadEventDetails() {
 
   const eventData = eventSnap.data();
 
-  if (
-    eventData.customerId &&
-    eventData.customerId !== currentUser.uid &&
-    eventData.ownerId !== currentUser.uid &&
-    !isAdminPreview()
-  ) {
+  if (!canAccessEvent(eventData)) {
     currentEventData = null;
     renderMissingEvent();
+    setCheckoutStatus("You do not have access to this event checkout.", "error");
     return;
   }
 
@@ -1151,29 +1657,29 @@ async function loadSelectedVendors() {
   }
 
   try {
-    let boardQuery;
-
-    if (isAdminPreview()) {
-      boardQuery = query(
-        collection(db, "eventBoardItems"),
-        where("eventId", "==", activeEventId)
-      );
-    } else {
-      boardQuery = query(
-        collection(db, "eventBoardItems"),
-        where("userId", "==", currentUser.uid),
-        where("eventId", "==", activeEventId)
-      );
-    }
+    const boardQuery = query(
+      collection(db, "eventBoardItems"),
+      where("eventId", "==", activeEventId)
+    );
 
     const snapshot = await getDocs(boardQuery);
     const items = [];
 
     snapshot.forEach((docSnap) => {
-      items.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
+      const data = docSnap.data();
+
+      if (
+        isAdminPreview() ||
+        data.userId === currentUser.uid ||
+        data.customerId === currentUser.uid ||
+        data.ownerId === currentUser.uid ||
+        data.plannerId === currentUser.uid
+      ) {
+        items.push({
+          id: docSnap.id,
+          ...data
+        });
+      }
     });
 
     items.sort((a, b) => {
@@ -1225,11 +1731,13 @@ function buildBookingRequestPayload() {
   const vendorIds = Array.from(new Set(cleanVendors.map((vendor) => vendor.vendorId).filter(Boolean)));
   const listingIds = Array.from(new Set(cleanVendors.map((vendor) => vendor.listingId).filter(Boolean)));
   const eventName = safeText(currentEventData?.eventName, "Event Request");
+  const actorRole = getActorRole();
+  const existingCustomerId = currentEventData?.customerId || "";
+  const existingPlannerId = currentEventData?.plannerId || "";
 
-  return {
-    customerId: currentUser.uid,
-    customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Customer",
-    customerEmail: currentUserData?.email || currentUser.email || "",
+  const payload = {
+    submittedBy: currentUser.uid,
+    submittedByRole: actorRole,
 
     eventId: activeEventId,
     eventName,
@@ -1251,7 +1759,10 @@ function buildBookingRequestPayload() {
     paymentStatus: "not_collected",
     requestStatus: "pending",
     status: "pending",
+
     hiddenForCustomer: false,
+    hiddenForPlanner: false,
+    hiddenForVendorIds: {},
 
     transportationSafetyPositioning: "RentEvent is not a rideshare platform. Transportation, valet, security, lifeguard, and safety-related requests are for professional event businesses/providers only, not individual on-demand ride listings.",
     professionalProviderNotice: "Transportation-related vendors should be shuttle companies, party bus companies, limo/chauffeur companies, wedding guest transportation companies, venue transportation providers, valet/parking companies, or similar professional event logistics providers.",
@@ -1259,6 +1770,34 @@ function buildBookingRequestPayload() {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
+
+  if (actorRole === "planner") {
+    payload.plannerId = existingPlannerId || currentUser.uid;
+    payload.plannerName = currentUserData?.plannerName || currentUserData?.name || currentUser.displayName || currentUser.email || "Planner";
+    payload.plannerEmail = currentUserData?.email || currentUser.email || "";
+    payload.plannerClientEvent = true;
+
+    payload.customerId = existingCustomerId || currentEventData?.clientUserId || "";
+    payload.customerName = currentEventData?.clientName || currentEventData?.customerName || "Planner Client";
+    payload.customerEmail = currentEventData?.clientEmail || currentEventData?.customerEmail || "";
+
+    payload.requestOwnerId = payload.plannerId;
+    payload.accountType = "planner";
+  } else {
+    payload.customerId = existingCustomerId || currentUser.uid;
+    payload.customerName = currentUserData?.name || currentUser.displayName || currentUser.email || "Customer";
+    payload.customerEmail = currentUserData?.email || currentUser.email || "";
+    payload.requestOwnerId = payload.customerId;
+    payload.accountType = currentEventData?.accountType || "customer";
+
+    if (existingPlannerId) {
+      payload.plannerId = existingPlannerId;
+      payload.plannerName = currentEventData?.plannerName || "";
+      payload.plannerEmail = currentEventData?.plannerEmail || "";
+    }
+  }
+
+  return payload;
 }
 
 async function createVendorBookingNotifications(requestId, payload) {
@@ -1278,7 +1817,7 @@ async function createVendorBookingNotifications(requestId, payload) {
         category: "Booking Request",
 
         title: "New booking request",
-        body: `${payload.customerName} submitted a request for ${payload.eventName}.`,
+        body: `${payload.plannerId ? payload.plannerName || "A planner" : payload.customerName} submitted a request for ${payload.eventName}.`,
 
         sourceId: requestId,
         sourceCollection: "bookingRequests",
@@ -1286,8 +1825,10 @@ async function createVendorBookingNotifications(requestId, payload) {
         eventId: payload.eventId,
         eventName: payload.eventName,
 
-        customerId: payload.customerId,
-        customerName: payload.customerName,
+        customerId: payload.customerId || "",
+        customerName: payload.customerName || "",
+        plannerId: payload.plannerId || "",
+        plannerName: payload.plannerName || "",
 
         read: false,
         createdAt: serverTimestamp(),
@@ -1309,8 +1850,13 @@ async function submitBookingRequest() {
     return;
   }
 
+  if (currentUserData?.accountStatus === "deactivated" || currentUserData?.accountStatus === "pending_deletion") {
+    setCheckoutStatus("This account is not active, so booking requests cannot be submitted.", "error");
+    return;
+  }
+
   if (!activeEventId) {
-    window.location.href = "dashboard.html#myEventsSection";
+    window.location.href = isPlannerView() ? "planner-dashboard.html" : "dashboard.html#myEventsSection";
     return;
   }
 
@@ -1332,14 +1878,15 @@ async function submitBookingRequest() {
     }
 
     const bookingRef = await addDoc(collection(db, "bookingRequests"), payload);
-
     lastBookingRequestId = bookingRef.id;
 
     await createVendorBookingNotifications(bookingRef.id, payload);
 
     document.getElementById("successSection").style.display = "block";
     document.getElementById("successMessage").textContent =
-      "Your request was submitted successfully. You can track updates from your My Requests page.";
+      isPlannerView()
+        ? "Your client request was submitted successfully. You can track updates from the request page."
+        : "Your request was submitted successfully. You can track updates from your My Requests page.";
 
     setCheckoutStatus("Booking request submitted successfully. Vendors have been notified.", "success");
 
@@ -1359,6 +1906,25 @@ async function submitBookingRequest() {
   }
 }
 
+async function loadUnreadNotifications() {
+  let unreadNotifications = 0;
+
+  try {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", currentUser.uid),
+      where("read", "==", false)
+    );
+
+    const snapshot = await getDocs(notificationsQuery);
+    unreadNotifications = snapshot.size;
+  } catch {
+    unreadNotifications = 0;
+  }
+
+  setBadge("topNotificationBadge", unreadNotifications);
+}
+
 async function loadPage() {
   applyEventLinks();
 
@@ -1372,9 +1938,17 @@ async function loadPage() {
   }
 
   await loadSelectedVendors();
+
+  if (currentUserData?.accountStatus === "deactivated" || currentUserData?.accountStatus === "pending_deletion") {
+    setCheckoutStatus("This account is not currently active. Checkout actions are disabled.", "error");
+  }
 }
 
 document.getElementById("continuePaymentBtn").addEventListener("click", submitBookingRequest);
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -1394,12 +1968,24 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUserData = userSnap.data();
 
-  if (currentUserData.role === "vendor") {
+  const activeRole = getActiveRole(currentUserData);
+
+  if (!canUseCheckout(currentUserData)) {
+    window.location.href = getDashboardForRole(activeRole);
+    return;
+  }
+
+  if (activeRole === "vendor") {
     window.location.href = "vendor-dashboard.html";
     return;
   }
 
-  loadPage();
+  renderRoleSwitcher(currentUserData);
+
+  await Promise.all([
+    loadUnreadNotifications(),
+    loadPage()
+  ]);
 });
 </script>
 
