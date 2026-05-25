@@ -3,32 +3,713 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Booking Requests | RentEvent</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
   <style>
-    *{box-sizing:border-box} :root{--bg:#f7f2e9;--card:#fff;--text:#161616;--muted:#6a625a;--line:#ece2d3;--soft:#faf5ee;--c1:#ff9a73;--c2:#ff7a63;--c3:#ff5f67;--gold:#d88914;--green:#eaf7ef;--greenText:#2d7a49;--blue:#edf4ff;--blueText:#4067b2;--purple:#f0eaff;--purpleText:#6f4ab8;--red:#ffe7e2;--redText:#c74f4d;--shadow:0 18px 40px rgba(123,96,58,.08);--strong:0 18px 32px rgba(255,108,98,.18)}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,sans-serif} body{min-height:100vh}.page{width:100%;max-width:430px;margin:0 auto;min-height:100vh;padding:20px 18px 112px}
-    .admin-preview-bar{display:none;position:sticky;top:0;z-index:90;padding:12px 18px;background:#161616;color:#fff;box-shadow:0 12px 28px rgba(22,22,22,.18)}.admin-preview-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.admin-preview-text{font-size:.82rem;line-height:1.35;font-weight:700}.admin-preview-text span{display:block;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.72);margin-top:2px}.admin-preview-btn{min-height:38px;padding:0 13px;border-radius:999px;background:#fff;color:#161616;text-decoration:none;font-size:.8rem;font-weight:800;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center}
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}.back-link,.icon-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;color:#222;text-decoration:none;box-shadow:0 8px 20px rgba(140,111,75,.05);flex-shrink:0;font-weight:800}.topbar-center{flex:1;text-align:center}.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#7b7268;margin-bottom:4px}.page-title{margin:0;font-size:1.55rem;line-height:1;letter-spacing:-.04em;font-weight:800}
-    .hero-card{position:relative;overflow:hidden;border-radius:34px;padding:22px 20px;background:linear-gradient(160deg,var(--c1),var(--c2) 52%,var(--c3));color:#fff;box-shadow:var(--strong);margin-bottom:24px}.hero-card:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-60px;top:-45px;background:rgba(255,255,255,.12)}.hero-content{position:relative;z-index:1;max-width:320px}.hero-label{font-size:.88rem;font-weight:600;opacity:.95;margin-bottom:8px}.hero-title{margin:0 0 10px;font-size:2rem;line-height:.98;letter-spacing:-.05em;font-weight:800}.hero-subtitle{margin:0 0 16px;font-size:.95rem;line-height:1.45;color:rgba(255,255,255,.95)}.hero-meta{display:flex;flex-wrap:wrap;gap:8px}.hero-pill{min-height:30px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.18);color:#fff}
-    .section{margin-top:28px}.section-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.section-title{margin:0;font-size:1.45rem;line-height:1.02;letter-spacing:-.04em;font-weight:800}.section-link{color:var(--muted);text-decoration:none;font-size:.92rem;font-weight:700;white-space:nowrap}.request-list{display:grid;gap:16px}.request-card,.empty-card{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow)}.request-card.withdrawn-card{opacity:.88}.request-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}.request-title{margin:0 0 4px;font-size:1.08rem;line-height:1.12;font-weight:800;letter-spacing:-.03em}.request-subtitle{margin:0;color:var(--muted);font-size:.88rem;line-height:1.4;font-weight:600}.request-total{font-size:1rem;font-weight:800;white-space:nowrap;text-align:right}
-    .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.pill{min-height:28px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700;text-transform:capitalize}.pill.pending{background:#fff4df;color:#aa6f12}.pill.info{background:#f6efe4;color:#6a625a}.pill.safe{background:var(--green);color:var(--greenText)}.pill.ai{background:var(--purple);color:var(--purpleText)}.pill.type{background:var(--blue);color:var(--blueText)}.pill.declined,.pill.withdrawn{background:var(--red);color:var(--redText)}
-    .request-grid{display:grid;gap:10px;margin:14px 0;padding:14px;border:1px solid var(--line);background:var(--soft);border-radius:22px}.info-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(236,226,211,.9);padding-bottom:8px}.info-row:last-child{border-bottom:none;padding-bottom:0}.info-label{font-size:.76rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.info-value{font-size:.88rem;text-align:right;font-weight:700;max-width:62%}
-    .vendor-box,.response-box,.withdrawn-box,.ai-box{margin-top:12px;padding:14px;border-radius:22px;background:#fff;border:1px solid var(--line)}.vendor-box h4,.response-box h4,.withdrawn-box h4,.ai-box h4{margin:0 0 6px;font-size:.95rem;font-weight:800}.vendor-box p,.response-box p,.withdrawn-box p,.ai-box p{margin:0;font-size:.84rem;line-height:1.45;color:var(--muted)}.response-box{background:var(--soft)}.withdrawn-box{background:var(--red);border-color:rgba(199,79,77,.18)}.withdrawn-box h4,.withdrawn-box p{color:var(--redText)}.ai-box{background:var(--purple);color:var(--purpleText)}.ai-box p,.ai-box h4{color:var(--purpleText)}
-    .request-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.btn,.btn-secondary,.btn-safe,.btn-warning,.btn-danger{min-height:46px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-size:.9rem;font-weight:700;font-family:inherit;border:none;flex:1;cursor:pointer;min-width:120px;padding:0 16px}.btn{background:linear-gradient(135deg,var(--c1),var(--c2) 52%,var(--c3));color:#fff;box-shadow:0 14px 28px rgba(255,107,97,.16)}.btn-secondary{background:var(--soft);color:#4a433d}.btn-safe{background:var(--green);color:var(--greenText)}.btn-warning{background:#fff4df;color:#8d5f11}.btn-danger{background:var(--red);color:var(--redText)}button:disabled{opacity:.65;cursor:not-allowed}
-    .empty-card{text-align:center;padding:24px 18px}.empty-icon{width:64px;height:64px;border-radius:22px;margin:0 auto 14px;background:#fff1dc;color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800}.empty-card h3{margin:0 0 8px;font-size:1.05rem;font-weight:800;letter-spacing:-.03em}.empty-card p{margin:0 0 16px;color:var(--muted);font-size:.9rem;line-height:1.45}.status-message{display:none;margin-top:14px;border-radius:18px;padding:12px 14px;font-size:.85rem;font-weight:700;line-height:1.45}.status-message.info{display:block;background:#fff4df;color:#8d5f11}.status-message.success{display:block;background:var(--green);color:var(--greenText)}.status-message.error{display:block;background:var(--red);color:var(--redText)}
-    .modal-overlay{position:fixed;inset:0;background:rgba(22,22,22,.42);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal-overlay.show{display:flex}.modal-card{width:100%;max-width:390px;background:#fff;border-radius:30px;padding:20px;box-shadow:0 24px 70px rgba(22,22,22,.22)}.modal-label{display:inline-flex;min-height:28px;padding:0 10px;border-radius:999px;align-items:center;justify-content:center;background:var(--blue);color:var(--blueText);font-size:.76rem;font-weight:800;margin-bottom:12px}.modal-title{margin:0 0 8px;font-size:1.45rem;line-height:1.05;letter-spacing:-.04em;font-weight:800}.modal-text{margin:0 0 16px;color:var(--muted);font-size:.92rem;line-height:1.45}.modal-field{margin-bottom:14px}.modal-field label{display:block;margin-bottom:7px;font-size:.78rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.modal-field select,.modal-field textarea{width:100%;border:1px solid var(--line);border-radius:18px;padding:12px 14px;font-family:inherit;font-size:.92rem;background:var(--soft);color:var(--text);outline:none}.modal-field textarea{min-height:86px;resize:vertical}.modal-actions{display:flex;gap:10px;margin-top:16px}.modal-actions .btn-secondary,.modal-actions .btn{min-width:0}
-    .bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:calc(100% - 24px);max-width:406px;background:rgba(255,255,255,.94);border:1px solid rgba(235,225,211,.95);border-radius:999px;padding:10px 8px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;box-shadow:0 18px 38px rgba(120,96,60,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.nav-item{min-height:58px;border-radius:999px;text-decoration:none;color:#6c655d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:.76rem;font-weight:700;text-align:center;padding:0 4px;position:relative}.nav-item.active{background:linear-gradient(135deg,var(--c1),var(--c2) 52%,var(--c3));color:#fff;box-shadow:0 10px 22px rgba(255,107,97,.24)}
-    @media (min-width:768px){body{padding:24px 0}.page{max-width:960px}.request-list{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom-nav{max-width:520px}}
+    *{box-sizing:border-box}
+
+    :root{
+      --bg:#f7f2e9;
+      --card:#fff;
+      --text:#161616;
+      --muted:#6a625a;
+      --line:#ece2d3;
+      --soft:#faf5ee;
+      --c1:#ff9a73;
+      --c2:#ff7a63;
+      --c3:#ff5f67;
+      --gold:#d88914;
+      --green:#eaf7ef;
+      --greenText:#2d7a49;
+      --blue:#edf4ff;
+      --blueText:#4067b2;
+      --purple:#f0eaff;
+      --purpleText:#6f4ab8;
+      --red:#ffe7e2;
+      --redText:#c74f4d;
+      --shadow:0 18px 40px rgba(123,96,58,.08);
+      --strong:0 18px 32px rgba(255,108,98,.18)
+    }
+
+    html,
+    body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter,sans-serif
+    }
+
+    body{min-height:100vh}
+
+    .page{
+      width:100%;
+      max-width:430px;
+      margin:0 auto;
+      min-height:100vh;
+      padding:20px 18px 112px
+    }
+
+    .admin-preview-bar{
+      display:none;
+      position:sticky;
+      top:0;
+      z-index:90;
+      padding:12px 18px;
+      background:#161616;
+      color:#fff;
+      box-shadow:0 12px 28px rgba(22,22,22,.18)
+    }
+
+    .admin-preview-inner{
+      max-width:960px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px
+    }
+
+    .admin-preview-text{
+      font-size:.82rem;
+      line-height:1.35;
+      font-weight:700
+    }
+
+    .admin-preview-text span{
+      display:block;
+      font-size:.72rem;
+      font-weight:600;
+      color:rgba(255,255,255,.72);
+      margin-top:2px
+    }
+
+    .admin-preview-btn{
+      min-height:38px;
+      padding:0 13px;
+      border-radius:999px;
+      background:#fff;
+      color:#161616;
+      text-decoration:none;
+      font-size:.8rem;
+      font-weight:800;
+      white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:22px
+    }
+
+    .back-link,
+    .icon-btn{
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.85);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#222;
+      text-decoration:none;
+      box-shadow:0 8px 20px rgba(140,111,75,.05);
+      flex-shrink:0;
+      font-weight:800;
+      position:relative
+    }
+
+    .icon-btn svg{
+      width:20px;
+      height:20px
+    }
+
+    .notification-badge{
+      position:absolute;
+      min-width:20px;
+      height:20px;
+      padding:0 6px;
+      border-radius:999px;
+      background:linear-gradient(135deg,var(--c2),var(--c3));
+      color:#fff;
+      font-size:.68rem;
+      line-height:20px;
+      font-weight:800;
+      text-align:center;
+      border:2px solid #fff;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:5;
+      top:-5px;
+      right:-5px;
+      box-shadow:0 8px 16px rgba(255,95,103,.28)
+    }
+
+    .topbar-center{
+      flex:1;
+      text-align:center
+    }
+
+    .eyebrow{
+      font-size:.78rem;
+      font-weight:700;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#7b7268;
+      margin-bottom:4px
+    }
+
+    .page-title{
+      margin:0;
+      font-size:1.55rem;
+      line-height:1;
+      letter-spacing:-.04em;
+      font-weight:800
+    }
+
+    .role-switcher{
+      margin:10px auto 0;
+      display:none;
+      align-items:center;
+      gap:8px;
+      width:fit-content;
+      max-width:100%;
+      padding:6px;
+      border-radius:999px;
+      background:rgba(255,255,255,.82);
+      border:1px solid var(--line);
+      box-shadow:0 8px 18px rgba(140,111,75,.05)
+    }
+
+    .role-switcher-label{
+      padding-left:10px;
+      color:var(--muted);
+      font-size:.76rem;
+      font-weight:800;
+      white-space:nowrap
+    }
+
+    .role-select{
+      min-height:34px;
+      border:none;
+      border-radius:999px;
+      background:#fff;
+      color:var(--text);
+      font-family:inherit;
+      font-size:.8rem;
+      font-weight:800;
+      padding:0 28px 0 12px;
+      outline:none;
+      cursor:pointer;
+      max-width:190px;
+      box-shadow:0 6px 14px rgba(120,96,60,.06)
+    }
+
+    .hero-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:34px;
+      padding:22px 20px;
+      background:linear-gradient(160deg,var(--c1),var(--c2) 52%,var(--c3));
+      color:#fff;
+      box-shadow:var(--strong);
+      margin-bottom:24px
+    }
+
+    .hero-card:after{
+      content:"";
+      position:absolute;
+      width:170px;
+      height:170px;
+      border-radius:50%;
+      right:-60px;
+      top:-45px;
+      background:rgba(255,255,255,.12)
+    }
+
+    .hero-content{
+      position:relative;
+      z-index:1;
+      max-width:320px
+    }
+
+    .hero-label{
+      font-size:.88rem;
+      font-weight:600;
+      opacity:.95;
+      margin-bottom:8px
+    }
+
+    .hero-title{
+      margin:0 0 10px;
+      font-size:2rem;
+      line-height:.98;
+      letter-spacing:-.05em;
+      font-weight:800
+    }
+
+    .hero-subtitle{
+      margin:0 0 16px;
+      font-size:.95rem;
+      line-height:1.45;
+      color:rgba(255,255,255,.95)
+    }
+
+    .hero-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px
+    }
+
+    .hero-pill{
+      min-height:30px;
+      padding:0 10px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:.76rem;
+      font-weight:700;
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff
+    }
+
+    .section{margin-top:28px}
+
+    .section-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px
+    }
+
+    .section-title{
+      margin:0;
+      font-size:1.45rem;
+      line-height:1.02;
+      letter-spacing:-.04em;
+      font-weight:800
+    }
+
+    .section-link{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:.92rem;
+      font-weight:700;
+      white-space:nowrap
+    }
+
+    .request-list{
+      display:grid;
+      gap:16px
+    }
+
+    .request-card,
+    .empty-card{
+      background:var(--card);
+      border-radius:28px;
+      padding:18px;
+      box-shadow:var(--shadow)
+    }
+
+    .request-card.withdrawn-card{opacity:.88}
+
+    .request-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px
+    }
+
+    .request-title{
+      margin:0 0 4px;
+      font-size:1.08rem;
+      line-height:1.12;
+      font-weight:800;
+      letter-spacing:-.03em
+    }
+
+    .request-subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:.88rem;
+      line-height:1.4;
+      font-weight:600
+    }
+
+    .request-total{
+      font-size:1rem;
+      font-weight:800;
+      white-space:nowrap;
+      text-align:right
+    }
+
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:12px 0
+    }
+
+    .pill{
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:.76rem;
+      font-weight:700;
+      text-transform:capitalize
+    }
+
+    .pill.pending{background:#fff4df;color:#aa6f12}
+    .pill.info{background:#f6efe4;color:#6a625a}
+    .pill.safe{background:var(--green);color:var(--greenText)}
+    .pill.ai{background:var(--purple);color:var(--purpleText)}
+    .pill.type{background:var(--blue);color:var(--blueText)}
+    .pill.declined,
+    .pill.withdrawn{background:var(--red);color:var(--redText)}
+
+    .request-grid{
+      display:grid;
+      gap:10px;
+      margin:14px 0;
+      padding:14px;
+      border:1px solid var(--line);
+      background:var(--soft);
+      border-radius:22px
+    }
+
+    .info-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid rgba(236,226,211,.9);
+      padding-bottom:8px
+    }
+
+    .info-row:last-child{
+      border-bottom:none;
+      padding-bottom:0
+    }
+
+    .info-label{
+      font-size:.76rem;
+      color:var(--muted);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em
+    }
+
+    .info-value{
+      font-size:.88rem;
+      text-align:right;
+      font-weight:700;
+      max-width:62%
+    }
+
+    .vendor-box,
+    .response-box,
+    .withdrawn-box,
+    .ai-box{
+      margin-top:12px;
+      padding:14px;
+      border-radius:22px;
+      background:#fff;
+      border:1px solid var(--line)
+    }
+
+    .vendor-box h4,
+    .response-box h4,
+    .withdrawn-box h4,
+    .ai-box h4{
+      margin:0 0 6px;
+      font-size:.95rem;
+      font-weight:800
+    }
+
+    .vendor-box p,
+    .response-box p,
+    .withdrawn-box p,
+    .ai-box p{
+      margin:0;
+      font-size:.84rem;
+      line-height:1.45;
+      color:var(--muted)
+    }
+
+    .response-box{background:var(--soft)}
+
+    .withdrawn-box{
+      background:var(--red);
+      border-color:rgba(199,79,77,.18)
+    }
+
+    .withdrawn-box h4,
+    .withdrawn-box p{color:var(--redText)}
+
+    .ai-box{
+      background:var(--purple);
+      color:var(--purpleText)
+    }
+
+    .ai-box p,
+    .ai-box h4{color:var(--purpleText)}
+
+    .request-actions{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap
+    }
+
+    .btn,
+    .btn-secondary,
+    .btn-safe,
+    .btn-warning,
+    .btn-danger{
+      min-height:46px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      font-size:.9rem;
+      font-weight:700;
+      font-family:inherit;
+      border:none;
+      flex:1;
+      cursor:pointer;
+      min-width:120px;
+      padding:0 16px
+    }
+
+    .btn{
+      background:linear-gradient(135deg,var(--c1),var(--c2) 52%,var(--c3));
+      color:#fff;
+      box-shadow:0 14px 28px rgba(255,107,97,.16)
+    }
+
+    .btn-secondary{background:var(--soft);color:#4a433d}
+    .btn-safe{background:var(--green);color:var(--greenText)}
+    .btn-warning{background:#fff4df;color:#8d5f11}
+    .btn-danger{background:var(--red);color:var(--redText)}
+    button:disabled{opacity:.65;cursor:not-allowed}
+
+    .empty-card{
+      text-align:center;
+      padding:24px 18px
+    }
+
+    .empty-icon{
+      width:64px;
+      height:64px;
+      border-radius:22px;
+      margin:0 auto 14px;
+      background:#fff1dc;
+      color:var(--gold);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.6rem;
+      font-weight:800
+    }
+
+    .empty-card h3{
+      margin:0 0 8px;
+      font-size:1.05rem;
+      font-weight:800;
+      letter-spacing:-.03em
+    }
+
+    .empty-card p{
+      margin:0 0 16px;
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.45
+    }
+
+    .status-message{
+      display:none;
+      margin-top:14px;
+      border-radius:18px;
+      padding:12px 14px;
+      font-size:.85rem;
+      font-weight:700;
+      line-height:1.45
+    }
+
+    .status-message.info{display:block;background:#fff4df;color:#8d5f11}
+    .status-message.success{display:block;background:var(--green);color:var(--greenText)}
+    .status-message.error{display:block;background:var(--red);color:var(--redText)}
+
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(22,22,22,.42);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50
+    }
+
+    .modal-overlay.show{display:flex}
+
+    .modal-card{
+      width:100%;
+      max-width:390px;
+      background:#fff;
+      border-radius:30px;
+      padding:20px;
+      box-shadow:0 24px 70px rgba(22,22,22,.22)
+    }
+
+    .modal-label{
+      display:inline-flex;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      align-items:center;
+      justify-content:center;
+      background:var(--blue);
+      color:var(--blueText);
+      font-size:.76rem;
+      font-weight:800;
+      margin-bottom:12px
+    }
+
+    .modal-title{
+      margin:0 0 8px;
+      font-size:1.45rem;
+      line-height:1.05;
+      letter-spacing:-.04em;
+      font-weight:800
+    }
+
+    .modal-text{
+      margin:0 0 16px;
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.45
+    }
+
+    .modal-field{margin-bottom:14px}
+
+    .modal-field label{
+      display:block;
+      margin-bottom:7px;
+      font-size:.78rem;
+      color:var(--muted);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em
+    }
+
+    .modal-field select,
+    .modal-field textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px 14px;
+      font-family:inherit;
+      font-size:.92rem;
+      background:var(--soft);
+      color:var(--text);
+      outline:none
+    }
+
+    .modal-field textarea{
+      min-height:86px;
+      resize:vertical
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      margin-top:16px
+    }
+
+    .modal-actions .btn-secondary,
+    .modal-actions .btn{min-width:0}
+
+    .bottom-nav{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:16px;
+      width:calc(100% - 24px);
+      max-width:406px;
+      background:rgba(255,255,255,.94);
+      border:1px solid rgba(235,225,211,.95);
+      border-radius:999px;
+      padding:10px 8px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:4px;
+      box-shadow:0 18px 38px rgba(120,96,60,.14);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px)
+    }
+
+    .nav-item{
+      min-height:58px;
+      border-radius:999px;
+      text-decoration:none;
+      color:#6c655d;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      font-size:.76rem;
+      font-weight:700;
+      text-align:center;
+      padding:0 4px;
+      position:relative
+    }
+
+    .nav-item.active{
+      background:linear-gradient(135deg,var(--c1),var(--c2) 52%,var(--c3));
+      color:#fff;
+      box-shadow:0 10px 22px rgba(255,107,97,.24)
+    }
+
+    @media (min-width:768px){
+      body{padding:24px 0}
+      .page{max-width:960px}
+      .request-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .bottom-nav{max-width:520px}
+    }
   </style>
 </head>
 
 <body>
   <div class="admin-preview-bar" id="adminPreviewBar">
     <div class="admin-preview-inner">
-      <div class="admin-preview-text">Admin Preview Mode<span>You are viewing vendor booking requests as admin. Responses are disabled.</span></div>
+      <div class="admin-preview-text">
+        Admin Preview Mode
+        <span>You are viewing vendor booking requests as admin. Responses are disabled.</span>
+      </div>
       <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
     </div>
   </div>
@@ -36,23 +717,56 @@
   <main class="page">
     <header class="topbar">
       <a href="vendor-dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
-      <div class="topbar-center"><div class="eyebrow">Vendor Portal</div><h1 class="page-title">Booking Requests</h1></div>
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow" id="pageEyebrow">Vendor Portal</div>
+        <h1 class="page-title">Booking Requests</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
+      </div>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <span class="notification-badge" id="topNotificationBadge">0</span>
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
+          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
         <div class="hero-label">Incoming Event Requests</div>
         <h2 class="hero-title">Review client requests.</h2>
-        <p class="hero-subtitle">See event details, selected services, AI planner context, and respond with availability.</p>
-        <div class="hero-meta"><span class="hero-pill" id="requestCountPill">0 Requests</span><span class="hero-pill" id="pendingCountPill">0 Pending</span></div>
+        <p class="hero-subtitle">
+          See event details, selected services, AI planner context, and respond with availability.
+        </p>
+
+        <div class="hero-meta">
+          <span class="hero-pill" id="requestCountPill">0 Requests</span>
+          <span class="hero-pill" id="pendingCountPill">0 Pending</span>
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <div class="section-header"><h2 class="section-title">Requests</h2><a class="section-link" href="messages.html" id="inboxLink">Inbox</a></div>
+      <div class="section-header">
+        <h2 class="section-title">Requests</h2>
+        <a class="section-link" href="messages.html" id="inboxLink">Inbox</a>
+      </div>
+
       <div class="status-message" id="statusMessage"></div>
-      <div class="request-list" id="requestList"><div class="empty-card"><div class="empty-icon">…</div><h3>Loading requests</h3><p>We’re checking for booking requests connected to your vendor account.</p></div></div>
+
+      <div class="request-list" id="requestList">
+        <div class="empty-card">
+          <div class="empty-icon">…</div>
+          <h3>Loading requests</h3>
+          <p>We’re checking for booking requests connected to your vendor account.</p>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -60,10 +774,28 @@
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="responseModalTitle">
       <div class="modal-label">Vendor Response</div>
       <h2 class="modal-title" id="responseModalTitle">Respond to request</h2>
-      <p class="modal-text">Let the customer know if you are available, need more details, or are not available for this event.</p>
-      <div class="modal-field"><label for="responseStatusSelect">Response</label><select id="responseStatusSelect"><option value="available">Available</option><option value="needs_info">Need More Information</option><option value="declined">Not Available</option></select></div>
-      <div class="modal-field"><label for="responseNote">Optional note</label><textarea id="responseNote" placeholder="Add a short response for the customer..."></textarea></div>
-      <div class="modal-actions"><button class="btn-secondary" type="button" id="cancelResponseBtn">Cancel</button><button class="btn" type="button" id="confirmResponseBtn">Send Response</button></div>
+      <p class="modal-text">
+        Let the customer know if you are available, need more details, or are not available for this event.
+      </p>
+
+      <div class="modal-field">
+        <label for="responseStatusSelect">Response</label>
+        <select id="responseStatusSelect">
+          <option value="available">Available</option>
+          <option value="needs_info">Need More Information</option>
+          <option value="declined">Not Available</option>
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label for="responseNote">Optional note</label>
+        <textarea id="responseNote" placeholder="Add a short response for the customer..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="cancelResponseBtn">Cancel</button>
+        <button class="btn" type="button" id="confirmResponseBtn">Send Response</button>
+      </div>
     </div>
   </div>
 
@@ -77,9 +809,30 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, query, where, updateDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-const firebaseConfig = { apiKey:"AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU", authDomain:"rent-event-f7abd.firebaseapp.com", projectId:"rent-event-f7abd", storageBucket:"rent-event-f7abd.firebasestorage.app", messagingSenderId:"840686040363", appId:"1:840686040363:web:3103c8c5b624deecee416e", measurementId:"G-600Z95K9GX" };
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -89,38 +842,284 @@ let currentUserData = null;
 let bookingRequests = [];
 let isBusy = false;
 let pendingResponseRequestId = null;
+
 const pageParams = new URLSearchParams(window.location.search);
 const selectedRequestId = pageParams.get("id") || "";
 
-function safeText(value, fallback="") { return value && String(value).trim() ? String(value).trim() : fallback; }
-function escapeHtml(value) { return String(value || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
-function formatMoney(value) { return `$${Math.round(Number(value || 0)).toLocaleString()}`; }
-function formatTime(value) { if (!value || !value.seconds) return "New"; const d = new Date(value.seconds * 1000); const diff = Date.now() - d.getTime(); const m = Math.floor(diff/60000); const h = Math.floor(m/60); const days = Math.floor(h/24); if (m < 1) return "Now"; if (m < 60) return `${m} min ago`; if (h < 24) return `${h} hr ago`; if (days === 1) return "Yesterday"; if (days < 7) return `${days} days ago`; return d.toLocaleDateString(); }
-function setText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
-function isAdminPreview() { return currentUserData?.role === "admin"; }
-function showStatus(message, type="info") { const s = document.getElementById("statusMessage"); s.textContent = message; s.className = `status-message ${type}`; s.style.display = "block"; setTimeout(() => { s.style.display = "none"; }, 3500); }
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function formatMoney(value) {
+  return `$${Math.round(Number(value || 0)).toLocaleString()}`;
+}
+
+function formatTime(value) {
+  if (!value || !value.seconds) return "New";
+
+  const d = new Date(value.seconds * 1000);
+  const diff = Date.now() - d.getTime();
+  const m = Math.floor(diff / 60000);
+  const h = Math.floor(m / 60);
+  const days = Math.floor(h / 24);
+
+  if (m < 1) return "Now";
+  if (m < 60) return `${m} min ago`;
+  if (h < 24) return `${h} hr ago`;
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days} days ago`;
+
+  return d.toLocaleDateString();
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
+function normalizeRole(role) {
+  if (role === "client") return "customer";
+  if (role === "host") return "customer";
+  if (role === "event_host") return "customer";
+  return role || "customer";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      if (role) roleSet.add(normalizeRole(role));
+    });
+  }
+
+  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
+  if (userData.role) roleSet.add(normalizeRole(userData.role));
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    normalizeRole(userData.role) === "admin" ||
+    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+  ) {
+    roleSet.add("admin");
+    roleSet.add("vendor");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+
+  if (allowedRoles.includes(requestedRole)) return requestedRole;
+  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
+  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
+
+  return allowedRoles[0] || "customer";
+}
+
+function canUseVendorRequests(userData = {}) {
+  const roles = getAllowedRoles(userData);
+
+  return (
+    roles.includes("vendor") ||
+    roles.includes("admin") ||
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true
+  );
+}
+
+function isAdminPreview() {
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function showStatus(message, type = "info") {
+  const s = document.getElementById("statusMessage");
+  s.textContent = message;
+  s.className = `status-message ${type}`;
+  s.style.display = "block";
+
+  setTimeout(() => {
+    s.style.display = "none";
+  }, 3500);
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const roles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (roles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = roles.map((role) => {
+    return `<option value="${escapeHtml(role)}">${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  select.value = activeRole === "admin" ? "admin" : "vendor";
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
+}
 
 function enableAdminPreviewMode() {
   if (!isAdminPreview()) return;
+
   document.getElementById("adminPreviewBar").style.display = "block";
   document.getElementById("backLink").href = "admin-dashboard.html";
   document.getElementById("inboxLink").href = "admin-dashboard.html";
   document.getElementById("bottomHomeLink").href = "admin-dashboard.html";
   document.getElementById("bottomAddLink").href = "admin-dashboard.html";
   document.getElementById("bottomInboxLink").href = "admin-dashboard.html";
+  document.getElementById("pageEyebrow").textContent = "Admin Preview";
+
   document.querySelector(".hero-label").textContent = "Admin Vendor Request Review";
   document.querySelector(".hero-title").textContent = "Preview vendor requests.";
   document.querySelector(".hero-subtitle").textContent = "Review booking requests from the vendor side without changing records.";
 }
 
-function getEventLocation(eventDetails) { const city = safeText(eventDetails?.eventCity, ""); const zip = safeText(eventDetails?.eventZip, ""); return [city, zip].filter(Boolean).join(" ") || "Location not listed"; }
-function getAiSummary(request) { const ai = request.aiPlannerSuggestions; const suggestions = Array.isArray(ai?.suggestions) ? ai.suggestions : []; return suggestions.slice(0, 3).map((i) => safeText(i.title, "Suggested add-on")).filter(Boolean).join(", "); }
-function getStatusLabel(status) { if (status === "withdrawn") return "Withdrawn"; if (status === "confirmed") return "Confirmed"; if (status === "paid") return "Paid"; return "Pending"; }
-function getStatusPillClass(status) { if (status === "withdrawn") return "withdrawn"; if (status === "confirmed" || status === "paid") return "safe"; return "pending"; }
-function getVendorResponse(request) { return (request.vendorResponses || {})[currentUser.uid] || null; }
-function getResponseLabel(status) { if (status === "available") return "Available"; if (status === "needs_info") return "Needs More Info"; if (status === "declined") return "Not Available"; return "No Response Yet"; }
-function getResponsePillClass(status) { if (status === "available") return "safe"; if (status === "needs_info") return "pending"; if (status === "declined") return "declined"; return "info"; }
-function getVendorItemsForCurrentVendor(request) { const vendors = Array.isArray(request.vendors) ? request.vendors : []; return isAdminPreview() ? vendors : vendors.filter((v) => safeText(v.vendorId, "") === currentUser.uid); }
+function getEventLocation(eventDetails) {
+  const city = safeText(eventDetails?.eventCity, "");
+  const zip = safeText(eventDetails?.eventZip, "");
+  return [city, zip].filter(Boolean).join(" ") || "Location not listed";
+}
+
+function getAiSummary(request) {
+  const ai = request.aiPlannerSuggestions;
+  const suggestions = Array.isArray(ai?.suggestions) ? ai.suggestions : [];
+
+  return suggestions
+    .slice(0, 3)
+    .map((i) => safeText(i.title, "Suggested add-on"))
+    .filter(Boolean)
+    .join(", ");
+}
+
+function getStatusLabel(status) {
+  if (status === "withdrawn") return "Withdrawn";
+  if (status === "confirmed") return "Confirmed";
+  if (status === "paid") return "Paid";
+  if (status === "needs_more_info") return "Needs More Info";
+  return "Pending";
+}
+
+function getStatusPillClass(status) {
+  if (status === "withdrawn") return "withdrawn";
+  if (status === "confirmed" || status === "paid") return "safe";
+  if (status === "needs_more_info") return "pending";
+  return "pending";
+}
+
+function getVendorResponse(request) {
+  if (!currentUser) return null;
+  return (request.vendorResponses || {})[currentUser.uid] || null;
+}
+
+function getResponseLabel(status) {
+  if (status === "available") return "Available";
+  if (status === "needs_info") return "Needs More Info";
+  if (status === "declined") return "Not Available";
+  return "No Response Yet";
+}
+
+function getResponsePillClass(status) {
+  if (status === "available") return "safe";
+  if (status === "needs_info") return "pending";
+  if (status === "declined") return "declined";
+  return "info";
+}
+
+function getVendorItemsForCurrentVendor(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  return isAdminPreview() ? vendors : vendors.filter((v) => safeText(v.vendorId, "") === currentUser.uid);
+}
 
 function normalizeProfessionalLabel(value) {
   const clean = safeText(value, "");
@@ -178,28 +1177,46 @@ function buildBookingConversationId(requestId, customerId, vendorId) {
 }
 
 function renderEmptyRequests() {
-  document.getElementById("requestList").innerHTML = `<div class="empty-card"><div class="empty-icon">+</div><h3>No booking requests yet</h3><p>When customers submit requests that include your listings, they will appear here.</p><a class="btn" href="${isAdminPreview() ? "admin-dashboard.html" : "vendor-dashboard.html"}">${isAdminPreview() ? "Back to Admin" : "Back to Dashboard"}</a></div>`;
+  document.getElementById("requestList").innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">+</div>
+      <h3>No booking requests yet</h3>
+      <p>When customers or planners submit requests that include your listings, they will appear here.</p>
+      <a class="btn" href="${isAdminPreview() ? "admin-dashboard.html" : "vendor-dashboard.html"}">${isAdminPreview() ? "Back to Admin" : "Back to Dashboard"}</a>
+    </div>
+  `;
 }
 
 function renderRequests() {
-  const visible = selectedRequestId ? bookingRequests.filter((r) => r.id === selectedRequestId) : bookingRequests;
-  const pending = visible.filter((r) => safeText(r.requestStatus || r.status, "pending") !== "withdrawn" && !getVendorResponse(r)).length;
+  const visible = selectedRequestId
+    ? bookingRequests.filter((r) => r.id === selectedRequestId)
+    : bookingRequests;
+
+  const pending = visible.filter((r) => {
+    const status = safeText(r.requestStatus || r.status, "pending");
+    return status !== "withdrawn" && !getVendorResponse(r);
+  }).length;
+
   setText("requestCountPill", `${visible.length} Request${visible.length === 1 ? "" : "s"}`);
   setText("pendingCountPill", `${pending} Pending`);
-  if (!visible.length) { renderEmptyRequests(); return; }
+
+  if (!visible.length) {
+    renderEmptyRequests();
+    return;
+  }
 
   document.getElementById("requestList").innerHTML = visible.map((request) => {
     const requestId = encodeURIComponent(request.id || "");
     const eventDetails = request.eventDetails || {};
     const eventId = safeText(request.eventId || eventDetails.id, "");
     const eventName = safeText(eventDetails.eventName || request.eventName, "Unnamed Event");
-    const eventType = safeText(eventDetails.eventType, "Event");
-    const eventDate = safeText(eventDetails.eventDate, "Date not listed");
+    const eventType = safeText(eventDetails.eventType || request.eventType, "Event");
+    const eventDate = safeText(eventDetails.eventDate || request.eventDate, "Date not listed");
     const location = getEventLocation(eventDetails);
-    const guestCount = safeText(eventDetails.guestCount, "Not listed");
-    const budget = safeText(eventDetails.eventBudget, "Not listed");
-    const styleVibe = safeText(eventDetails.styleVibe, "Not listed");
-    const customerName = safeText(request.customerName, "Customer");
+    const guestCount = safeText(eventDetails.guestCount || request.guestCount, "Not listed");
+    const budget = safeText(eventDetails.eventBudget || request.eventBudget, "Not listed");
+    const styleVibe = safeText(eventDetails.styleVibe || request.styleVibe, "Not listed");
+    const customerName = safeText(request.customerName || request.plannerName, "Customer");
     const status = safeText(request.requestStatus || request.status, "pending");
     const isWithdrawn = status === "withdrawn";
     const response = getVendorResponse(request);
@@ -210,32 +1227,117 @@ function renderRequests() {
     const aiSummary = getAiSummary(request);
     const vendorItems = getVendorItemsForCurrentVendor(request);
     const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "No reason provided.");
+    const plannerBadge = request.plannerId ? `<span class="pill ai">Planner Request</span>` : "";
 
-    const vendorBox = vendorItems.length ? vendorItems.map((vendor) => {
-      const title = safeText(vendor.listingTitle, "Requested Listing");
-      const category = normalizeProfessionalLabel(safeText(vendor.category || vendor.mainCategory, "Event Service"));
-      const price = formatMoney(vendor.priceNumber || 0);
-      const vendorName = safeText(vendor.vendorName, "Vendor");
-      return `<div class="vendor-box"><h4>${escapeHtml(title)}</h4><p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p></div>`;
-    }).join("") : `<div class="vendor-box"><h4>No matching vendor item</h4><p>This request may not contain a listing connected to your vendor account.</p></div>`;
+    const vendorBox = vendorItems.length
+      ? vendorItems.map((vendor) => {
+          const title = safeText(vendor.listingTitle || vendor.title, "Requested Listing");
+          const category = normalizeProfessionalLabel(safeText(vendor.category || vendor.mainCategory, "Event Service"));
+          const price = formatMoney(vendor.priceNumber || vendor.startingPrice || 0);
+          const vendorName = safeText(vendor.vendorName, "Vendor");
 
-    return `<article class="request-card ${isWithdrawn ? "withdrawn-card" : ""}">
-      <div class="request-top"><div><h3 class="request-title">${escapeHtml(eventName)}</h3><p class="request-subtitle">${escapeHtml(customerName)} · Submitted ${escapeHtml(formatTime(request.createdAt))}</p></div><div class="request-total">${escapeHtml(formatMoney(request.totalDue || 0))}</div></div>
-      <div class="pill-row"><span class="pill ${getStatusPillClass(status)}">${escapeHtml(getStatusLabel(status))}</span><span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span><span class="pill info">${escapeHtml(safeText(request.paymentStatus,"not_collected").replaceAll("_"," "))}</span><span class="pill type">${escapeHtml(eventType)}</span>${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}</div>
-      ${isWithdrawn ? `<div class="withdrawn-box"><h4>Request Withdrawn</h4><p>The customer withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p></div>` : ""}
-      <div class="request-grid"><div class="info-row"><span class="info-label">Date</span><span class="info-value">${escapeHtml(eventDate)}</span></div><div class="info-row"><span class="info-label">Location</span><span class="info-value">${escapeHtml(location)}</span></div><div class="info-row"><span class="info-label">Guests</span><span class="info-value">${escapeHtml(guestCount)}</span></div><div class="info-row"><span class="info-label">Budget</span><span class="info-value">${escapeHtml(budget)}</span></div><div class="info-row"><span class="info-label">Style</span><span class="info-value">${escapeHtml(styleVibe)}</span></div></div>
-      ${vendorBox}
-      ${response ? `<div class="response-box"><h4>Your Response</h4><p>${escapeHtml(responseLabel)}${responseNote ? ` · ${escapeHtml(responseNote)}` : ""}</p>${response.conversationId ? `<div style="margin-top:12px;"><a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(response.conversationId)}">Open Chat Thread</a></div>` : ""}</div>` : ""}
-      ${aiSummary ? `<div class="ai-box"><h4>AI Planner Context</h4><p>${escapeHtml(aiSummary)}</p></div>` : ""}
-      ${isAdminPreview() ? `<div class="request-actions"><a class="btn-secondary" href="admin-dashboard.html">Back to Admin</a>${eventId ? `<a class="btn" href="event-builder.html?eventId=${encodeURIComponent(eventId)}">Preview Event</a>` : ""}</div>` : isWithdrawn ? `<div class="request-actions"><a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a></div>` : `<div class="request-actions"><button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">Available</button><button class="btn-warning" type="button" data-respond-request="${requestId}" data-response-status="needs_info">Need Info</button><button class="btn-danger" type="button" data-respond-request="${requestId}" data-response-status="declined">Decline</button></div>`}
-    </article>`;
+          return `
+            <div class="vendor-box">
+              <h4>${escapeHtml(title)}</h4>
+              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+            </div>
+          `;
+        }).join("")
+      : `
+        <div class="vendor-box">
+          <h4>No matching vendor item</h4>
+          <p>This request may not contain a listing connected to your vendor account.</p>
+        </div>
+      `;
+
+    return `
+      <article class="request-card ${isWithdrawn ? "withdrawn-card" : ""}">
+        <div class="request-top">
+          <div>
+            <h3 class="request-title">${escapeHtml(eventName)}</h3>
+            <p class="request-subtitle">${escapeHtml(customerName)} · Submitted ${escapeHtml(formatTime(request.createdAt))}</p>
+          </div>
+          <div class="request-total">${escapeHtml(formatMoney(request.totalDue || 0))}</div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill ${getStatusPillClass(status)}">${escapeHtml(getStatusLabel(status))}</span>
+          <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+          <span class="pill info">${escapeHtml(safeText(request.paymentStatus,"not_collected").replaceAll("_"," "))}</span>
+          <span class="pill type">${escapeHtml(eventType)}</span>
+          ${plannerBadge}
+          ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
+        </div>
+
+        ${isWithdrawn ? `
+          <div class="withdrawn-box">
+            <h4>Request Withdrawn</h4>
+            <p>The customer withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p>
+          </div>
+        ` : ""}
+
+        <div class="request-grid">
+          <div class="info-row"><span class="info-label">Date</span><span class="info-value">${escapeHtml(eventDate)}</span></div>
+          <div class="info-row"><span class="info-label">Location</span><span class="info-value">${escapeHtml(location)}</span></div>
+          <div class="info-row"><span class="info-label">Guests</span><span class="info-value">${escapeHtml(guestCount)}</span></div>
+          <div class="info-row"><span class="info-label">Budget</span><span class="info-value">${escapeHtml(budget)}</span></div>
+          <div class="info-row"><span class="info-label">Style</span><span class="info-value">${escapeHtml(styleVibe)}</span></div>
+        </div>
+
+        ${vendorBox}
+
+        ${response ? `
+          <div class="response-box">
+            <h4>Your Response</h4>
+            <p>${escapeHtml(responseLabel)}${responseNote ? ` · ${escapeHtml(responseNote)}` : ""}</p>
+            ${response.conversationId ? `
+              <div style="margin-top:12px;">
+                <a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(response.conversationId)}">Open Chat Thread</a>
+              </div>
+            ` : ""}
+          </div>
+        ` : ""}
+
+        ${aiSummary ? `
+          <div class="ai-box">
+            <h4>AI Planner Context</h4>
+            <p>${escapeHtml(aiSummary)}</p>
+          </div>
+        ` : ""}
+
+        ${isAdminPreview() ? `
+          <div class="request-actions">
+            <a class="btn-secondary" href="admin-dashboard.html">Back to Admin</a>
+            ${eventId ? `<a class="btn" href="event-builder.html?eventId=${encodeURIComponent(eventId)}">Preview Event</a>` : ""}
+          </div>
+        ` : isWithdrawn ? `
+          <div class="request-actions">
+            <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
+          </div>
+        ` : `
+          <div class="request-actions">
+            <button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">Available</button>
+            <button class="btn-warning" type="button" data-respond-request="${requestId}" data-response-status="needs_info">Need Info</button>
+            <button class="btn-danger" type="button" data-respond-request="${requestId}" data-response-status="declined">Decline</button>
+          </div>
+        `}
+      </article>
+    `;
   }).join("");
 
-  document.querySelectorAll("[data-respond-request]").forEach((button) => button.addEventListener("click", () => openResponseModal(button.dataset.respondRequest, button.dataset.responseStatus)));
+  document.querySelectorAll("[data-respond-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openResponseModal(button.dataset.respondRequest, button.dataset.responseStatus);
+    });
+  });
 }
 
 function openResponseModal(requestId, status) {
-  if (isAdminPreview()) { showStatus("Admin preview mode is view-only. Use a vendor test account to respond to requests.", "error"); return; }
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a vendor test account to respond to requests.", "error");
+    return;
+  }
+
   pendingResponseRequestId = decodeURIComponent(requestId);
   document.getElementById("responseStatusSelect").value = status || "available";
   document.getElementById("responseNote").value = "";
@@ -250,12 +1352,12 @@ function closeResponseModal() {
 }
 
 async function createOrOpenCustomerConversation(request, responseStatus, responseNote) {
-  const customerId = safeText(request.customerId, "");
+  const customerId = safeText(request.customerId || request.ownerId, "");
   const vendorId = currentUser.uid;
   const requestId = safeText(request.id || pendingResponseRequestId, "");
   const eventId = safeText(request.eventId, "");
   const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
-  const customerName = safeText(request.customerName, "Customer");
+  const customerName = safeText(request.customerName || request.plannerName, "Customer");
   const vendorName = safeText(currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "Vendor", "Vendor");
   const vendorItems = getVendorItemsForCurrentVendor(request);
   const firstVendorItem = vendorItems[0] || {};
@@ -281,10 +1383,11 @@ async function createOrOpenCustomerConversation(request, responseStatus, respons
       [vendorId]: vendorName
     },
     participantRoles: {
-      [customerId]: "customer",
+      [customerId]: request.plannerId ? "planner" : "customer",
       [vendorId]: "vendor"
     },
     customerId,
+    plannerId: request.plannerId || "",
     vendorId,
     bookingRequestId: requestId,
     eventId,
@@ -321,12 +1424,13 @@ async function createCustomerResponseNotification(request, responseStatus, respo
   try {
     const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
     const vendorName = safeText(currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "A vendor", "A vendor");
+    const recipientId = safeText(request.customerId || request.ownerId, "");
 
-    if (!request.customerId) return;
+    if (!recipientId) return;
 
     await addDoc(collection(db, "notifications"), {
-      recipientId: request.customerId,
-      recipientRole: "customer",
+      recipientId,
+      recipientRole: request.plannerId ? "planner" : "customer",
       type: "vendor_response",
       typeLabel: "Vendor Response",
       category: "Booking Request",
@@ -351,9 +1455,20 @@ async function createCustomerResponseNotification(request, responseStatus, respo
 
 async function confirmResponse() {
   if (isBusy || !pendingResponseRequestId) return;
-  if (isAdminPreview()) { showStatus("Admin preview mode is view-only. Use a vendor test account to respond to requests.", "error"); closeResponseModal(); return; }
+
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a vendor test account to respond to requests.", "error");
+    closeResponseModal();
+    return;
+  }
+
   const request = bookingRequests.find((item) => item.id === pendingResponseRequestId);
-  if (!request) { showStatus("Could not find that request.", "error"); closeResponseModal(); return; }
+
+  if (!request) {
+    showStatus("Could not find that request.", "error");
+    closeResponseModal();
+    return;
+  }
 
   const responseStatus = document.getElementById("responseStatusSelect").value;
   const responseNote = safeText(document.getElementById("responseNote").value, "");
@@ -372,13 +1487,25 @@ async function confirmResponse() {
     };
 
     const conversationId = await createOrOpenCustomerConversation(request, responseStatus, responseNote);
-    const updatedResponses = { ...(request.vendorResponses || {}), [currentUser.uid]: { ...responseData, conversationId } };
-    const updatedConversationIds = { ...(request.vendorConversationIds || {}), [currentUser.uid]: conversationId };
+    const updatedResponses = {
+      ...(request.vendorResponses || {}),
+      [currentUser.uid]: {
+        ...responseData,
+        conversationId
+      }
+    };
+
+    const updatedConversationIds = {
+      ...(request.vendorConversationIds || {}),
+      [currentUser.uid]: conversationId
+    };
 
     await updateDoc(doc(db, "bookingRequests", pendingResponseRequestId), {
       vendorResponses: updatedResponses,
       vendorConversationIds: updatedConversationIds,
-      requestStatus: responseStatus === "needs_info" ? "needs_more_info" : safeText(request.requestStatus || request.status, "pending"),
+      requestStatus: responseStatus === "needs_info"
+        ? "needs_more_info"
+        : safeText(request.requestStatus || request.status, "pending"),
       updatedAt: serverTimestamp()
     });
 
@@ -402,6 +1529,24 @@ async function confirmResponse() {
   }
 }
 
+async function loadUnreadNotifications() {
+  let unreadNotifications = 0;
+
+  try {
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", currentUser.uid),
+      where("read", "==", false)
+    );
+
+    const snapshot = await getDocs(notificationsQuery);
+    unreadNotifications = snapshot.size;
+  } catch {
+    unreadNotifications = 0;
+  }
+
+  setBadge("topNotificationBadge", unreadNotifications);
+}
 
 async function loadRequestIdsFromNotifications() {
   const requestIds = [];
@@ -515,24 +1660,65 @@ async function loadBookingRequests() {
 
 document.getElementById("cancelResponseBtn").addEventListener("click", closeResponseModal);
 document.getElementById("confirmResponseBtn").addEventListener("click", confirmResponse);
-document.getElementById("responseModal").addEventListener("click", (event) => { if (event.target.id === "responseModal") closeResponseModal(); });
+
+document.getElementById("responseModal").addEventListener("click", (event) => {
+  if (event.target.id === "responseModal") closeResponseModal();
+});
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
+});
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = "index.html"; return; }
-  currentUser = user;
-  const userRef = doc(db, "users", user.uid);
-  const userSnap = await getDoc(userRef);
-  if (!userSnap.exists()) { window.location.href = "index.html"; return; }
-  currentUserData = userSnap.data();
-  if (currentUserData.role === "admin") enableAdminPreviewMode();
-  else if (currentUserData.role !== "vendor") {
-    if (currentUserData.role === "planner" || currentUserData.plannerPro === true) window.location.href = "planner-dashboard.html";
-    else window.location.href = "dashboard.html";
+  if (!user) {
+    window.location.href = "index.html";
     return;
   }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+
+  const activeRole = getActiveRole(currentUserData);
+
+  if (!canUseVendorRequests(currentUserData)) {
+    window.location.href = getDashboardForRole(activeRole);
+    return;
+  }
+
+  if (activeRole !== "vendor" && activeRole !== "admin") {
+    window.location.href = getDashboardForRole(activeRole);
+    return;
+  }
+
+  renderRoleSwitcher(currentUserData);
+
+  if (activeRole === "admin") {
+    enableAdminPreviewMode();
+  }
+
+  if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
+    showStatus("This account is not currently active. Some actions may be limited.", "error");
+  }
+
   console.log("RentEvent booking requests UID:", currentUser.uid);
-  if (selectedRequestId) setText("requestCountPill", "1 Request");
-  loadBookingRequests();
+
+  if (selectedRequestId) {
+    setText("requestCountPill", "1 Request");
+  }
+
+  await Promise.all([
+    loadUnreadNotifications(),
+    loadBookingRequests()
+  ]);
 });
 </script>
 </body>
