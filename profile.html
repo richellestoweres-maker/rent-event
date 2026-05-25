@@ -291,7 +291,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
+      font-size: 1.55rem;
+      font-weight: 900;
     }
 
     .role-card-grid {
@@ -420,8 +421,10 @@
       align-items: center;
       justify-content: center;
       color: #161616;
-      font-size: 1.25rem;
-      font-weight: 800;
+      font-size: 1rem;
+      font-weight: 900;
+      background: var(--soft-2);
+      border: 1px solid rgba(236, 226, 211, 0.8);
     }
 
     .menu-copy {
@@ -700,7 +703,7 @@
         <h3 id="rolePromoTitle">Become a vendor</h3>
         <p id="rolePromoText">List your event services and connect with customers planning real events.</p>
       </div>
-      <div class="promo-art" id="rolePromoIcon">✨</div>
+      <div class="promo-art" id="rolePromoIcon">V</div>
     </a>
 
     <section class="role-card-grid" id="roleCardGrid"></section>
@@ -710,17 +713,17 @@
         <h2 class="section-title">Account</h2>
 
         <div class="menu-list">
-          <a class="menu-item" href="edit-profile.html">
-            <span class="menu-icon">⚙</span>
+          <a class="menu-item" href="account-settings.html">
+            <span class="menu-icon">A</span>
             <span class="menu-copy">
               <span>Account settings</span>
-              <span>Edit your name, phone, location, email preferences, and account details.</span>
+              <span>Edit profile info, notification preferences, billing, deactivation, and deletion requests.</span>
             </span>
             <span class="menu-arrow">›</span>
           </a>
 
           <a class="menu-item" href="profile-public.html">
-            <span class="menu-icon">○</span>
+            <span class="menu-icon">P</span>
             <span class="menu-copy">
               <span>View profile</span>
               <span>Preview how your basic account appears in RentEvent.</span>
@@ -729,7 +732,7 @@
           </a>
 
           <a class="menu-item" href="notifications.html">
-            <span class="menu-icon">🔔</span>
+            <span class="menu-icon">N</span>
             <span class="menu-copy">
               <span>Notifications</span>
               <span>See all alerts, replies, and message updates.</span>
@@ -742,9 +745,7 @@
       <section class="section">
         <h2 class="section-title">Quick Access</h2>
 
-        <div class="menu-list" id="quickAccessList">
-          <!-- Quick access renders here -->
-        </div>
+        <div class="menu-list" id="quickAccessList"></div>
       </section>
     </div>
 
@@ -771,7 +772,7 @@
         </a>
 
         <a class="menu-item" href="terms.html">
-          <span class="menu-icon">▣</span>
+          <span class="menu-icon">T</span>
           <span class="menu-copy">
             <span>Terms of Service</span>
             <span>Review marketplace rules, policies, and responsibilities.</span>
@@ -780,7 +781,7 @@
         </a>
 
         <a class="menu-item" href="privacy.html">
-          <span class="menu-icon">◷</span>
+          <span class="menu-icon">PR</span>
           <span class="menu-copy">
             <span>Privacy Policy</span>
             <span>Learn how RentEvent handles account and event information.</span>
@@ -789,7 +790,7 @@
         </a>
 
         <a class="menu-item" href="safety.html">
-          <span class="menu-icon">◇</span>
+          <span class="menu-icon">S</span>
           <span class="menu-copy">
             <span>Safety & marketplace guidelines</span>
             <span>Professional vendor expectations, prohibited listings, and reporting.</span>
@@ -804,7 +805,7 @@
 
       <div class="menu-list">
         <button class="logout-btn" type="button" id="logoutBtn">
-          <span class="menu-icon">▯</span>
+          <span class="menu-icon">L</span>
           <span>Log out</span>
           <span class="menu-arrow">›</span>
         </button>
@@ -1025,7 +1026,6 @@ async function switchDashboardRole(nextRole) {
   try {
     await updateDoc(doc(db, "users", currentUser.uid), {
       activeRole: normalizedRole,
-      role: normalizedRole,
       updatedAt: serverTimestamp()
     });
   } catch (error) {
@@ -1038,7 +1038,7 @@ async function switchDashboardRole(nextRole) {
 function renderMenuItem(href, title, subtitle, icon = "›") {
   return `
     <a class="menu-item" href="${href}">
-      <span class="menu-icon">${icon}</span>
+      <span class="menu-icon">${escapeHtml(icon)}</span>
       <span class="menu-copy">
         <span>${escapeHtml(title)}</span>
         <span>${escapeHtml(subtitle)}</span>
@@ -1110,41 +1110,41 @@ function renderQuickAccess(activeRole) {
 
   if (activeRole === "admin") {
     list.innerHTML = [
-      renderMenuItem("admin-dashboard.html", "Admin Dashboard", "Review users, listings, requests, and launch data.", "▦"),
-      renderMenuItem("listings.html", "Marketplace", "Preview public listings and vendor categories.", "⌕"),
-      renderMenuItem("messages.html", "Messages", "Review marketplace conversations during testing.", "☏"),
-      renderMenuItem("notifications.html", "Notifications", "Check app alerts and system messages.", "🔔")
+      renderMenuItem("admin-dashboard.html", "Admin Dashboard", "Review users, listings, requests, and launch data.", "AD"),
+      renderMenuItem("listings.html", "Marketplace", "Preview public listings and vendor categories.", "M"),
+      renderMenuItem("messages.html", "Messages", "Review marketplace conversations during testing.", "IN"),
+      renderMenuItem("notifications.html", "Notifications", "Check app alerts and system messages.", "N")
     ].join("");
     return;
   }
 
   if (activeRole === "vendor") {
     list.innerHTML = [
-      renderMenuItem("vendor-dashboard.html", "Vendor dashboard", "Manage listings, requests, and booking activity.", "▦"),
-      renderMenuItem("vendor-profile.html", "Vendor profile", "Edit your business profile and service details.", "□"),
-      renderMenuItem("my-listings.html", "My listings", "Edit services, pricing, categories, and photos.", "□"),
-      renderMenuItem("booking-requests.html", "Booking requests", "Review customer requests and respond quickly.", "✉"),
-      renderMenuItem("messages.html", "Messages", "Keep customer conversations organized.", "☏")
+      renderMenuItem("vendor-dashboard.html", "Vendor dashboard", "Manage listings, requests, and booking activity.", "VD"),
+      renderMenuItem("vendor-profile.html", "Vendor profile", "Edit your business profile and service details.", "VP"),
+      renderMenuItem("my-listings.html", "My listings", "Edit services, pricing, categories, and photos.", "L"),
+      renderMenuItem("booking-requests.html", "Booking requests", "Review customer requests and respond quickly.", "R"),
+      renderMenuItem("messages.html", "Messages", "Keep customer conversations organized.", "IN")
     ].join("");
     return;
   }
 
   if (activeRole === "planner") {
     list.innerHTML = [
-      renderMenuItem("planner-dashboard.html", "Planner dashboard", "Manage client projects and event boards.", "▦"),
-      renderMenuItem("planner-profile.html", "Planner profile", "Edit planner details and service information.", "P"),
-      renderMenuItem("listings.html", "Browse Vendors", "Source venues, glam, rentals, music, and event services.", "⌕"),
-      renderMenuItem("my-requests.html", "Client Requests", "Track submitted vendor requests across events.", "□"),
-      renderMenuItem("messages.html", "Messages", "Keep vendor conversations organized by client event.", "☏")
+      renderMenuItem("planner-dashboard.html", "Planner dashboard", "Manage client projects and event boards.", "PD"),
+      renderMenuItem("planner-profile.html", "Planner profile", "Edit planner details and service information.", "PP"),
+      renderMenuItem("listings.html", "Browse Vendors", "Source venues, glam, rentals, music, and event services.", "V"),
+      renderMenuItem("my-requests.html", "Client Requests", "Track submitted vendor requests across events.", "R"),
+      renderMenuItem("messages.html", "Messages", "Keep vendor conversations organized by client event.", "IN")
     ].join("");
     return;
   }
 
   list.innerHTML = [
-    renderMenuItem("dashboard.html#myEventsSection", "My Events", "Open your event project boards.", "▦"),
-    renderMenuItem("listings.html", "Explore vendors", "Find venues, glam, rentals, music, and event services.", "⌕"),
-    renderMenuItem("my-requests.html", "My Requests", "Track submitted vendor requests.", "□"),
-    renderMenuItem("messages.html", "Messages", "Review vendor conversations.", "☏")
+    renderMenuItem("dashboard.html#myEventsSection", "My Events", "Open your event project boards.", "E"),
+    renderMenuItem("listings.html", "Explore vendors", "Find venues, glam, rentals, music, and event services.", "V"),
+    renderMenuItem("my-requests.html", "My Requests", "Track submitted vendor requests.", "R"),
+    renderMenuItem("messages.html", "Messages", "Review vendor conversations.", "IN")
   ].join("");
 }
 
@@ -1233,20 +1233,21 @@ function applyRoleLayout(userData, activeRole) {
   if (activeRole === "admin") {
     const bar = document.getElementById("adminPreviewBar");
     if (bar) bar.style.display = "block";
+
     promoCard.href = "admin-dashboard.html";
     promoTitle.textContent = "Admin dashboard";
     promoText.textContent = "Review users, listings, support items, and launch data.";
-    promoIcon.textContent = "▦";
+    promoIcon.textContent = "A";
   } else if (activeRole === "vendor") {
     promoCard.href = "vendor-profile.html";
     promoTitle.textContent = "Manage your vendor profile";
     promoText.textContent = "Keep your services, pricing, verification details, and booking settings up to date.";
-    promoIcon.textContent = "□";
+    promoIcon.textContent = "V";
   } else if (activeRole === "planner") {
     promoCard.href = "planner-profile.html";
     promoTitle.textContent = "Manage your planner profile";
     promoText.textContent = "Organize planner details, client events, and preferred vendor workflows.";
-    promoIcon.textContent = "▦";
+    promoIcon.textContent = "P";
   } else if (allowedRoles.includes("vendor")) {
     promoCard.href = "vendor-profile.html";
     promoTitle.textContent = "Your vendor tools are ready";
@@ -1256,7 +1257,7 @@ function applyRoleLayout(userData, activeRole) {
     promoCard.href = "vendor-onboarding.html";
     promoTitle.textContent = "Become a vendor";
     promoText.textContent = "List your event services and connect with customers planning real events.";
-    promoIcon.textContent = "✨";
+    promoIcon.textContent = "V";
   }
 
   renderRoleCards(userData, activeRole);
@@ -1277,6 +1278,8 @@ async function loadCounts(user) {
 
     if (activeRole === "admin") {
       eventsQuery = query(collection(db, "customerEvents"));
+    } else if (activeRole === "planner") {
+      eventsQuery = query(collection(db, "customerEvents"), where("plannerId", "==", user.uid));
     } else {
       eventsQuery = query(collection(db, "customerEvents"), where("customerId", "==", user.uid));
     }
@@ -1303,6 +1306,8 @@ async function loadCounts(user) {
       requestsQuery = query(collection(db, "bookingRequests"));
     } else if (activeRole === "vendor") {
       requestsQuery = query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", user.uid));
+    } else if (activeRole === "planner") {
+      requestsQuery = query(collection(db, "bookingRequests"), where("plannerId", "==", user.uid));
     } else {
       requestsQuery = query(collection(db, "bookingRequests"), where("customerId", "==", user.uid));
     }
@@ -1354,6 +1359,7 @@ async function loadCounts(user) {
   }
 
   setText("tripStat", eventCount);
+  setText("tripStatLabel", activeRole === "planner" ? "Client Events" : "Events");
   setText("requestStat", requestCount);
   setText("messageStat", unreadMessages);
   setBadge("bottomInboxBadge", unreadMessages);
@@ -1366,8 +1372,20 @@ function renderProfile(user, userData) {
 
   const displayName =
     activeRole === "vendor"
-      ? safeText(userData.businessName, "") || safeText(userData.vendorName, "") || safeText(userData.name, "") || safeText(user.displayName, "") || safeText(user.email, getRoleLabel(activeRole))
-      : safeText(userData.name, "") || safeText(user.displayName, "") || safeText(user.email, getRoleLabel(activeRole));
+      ? safeText(userData.businessName, "") ||
+        safeText(userData.vendorName, "") ||
+        safeText(userData.name, "") ||
+        safeText(user.displayName, "") ||
+        safeText(user.email, getRoleLabel(activeRole))
+      : activeRole === "planner"
+        ? safeText(userData.plannerBusinessName, "") ||
+          safeText(userData.plannerName, "") ||
+          safeText(userData.name, "") ||
+          safeText(user.displayName, "") ||
+          safeText(user.email, getRoleLabel(activeRole))
+        : safeText(userData.name, "") ||
+          safeText(user.displayName, "") ||
+          safeText(user.email, getRoleLabel(activeRole));
 
   const email = safeText(userData.email, user.email || "No email listed");
   const location = getLocation(userData);
