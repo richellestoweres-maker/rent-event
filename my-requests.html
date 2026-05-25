@@ -1368,6 +1368,20 @@ function getRequestOwnerId(request) {
   return safeText(request.requestOwnerId || request.customerId || currentUser.uid, currentUser.uid);
 }
 
+function getRequestOwnerName(request) {
+  if (isPlannerView()) {
+    return safeText(request.requestOwnerName || request.plannerName || currentUserData?.plannerName || currentUserData?.name || currentUser.email, "Planner");
+  }
+
+  return safeText(request.requestOwnerName || request.customerName || currentUserData?.name || currentUser.email, "Customer");
+}
+
+function getRequestOwnerRole(request) {
+  if (safeText(request.requestOwnerRole, "")) return request.requestOwnerRole;
+  if (isPlannerView() || request.plannerId === getRequestOwnerId(request)) return "planner";
+  return "customer";
+}
+
 function normalizeProfessionalLabel(value) {
   const clean = safeText(value, "");
 
@@ -1537,7 +1551,7 @@ function renderRequests() {
                 </div>
 
                 ${responseNote ? `<p class="response-note">${escapeHtml(responseNote)}</p>` : ""}
-                ${vendorId ? `<div style="margin-top:12px;"><button class="btn-secondary" type="button" data-open-vendor-chat="${escapeHtml(vendorId)}" data-open-request="${escapeHtml(request.id)}">Open Chat</button></div>` : ""}
+                ${vendorId ? `<div style="margin-top:12px;"><button class="btn-secondary" type="button" data-message-vendor="${escapeHtml(vendorId)}" data-message-request="${escapeHtml(request.id)}">Message Vendor</button></div>` : ""}
               </div>
             `;
           }).join("")}
@@ -1621,7 +1635,7 @@ function renderRequests() {
           </div>
         ` : `
           <div class="request-actions">
-            <button class="btn" type="button" data-message-request="${requestId}">Message Vendors</button>
+            <button class="btn" type="button" data-message-request-main="${requestId}">Message Vendor</button>
             <a class="btn-secondary" href="${escapeHtml(withEventParam("event-builder.html", getRequestEventId(request)))}">Edit Event</a>
             <button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>
           </div>
@@ -1630,15 +1644,15 @@ function renderRequests() {
     `;
   }).join("");
 
-  document.querySelectorAll("[data-message-request]").forEach((button) => {
+  document.querySelectorAll("[data-message-request-main]").forEach((button) => {
     button.addEventListener("click", () => {
-      messageVendorsForRequest(button.dataset.messageRequest);
+      messageFirstVendorForRequest(button.dataset.messageRequestMain);
     });
   });
 
-  document.querySelectorAll("[data-open-vendor-chat]").forEach((button) => {
+  document.querySelectorAll("[data-message-vendor]").forEach((button) => {
     button.addEventListener("click", () => {
-      openVendorChatForRequest(button.dataset.openRequest, button.dataset.openVendorChat);
+      messageVendorForRequest(button.dataset.messageRequest, button.dataset.messageVendor);
     });
   });
 
@@ -1833,7 +1847,7 @@ async function clearRequestFromCustomerView(requestId) {
   }
 }
 
-async function openVendorChatForRequest(requestId, vendorId) {
+async function messageVendorForRequest(requestId, vendorId) {
   if (isAdminPreview()) {
     showStatus("Messaging is disabled in admin preview mode. Use a customer or planner test account to test messages.", "error");
     return;
@@ -1866,92 +1880,127 @@ async function openVendorChatForRequest(requestId, vendorId) {
   const vendor = vendors.find((item) => safeText(item.vendorId, "") === cleanVendorId) || vendors[0] || {};
   const requestEventId = getRequestEventId(request) || cleanRequestId;
   const ownerId = getRequestOwnerId(request);
-  const conversationId = buildBookingConversationId(cleanRequestId, ownerId, cleanVendorId);
-  const eventDetails = request.eventDetails || {};
-  const eventName = safeText(eventDetails.eventName || request.eventName, "my event");
+  const ownerName = getRequestOwnerName(request);
+  const ownerRole = getRequestOwnerRole(request);
   const vendorName = safeText(vendor.vendorName, "Vendor");
   const listingTitle = safeText(vendor.listingTitle || vendor.title, "your listing");
   const listingCategory = normalizeProfessionalLabel(safeText(vendor.category || vendor.listingCategory || vendor.mainCategory, "Event Service"));
-  const senderRole = isPlannerView() ? "planner" : "customer";
-  const senderName = currentUserData.plannerName || currentUserData.name || currentUser.displayName || currentUser.email || "Customer";
-  const response = getVendorResponse(request, cleanVendorId);
-  const responseNote = safeText(response?.note, "");
-  const responseStatus = safeText(response?.status, "");
-  const firstMessage = responseNote
-    ? `${getResponseLabel(responseStatus)}: ${responseNote}`
-    : `Conversation opened for ${eventName}. You can send a message to ${vendorName} here.`;
+  const eventDetails = request.eventDetails || {};
+  const eventName = safeText(eventDetails.eventName || request.eventName, "my event");
+
+  const savedConversationId =
+    safeText(vendor.conversationId, "") ||
+    safeText(request.vendorConversationIds?.[cleanVendorId], "") ||
+    safeText(request.vendorResponses?.[cleanVendorId]?.conversationId, "");
+
+  const conversationId = savedConversationId || buildBookingConversationId(cleanRequestId, ownerId, cleanVendorId);
 
   try {
     isBusy = true;
-    showStatus("Opening vendor chat thread...", "info");
+    showStatus("Opening message thread...", "info");
 
-    await setDoc(doc(db, "conversations", conversationId), {
-      conversationKey: conversationId,
-      participantIds: [ownerId, cleanVendorId],
-      participantNames: {
-        [ownerId]: senderName,
-        [cleanVendorId]: vendorName
-      },
-      participantRoles: {
-        [ownerId]: senderRole,
-        [cleanVendorId]: "vendor"
-      },
-      customerId: request.customerId || "",
-      plannerId: request.plannerId || (isPlannerView() ? currentUser.uid : ""),
-      vendorId: cleanVendorId,
-      listingId: safeText(vendor.listingId, ""),
-      eventId: requestEventId,
-      bookingRequestId: cleanRequestId,
-      listingTitle,
-      listingCategory,
-      listingLocation: getEventLocation(eventDetails),
-      eventName,
-      title: vendorName,
-      contextType: "Booking Request",
-      lastMessage: firstMessage,
-      lastSenderId: response ? cleanVendorId : ownerId,
-      unreadFor: {},
-      createdAt: request.createdAt || serverTimestamp(),
-      updatedAt: serverTimestamp()
-    }, { merge: true });
+    const conversationSnap = await getDoc(doc(db, "conversations", conversationId));
+
+    if (!conversationSnap.exists()) {
+      const firstMessage = `New booking request for ${eventName} regarding ${listingTitle}.`;
+
+      await setDoc(doc(db, "conversations", conversationId), {
+        conversationKey: conversationId,
+        participantIds: [ownerId, cleanVendorId],
+        participantNames: {
+          [ownerId]: ownerName,
+          [cleanVendorId]: vendorName
+        },
+        participantRoles: {
+          [ownerId]: ownerRole,
+          [cleanVendorId]: "vendor"
+        },
+        customerId: request.customerId || "",
+        customerName: request.customerName || "",
+        plannerId: request.plannerId || "",
+        plannerName: request.plannerName || "",
+        requestOwnerId: ownerId,
+        requestOwnerName: ownerName,
+        requestOwnerRole: ownerRole,
+        vendorId: cleanVendorId,
+        vendorName,
+        listingId: safeText(vendor.listingId, ""),
+        eventId: requestEventId,
+        bookingRequestId: cleanRequestId,
+        listingTitle,
+        listingCategory,
+        listingLocation: getEventLocation(eventDetails),
+        eventName,
+        title: vendorName,
+        contextType: "Booking Request",
+        lastMessage: firstMessage,
+        lastSenderId: ownerId,
+        lastSenderName: ownerName,
+        lastSenderRole: ownerRole,
+        unreadFor: {
+          [cleanVendorId]: true
+        },
+        source: "my-requests",
+        createdAt: request.createdAt || serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      await addDoc(collection(db, "conversations", conversationId, "messages"), {
+        text: firstMessage,
+        senderId: ownerId,
+        senderName: ownerName,
+        senderRole: ownerRole,
+        systemGenerated: true,
+        messageType: "booking_request",
+        bookingRequestId: cleanRequestId,
+        eventId: requestEventId,
+        listingId: safeText(vendor.listingId, ""),
+        createdAt: serverTimestamp()
+      });
+    }
 
     const updatedResponses = {
       ...(request.vendorResponses || {}),
       [cleanVendorId]: {
-        ...(response || {}),
+        ...(request.vendorResponses?.[cleanVendorId] || {}),
         conversationId
       }
     };
 
-    try {
-      await updateDoc(doc(db, "bookingRequests", cleanRequestId), {
-        vendorResponses: updatedResponses,
-        vendorConversationIds: {
-          ...(request.vendorConversationIds || {}),
-          [cleanVendorId]: conversationId
-        },
-        updatedAt: serverTimestamp()
-      });
+    const updatedConversationIds = {
+      ...(request.vendorConversationIds || {}),
+      [cleanVendorId]: conversationId
+    };
 
-      request.vendorResponses = updatedResponses;
-      request.vendorConversationIds = {
-        ...(request.vendorConversationIds || {}),
-        [cleanVendorId]: conversationId
+    const updatedVendors = vendors.map((item) => {
+      if (safeText(item.vendorId, "") !== cleanVendorId) return item;
+      return {
+        ...item,
+        conversationId
       };
-    } catch (updateError) {
-      console.warn("Chat opened, but request conversation ID could not be updated:", updateError.message);
-    }
+    });
+
+    await updateDoc(doc(db, "bookingRequests", cleanRequestId), {
+      vendors: updatedVendors,
+      vendorResponses: updatedResponses,
+      vendorConversationIds: updatedConversationIds,
+      updatedAt: serverTimestamp()
+    });
+
+    request.vendors = updatedVendors;
+    request.vendorResponses = updatedResponses;
+    request.vendorConversationIds = updatedConversationIds;
 
     window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(requestEventId)}`;
 
   } catch (error) {
-    showStatus(`Could not open chat: ${error.message}`, "error");
+    showStatus(`Could not open message thread: ${error.message}`, "error");
   } finally {
     isBusy = false;
   }
 }
 
-async function messageVendorsForRequest(requestId) {
+async function messageFirstVendorForRequest(requestId) {
   if (isAdminPreview()) {
     showStatus("Messaging is disabled in admin preview mode. Use a customer or planner test account to test messages.", "error");
     return;
@@ -1973,7 +2022,7 @@ async function messageVendorsForRequest(requestId) {
     return;
   }
 
-  await openVendorChatForRequest(cleanRequestId, firstVendor.vendorId);
+  await messageVendorForRequest(cleanRequestId, firstVendor.vendorId);
 }
 
 async function loadUnreadNotifications() {
