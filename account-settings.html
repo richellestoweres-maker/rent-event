@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Account Settings | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --gold-soft: #fff4df;
+      --gold-text: #aa6f12;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 132px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+      max-width: 340px;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.4);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #574f47;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
+      font-family: inherit;
+      font-size: 0.96rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input,
+    .select {
+      min-height: 54px;
+      padding: 0 16px;
+    }
+
+    .textarea {
+      min-height: 112px;
+      padding: 14px 16px;
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #a49a8f;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .helper-text {
+      margin: 8px 0 0;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 12px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
+      background: var(--gold-soft);
+      color: #8d5f11;
+    }
+
+    .status-message.success {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-message.error {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .role-switcher {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120, 96, 60, 0.06);
+    }
+
+    .role-card-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .role-card {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .role-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      background: var(--gold-soft);
+      color: var(--gold-text);
+    }
+
+    .role-card.enabled .role-icon {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .role-card h3 {
+      margin: 0 0 4px;
+      font-size: 0.98rem;
+      letter-spacing: -0.03em;
+    }
+
+    .role-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      white-space: nowrap;
+      background: var(--gold-soft);
+      color: var(--gold-text);
+    }
+
+    .pill.safe {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.blue {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .pill.purple {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .pill.red {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .toggle-card {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .toggle-card:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-card h3 {
+      margin: 0 0 4px;
+      font-size: 0.98rem;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .toggle-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .switch {
+      position: relative;
+      width: 52px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #ded4c6;
+      transition: 0.2s;
+      border-radius: 999px;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 24px;
+      width: 24px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      transition: 0.2s;
+      border-radius: 50%;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+
+    .switch input:checked + .slider {
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .billing-box {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .billing-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.9rem;
+      line-height: 1.35;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .billing-line:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .billing-line span:first-child {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .billing-line span:last-child {
+      text-align: right;
+      font-weight: 800;
+    }
+
+    .danger-card {
+      background: #fff;
+      border: 1px solid rgba(199, 79, 77, 0.22);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .danger-card h3 {
+      margin: 0 0 6px;
+      color: var(--red-text);
+      font-size: 1.02rem;
+      letter-spacing: -0.03em;
+    }
+
+    .danger-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .btn,
+    .btn-secondary,
+    .btn-danger {
+      min-height: 50px;
+      border-radius: 999px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex: 1;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      padding: 0 16px;
+      text-align: center;
+    }
+
+    .btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      color: #4a433d;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      color: var(--red-text);
+      background: var(--red-soft);
+      border: 1px solid rgba(199, 79, 77, 0.22);
+    }
+
+    .btn:disabled,
+    .btn-secondary:disabled,
+    .btn-danger:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .save-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      width: calc(100% - 24px);
+      max-width: 406px;
+      display: flex;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .bottom-spacer {
+      height: 14px;
+    }
+
+    @media (max-width: 390px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .role-card {
+        grid-template-columns: 44px 1fr;
+      }
+
+      .role-card .pill {
+        grid-column: 2;
+        width: fit-content;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 960px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .save-bar {
+        max-width: 520px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="profile.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Account</div>
+        <h1 class="page-title">Settings</h1>
+      </div>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <h2 class="hero-title" id="heroName">Account Settings</h2>
+        <p class="hero-subtitle">
+          Manage your profile, roles, notification preferences, billing status, and account safety settings.
+        </p>
+
+        <div class="hero-pills">
+          <span class="hero-pill" id="accountStatusPill">Active Account</span>
+          <span class="hero-pill" id="activeRolePill">Customer</span>
+          <span class="hero-pill" id="subscriptionPill">Free Plan</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="settings-grid">
+      <div>
+        <section class="section">
+          <h2 class="section-title">Basic Info</h2>
+
+          <div class="card">
+            <div class="form-grid">
+              <div>
+                <label for="nameInput">Full Name</label>
+                <input id="nameInput" class="input" type="text" placeholder="Your name" />
+              </div>
+
+              <div class="row-2">
+                <div>
+                  <label for="emailInput">Email</label>
+                  <input id="emailInput" class="input" type="email" placeholder="you@email.com" />
+                  <p class="helper-text">This updates your RentEvent profile record. Changing login email may require a separate Firebase auth flow later.</p>
+                </div>
+
+                <div>
+                  <label for="phoneInput">Phone</label>
+                  <input id="phoneInput" class="input" type="text" placeholder="(281) 555-0198" />
+                </div>
+              </div>
+
+              <div class="row-2">
+                <div>
+                  <label for="cityInput">City</label>
+                  <input id="cityInput" class="input" type="text" placeholder="League City" />
+                </div>
+
+                <div>
+                  <label for="stateInput">State</label>
+                  <input id="stateInput" class="input" type="text" placeholder="TX" />
+                </div>
+              </div>
+
+              <div>
+                <label for="zipInput">ZIP Code</label>
+                <input id="zipInput" class="input" type="text" placeholder="77573" />
+              </div>
+
+              <div class="status-message" id="basicStatus"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Roles</h2>
+
+          <div class="card">
+            <p class="helper-text" style="margin-top:0;">
+              Your RentEvent account can have multiple roles under one login. The active role controls which dashboard opens first.
+            </p>
+
+            <div class="role-switcher" id="roleSwitcher">
+              <span class="role-switcher-label">Active role</span>
+              <select class="role-select" id="roleSelect" aria-label="Switch active role"></select>
+            </div>
+
+            <div class="role-card-grid" id="roleCardGrid" style="margin-top:14px;"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Notifications</h2>
+
+          <div class="card">
+            <div class="toggle-card">
+              <div>
+                <h3>Email updates</h3>
+                <p>Receive account, booking, request, and marketplace updates by email.</p>
+              </div>
+
+              <label class="switch">
+                <input id="emailOptInInput" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-card">
+              <div>
+                <h3>SMS updates</h3>
+                <p>Allow RentEvent to send text updates when SMS features are connected.</p>
+              </div>
+
+              <label class="switch">
+                <input id="smsOptInInput" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-card">
+              <div>
+                <h3>Marketing updates</h3>
+                <p>Receive launch announcements, feature updates, and marketplace offers.</p>
+              </div>
+
+              <label class="switch">
+                <input id="marketingOptInInput" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="status-message" id="notificationStatus"></div>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="section">
+          <h2 class="section-title">Billing & Plans</h2>
+
+          <div class="card">
+            <div class="billing-box">
+              <div class="billing-line">
+                <span>Current Plan</span>
+                <span id="currentPlanText">Free</span>
+              </div>
+
+              <div class="billing-line">
+                <span>Status</span>
+                <span id="billingStatusText">No paid subscription</span>
+              </div>
+
+              <div class="billing-line">
+                <span>Renewal / End Date</span>
+                <span id="billingDateText">Not applicable</span>
+              </div>
+
+              <div class="billing-line">
+                <span>Provider</span>
+                <span id="billingProviderText">Not connected</span>
+              </div>
+            </div>
+
+            <p class="helper-text">
+              When Stripe is connected, this page should open the Stripe Customer Portal for upgrades, downgrades, cancellations, payment method updates, and invoices.
+            </p>
+
+            <div class="button-row">
+              <button class="btn" type="button" id="manageBillingBtn">Manage Billing</button>
+              <button class="btn-secondary" type="button" id="upgradePlanBtn">View Plans</button>
+            </div>
+
+            <div class="status-message" id="billingStatus"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Account Status</h2>
+
+          <div class="card">
+            <div class="billing-box">
+              <div class="billing-line">
+                <span>Account Status</span>
+                <span id="accountStatusText">Active</span>
+              </div>
+
+              <div class="billing-line">
+                <span>Deletion Request</span>
+                <span id="deletionStatusText">None</span>
+              </div>
+            </div>
+
+            <p class="helper-text">
+              Deactivation hides or pauses your account activity while keeping records available for safety, disputes, bookings, and legal reasons.
+            </p>
+
+            <div class="button-row">
+              <button class="btn-secondary" type="button" id="reactivateBtn" style="display:none;">Reactivate Account</button>
+              <button class="btn-danger" type="button" id="deactivateBtn">Deactivate Account</button>
+            </div>
+
+            <div class="status-message" id="accountStatusMessage"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Danger Zone</h2>
+
+          <div class="danger-card">
+            <h3>Request Permanent Deletion</h3>
+            <p>
+              This will mark your account for permanent deletion review. Listings are hidden, active subscriptions should be canceled, and personal data may be deleted or anonymized where legally allowed.
+            </p>
+
+            <label for="deletionReasonInput">Reason for deletion</label>
+            <textarea id="deletionReasonInput" class="textarea" placeholder="Optional, but helpful."></textarea>
+
+            <div class="button-row">
+              <button class="btn-danger" type="button" id="requestDeletionBtn">Request Permanent Deletion</button>
+            </div>
+
+            <div class="status-message" id="deleteStatus"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="bottom-spacer"></div>
+  </main>
+
+  <div class="save-bar">
+    <button class="btn-secondary" type="button" id="cancelBtn">Cancel</button>
+    <button class="btn" type="button" id="saveBtn">Save Settings</button>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e",
+  measurementId: "G-600Z95K9GX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
+let currentSubscription = null;
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() ? String(value).trim() : fallback;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = safeText(value, "");
+}
+
+function showStatus(id, message, type = "") {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.textContent = message;
+  el.className = "status-message";
+  if (type) el.classList.add(type);
+  el.style.display = "block";
+}
+
+function hideStatus(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = "none";
+  el.textContent = "";
+}
+
+function setSaving(isSaving) {
+  document.getElementById("saveBtn").disabled = isSaving;
+  document.getElementById("cancelBtn").disabled = isSaving;
+  document.getElementById("deactivateBtn").disabled = isSaving;
+  document.getElementById("reactivateBtn").disabled = isSaving;
+  document.getElementById("requestDeletionBtn").disabled = isSaving;
+}
+
+function normalizeRole(role) {
+  if (role === "client") return "customer";
+  if (role === "host") return "customer";
+  if (role === "event_host") return "customer";
+  return role || "customer";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      if (role) roleSet.add(normalizeRole(role));
+    });
+  }
+
+  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
+  if (userData.role) roleSet.add(normalizeRole(userData.role));
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    normalizeRole(userData.role) === "admin" ||
+    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+  ) {
+    roleSet.add("admin");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+
+  if (allowedRoles.includes(requestedRole)) return requestedRole;
+  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
+  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
+
+  return allowedRoles[0] || "customer";
+}
+
+function formatDateFromTimestamp(value) {
+  if (!value) return "Not applicable";
+
+  if (value.seconds) {
+    return new Date(value.seconds * 1000).toLocaleDateString();
+  }
+
+  const parsed = new Date(value);
+  if (!Number.isNaN(parsed.getTime())) return parsed.toLocaleDateString();
+
+  return String(value);
+}
+
+function getPlanLabel(subscription = {}, userData = {}) {
+  const tier = safeText(subscription.tier || userData.subscription?.tier || userData.planTier, "free");
+
+  const labels = {
+    free: "Free",
+    customer_free: "Customer Free",
+    vendor_pro: "Vendor Pro",
+    planner_pro: "Planner Pro",
+    featured_vendor: "Featured Vendor",
+    ai_planning: "AI Planning Upgrade"
+  };
+
+  return labels[tier] || tier.replaceAll("_", " ");
+}
+
+function getSubscriptionStatus(subscription = {}, userData = {}) {
+  return safeText(subscription.status || userData.subscription?.status || userData.subscriptionStatus, "No paid subscription");
+}
+
+function getSubscriptionProvider(subscription = {}, userData = {}) {
+  return safeText(subscription.provider || userData.subscription?.provider, "Not connected");
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const roleSwitcher = document.getElementById("roleSwitcher");
+  const roleSelect = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!roleSwitcher || !roleSelect) return;
+
+  if (allowedRoles.length <= 1) {
+    roleSwitcher.style.display = "none";
+    return;
+  }
+
+  roleSelect.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${escapeHtml(role)}">${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  roleSelect.value = activeRole;
+  roleSwitcher.style.display = "inline-flex";
+}
+
+function renderRoleCards(userData = {}) {
+  const grid = document.getElementById("roleCardGrid");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  const cards = [
+    {
+      role: "customer",
+      title: "Customer / Event Host",
+      description: "Plan events, save vendors, submit quote requests, and message vendors."
+    },
+    {
+      role: "vendor",
+      title: "Vendor",
+      description: "Manage your vendor profile, listings, requests, and customer conversations."
+    },
+    {
+      role: "planner",
+      title: "Planner",
+      description: "Manage client events, vendor sourcing, planning tools, and client requests."
+    }
+  ];
+
+  if (allowedRoles.includes("admin")) {
+    cards.push({
+      role: "admin",
+      title: "Admin",
+      description: "Manage marketplace users, listings, requests, and launch activity."
+    });
+  }
+
+  grid.innerHTML = cards.map((card) => {
+    const enabled = allowedRoles.includes(card.role);
+    const isActive = activeRole === card.role;
+    const status = isActive ? "Active" : enabled ? "Enabled" : "Not enabled";
+
+    return `
+      <div class="role-card ${enabled ? "enabled" : ""}">
+        <div class="role-icon">${escapeHtml(card.role.charAt(0).toUpperCase())}</div>
+        <div>
+          <h3>${escapeHtml(card.title)}</h3>
+          <p>${escapeHtml(card.description)}</p>
+        </div>
+        <span class="pill ${isActive ? "purple" : enabled ? "safe" : ""}">${escapeHtml(status)}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderAccountData(userData = {}, subscription = {}) {
+  const activeRole = getActiveRole(userData);
+  const accountStatus = safeText(userData.accountStatus, "active");
+  const deletionStatus = safeText(userData.deletionStatus, userData.deletionRequestedAt ? "requested" : "none");
+
+  setValue("nameInput", userData.name || "");
+  setValue("emailInput", userData.email || currentUser?.email || "");
+  setValue("phoneInput", userData.phone || "");
+  setValue("cityInput", userData.city || userData.locationCity || "");
+  setValue("stateInput", userData.state || userData.locationState || "");
+  setValue("zipInput", userData.zipCode || userData.zip || "");
+
+  document.getElementById("emailOptInInput").checked = userData.emailOptIn === true;
+  document.getElementById("smsOptInInput").checked = userData.smsOptIn === true;
+  document.getElementById("marketingOptInInput").checked = userData.marketingOptIn === true;
+
+  setText("heroName", safeText(userData.name, "Account Settings"));
+  setText("activeRolePill", getRoleLabel(activeRole));
+  setText("accountStatusPill", accountStatus === "deactivated" ? "Deactivated" : accountStatus === "pending_deletion" ? "Pending Deletion" : "Active Account");
+
+  const planLabel = getPlanLabel(subscription, userData);
+  const billingStatus = getSubscriptionStatus(subscription, userData);
+  const provider = getSubscriptionProvider(subscription, userData);
+  const billingEnd = subscription.currentPeriodEnd || userData.subscription?.currentPeriodEnd || userData.currentPeriodEnd;
+
+  setText("subscriptionPill", planLabel);
+  setText("currentPlanText", planLabel);
+  setText("billingStatusText", billingStatus);
+  setText("billingProviderText", provider);
+  setText("billingDateText", formatDateFromTimestamp(billingEnd));
+
+  setText("accountStatusText", accountStatus.replaceAll("_", " "));
+  setText("deletionStatusText", deletionStatus === "none" ? "None" : deletionStatus.replaceAll("_", " "));
+
+  const deactivateBtn = document.getElementById("deactivateBtn");
+  const reactivateBtn = document.getElementById("reactivateBtn");
+
+  if (accountStatus === "deactivated") {
+    deactivateBtn.style.display = "none";
+    reactivateBtn.style.display = "inline-flex";
+  } else {
+    deactivateBtn.style.display = "inline-flex";
+    reactivateBtn.style.display = "none";
+  }
+
+  renderRoleSwitcher(userData);
+  renderRoleCards(userData);
+}
+
+async function saveSettings() {
+  if (!currentUser || !currentUserData) {
+    showStatus("basicStatus", "Still loading your account. Try again in a second.", "error");
+    return;
+  }
+
+  const name = document.getElementById("nameInput").value.trim();
+  const email = document.getElementById("emailInput").value.trim();
+  const phone = document.getElementById("phoneInput").value.trim();
+  const city = document.getElementById("cityInput").value.trim();
+  const state = document.getElementById("stateInput").value.trim();
+  const zipCode = document.getElementById("zipInput").value.trim();
+
+  const emailOptIn = document.getElementById("emailOptInInput").checked;
+  const smsOptIn = document.getElementById("smsOptInInput").checked;
+  const marketingOptIn = document.getElementById("marketingOptInInput").checked;
+
+  if (!name || !email) {
+    showStatus("basicStatus", "Please enter your name and email before saving.", "error");
+    return;
+  }
+
+  try {
+    setSaving(true);
+
+    const updates = {
+      name,
+      email,
+      phone,
+      city,
+      state,
+      zipCode,
+      locationCity: city,
+      locationState: state,
+      zip: zipCode,
+      emailOptIn,
+      smsOptIn,
+      marketingOptIn,
+      updatedAt: serverTimestamp()
+    };
+
+    await setDoc(doc(db, "users", currentUser.uid), updates, { merge: true });
+
+    currentUserData = {
+      ...currentUserData,
+      ...updates
+    };
+
+    renderAccountData(currentUserData, currentSubscription || {});
+    showStatus("basicStatus", "Account settings saved.", "success");
+    showStatus("notificationStatus", "Notification preferences saved.", "success");
+  } catch (error) {
+    showStatus("basicStatus", error.message, "error");
+  } finally {
+    setSaving(false);
+  }
+}
+
+async function switchActiveRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!allowedRoles.includes(normalizedRole)) {
+    alert("This role is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      role: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+
+    currentUserData = {
+      ...currentUserData,
+      activeRole: normalizedRole,
+      role: normalizedRole
+    };
+
+    renderAccountData(currentUserData, currentSubscription || {});
+    showStatus("basicStatus", `Active role changed to ${getRoleLabel(normalizedRole)}.`, "success");
+  } catch (error) {
+    showStatus("basicStatus", error.message, "error");
+  }
+}
+
+async function deactivateAccount() {
+  if (!currentUser || !currentUserData) return;
+
+  const confirmed = confirm(
+    "Deactivate your account? Your profile and activity will be paused or hidden, but records may remain for bookings, safety, disputes, and legal reasons."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    setSaving(true);
+
+    const updates = {
+      accountStatus: "deactivated",
+      deactivatedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+
+    if (getAllowedRoles(currentUserData).includes("vendor")) {
+      updates.vendorProfileStatus = "hidden";
+      updates.listingsPaused = true;
+    }
+
+    if (getAllowedRoles(currentUserData).includes("planner")) {
+      updates.plannerProfileStatus = "hidden";
+      updates.plannerAccessPaused = true;
+    }
+
+    await setDoc(doc(db, "users", currentUser.uid), updates, { merge: true });
+
+    currentUserData = {
+      ...currentUserData,
+      ...updates,
+      accountStatus: "deactivated"
+    };
+
+    renderAccountData(currentUserData, currentSubscription || {});
+    showStatus("accountStatusMessage", "Your account has been marked as deactivated.", "success");
+  } catch (error) {
+    showStatus("accountStatusMessage", error.message, "error");
+  } finally {
+    setSaving(false);
+  }
+}
+
+async function reactivateAccount() {
+  if (!currentUser || !currentUserData) return;
+
+  try {
+    setSaving(true);
+
+    const updates = {
+      accountStatus: "active",
+      reactivatedAt: serverTimestamp(),
+      listingsPaused: false,
+      plannerAccessPaused: false,
+      updatedAt: serverTimestamp()
+    };
+
+    await setDoc(doc(db, "users", currentUser.uid), updates, { merge: true });
+
+    currentUserData = {
+      ...currentUserData,
+      ...updates,
+      accountStatus: "active"
+    };
+
+    renderAccountData(currentUserData, currentSubscription || {});
+    showStatus("accountStatusMessage", "Your account has been reactivated.", "success");
+  } catch (error) {
+    showStatus("accountStatusMessage", error.message, "error");
+  } finally {
+    setSaving(false);
+  }
+}
+
+async function requestPermanentDeletion() {
+  if (!currentUser || !currentUserData) return;
+
+  const confirmed = confirm(
+    "Request permanent deletion? This will mark your account for deletion review and hide or pause account activity. This should also cancel paid subscriptions when billing is connected."
+  );
+
+  if (!confirmed) return;
+
+  const deletionReason = document.getElementById("deletionReasonInput").value.trim();
+
+  try {
+    setSaving(true);
+
+    const updates = {
+      accountStatus: "pending_deletion",
+      deletionStatus: "requested",
+      deletionReason,
+      deletionRequestedAt: serverTimestamp(),
+      listingsPaused: true,
+      vendorProfileStatus: "hidden",
+      plannerProfileStatus: "hidden",
+      plannerAccessPaused: true,
+      updatedAt: serverTimestamp()
+    };
+
+    await setDoc(doc(db, "users", currentUser.uid), updates, { merge: true });
+
+    await setDoc(doc(db, "deletion_requests", currentUser.uid), {
+      userId: currentUser.uid,
+      email: currentUserData.email || currentUser.email || "",
+      name: currentUserData.name || "",
+      roles: getAllowedRoles(currentUserData),
+      deletionReason,
+      status: "requested",
+      requestedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    currentUserData = {
+      ...currentUserData,
+      ...updates,
+      accountStatus: "pending_deletion",
+      deletionStatus: "requested"
+    };
+
+    renderAccountData(currentUserData, currentSubscription || {});
+    showStatus("deleteStatus", "Permanent deletion request submitted. Your account is now marked as pending deletion.", "success");
+  } catch (error) {
+    showStatus("deleteStatus", error.message, "error");
+  } finally {
+    setSaving(false);
+  }
+}
+
+function openBillingPortalPlaceholder() {
+  showStatus(
+    "billingStatus",
+    "Stripe billing portal is not connected yet. When Stripe is added, this button will open billing management for upgrades, downgrades, cancellations, cards, and invoices.",
+    ""
+  );
+}
+
+function openPlansPlaceholder() {
+  showStatus(
+    "billingStatus",
+    "Plan selection is not connected yet. Later this can route to pricing.html or open a Stripe checkout flow.",
+    ""
+  );
+}
+
+document.getElementById("saveBtn").addEventListener("click", saveSettings);
+
+document.getElementById("cancelBtn").addEventListener("click", () => {
+  window.location.href = "profile.html";
+});
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchActiveRole(event.target.value);
+});
+
+document.getElementById("deactivateBtn").addEventListener("click", deactivateAccount);
+document.getElementById("reactivateBtn").addEventListener("click", reactivateAccount);
+document.getElementById("requestDeletionBtn").addEventListener("click", requestPermanentDeletion);
+document.getElementById("manageBillingBtn").addEventListener("click", openBillingPortalPlaceholder);
+document.getElementById("upgradePlanBtn").addEventListener("click", openPlansPlaceholder);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const userRef = doc(db, "users", user.uid);
+  const subscriptionRef = doc(db, "subscriptions", user.uid);
+
+  const [userSnap, subscriptionSnap] = await Promise.all([
+    getDoc(userRef),
+    getDoc(subscriptionRef).catch(() => null)
+  ]);
+
+  if (!userSnap.exists()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  currentUserData = userSnap.data();
+  currentSubscription = subscriptionSnap && subscriptionSnap.exists() ? subscriptionSnap.data() : null;
+
+  renderAccountData(currentUserData, currentSubscription || {});
+});
+</script>
+
+</body>
+</html>
