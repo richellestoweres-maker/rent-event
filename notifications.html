@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Notifications | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -56,6 +57,56 @@
       min-height: 100vh;
     }
 
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .page {
       width: 100%;
       max-width: 430px;
@@ -66,7 +117,7 @@
 
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 22px;
@@ -89,9 +140,16 @@
       font-weight: 800;
     }
 
+    .icon-btn svg,
+    .back-link svg {
+      width: 20px;
+      height: 20px;
+    }
+
     .topbar-center {
       flex: 1;
       text-align: center;
+      min-width: 0;
     }
 
     .eyebrow {
@@ -109,6 +167,44 @@
       line-height: 1;
       letter-spacing: -0.04em;
       font-weight: 800;
+    }
+
+    .role-switcher {
+      margin: 10px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140,111,75,.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
     .hero-card {
@@ -136,7 +232,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 300px;
+      max-width: 320px;
     }
 
     .hero-label {
@@ -268,8 +364,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
+      font-size: 0.82rem;
       font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .icon-coral {
@@ -300,6 +398,7 @@
     .notification-content {
       min-width: 0;
       flex: 1;
+      padding-right: 10px;
     }
 
     .notification-top {
@@ -394,7 +493,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.1rem;
       font-weight: 800;
     }
 
@@ -491,56 +590,20 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
+    @media (max-width: 420px) {
+      .section-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
 
-    .admin-preview-bar {
-      display: none;
-      position: sticky;
-      top: 0;
-      z-index: 90;
-      margin: -20px -18px 18px;
-      padding: 12px 18px;
-      background: #161616;
-      color: #fff;
-      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
-    }
+      .filter-tabs {
+        width: 100%;
+        justify-content: space-between;
+      }
 
-    .admin-preview-inner {
-      width: 100%;
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .admin-preview-text {
-      font-size: 0.82rem;
-      line-height: 1.35;
-      font-weight: 700;
-    }
-
-    .admin-preview-text span {
-      display: block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.72);
-      margin-top: 2px;
-    }
-
-    .admin-preview-btn {
-      min-height: 38px;
-      padding: 0 13px;
-      border-radius: 999px;
-      background: #fff;
-      color: #161616;
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 800;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      .filter-tab {
+        flex: 1;
+      }
     }
 
     @media (min-width: 768px) {
@@ -585,9 +648,19 @@
       <div class="topbar-center">
         <div class="eyebrow" id="roleEyebrow">Updates</div>
         <h1 class="page-title">Notifications</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
       </div>
 
-      <a href="profile.html" class="icon-btn" id="profileLink" aria-label="Profile">☺</a>
+      <a href="profile.html" class="icon-btn" id="profileLink" aria-label="Profile">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
+          <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </a>
     </header>
 
     <section class="hero-card">
@@ -611,7 +684,7 @@
 
       <div class="notification-list" id="notificationList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon">...</div>
           <h3>Loading notifications</h3>
           <p>We’re checking for message and booking updates now.</p>
         </div>
@@ -633,7 +706,6 @@ import {
   where,
   getDocs,
   updateDoc,
-  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -702,13 +774,176 @@ function makeSafeId(value) {
     .slice(0, 180);
 }
 
-function buildBookingConversationId(requestId, customerId, vendorId) {
+function normalizeRole(role) {
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
+    });
+  }
+
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    userData.permissions?.admin === true ||
+    legacy === "admin"
+  ) {
+    roleSet.add("admin");
+    roleSet.add("customer");
+    roleSet.add("vendor");
+    roleSet.add("planner");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
+  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
+
+  return allowedRoles[0] || "customer";
+}
+
+function isAdminPreview() {
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (allowedRoles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${escapeHtml(role)}" ${role === activeRole ? "selected" : ""}>${escapeHtml(getRoleLabel(role))}</option>`;
+  }).join("");
+
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
+}
+
+function getHomeHref(role = getActiveRole(currentUserData || {})) {
+  return getDashboardForRole(role);
+}
+
+function buildBookingConversationId(requestId, ownerId, vendorId) {
   return [
     "booking",
     makeSafeId(requestId),
-    makeSafeId(customerId),
+    makeSafeId(ownerId),
     makeSafeId(vendorId)
   ].join("__");
+}
+
+function getNotificationEventId(notification) {
+  return (
+    safeText(notification.eventId, "") ||
+    safeText(notification.raw?.eventId, "") ||
+    safeText(notification.raw?.eventDetails?.eventId, "")
+  );
+}
+
+function getNotificationRequestId(notification) {
+  const sourceCollection = safeText(notification.sourceCollection, "");
+
+  return (
+    safeText(notification.bookingRequestId, "") ||
+    safeText(notification.requestId, "") ||
+    (sourceCollection === "bookingRequests" ? safeText(notification.sourceId, "") : "")
+  );
 }
 
 function getNotificationConversationId(notification) {
@@ -716,15 +951,23 @@ function getNotificationConversationId(notification) {
   const sourceId = safeText(notification.sourceId, "");
   const conversationId = safeText(notification.conversationId, "");
   const bookingRequestId = safeText(notification.bookingRequestId || notification.requestId, "");
-  const customerId = safeText(notification.customerId || notification.raw?.customerId, "");
+  const ownerId = safeText(
+    notification.requestOwnerId ||
+    notification.plannerId ||
+    notification.customerId ||
+    notification.raw?.requestOwnerId ||
+    notification.raw?.plannerId ||
+    notification.raw?.customerId,
+    ""
+  );
   const vendorId = safeText(notification.vendorId || notification.raw?.vendorId, "");
 
   if (conversationId) return conversationId;
   if (notification.collectionName === "conversations" && sourceId) return sourceId;
   if (sourceCollection === "conversations" && sourceId) return sourceId;
 
-  if (bookingRequestId && customerId && vendorId) {
-    return buildBookingConversationId(bookingRequestId, customerId, vendorId);
+  if (bookingRequestId && ownerId && vendorId) {
+    return buildBookingConversationId(bookingRequestId, ownerId, vendorId);
   }
 
   return "";
@@ -743,32 +986,39 @@ async function getConversationIdFromBookingRequest(requestId) {
       ...requestSnap.data()
     };
 
-    const role = getRole(currentUserData || {});
+    const role = getActiveRole(currentUserData || {});
     const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+    const requestOwnerId = safeText(request.requestOwnerId || request.plannerId || request.customerId, "");
     const customerId = safeText(request.customerId, "");
+    const plannerId = safeText(request.plannerId, "");
 
+    let ownerId = requestOwnerId || customerId || plannerId;
     let vendor = null;
 
     if (role === "vendor") {
       vendor = vendors.find((item) => safeText(item.vendorId, "") === currentUser.uid) || null;
+      ownerId = requestOwnerId || plannerId || customerId;
     } else {
       const responses = request.vendorResponses || {};
       vendor = vendors.find((item) => {
         const vendorId = safeText(item.vendorId, "");
         return vendorId && responses[vendorId]?.conversationId;
       }) || vendors.find((item) => safeText(item.vendorId, "")) || null;
+
+      if (role === "planner") ownerId = plannerId || requestOwnerId || currentUser.uid;
+      if (role === "customer") ownerId = customerId || requestOwnerId || currentUser.uid;
     }
 
     if (!vendor) return "";
 
     const vendorId = safeText(vendor.vendorId, "");
-    if (!customerId || !vendorId) return "";
+    if (!ownerId || !vendorId) return "";
 
     const responses = request.vendorResponses || {};
     const vendorConversationIds = request.vendorConversationIds || {};
     const existingId = safeText(responses[vendorId]?.conversationId, "") || safeText(vendorConversationIds[vendorId], "");
 
-    return existingId || buildBookingConversationId(cleanRequestId, customerId, vendorId);
+    return existingId || buildBookingConversationId(cleanRequestId, ownerId, vendorId);
   } catch (error) {
     console.warn("Could not resolve conversation from booking request:", error.message);
     return "";
@@ -794,7 +1044,9 @@ async function markNotificationRead(notification) {
 
     if (notification.collectionName === "notifications") {
       await updateDoc(doc(db, "notifications", notification.id), {
-        read: true
+        read: true,
+        readAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
     }
 
@@ -805,7 +1057,7 @@ async function markNotificationRead(notification) {
 }
 
 async function getResolvedNotificationHref(notification) {
-  const role = getRole(currentUserData || {});
+  const role = getActiveRole(currentUserData || {});
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
   const sourceId = safeText(notification.sourceId, "");
@@ -870,24 +1122,6 @@ function getOtherParticipantName(conversation) {
   return safeText(conversation.title, "Conversation");
 }
 
-function getRole(userData) {
-  if (userData.role === "admin") return "admin";
-  if (userData.role === "vendor") return "vendor";
-  if (userData.role === "planner" || userData.plannerPro === true) return "planner";
-  return "customer";
-}
-
-function isAdminRole() {
-  return getRole(currentUserData || {}) === "admin";
-}
-
-function getHomeHref(role) {
-  if (role === "admin") return "admin-dashboard.html";
-  if (role === "vendor") return "vendor-dashboard.html";
-  if (role === "planner") return "planner-dashboard.html";
-  return "dashboard.html";
-}
-
 function enableAdminView() {
   const bar = document.getElementById("adminPreviewBar");
   if (bar) bar.style.display = "block";
@@ -925,18 +1159,19 @@ function renderBottomNav(role) {
         <span>Home</span>
       </a>
 
-      <a class="nav-item" href="add-listing.html">
+      <a class="nav-item" href="booking-requests.html">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         </svg>
-        <span>Add</span>
+        <span>Requests</span>
       </a>
 
       <a class="nav-item active" href="notifications.html">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
         </svg>
         <span>Alerts</span>
       </a>
@@ -972,8 +1207,8 @@ function renderBottomNav(role) {
 
     <a class="nav-item active" href="notifications.html">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-        <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
       </svg>
       <span>Alerts</span>
     </a>
@@ -1025,7 +1260,8 @@ function applyRoleLayout(role) {
 
 function renderEmptyState() {
   const list = document.getElementById("notificationList");
-  const role = getRole(currentUserData || {});
+  const role = getActiveRole(currentUserData || {});
+
   const href = role === "admin"
     ? "admin-dashboard.html"
     : role === "vendor"
@@ -1033,6 +1269,7 @@ function renderEmptyState() {
       : role === "planner"
         ? "planner-dashboard.html"
         : "listings.html";
+
   const label = role === "admin"
     ? "Back to Admin"
     : role === "vendor"
@@ -1043,37 +1280,19 @@ function renderEmptyState() {
 
   list.innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">✓</div>
+      <div class="empty-icon">OK</div>
       <h3>${activeFilter === "unread" ? "No unread notifications" : "No notifications yet"}</h3>
       <p>${activeFilter === "unread" ? "Once you click an unread alert, it will unhighlight but stay in All so you can open it again later." : "You’re all caught up. New messages and booking updates will appear here."}</p>
       <div class="empty-actions">
-        <a class="btn" href="${href}">${label}</a>
+        <a class="btn" href="${escapeHtml(href)}">${escapeHtml(label)}</a>
         <a class="btn-secondary" href="messages.html">Open Inbox</a>
       </div>
     </div>
   `;
 }
 
-function getNotificationEventId(notification) {
-  return (
-    safeText(notification.eventId, "") ||
-    safeText(notification.raw?.eventId, "") ||
-    safeText(notification.raw?.eventDetails?.eventId, "")
-  );
-}
-
-function getNotificationRequestId(notification) {
-  const sourceCollection = safeText(notification.sourceCollection, "");
-
-  return (
-    safeText(notification.bookingRequestId, "") ||
-    safeText(notification.requestId, "") ||
-    (sourceCollection === "bookingRequests" ? safeText(notification.sourceId, "") : "")
-  );
-}
-
 function getNotificationHref(notification) {
-  const role = getRole(currentUserData || {});
+  const role = getActiveRole(currentUserData || {});
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
   const sourceId = safeText(notification.sourceId, "");
@@ -1134,14 +1353,13 @@ function getIconClass(notification) {
 function getIconText(notification) {
   const type = safeText(notification.type, "");
 
-  if (type === "vendor_response") return "✓";
+  if (type === "vendor_response") return "OK";
   if (type === "request_withdrawn") return "!";
-  if (type === "booking_request") return "◎";
-  if (type === "message") return "✉";
+  if (type === "booking_request") return "REQ";
+  if (type === "message") return "MSG";
 
-  return "•";
+  return "NEW";
 }
-
 
 function updateFilterButtons() {
   const allBtn = document.getElementById("allFilterBtn");
@@ -1149,14 +1367,6 @@ function updateFilterButtons() {
 
   if (allBtn) allBtn.classList.toggle("active", activeFilter === "all");
   if (unreadBtn) unreadBtn.classList.toggle("active", activeFilter === "unread");
-}
-
-function getVisibleNotifications() {
-  if (activeFilter === "unread") {
-    return allNotifications.filter((notification) => notification.read === false);
-  }
-
-  return allNotifications;
 }
 
 function setNotificationFilter(filter) {
@@ -1224,7 +1434,7 @@ function renderNotifications(notifications) {
       const notification = allNotifications.find((item) => item.id === notificationId);
 
       if (!notification) {
-        window.location.href = card.getAttribute("href") || getHomeHref(getRole(currentUserData || {}));
+        window.location.href = card.getAttribute("href") || getHomeHref(getActiveRole(currentUserData || {}));
         return;
       }
 
@@ -1260,6 +1470,9 @@ function buildConversationNotification(conversation) {
     eventName: eventName || null,
     bookingRequestId: conversation.bookingRequestId || null,
     listingId: conversation.listingId || null,
+    customerId: conversation.customerId || "",
+    plannerId: conversation.plannerId || "",
+    vendorId: conversation.vendorId || "",
     read: !isUnread,
     createdAt: conversation.updatedAt || conversation.createdAt,
     updatedAt: conversation.updatedAt || conversation.createdAt,
@@ -1270,9 +1483,10 @@ function buildConversationNotification(conversation) {
 async function loadConversationNotifications(user) {
   try {
     const conversationsRef = collection(db, "conversations");
-    const conversationsQuery = isAdminRole()
+    const conversationsQuery = isAdminPreview()
       ? query(conversationsRef)
       : query(conversationsRef, where("participantIds", "array-contains", user.uid));
+
     const snapshot = await getDocs(conversationsQuery);
 
     const conversations = [];
@@ -1294,7 +1508,10 @@ async function loadConversationNotifications(user) {
 async function loadAppNotifications(user) {
   try {
     const notificationsRef = collection(db, "notifications");
-    const notificationsQuery = query(notificationsRef, where("recipientId", "==", user.uid));
+    const notificationsQuery = isAdminPreview()
+      ? query(notificationsRef)
+      : query(notificationsRef, where("recipientId", "==", user.uid));
+
     const snapshot = await getDocs(notificationsQuery);
 
     const notifications = [];
@@ -1376,6 +1593,9 @@ document.getElementById("unreadFilterBtn").addEventListener("click", () => {
   setNotificationFilter("unread");
 });
 
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -1395,7 +1615,11 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUserData = userSnap.data();
 
-  applyRoleLayout(getRole(currentUserData));
+  const activeRole = getActiveRole(currentUserData);
+
+  renderRoleSwitcher(currentUserData);
+  applyRoleLayout(activeRole);
+
   loadNotifications(user);
 });
 </script>
