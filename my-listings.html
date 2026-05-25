@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>My Listings | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,9 +14,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -36,6 +35,8 @@
       --blue-text: #4067b2;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
       --radius-xl: 34px;
@@ -50,8 +51,56 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
+    body { min-height: 100vh; }
+
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .page {
@@ -64,7 +113,7 @@
 
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 22px;
@@ -84,12 +133,13 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .topbar-center {
       flex: 1;
       text-align: center;
+      min-width: 0;
     }
 
     .eyebrow {
@@ -107,6 +157,44 @@
       line-height: 1;
       letter-spacing: -0.04em;
       font-weight: 800;
+    }
+
+    .role-switcher {
+      margin: 10px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140,111,75,.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
     .hero-card {
@@ -134,7 +222,7 @@
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 280px;
+      max-width: 300px;
     }
 
     .hero-label {
@@ -192,9 +280,7 @@
       -webkit-backdrop-filter: blur(6px);
     }
 
-    .section {
-      margin-top: 28px;
-    }
+    .section { margin-top: 28px; }
 
     .section-header {
       display: flex;
@@ -218,6 +304,39 @@
       font-size: 0.92rem;
       font-weight: 700;
       white-space: nowrap;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 14px 10px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.74rem;
+      line-height: 1.25;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
     .listing-list {
@@ -257,9 +376,7 @@
       background: rgba(255, 255, 255, 0.22);
     }
 
-    .listing-thumb.has-photo::before {
-      display: none;
-    }
+    .listing-thumb.has-photo::before { display: none; }
 
     .listing-thumb img {
       width: 100%;
@@ -330,12 +447,13 @@
     }
 
     .pill.category {
-      background: #f0eaff;
-      color: #6f4ab8;
+      background: var(--purple-soft);
+      color: var(--purple-text);
     }
 
     .pill.paused,
-    .pill.draft {
+    .pill.draft,
+    .pill.hidden {
       background: var(--red-soft);
       color: var(--red-text);
     }
@@ -367,6 +485,7 @@
       border: none;
       flex: 1;
       min-width: 110px;
+      padding: 0 14px;
     }
 
     .btn {
@@ -416,6 +535,28 @@
       line-height: 1.45;
     }
 
+    .status-message {
+      display: none;
+      margin-bottom: 14px;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .status-message.info {
+      display: block;
+      background: #fff4df;
+      color: #8d5f11;
+    }
+
+    .status-message.error {
+      display: block;
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -451,10 +592,7 @@
       padding: 0 4px;
     }
 
-    .nav-item svg {
-      width: 20px;
-      height: 20px;
-    }
+    .nav-item svg { width: 20px; height: 20px; }
 
     .nav-item.active {
       background: linear-gradient(135deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
@@ -463,66 +601,92 @@
     }
 
     @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
-      }
+      body { padding: 24px 0; }
 
-      .page {
-        max-width: 960px;
-      }
+      .page { max-width: 960px; }
 
-      .hero-content {
-        max-width: 430px;
+      .hero-content { max-width: 430px; }
+
+      .stats-grid {
+        max-width: 520px;
       }
 
       .listing-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .bottom-nav {
-        max-width: 520px;
-      }
+      .bottom-nav { max-width: 520px; }
     }
   </style>
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Preview Mode
+        <span>You are viewing vendor listings as admin.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
-      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">
-        ←
-      </a>
+      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back" id="backLink">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Vendor Portal</div>
+        <div class="eyebrow" id="pageEyebrow">Vendor Portal</div>
         <h1 class="page-title">My Listings</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
       </div>
 
-      <a href="add-listing.html" class="icon-btn" aria-label="Add listing">
-        +
-      </a>
+      <a href="add-listing.html" class="icon-btn" aria-label="Add listing" id="addListingTopLink">+</a>
     </header>
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">Your active services</div>
-        <h2 class="hero-title">Manage everything you’ve published.</h2>
-        <p class="hero-subtitle">
+        <div class="hero-label" id="heroLabel">Your active services</div>
+        <h2 class="hero-title" id="heroTitle">Manage everything you’ve published.</h2>
+        <p class="hero-subtitle" id="heroSubtitle">
           Review performance, make updates, and keep your listings fresh and bookable.
         </p>
 
         <div class="hero-actions">
-          <a class="hero-btn" href="add-listing.html">Add New</a>
-          <a class="hero-btn-secondary" href="vendor-dashboard.html">Dashboard</a>
+          <a class="hero-btn" href="add-listing.html" id="addListingHeroLink">Add New</a>
+          <a class="hero-btn-secondary" href="vendor-dashboard.html" id="dashboardHeroLink">Dashboard</a>
         </div>
       </div>
     </section>
 
     <section class="section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number" id="totalListingCount">0</span>
+          <span class="stat-label">Listings</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-number" id="publishedListingCount">0</span>
+          <span class="stat-label">Active</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-number" id="draftListingCount">0</span>
+          <span class="stat-label">Drafts</span>
+        </div>
+      </div>
+
       <div class="section-header">
         <h2 class="section-title">Your Listings</h2>
-        <a class="section-link" href="add-listing.html">New Listing</a>
+        <a class="section-link" href="add-listing.html" id="newListingLink">New Listing</a>
       </div>
+
+      <div class="status-message" id="statusMessage"></div>
 
       <div class="listing-list" id="listingList">
         <div class="empty-card">
@@ -535,14 +699,14 @@
   </main>
 
   <nav class="bottom-nav" aria-label="Vendor navigation">
-    <a class="nav-item" href="vendor-dashboard.html">
+    <a class="nav-item" href="vendor-dashboard.html" id="bottomHomeLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
       </svg>
       <span>Home</span>
     </a>
 
-    <a class="nav-item" href="add-listing.html">
+    <a class="nav-item" href="add-listing.html" id="bottomAddLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -559,7 +723,7 @@
       <span>Listings</span>
     </a>
 
-    <a class="nav-item" href="messages.html">
+    <a class="nav-item" href="messages.html" id="bottomInboxLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
@@ -572,7 +736,17 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -587,6 +761,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+let currentUser = null;
+let currentUserData = null;
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -617,13 +794,172 @@ function formatPrice(value) {
   return `$${Math.round(number)}+`;
 }
 
-function statusClass(status) {
+function normalizeRole(role) {
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
+    });
+  }
+
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    userData.permissions?.admin === true ||
+    legacy === "admin"
+  ) {
+    roleSet.add("admin");
+    roleSet.add("vendor");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("vendor")) return "vendor";
+
+  return allowedRoles[0] || "customer";
+}
+
+function canUseVendorTools(userData = {}) {
+  const roles = getAllowedRoles(userData);
+
+  return (
+    roles.includes("vendor") ||
+    roles.includes("admin") ||
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true
+  );
+}
+
+function isAdminPreview() {
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (allowedRoles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${role}" ${role === activeRole ? "selected" : ""}>${getRoleLabel(role)}</option>`;
+  }).join("");
+
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
+}
+
+function showStatus(message, type = "info") {
+  const status = document.getElementById("statusMessage");
+  status.textContent = message;
+  status.className = `status-message ${type}`;
+  status.style.display = "block";
+}
+
+function statusClass(status, visibility) {
+  if (visibility === "hidden") return "hidden";
   if (status === "published") return "active";
   if (status === "draft") return "draft";
   return "paused";
 }
 
-function statusLabel(status) {
+function statusLabel(status, visibility) {
+  if (visibility === "hidden") return "Hidden";
   if (status === "published") return "Active";
   if (status === "draft") return "Draft";
   return safeText(status, "Paused");
@@ -632,12 +968,15 @@ function statusLabel(status) {
 function renderEmptyState() {
   const listingList = document.getElementById("listingList");
 
+  const backHref = isAdminPreview() ? "admin-dashboard.html" : "add-listing.html";
+  const buttonText = isAdminPreview() ? "Back to Admin" : "Add Your First Listing";
+
   listingList.innerHTML = `
     <div class="empty-card">
       <div class="empty-icon">+</div>
       <h3>No listings yet</h3>
-      <p>Create your first vendor listing so customers can find and book your services.</p>
-      <a class="btn" href="add-listing.html">Add Your First Listing</a>
+      <p>${isAdminPreview() ? "No vendor listings were found in the marketplace yet." : "Create your first vendor listing so customers can find and book your services."}</p>
+      <a class="btn" href="${backHref}">${buttonText}</a>
     </div>
   `;
 }
@@ -671,8 +1010,20 @@ function getEventTypes(listing) {
     .filter(Boolean);
 }
 
+function setStats(listings) {
+  const total = listings.length;
+  const published = listings.filter((listing) => safeText(listing.status, "draft") === "published" && safeText(listing.listingVisibility, "visible") !== "hidden").length;
+  const drafts = listings.filter((listing) => safeText(listing.status, "draft") === "draft").length;
+
+  document.getElementById("totalListingCount").textContent = total;
+  document.getElementById("publishedListingCount").textContent = published;
+  document.getElementById("draftListingCount").textContent = drafts;
+}
+
 function renderListings(listings) {
   const listingList = document.getElementById("listingList");
+
+  setStats(listings);
 
   if (!listings.length) {
     renderEmptyState();
@@ -692,12 +1043,18 @@ function renderListings(listings) {
     const views = Number(listing.views || 0);
     const saves = Number(listing.saves || 0);
     const status = safeText(listing.status, "draft");
+    const visibility = safeText(listing.listingVisibility, "visible");
     const imageUrl = safeText(listing.imageUrl, "");
     const availability = safeText(listing.availability, "");
+    const vendorName = safeText(listing.vendorName, "");
 
     const listingId = encodeURIComponent(listing.id || "");
 
     const noteParts = [];
+
+    if (isAdminPreview() && vendorName) {
+      noteParts.push(`Vendor: ${vendorName}.`);
+    }
 
     if (eventTypes.length) {
       noteParts.push(`Best for ${eventTypePreview}${moreEventTypes}.`);
@@ -731,7 +1088,7 @@ function renderListings(listings) {
         </div>
 
         <div class="listing-meta">
-          <span class="pill ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>
+          <span class="pill ${statusClass(status, visibility)}">${escapeHtml(statusLabel(status, visibility))}</span>
           <span class="pill category">${escapeHtml(mainCategory)}</span>
           <span class="pill views">${views} Views</span>
           <span class="pill saves">${saves} Saves</span>
@@ -754,9 +1111,16 @@ async function loadVendorListings(user) {
   const listingList = document.getElementById("listingList");
 
   try {
-    const listingsRef = collection(db, "listings");
-    const q = query(listingsRef, where("vendorId", "==", user.uid));
-    const snapshot = await getDocs(q);
+    let snapshot;
+
+    if (isAdminPreview()) {
+      const q = query(collection(db, "listings"));
+      snapshot = await getDocs(q);
+    } else {
+      const listingsRef = collection(db, "listings");
+      const q = query(listingsRef, where("vendorId", "==", user.uid));
+      snapshot = await getDocs(q);
+    }
 
     const listings = [];
 
@@ -781,17 +1145,42 @@ async function loadVendorListings(user) {
         <div class="empty-icon">!</div>
         <h3>Could not load listings</h3>
         <p>${escapeHtml(error.message)}</p>
-        <a class="btn" href="vendor-dashboard.html">Back to Dashboard</a>
+        <a class="btn" href="${isAdminPreview() ? "admin-dashboard.html" : "vendor-dashboard.html"}">Go Back</a>
       </div>
     `;
   }
 }
+
+function enableAdminPreviewMode() {
+  if (!isAdminPreview()) return;
+
+  document.getElementById("adminPreviewBar").style.display = "block";
+  document.getElementById("backLink").href = "admin-dashboard.html";
+  document.getElementById("addListingTopLink").href = "admin-dashboard.html";
+  document.getElementById("addListingHeroLink").href = "admin-dashboard.html";
+  document.getElementById("dashboardHeroLink").href = "admin-dashboard.html";
+  document.getElementById("newListingLink").href = "admin-dashboard.html";
+  document.getElementById("bottomHomeLink").href = "admin-dashboard.html";
+  document.getElementById("bottomAddLink").href = "admin-dashboard.html";
+  document.getElementById("bottomInboxLink").href = "admin-dashboard.html";
+
+  document.getElementById("pageEyebrow").textContent = "Admin Preview";
+  document.getElementById("heroLabel").textContent = "Marketplace Listings";
+  document.getElementById("heroTitle").textContent = "Review vendor listings.";
+  document.getElementById("heroSubtitle").textContent = "Preview all listings across the marketplace without using a vendor account.";
+}
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
     return;
   }
+
+  currentUser = user;
 
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
@@ -801,11 +1190,28 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userData = userSnap.data();
+  currentUserData = userSnap.data();
 
-  if (userData.role !== "vendor") {
-    window.location.href = "dashboard.html";
+  const activeRole = getActiveRole(currentUserData);
+
+  if (!canUseVendorTools(currentUserData)) {
+    window.location.href = getDashboardForRole(activeRole);
     return;
+  }
+
+  if (activeRole !== "vendor" && activeRole !== "admin") {
+    window.location.href = getDashboardForRole(activeRole);
+    return;
+  }
+
+  renderRoleSwitcher(currentUserData);
+
+  if (activeRole === "admin") {
+    enableAdminPreviewMode();
+  }
+
+  if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
+    showStatus("This account is not currently active. Listings may be hidden or limited.", "error");
   }
 
   loadVendorListings(user);
