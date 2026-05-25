@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Add Listing | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -62,7 +63,7 @@
 
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 22px;
@@ -83,11 +84,18 @@
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 800;
+      position: relative;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
     }
 
     .topbar-center {
       flex: 1;
       text-align: center;
+      min-width: 0;
     }
 
     .eyebrow {
@@ -105,6 +113,44 @@
       line-height: 1;
       letter-spacing: -0.04em;
       font-weight: 800;
+    }
+
+    .role-switcher {
+      margin: 10px auto 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(140,111,75,.05);
+    }
+
+    .role-switcher-label {
+      padding-left: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .role-select {
+      min-height: 34px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0 28px 0 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 190px;
+      box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
     .hero-card {
@@ -475,14 +521,25 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back">←</a>
+      <a href="vendor-dashboard.html" class="back-link" aria-label="Go back" id="backLink">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Vendor Portal</div>
         <h1 class="page-title">Add Listing</h1>
+
+        <div class="role-switcher" id="roleSwitcher">
+          <span class="role-switcher-label">Viewing as</span>
+          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
+        </div>
       </div>
 
-      <a href="messages.html" class="icon-btn" aria-label="Messages">✉</a>
+      <a href="messages.html" class="icon-btn" aria-label="Messages">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+      </a>
     </header>
 
     <section class="hero-card">
@@ -490,7 +547,7 @@
         <div class="hero-label">Create a new service</div>
         <h2 class="hero-title">Showcase your business beautifully.</h2>
         <p class="hero-subtitle">
-          Add a polished listing with music, glam, rentals, venues, food, planning, professional staffing, event safety providers, transportation companies, beauty, entertainment, and every event type your service fits.
+          Add a polished listing with music, glam, rentals, venues, food, planning, staffing, safety providers, transportation companies, beauty, entertainment, and every event type your service fits.
         </p>
       </div>
     </section>
@@ -765,7 +822,7 @@
           </div>
 
           <div class="upload-card">
-            <div class="upload-icon">◎</div>
+            <div class="upload-icon">IMG</div>
             <h3 class="upload-title">Photo Display Preview</h3>
             <p class="upload-text">
               This image will appear on the marketplace, listing detail page, vendor dashboard, My Listings, and the event board.
@@ -789,7 +846,15 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -1199,6 +1264,152 @@ function buildLocationLabel(baseCity, baseState) {
   return "";
 }
 
+function normalizeRole(role) {
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
+}
+
+function getDashboardForRole(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "admin-dashboard.html";
+  if (normalizedRole === "vendor") return "vendor-dashboard.html";
+  if (normalizedRole === "planner") return "planner-dashboard.html";
+
+  return "dashboard.html";
+}
+
+function getRoleLabel(role) {
+  const normalizedRole = normalizeRole(role);
+
+  if (normalizedRole === "admin") return "Admin";
+  if (normalizedRole === "vendor") return "Vendor";
+  if (normalizedRole === "planner") return "Planner";
+
+  return "Customer";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
+    });
+  }
+
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    userData.permissions?.admin === true ||
+    legacy === "admin"
+  ) {
+    roleSet.add("admin");
+    roleSet.add("vendor");
+    roleSet.add("customer");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("vendor")) return "vendor";
+
+  return allowedRoles[0] || "customer";
+}
+
+function canUseVendorTools(userData = {}) {
+  const roles = getAllowedRoles(userData);
+
+  return (
+    roles.includes("vendor") ||
+    roles.includes("admin") ||
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true
+  );
+}
+
+function renderRoleSwitcher(userData = {}) {
+  const wrapper = document.getElementById("roleSwitcher");
+  const select = document.getElementById("roleSelect");
+  const allowedRoles = getAllowedRoles(userData);
+  const activeRole = getActiveRole(userData);
+
+  if (!wrapper || !select) return;
+
+  if (allowedRoles.length <= 1) {
+    wrapper.style.display = "none";
+    return;
+  }
+
+  select.innerHTML = allowedRoles.map((role) => {
+    return `<option value="${role}" ${role === activeRole ? "selected" : ""}>${getRoleLabel(role)}</option>`;
+  }).join("");
+
+  wrapper.style.display = "inline-flex";
+}
+
+async function switchDashboardRole(nextRole) {
+  if (!currentUser || !currentUserData) return;
+
+  const normalizedRole = normalizeRole(nextRole);
+  const allowedRoles = getAllowedRoles(currentUserData);
+
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
+    alert("This dashboard is not enabled on your account yet.");
+    renderRoleSwitcher(currentUserData);
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      activeRole: normalizedRole,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not save active role:", error.message);
+  }
+
+  window.location.href = getDashboardForRole(normalizedRole);
+}
+
 function populateSpecificServices(mainCategory) {
   const categorySelect = document.getElementById("category");
   const options = serviceOptions[mainCategory] || [];
@@ -1224,6 +1435,10 @@ function populateSpecificServices(mainCategory) {
 
 document.getElementById("main-category").addEventListener("change", (event) => {
   populateSpecificServices(event.target.value);
+});
+
+document.getElementById("roleSelect").addEventListener("change", (event) => {
+  switchDashboardRole(event.target.value);
 });
 
 const imageUrlInput = document.getElementById("image-url");
@@ -1262,18 +1477,36 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const userData = userSnap.data();
+  const activeRole = getActiveRole(userData);
 
-  if (userData.role !== "vendor") {
-    window.location.href = "dashboard.html";
+  if (!canUseVendorTools(userData)) {
+    window.location.href = getDashboardForRole(activeRole);
+    return;
+  }
+
+  if (activeRole !== "vendor" && activeRole !== "admin") {
+    window.location.href = getDashboardForRole(activeRole);
     return;
   }
 
   currentUser = user;
   currentUserData = userData;
 
-  const businessCity = safeText(userData.baseCity, "") || safeText(userData.location, "");
-  const businessState = safeText(userData.baseState, "") || "TX";
+  renderRoleSwitcher(userData);
+
+  if (activeRole === "admin") {
+    document.getElementById("backLink").href = "admin-dashboard.html";
+    showStatus("Admin preview is allowed, but publishing should be tested with a real vendor account.", "info");
+  }
+
+  if (userData.accountStatus === "deactivated" || userData.accountStatus === "pending_deletion") {
+    showStatus("This account is not currently active. Listing actions may be limited.", "error");
+  }
+
+  const businessCity = safeText(userData.baseCity, "") || safeText(userData.location, "") || safeText(userData.city, "");
+  const businessState = safeText(userData.baseState, "") || safeText(userData.state, "") || "TX";
   const businessServiceArea = safeText(userData.serviceArea, "");
+  const businessServiceCities = safeText(userData.serviceCities, "");
 
   if (businessCity) {
     document.getElementById("base-city").value = businessCity;
@@ -1286,11 +1519,26 @@ onAuthStateChanged(auth, async (user) => {
   if (businessServiceArea) {
     document.getElementById("service-area").value = businessServiceArea;
   }
+
+  if (businessServiceCities) {
+    document.getElementById("service-cities").value = Array.isArray(userData.serviceCities)
+      ? userData.serviceCities.join(", ")
+      : businessServiceCities;
+  }
+
+  if (safeText(userData.zipCode || userData.zip, "")) {
+    document.getElementById("zip-code").value = safeText(userData.zipCode || userData.zip, "");
+  }
 });
 
 window.saveListing = async function(status) {
   if (!currentUser || !currentUserData) {
     showStatus("Still loading your vendor account. Please wait a second and try again.", "error");
+    return;
+  }
+
+  if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
+    showStatus("This account is not active, so new listings cannot be saved right now.", "error");
     return;
   }
 
@@ -1390,6 +1638,9 @@ window.saveListing = async function(status) {
       vendorId: currentUser.uid,
       vendorName,
       vendorEmail: currentUserData.email || currentUser.email || "",
+
+      listingVisibility: currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion" ? "hidden" : "visible",
+      createdByRole: getActiveRole(currentUserData),
 
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
