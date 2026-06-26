@@ -14,9 +14,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -24,12 +22,10 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f4ede2;
       --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
@@ -39,7 +35,9 @@
       --purple-text: #6f4ab8;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+      --radius-xl: 34px;
     }
 
     html,
@@ -51,9 +49,7 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .admin-preview-bar {
       display: none;
@@ -110,41 +106,75 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 28px 24px 112px;
-      background: var(--bg);
+      padding: 20px 18px 112px;
     }
 
     .topbar {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 24px;
+      gap: 12px;
+      margin-bottom: 22px;
     }
 
     .back-link,
     .icon-btn {
-      width: 50px;
-      height: 50px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.88);
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      background: rgba(255, 255, 255, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #222;
       text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       flex-shrink: 0;
       font-weight: 800;
       position: relative;
-      font-size: 1rem;
       cursor: pointer;
+      font-family: inherit;
     }
 
     .icon-btn svg {
       width: 20px;
       height: 20px;
+    }
+
+    .notification-badge,
+    .nav-badge {
+      position: absolute;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.68rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
+    }
+
+    .notification-badge {
+      top: -5px;
+      right: -5px;
+    }
+
+    .nav-badge {
+      top: 5px;
+      right: 14px;
+      min-width: 18px;
+      height: 18px;
+      line-height: 18px;
+      font-size: 0.62rem;
     }
 
     .topbar-center {
@@ -154,9 +184,9 @@
     }
 
     .eyebrow {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: #7b7268;
       margin-bottom: 4px;
@@ -164,7 +194,7 @@
 
     .page-title {
       margin: 0;
-      font-size: 1.35rem;
+      font-size: 1.55rem;
       line-height: 1;
       letter-spacing: -0.04em;
       font-weight: 800;
@@ -208,249 +238,64 @@
       box-shadow: 0 6px 14px rgba(120,96,60,.06);
     }
 
-    .notification-badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
       color: #fff;
-      font-size: 0.7rem;
-      line-height: 20px;
-      font-weight: 800;
-      text-align: center;
-      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
-      border: 2px solid #fff;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3;
-    }
-
-    .messages-header {
-      margin-bottom: 24px;
-    }
-
-    .messages-title {
-      margin: 0;
-      font-size: clamp(3.2rem, 12vw, 4.7rem);
-      line-height: 0.92;
-      letter-spacing: -0.075em;
-      font-weight: 800;
-    }
-
-    .messages-subtitle {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 0.96rem;
-      line-height: 1.45;
-      font-weight: 600;
-      max-width: 540px;
-    }
-
-    .message-tabs {
-      display: flex;
-      gap: 12px;
-      margin: 26px 0 22px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      scrollbar-width: none;
-    }
-
-    .message-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .message-tab {
-      min-height: 54px;
-      padding: 0 22px;
-      border-radius: 999px;
-      border: none;
-      background: #f4ede2;
-      color: #222;
-      font-family: inherit;
-      font-size: 0.98rem;
-      font-weight: 800;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-
-    .message-tab.active {
-      background: #161616;
-      color: #fff;
-    }
-
-    .mobile-search-bar {
-      display: none;
-      margin: -4px 0 22px;
-    }
-
-    .mobile-search-bar.show {
-      display: block;
-    }
-
-    .search-wrap {
+      box-shadow: var(--shadow-strong);
       margin-bottom: 22px;
     }
 
-    .search-input {
-      width: 100%;
-      min-height: 58px;
-      border-radius: 999px;
-      border: none;
-      background: #f4ede2;
-      padding: 0 20px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      color: var(--text);
-      outline: none;
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.04);
-    }
-
-    .search-input::placeholder {
-      color: #9f9488;
-    }
-
-    .section {
-      margin-top: 8px;
-    }
-
-    .section-title {
-      display: none;
-    }
-
-    .message-list {
-      display: grid;
-      gap: 0;
-    }
-
-    .message-card {
-      background: transparent;
-      border-radius: 0;
-      padding: 16px 0;
-      box-shadow: none;
-      display: grid;
-      grid-template-columns: 76px 1fr;
-      gap: 16px;
-      align-items: center;
-      text-decoration: none;
-      color: inherit;
-      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
-      position: relative;
-    }
-
-    .message-card:hover {
-      background: rgba(255,255,255,.55);
-      margin: 0 -12px;
-      padding-left: 12px;
-      padding-right: 12px;
-      border-radius: 20px;
-      border-bottom-color: transparent;
-    }
-
-    .message-card.unread::after {
+    .hero-card::after {
       content: "";
       position: absolute;
-      top: 24px;
-      right: 2px;
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
-    }
-
-    .avatar {
-      width: 76px;
-      height: 76px;
-      border-radius: 999px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-      color: white;
-      font-size: 1rem;
-      font-weight: 800;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .avatar::before {
-      content: "";
-      position: absolute;
-      inset: auto -4px -4px auto;
-      width: 42px;
-      height: 42px;
+      width: 170px;
+      height: 170px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.9);
-      border: 3px solid #fff;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
     }
 
-    .avatar span {
+    .hero-content {
       position: relative;
       z-index: 1;
+      max-width: 330px;
     }
 
-    .message-content {
-      min-width: 0;
-      flex: 1;
-      padding-right: 18px;
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
     }
 
-    .message-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 4px;
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
     }
 
-    .message-name {
-      margin: 0;
-      font-size: 1.45rem;
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-      font-weight: 500;
-    }
-
-    .message-time {
+    .hero-subtitle {
+      margin: 0 0 16px;
       font-size: 0.95rem;
-      color: #6f6f6f;
-      font-weight: 500;
-      white-space: nowrap;
-      letter-spacing: -0.01em;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
     }
 
-    .message-preview,
-    .message-detail-line {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .message-preview {
-      margin: 0 0 4px;
-      font-size: 1.02rem;
-      line-height: 1.35;
-      color: #666;
-    }
-
-    .message-detail-line {
-      margin: 0;
-      font-size: 0.98rem;
-      line-height: 1.35;
-      color: #777;
-    }
-
-    .message-meta {
-      display: none;
-    }
-
-    .pill {
-      min-height: 28px;
+    .hero-pill {
+      min-height: 30px;
       padding: 0 10px;
       border-radius: 999px;
       display: inline-flex;
@@ -458,66 +303,246 @@
       justify-content: center;
       font-size: 0.76rem;
       font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
     }
 
-    .pill.new {
-      background: var(--red-soft);
-      color: var(--red-text);
+    .search-wrap {
+      margin-bottom: 16px;
     }
 
-    .pill.vendor {
-      background: #fff4df;
-      color: #aa6f12;
+    .search-input {
+      width: 100%;
+      min-height: 54px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.86);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0 18px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      box-shadow: 0 10px 24px rgba(140,111,75,.05);
     }
 
-    .pill.customer {
-      background: var(--blue-soft);
-      color: var(--blue-text);
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
     }
 
-    .pill.system {
-      background: var(--green-soft);
-      color: var(--green-text);
+    .filter-tabs::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+      color: var(--muted);
+      padding: 0 14px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
-    .pill.event {
-      background: var(--purple-soft);
-      color: var(--purple-text);
+    .filter-btn.active {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255,107,97,.18);
     }
 
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .section-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .conversation-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .conversation-card,
     .empty-card {
-      background: transparent;
-      border-radius: 0;
-      padding: 120px 18px 24px;
-      box-shadow: none;
-      text-align: center;
+      background: var(--card);
+      border-radius: 28px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236,226,211,.74);
     }
 
-    .empty-icon {
-      width: 76px;
-      height: 76px;
-      border-radius: 24px;
-      margin: 0 auto 22px;
-      background: transparent;
-      color: #161616;
+    .conversation-card {
+      text-decoration: none;
+      color: inherit;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 14px;
+      position: relative;
+    }
+
+    .conversation-card.unread {
+      background: #fffaf7;
+      border-color: rgba(255, 95, 103, 0.28);
+    }
+
+    .conversation-card.unread::after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      box-shadow: 0 8px 16px rgba(255,95,103,.26);
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ffe7c2, #f4a43a);
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 0.92rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .conversation-body {
+      min-width: 0;
+      padding-right: 14px;
+    }
+
+    .conversation-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+
+    .conversation-title {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.14;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 210px;
+    }
+
+    .conversation-time {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #9a9084;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .conversation-preview {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .pill {
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: capitalize;
+    }
+
+    .pill.customer { background: var(--blue-soft); color: var(--blue-text); }
+    .pill.vendor { background: var(--green-soft); color: var(--green-text); }
+    .pill.planner { background: var(--purple-soft); color: var(--purple-text); }
+    .pill.admin { background: #eee; color: #222; }
+    .pill.event { background: #fff4df; color: #aa6f12; }
+    .pill.system { background: #f6efe4; color: #6a625a; }
+    .pill.new { background: var(--red-soft); color: var(--red-text); }
+
+    .empty-card {
+      text-align: center;
+      padding: 26px 18px;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      margin: 0 auto 14px;
+      background: #fff1dc;
+      color: var(--gold-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
       font-weight: 800;
     }
 
     .empty-card h3 {
       margin: 0 0 8px;
-      font-size: 1.65rem;
+      font-size: 1.08rem;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
 
     .empty-card p {
       margin: 0 0 16px;
-      color: #666;
-      font-size: 1.1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
       line-height: 1.45;
     }
 
@@ -537,16 +562,17 @@
       justify-content: center;
       text-decoration: none;
       font-size: 0.9rem;
-      font-weight: 700;
+      font-weight: 800;
       font-family: inherit;
       border: none;
       padding: 0 18px;
+      cursor: pointer;
     }
 
     .btn {
-      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
       color: #fff;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+      box-shadow: 0 14px 28px rgba(255,107,97,.16);
     }
 
     .btn-secondary {
@@ -566,11 +592,12 @@
       border-radius: 999px;
       padding: 10px 8px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 4px;
       box-shadow: 0 18px 38px rgba(120, 96, 60, 0.14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 50;
     }
 
     .nav-item {
@@ -583,10 +610,11 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       text-align: center;
       padding: 0 4px;
+      position: relative;
     }
 
     .nav-item svg {
@@ -595,32 +623,23 @@
     }
 
     .nav-item.active {
-      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
       color: #fff;
-      box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
+      box-shadow: 0 10px 22px rgba(255,107,97,.24);
     }
 
     @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
+      body { padding: 24px 0; }
+
+      .page { max-width: 960px; }
+
+      .conversation-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .page {
-        max-width: 960px;
-      }
+      .bottom-nav { max-width: 560px; }
 
-      .message-list,
-      .messages-header,
-      .topbar,
-      .mobile-search-bar {
-        max-width: 760px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .bottom-nav {
-        max-width: 520px;
-      }
+      .conversation-title { max-width: 300px; }
     }
   </style>
 </head>
@@ -630,7 +649,7 @@
     <div class="admin-preview-inner">
       <div class="admin-preview-text">
         Admin Preview Mode
-        <span>You are viewing all conversations as admin. Replying should be tested with role accounts.</span>
+        <span>You are viewing marketplace conversations with admin access.</span>
       </div>
       <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
     </div>
@@ -638,10 +657,10 @@
 
   <main class="page">
     <header class="topbar">
-      <a id="backLink" href="dashboard.html" class="back-link" aria-label="Go back">←</a>
+      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow" id="roleEyebrow">Inbox</div>
+        <div class="eyebrow" id="pageEyebrow">Inbox</div>
         <h1 class="page-title">Messages</h1>
 
         <div class="role-switcher" id="roleSwitcher">
@@ -650,49 +669,52 @@
         </div>
       </div>
 
-      <button class="icon-btn" type="button" id="searchToggleBtn" aria-label="Search messages">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M10.8 18.1C14.8 18.1 18.1 14.8 18.1 10.8C18.1 6.8 14.8 3.5 10.8 3.5C6.8 3.5 3.5 6.8 3.5 10.8C3.5 14.8 6.8 18.1 10.8 18.1Z" stroke="currentColor" stroke-width="2"></path>
-          <path d="M16.2 16.2L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-      </button>
-
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </header>
 
-    <section class="messages-header">
-      <h1 class="messages-title">Messages</h1>
-      <p class="messages-subtitle" id="messagesSubtitle">
-        Keep customer, vendor, planner, and booking conversations organized in one place.
-      </p>
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label" id="heroLabel">RentEvent Inbox</div>
+        <h2 class="hero-title" id="heroTitle">Your event conversations.</h2>
+        <p class="hero-subtitle" id="heroSubtitle">
+          Message vendors, customers, and planners without leaving RentEvent.
+        </p>
 
-      <div class="message-tabs" aria-label="Message filters">
-        <button class="message-tab active" type="button" data-message-filter="all">All</button>
-        <button class="message-tab" type="button" data-message-filter="primary" id="primaryMessageTab">Vendors</button>
-        <button class="message-tab" type="button" data-message-filter="support">Support</button>
+        <div class="hero-meta">
+          <span class="hero-pill" id="threadCountPill">0 Threads</span>
+          <span class="hero-pill" id="unreadCountPill">0 Unread</span>
+        </div>
       </div>
     </section>
 
-    <div class="mobile-search-bar" id="mobileSearchBar">
-      <div class="search-wrap">
-        <input id="searchInput" class="search-input" type="text" placeholder="Search messages..." />
-      </div>
+    <div class="search-wrap">
+      <input class="search-input" id="searchInput" type="search" placeholder="Search conversations..." />
+    </div>
+
+    <div class="filter-tabs">
+      <button class="filter-btn active" type="button" data-message-filter="all">All</button>
+      <button class="filter-btn" type="button" data-message-filter="unread">Unread</button>
+      <button class="filter-btn" type="button" data-message-filter="requests">Requests</button>
+      <button class="filter-btn" type="button" data-message-filter="support">Support</button>
     </div>
 
     <section class="section">
-      <h2 class="section-title" id="sectionTitle">Recent Conversations</h2>
+      <div class="section-header">
+        <h2 class="section-title" id="sectionTitle">Inbox</h2>
+        <a class="section-link" href="my-requests.html" id="requestsLink">Requests</a>
+      </div>
 
-      <div class="message-list" id="messageList">
+      <div class="conversation-list" id="conversationList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon">...</div>
           <h3>Loading messages</h3>
-          <p>We’re checking your inbox now.</p>
+          <p>We’re checking your RentEvent conversations now.</p>
         </div>
       </div>
     </section>
@@ -708,13 +730,11 @@ import {
   doc,
   getDoc,
   collection,
+  getDocs,
   query,
   where,
-  getDocs,
-  setDoc,
   updateDoc,
-  orderBy,
-  limit,
+  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -737,8 +757,8 @@ let currentUserData = null;
 let allConversations = [];
 let activeMessageFilter = "all";
 
-const urlParams = new URLSearchParams(window.location.search);
-const currentEventId = urlParams.get("eventId") || "";
+const pageParams = new URLSearchParams(window.location.search);
+const currentEventId = pageParams.get("eventId") || "";
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -751,50 +771,6 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-function withEventParam(url) {
-  if (!currentEventId) return url;
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}eventId=${encodeURIComponent(currentEventId)}`;
-}
-
-function initialsFromName(name) {
-  const cleanName = safeText(name, "RE");
-  const parts = cleanName.split(" ").filter(Boolean);
-
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-
-  return cleanName.slice(0, 2).toUpperCase();
-}
-
-function formatTime(value) {
-  if (!value || !value.seconds) {
-    if (typeof value === "string") {
-      const parsed = Date.parse(value);
-      if (!Number.isNaN(parsed)) {
-        return new Date(parsed).toLocaleDateString();
-      }
-    }
-    return "New";
-  }
-
-  const date = new Date(value.seconds * 1000);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMinutes = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMinutes < 1) return "Now";
-  if (diffMinutes < 60) return `${diffMinutes} min ago`;
-  if (diffHours < 24) return `${diffHours} hr ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-
-  return date.toLocaleDateString();
 }
 
 function setText(id, value) {
@@ -912,28 +888,20 @@ function isAdminPreview() {
   return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
 }
 
-function isPlannerView() {
-  return getActiveRole(currentUserData || {}) === "planner";
-}
-
-function isVendorView() {
-  return getActiveRole(currentUserData || {}) === "vendor";
-}
-
 function renderRoleSwitcher(userData = {}) {
   const wrapper = document.getElementById("roleSwitcher");
   const select = document.getElementById("roleSelect");
-  const allowedRoles = getAllowedRoles(userData);
+  const roles = getAllowedRoles(userData);
   const activeRole = getActiveRole(userData);
 
   if (!wrapper || !select) return;
 
-  if (allowedRoles.length <= 1) {
+  if (roles.length <= 1) {
     wrapper.style.display = "none";
     return;
   }
 
-  select.innerHTML = allowedRoles.map((role) => {
+  select.innerHTML = roles.map((role) => {
     return `<option value="${escapeHtml(role)}" ${role === activeRole ? "selected" : ""}>${escapeHtml(getRoleLabel(role))}</option>`;
   }).join("");
 
@@ -964,37 +932,286 @@ async function switchDashboardRole(nextRole) {
   window.location.href = getDashboardForRole(normalizedRole);
 }
 
-function getHomeHref(role = getActiveRole(currentUserData || {})) {
-  return getDashboardForRole(role);
-}
+function formatTime(value) {
+  if (!value) return "New";
 
-function enableAdminPreviewMode() {
-  if (!isAdminPreview()) return;
+  let date = null;
 
-  const bar = document.getElementById("adminPreviewBar");
-  if (bar) bar.style.display = "block";
-
-  const backLink = document.getElementById("backLink");
-  if (backLink) backLink.href = "admin-dashboard.html";
-
-  setText("roleEyebrow", "Admin Inbox");
-  setText("messagesSubtitle", "Preview conversations across the marketplace and return to the admin dashboard anytime.");
-}
-
-async function loadUnreadAppNotifications(user) {
-  try {
-    const notificationsRef = collection(db, "notifications");
-    const notificationsQuery = query(
-      notificationsRef,
-      where("recipientId", "==", user.uid),
-      where("read", "==", false)
-    );
-
-    const snapshot = await getDocs(notificationsQuery);
-    setBadge("topNotificationBadge", snapshot.size);
-  } catch {
-    setBadge("topNotificationBadge", 0);
+  if (value.seconds) {
+    date = new Date(value.seconds * 1000);
+  } else {
+    const parsed = Date.parse(value);
+    if (!Number.isNaN(parsed)) date = new Date(parsed);
   }
+
+  if (!date) return "New";
+
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return "Now";
+  if (diffMinutes < 60) return `${diffMinutes}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays}d`;
+
+  return date.toLocaleDateString();
+}
+
+function getSortTime(conversation) {
+  const value = conversation.updatedAt || conversation.lastMessageAt || conversation.createdAt;
+
+  if (value?.seconds) return value.seconds;
+  return Date.parse(value || "") / 1000 || 0;
+}
+
+function getInitials(name) {
+  const clean = safeText(name, "RE");
+  const parts = clean.split(" ").filter(Boolean);
+
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return clean.slice(0, 2).toUpperCase();
+}
+
+function getCurrentUserName() {
+  return currentUserData?.businessName ||
+    currentUserData?.vendorName ||
+    currentUserData?.plannerName ||
+    currentUserData?.name ||
+    currentUser?.displayName ||
+    currentUser?.email ||
+    "Me";
+}
+
+function getOtherParticipantId(conversation) {
+  const participantIds = Array.isArray(conversation.participantIds) ? conversation.participantIds : [];
+  return participantIds.find((id) => id !== currentUser.uid) || "";
+}
+
+function getOtherParticipantName(conversation) {
+  const participantNames = conversation.participantNames || {};
+  const otherId = getOtherParticipantId(conversation);
+
+  if (otherId && participantNames[otherId]) return participantNames[otherId];
+
+  if (conversation.vendorId === currentUser.uid) {
+    return conversation.requestOwnerName || conversation.customerName || conversation.plannerName || conversation.title || "Customer";
+  }
+
+  return conversation.vendorName || conversation.title || "Vendor";
+}
+
+function getOtherParticipantRole(conversation) {
+  const participantRoles = conversation.participantRoles || {};
+  const otherId = getOtherParticipantId(conversation);
+  const role = normalizeRole(participantRoles[otherId]);
+
+  if (role) return role;
+  if (conversation.vendorId === otherId) return "vendor";
+  if (conversation.plannerId === otherId) return "planner";
+  if (conversation.customerId === otherId) return "customer";
+
+  if (conversation.vendorId === currentUser.uid) {
+    if (conversation.plannerId) return "planner";
+    return "customer";
+  }
+
+  return "vendor";
+}
+
+function getConversationHref(conversation) {
+  const eventId = safeText(conversation.eventId || currentEventId, "");
+  const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
+
+  return `chat-thread.html?id=${encodeURIComponent(conversation.id)}${eventPart}`;
+}
+
+function getConversationTitle(conversation) {
+  return getOtherParticipantName(conversation);
+}
+
+function getConversationPreview(conversation) {
+  return safeText(conversation.lastMessage, "Open this thread to continue the conversation.");
+}
+
+function normalizeConversation(conversation) {
+  const participantIds = Array.isArray(conversation.participantIds) ? conversation.participantIds : [];
+  const participantNames = conversation.participantNames || {};
+
+  if (!participantNames[currentUser.uid]) {
+    participantNames[currentUser.uid] = getCurrentUserName();
+  }
+
+  return {
+    ...conversation,
+    participantIds,
+    participantNames
+  };
+}
+
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
+
+function buildBookingConversationId(requestId, ownerId, vendorId) {
+  return [
+    "booking",
+    makeSafeId(requestId),
+    makeSafeId(ownerId),
+    makeSafeId(vendorId)
+  ].join("__");
+}
+
+function getRequestOwnerId(request) {
+  return safeText(request.requestOwnerId || request.plannerId || request.customerId || request.submittedBy, "");
+}
+
+function getRequestOwnerName(request) {
+  return safeText(request.requestOwnerName || request.plannerName || request.customerName, "Customer");
+}
+
+function getRequestOwnerRole(request) {
+  if (safeText(request.requestOwnerRole, "")) return request.requestOwnerRole;
+  if (request.plannerId && request.plannerId === getRequestOwnerId(request)) return "planner";
+  return "customer";
+}
+
+function canSeeRequest(request) {
+  if (isAdminPreview()) return true;
+
+  const uid = currentUser.uid;
+  const role = getActiveRole(currentUserData || {});
+  const vendorIds = Array.isArray(request.vendorIds) ? request.vendorIds : [];
+
+  if (role === "vendor") return vendorIds.includes(uid);
+  if (role === "planner") return request.plannerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
+
+  return request.customerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
+}
+
+function buildConversationsFromBookingRequest(request) {
+  if (!currentUser || !canSeeRequest(request)) return [];
+
+  const role = getActiveRole(currentUserData || {});
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const requestId = safeText(request.id, "");
+  const ownerId = getRequestOwnerId(request);
+  const ownerName = getRequestOwnerName(request);
+  const ownerRole = getRequestOwnerRole(request);
+  const eventId = safeText(request.eventId, "") || safeText(request.eventDetails?.id, "");
+  const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
+
+  if (!requestId || !vendors.length) return [];
+
+  let visibleVendors = vendors;
+
+  if (role === "vendor" && !isAdminPreview()) {
+    visibleVendors = vendors.filter((vendor) => safeText(vendor.vendorId, "") === currentUser.uid);
+  }
+
+  return visibleVendors.map((vendor) => {
+    const vendorId = safeText(vendor.vendorId, "");
+    if (!vendorId || !ownerId) return null;
+
+    const savedConversationId =
+      safeText(vendor.conversationId, "") ||
+      safeText(request.vendorConversationIds?.[vendorId], "") ||
+      safeText(request.vendorResponses?.[vendorId]?.conversationId, "");
+
+    const conversationId = savedConversationId || buildBookingConversationId(requestId, ownerId, vendorId);
+    const vendorName = safeText(vendor.vendorName, "Vendor");
+    const listingTitle = safeText(vendor.listingTitle || vendor.title, "Requested Listing");
+    const lastMessage = safeText(request.vendorResponses?.[vendorId]?.note, `Booking request for ${eventName}.`);
+
+    return {
+      id: conversationId,
+      conversationKey: conversationId,
+      participantIds: [ownerId, vendorId],
+      participantNames: {
+        [ownerId]: ownerName,
+        [vendorId]: vendorName
+      },
+      participantRoles: {
+        [ownerId]: ownerRole,
+        [vendorId]: "vendor"
+      },
+      customerId: request.customerId || "",
+      plannerId: request.plannerId || "",
+      requestOwnerId: ownerId,
+      requestOwnerName: ownerName,
+      requestOwnerRole: ownerRole,
+      vendorId,
+      vendorName,
+      bookingRequestId: requestId,
+      eventId,
+      eventName,
+      listingId: safeText(vendor.listingId, ""),
+      listingTitle,
+      listingCategory: safeText(vendor.category || vendor.listingCategory || vendor.mainCategory, "Event Service"),
+      title: role === "vendor" ? ownerName : vendorName,
+      contextType: "Booking Request",
+      lastMessage,
+      lastSenderId: request.vendorResponses?.[vendorId] ? vendorId : ownerId,
+      unreadFor: {},
+      createdAt: request.createdAt || null,
+      updatedAt: request.vendorResponses?.[vendorId]?.respondedAt || request.updatedAt || request.createdAt || null,
+      repairedFromBookingRequest: true
+    };
+  }).filter(Boolean);
+}
+
+function applyRoleLayout(role) {
+  const backLink = document.getElementById("backLink");
+  const requestsLink = document.getElementById("requestsLink");
+
+  if (role === "admin") {
+    const bar = document.getElementById("adminPreviewBar");
+    if (bar) bar.style.display = "block";
+
+    backLink.href = "admin-dashboard.html";
+    requestsLink.href = "admin-dashboard.html";
+    requestsLink.textContent = "Admin";
+    setText("pageEyebrow", "Admin Inbox");
+    setText("heroLabel", "Marketplace Inbox");
+    setText("heroTitle", "Review conversations.");
+    setText("heroSubtitle", "Preview customer, planner, and vendor conversations during marketplace testing.");
+    return;
+  }
+
+  if (role === "vendor") {
+    backLink.href = "vendor-dashboard.html";
+    requestsLink.href = "booking-requests.html";
+    requestsLink.textContent = "Requests";
+    setText("pageEyebrow", "Vendor Inbox");
+    setText("heroLabel", "Vendor Messages");
+    setText("heroTitle", "Customer conversations.");
+    setText("heroSubtitle", "Reply to event requests and keep booking details in one place.");
+    return;
+  }
+
+  if (role === "planner") {
+    backLink.href = "planner-dashboard.html";
+    requestsLink.href = currentEventId ? `my-requests.html?eventId=${encodeURIComponent(currentEventId)}` : "my-requests.html";
+    requestsLink.textContent = "Client Requests";
+    setText("pageEyebrow", "Planner Inbox");
+    setText("heroLabel", "Planner Messages");
+    setText("heroTitle", "Vendor conversations.");
+    setText("heroSubtitle", "Keep vendor replies organized by client event and booking request.");
+    return;
+  }
+
+  backLink.href = "dashboard.html";
+  requestsLink.href = currentEventId ? `my-requests.html?eventId=${encodeURIComponent(currentEventId)}` : "my-requests.html";
+  requestsLink.textContent = "Requests";
+  setText("pageEyebrow", "Customer Inbox");
+  setText("heroLabel", "RentEvent Inbox");
+  setText("heroTitle", "Your event conversations.");
+  setText("heroSubtitle", "Message vendors, review replies, and keep event details in one place.");
 }
 
 function renderBottomNav(role) {
@@ -1004,8 +1221,8 @@ function renderBottomNav(role) {
     bottomNav.innerHTML = `
       <a class="nav-item" href="admin-dashboard.html"><span>Admin</span></a>
       <a class="nav-item" href="listings.html"><span>Listings</span></a>
-      <a class="nav-item active" href="messages.html"><span>Inbox</span></a>
-      <a class="nav-item" href="notifications.html"><span>Alerts</span></a>
+      <a class="nav-item active" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
+      <a class="nav-item" href="profile.html"><span>Profile</span></a>
     `;
     return;
   }
@@ -1038,10 +1255,10 @@ function renderBottomNav(role) {
       </a>
 
       <a class="nav-item active" href="messages.html">
+        <span class="nav-badge" id="bottomInboxBadge">0</span>
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
           <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         </svg>
         <span>Inbox</span>
       </a>
@@ -1051,38 +1268,10 @@ function renderBottomNav(role) {
 
   if (role === "planner") {
     bottomNav.innerHTML = `
-      <a class="nav-item" href="planner-dashboard.html">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
-        </svg>
-        <span>Planner</span>
-      </a>
-
-      <a class="nav-item" href="${withEventParam("listings.html")}">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
-          <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-        <span>Listings</span>
-      </a>
-
-      <a class="nav-item active" href="${withEventParam("messages.html")}">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-        <span>Inbox</span>
-      </a>
-
-      <a class="nav-item" href="planner-profile.html">
-        <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-          <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-        <span>Profile</span>
-      </a>
+      <a class="nav-item" href="planner-dashboard.html"><span>Planner</span></a>
+      <a class="nav-item" href="listings.html"><span>Vendors</span></a>
+      <a class="nav-item active" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
+      <a class="nav-item" href="profile.html"><span>Profile</span></a>
     `;
     return;
   }
@@ -1095,638 +1284,117 @@ function renderBottomNav(role) {
       <span>Home</span>
     </a>
 
-    <a class="nav-item" href="${withEventParam("listings.html")}">
+    <a class="nav-item" href="listings.html">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
-        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Listings</span>
+      <span>Explore</span>
     </a>
 
-    <a class="nav-item active" href="${withEventParam("messages.html")}">
+    <a class="nav-item" href="my-requests.html">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M5 5H19V19H5V5Z" stroke="currentColor" stroke-width="2"></path>
+        <path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span>Requests</span>
+    </a>
+
+    <a class="nav-item active" href="messages.html">
+      <span class="nav-badge" id="bottomInboxBadge">0</span>
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
         <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
       <span>Inbox</span>
-    </a>
-
-    <a class="nav-item" href="profile.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Profile</span>
     </a>
   `;
 }
 
-function applyRoleLayout(role) {
-  const backLink = document.getElementById("backLink");
-  const primaryTab = document.getElementById("primaryMessageTab");
+function updateCounts() {
+  const total = allConversations.length;
+  const unread = allConversations.filter((conversation) => {
+    const unreadFor = conversation.unreadFor || {};
+    return !!unreadFor[currentUser.uid];
+  }).length;
 
-  if (primaryTab) {
-    primaryTab.textContent = role === "vendor" ? "Customers" : "Vendors";
-  }
-
-  if (role === "admin") {
-    enableAdminPreviewMode();
-  } else if (role === "vendor") {
-    backLink.href = "vendor-dashboard.html";
-    setText("roleEyebrow", currentEventId ? "Event Inbox" : "Vendor Inbox");
-    setText("messagesSubtitle", "Reply to client questions, confirm details, and keep booking conversations organized.");
-  } else if (role === "planner") {
-    backLink.href = currentEventId ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}` : "planner-dashboard.html";
-    setText("roleEyebrow", currentEventId ? "Planner Event Inbox" : "Planner Inbox");
-    setText("messagesSubtitle", currentEventId
-      ? "Keep every vendor conversation for this client event in one place."
-      : "Manage vendor conversations across client events without losing the thread.");
-  } else {
-    backLink.href = currentEventId ? `event-builder.html?eventId=${encodeURIComponent(currentEventId)}` : "dashboard.html";
-    setText("roleEyebrow", currentEventId ? "Event Inbox" : "Customer Inbox");
-    setText("messagesSubtitle", currentEventId
-      ? "Keep every vendor conversation for this event project in one place."
-      : "Ask questions, confirm details, and keep all your event communication in one place.");
-  }
-
-  renderBottomNav(role);
+  setText("threadCountPill", `${total} Thread${total === 1 ? "" : "s"}`);
+  setText("unreadCountPill", `${unread} Unread`);
+  setBadge("bottomInboxBadge", unread);
 }
 
-function renderEmptyState() {
-  const messageList = document.getElementById("messageList");
+function renderEmptyConversations() {
+  const list = document.getElementById("conversationList");
   const role = getActiveRole(currentUserData || {});
 
-  const primaryHref = role === "admin"
-    ? "admin-dashboard.html"
-    : role === "vendor"
-      ? "booking-requests.html"
-      : withEventParam("listings.html");
+  const href = role === "vendor"
+    ? "booking-requests.html"
+    : role === "planner"
+      ? "planner-dashboard.html"
+      : role === "admin"
+        ? "admin-dashboard.html"
+        : "listings.html";
 
-  const primaryText = role === "admin"
-    ? "Back to Admin"
-    : role === "vendor"
-      ? "View Booking Requests"
-      : "Browse Listings";
+  const label = role === "vendor"
+    ? "View Requests"
+    : role === "planner"
+      ? "Planner Dashboard"
+      : role === "admin"
+        ? "Back to Admin"
+        : "Browse Vendors";
 
-  const homeHref = getHomeHref(role);
-
-  const copy = role === "admin"
-    ? "Conversations across the marketplace will appear here once customers, planners, and vendors begin messaging."
-    : role === "vendor"
-      ? "When customers or planners message you about a listing or event request, those conversations will appear here."
-      : currentEventId
-        ? "When you message vendors for this event, those conversations will appear here."
-        : "When you message vendors about listings, those conversations will appear here.";
-
-  messageList.innerHTML = `
+  list.innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">
-        <svg width="42" height="42" viewBox="0 0 24 24" fill="none">
-          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-      </div>
-      <h3>You don’t have any messages</h3>
-      <p>${escapeHtml(copy)}</p>
+      <div class="empty-icon">MSG</div>
+      <h3>No messages yet</h3>
+      <p>Once a customer, planner, or vendor conversation is created, it will show here automatically.</p>
       <div class="empty-actions">
-        <a class="btn" href="${escapeHtml(primaryHref)}">${escapeHtml(primaryText)}</a>
-        <a class="btn-secondary" href="${escapeHtml(homeHref)}">Back Home</a>
+        <a class="btn" href="${escapeHtml(href)}">${escapeHtml(label)}</a>
       </div>
     </div>
   `;
 }
 
-function getConversationTitle(conversation) {
-  const participantNames = conversation.participantNames || {};
-  const otherIds = Array.isArray(conversation.participantIds)
-    ? conversation.participantIds.filter((id) => currentUser && id !== currentUser.uid)
-    : [];
-
-  const otherId = otherIds[0];
-
-  if (otherId && participantNames[otherId]) {
-    return participantNames[otherId];
-  }
-
-  return safeText(conversation.title, "Conversation");
-}
-
-function getConversationEventName(conversation) {
-  return safeText(
-    conversation.eventName ||
-    conversation.sourceLabel ||
-    conversation.eventDetails?.eventName ||
-    "",
-    ""
-  );
-}
-
-function makeSafeId(value) {
-  return safeText(value, "item")
-    .replace(/[^a-zA-Z0-9_-]/g, "_")
-    .slice(0, 180);
-}
-
-function buildBookingConversationId(requestId, customerId, vendorId) {
-  return [
-    "booking",
-    makeSafeId(requestId),
-    makeSafeId(customerId),
-    makeSafeId(vendorId)
-  ].join("__");
-}
-
-function normalizeProfessionalLabel(value) {
-  const clean = safeText(value, "");
-
-  const labelMap = {
-    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
-    "Drivers / Chauffeurs": "Professional Transportation Companies",
-    "Private Drivers": "Shuttle Companies",
-    "Chauffeur Service": "Limo / Chauffeur Companies",
-    "Party Bus Driver": "Party Bus Companies",
-    "Party Bus": "Party Bus Companies",
-    "Shuttle Service": "Shuttle Companies",
-    "Guest Transportation": "Wedding Guest Transportation Companies",
-    "Airport Transportation": "Airport Transportation Companies",
-    "Wedding Transportation": "Wedding Guest Transportation Companies",
-    "Corporate Transportation": "Corporate Transportation Companies",
-    "Transportation": "Transportation Companies",
-    "Luxury Car Rental": "Luxury Car Service",
-    "Vintage Car Rental": "Vintage Car Rentals",
-    "Getaway Car": "Getaway Car Rentals",
-    "Golf Cart Rentals": "Golf Cart Shuttle Services",
-    "Security": "Security Companies",
-    "Private Event Security": "Private Event Security Companies",
-    "Off-Duty Police Officers": "Off-Duty Officer Services",
-    "Crowd Control": "Crowd Control Services",
-    "Gate / Entry Security": "Gate / Entry Security Teams",
-    "Lifeguards": "Certified Lifeguard Providers",
-    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
-    "Water Safety Attendants": "Water Safety Providers",
-    "Parking Attendants": "Parking Attendant Companies",
-    "Valet / Parking": "Valet / Parking Companies",
-    "Traffic Control": "Traffic Control Providers",
-    "Bathroom Attendants": "Restroom Attendant Staffing",
-    "Setup Crew": "Setup Crew Companies",
-    "Breakdown Crew": "Breakdown Crew Companies",
-    "Cleanup Crew": "Cleanup Crew Companies"
-  };
-
-  return labelMap[clean] || clean;
-}
-
-function getVendorConversationId(request, vendorId) {
-  const responses = request.vendorResponses || {};
-  const response = responses[vendorId] || {};
-  const conversationIds = request.vendorConversationIds || {};
-
-  return safeText(response.conversationId, "") ||
-    safeText(conversationIds[vendorId], "") ||
-    buildBookingConversationId(request.id, request.requestOwnerId || request.customerId || request.plannerId, vendorId);
-}
-
-function canSeeRequest(request) {
-  if (isAdminPreview()) return true;
-
-  const uid = currentUser.uid;
-  const role = getActiveRole(currentUserData || {});
-  const vendorIds = Array.isArray(request.vendorIds) ? request.vendorIds : [];
-
-  if (role === "vendor") {
-    return vendorIds.includes(uid);
-  }
-
-  if (role === "planner") {
-    return request.plannerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
-  }
-
-  return request.customerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
-}
-
-function buildConversationsFromBookingRequest(request) {
-  if (!currentUser || !canSeeRequest(request)) return [];
-
-  const role = getActiveRole(currentUserData || {});
-  const requestId = safeText(request.id, "");
-  const customerId = safeText(request.customerId, "");
-  const plannerId = safeText(request.plannerId, "");
-  const requestOwnerId = safeText(request.requestOwnerId || plannerId || customerId, "");
-  const eventId = safeText(request.eventId, "") || safeText(request.eventDetails?.id, "");
-  const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
-  const customerName = safeText(request.customerName, "Customer");
-  const plannerName = safeText(request.plannerName, "Planner");
-  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
-
-  if (!requestId || !vendors.length) return [];
-
-  let visibleVendors = vendors;
-
-  if (role === "vendor" && !isAdminPreview()) {
-    visibleVendors = vendors.filter((vendor) => safeText(vendor.vendorId, "") === currentUser.uid);
-  }
-
-  return visibleVendors.map((vendor) => {
-    const vendorId = safeText(vendor.vendorId, "");
-    if (!vendorId) return null;
-
-    const vendorName = safeText(vendor.vendorName, "Vendor");
-    const ownerIdForConversation = requestOwnerId || customerId || plannerId || currentUser.uid;
-    const conversationId = getVendorConversationId(request, vendorId);
-    const listingTitle = safeText(vendor.listingTitle || vendor.title, "Event Request");
-    const listingCategory = normalizeProfessionalLabel(safeText(vendor.category || vendor.listingCategory || vendor.mainCategory, "Event Service"));
-    const vendorResponses = request.vendorResponses || {};
-    const vendorResponse = vendorResponses[vendorId] || null;
-
-    const responseStatus = safeText(vendorResponse?.status, "");
-    const responseLabel = responseStatus === "needs_info"
-      ? "Needs More Info"
-      : responseStatus === "available"
-        ? "Available"
-        : responseStatus === "declined"
-          ? "Declined"
-          : "Booking Request";
-
-    const lastMessage = vendorResponse?.note
-      ? `${responseLabel}: ${vendorResponse.note}`
-      : `Booking request for ${eventName}.`;
-
-    const ownerName = plannerId ? plannerName : customerName;
-    const ownerRole = plannerId ? "planner" : "customer";
-
-    return {
-      id: conversationId,
-      conversationKey: conversationId,
-      participantIds: [ownerIdForConversation, vendorId].filter(Boolean),
-      participantNames: {
-        [ownerIdForConversation]: ownerName,
-        [vendorId]: vendorName
-      },
-      participantRoles: {
-        [ownerIdForConversation]: ownerRole,
-        [vendorId]: "vendor"
-      },
-      customerId,
-      plannerId,
-      vendorId,
-      bookingRequestId: requestId,
-      eventId,
-      eventName,
-      listingId: safeText(vendor.listingId, ""),
-      listingTitle,
-      listingCategory,
-      listingLocation: safeText(vendor.location || request.eventDetails?.eventCity || "", ""),
-      title: role === "vendor" ? ownerName : vendorName,
-      contextType: "Booking Request",
-      lastMessage,
-      lastSenderId: vendorResponse ? vendorId : ownerIdForConversation,
-      unreadFor: {},
-      createdAt: request.createdAt || null,
-      updatedAt: vendorResponse?.respondedAt || request.updatedAt || request.createdAt || null,
-      _needsRepair: true
-    };
-  }).filter(Boolean);
-}
-
-async function loadConversationIdsFromNotifications(user) {
-  const ids = [];
-
-  try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid)
-    );
-
-    const snapshot = await getDocs(notificationsQuery);
-
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const sourceCollection = safeText(data.sourceCollection, "");
-      const sourceId = safeText(data.sourceId, "");
-      const conversationId = safeText(data.conversationId, "");
-      const bookingRequestId = safeText(data.bookingRequestId, "");
-      const customerId = safeText(data.customerId || data.plannerId || data.requestOwnerId, "");
-      const vendorId = safeText(data.vendorId, "");
-
-      if (conversationId) ids.push(conversationId);
-      if (sourceCollection === "conversations" && sourceId) ids.push(sourceId);
-
-      if (bookingRequestId && customerId && vendorId) {
-        ids.push(buildBookingConversationId(bookingRequestId, customerId, vendorId));
-      }
-    });
-  } catch (error) {
-    console.warn("Conversation notification fallback skipped:", error.message);
-  }
-
-  return Array.from(new Set(ids));
-}
-
-async function loadConversationFallbacksFromNotifications(user, existingIds = []) {
-  const conversations = [];
-  const ids = await loadConversationIdsFromNotifications(user);
-  const uniqueIds = ids.filter((id) => !existingIds.includes(id));
-
-  for (const conversationId of uniqueIds) {
-    try {
-      const conversationSnap = await getDoc(doc(db, "conversations", conversationId));
-      if (!conversationSnap.exists()) continue;
-
-      const data = conversationSnap.data();
-      const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
-
-      if (isAdminPreview() || participantIds.includes(user.uid)) {
-        conversations.push({
-          id: conversationSnap.id,
-          ...data
-        });
-      }
-    } catch (error) {
-      console.warn("Could not load conversation notification fallback:", conversationId, error.message);
-    }
-  }
-
-  return conversations;
-}
-
-function buildConversationFromNotification(notification) {
-  if (!notification || !currentUser) return null;
-
-  const sourceCollection = safeText(notification.sourceCollection, "");
-  const sourceId = safeText(notification.sourceId, "");
-  const conversationId = safeText(notification.conversationId, "") ||
-    (sourceCollection === "conversations" ? sourceId : "");
-
-  if (!conversationId) return null;
-
-  const senderId = safeText(notification.senderId, "");
-  const senderName = safeText(notification.senderName || notification.fromName || notification.title, "RentEvent User");
-  const eventId = safeText(notification.eventId, currentEventId);
-  const eventName = safeText(notification.eventName || notification.sourceLabel, "");
-  const listingTitle = safeText(notification.listingTitle || notification.sourceLabel, "");
-  const bookingRequestId = safeText(notification.bookingRequestId, "");
-  const body = safeText(notification.body || notification.text || notification.lastMessage, "New message.");
-  const myRole = getActiveRole(currentUserData || {});
-
-  const participantNames = {
-    [currentUser.uid]: safeText(currentUserData?.name || currentUser.displayName || currentUser.email, "Me")
-  };
-
-  if (senderId && senderId !== currentUser.uid) {
-    participantNames[senderId] = senderName;
-  }
-
-  const participantIds = senderId && senderId !== currentUser.uid
-    ? [currentUser.uid, senderId]
-    : [currentUser.uid];
-
-  return {
-    id: conversationId,
-    conversationKey: conversationId,
-    participantIds,
-    participantNames,
-    participantRoles: {
-      [currentUser.uid]: myRole,
-      ...(senderId ? { [senderId]: "user" } : {})
-    },
-    customerId: safeText(notification.customerId, myRole === "vendor" ? "" : currentUser.uid),
-    plannerId: safeText(notification.plannerId, myRole === "planner" ? currentUser.uid : ""),
-    vendorId: safeText(notification.vendorId, myRole === "vendor" ? currentUser.uid : ""),
-    bookingRequestId,
-    eventId,
-    eventName,
-    listingId: safeText(notification.listingId, ""),
-    listingTitle,
-    listingCategory: normalizeProfessionalLabel(safeText(notification.listingCategory || notification.category, "Message")),
-    title: senderName,
-    contextType: "Message",
-    lastMessage: body,
-    lastSenderId: senderId,
-    unreadFor: notification.read === false ? { [currentUser.uid]: true } : {},
-    createdAt: notification.createdAt || null,
-    updatedAt: notification.updatedAt || notification.createdAt || null,
-    _fromNotificationOnly: true
-  };
-}
-
-async function loadDirectConversationCardsFromNotifications(user, existingIds = []) {
-  const conversations = [];
-
-  try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid)
-    );
-
-    const snapshot = await getDocs(notificationsQuery);
-
-    snapshot.forEach((docSnap) => {
-      const notification = {
-        id: docSnap.id,
-        ...docSnap.data()
-      };
-
-      const type = safeText(notification.type, "");
-      const sourceCollection = safeText(notification.sourceCollection, "");
-
-      if (type !== "message" && sourceCollection !== "conversations") return;
-
-      const fallbackConversation = buildConversationFromNotification(notification);
-
-      if (!fallbackConversation || existingIds.includes(fallbackConversation.id)) return;
-
-      conversations.push(fallbackConversation);
-      existingIds.push(fallbackConversation.id);
-    });
-  } catch (error) {
-    console.warn("Direct notification inbox fallback skipped:", error.message);
-  }
-
-  return conversations;
-}
-
-async function loadBookingRequestConversationFallbacks(user, existingIds = []) {
-  const conversations = [];
-
-  try {
-    let requestQuery;
-    const role = getActiveRole(currentUserData || {});
-
-    if (isAdminPreview()) {
-      requestQuery = query(collection(db, "bookingRequests"));
-    } else if (role === "vendor") {
-      requestQuery = query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", user.uid));
-    } else if (role === "planner") {
-      requestQuery = query(collection(db, "bookingRequests"), where("plannerId", "==", user.uid));
-    } else {
-      requestQuery = query(collection(db, "bookingRequests"), where("customerId", "==", user.uid));
-    }
-
-    const snapshot = await getDocs(requestQuery);
-
-    for (const requestSnap of snapshot.docs) {
-      const request = {
-        id: requestSnap.id,
-        ...requestSnap.data()
-      };
-
-      const fallbackConversations = buildConversationsFromBookingRequest(request);
-
-      for (const fallbackConversation of fallbackConversations) {
-        if (!fallbackConversation || existingIds.includes(fallbackConversation.id)) continue;
-
-        if (currentEventId) {
-          const requestEventId = safeText(fallbackConversation.eventId, "");
-          if (requestEventId !== currentEventId) continue;
-        }
-
-        conversations.push(fallbackConversation);
-        existingIds.push(fallbackConversation.id);
-
-        try {
-          await setDoc(doc(db, "conversations", fallbackConversation.id), {
-            ...fallbackConversation,
-            _needsRepair: false,
-            repairedFromBookingRequest: true,
-            updatedAt: fallbackConversation.updatedAt || serverTimestamp(),
-            createdAt: fallbackConversation.createdAt || serverTimestamp()
-          }, { merge: true });
-        } catch (error) {
-          console.warn("Could not repair missing conversation:", fallbackConversation.id, error.message);
-        }
-      }
-    }
-
-    if (role === "planner" && !isAdminPreview()) {
-      const ownerQuery = query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid));
-      const ownerSnapshot = await getDocs(ownerQuery);
-
-      for (const requestSnap of ownerSnapshot.docs) {
-        const request = {
-          id: requestSnap.id,
-          ...requestSnap.data()
-        };
-
-        const fallbackConversations = buildConversationsFromBookingRequest(request);
-
-        for (const fallbackConversation of fallbackConversations) {
-          if (!fallbackConversation || existingIds.includes(fallbackConversation.id)) continue;
-          conversations.push(fallbackConversation);
-          existingIds.push(fallbackConversation.id);
-        }
-      }
-    }
-  } catch (error) {
-    console.warn("Booking request conversation fallback skipped:", error.message);
-  }
-
-  return conversations;
-}
-
-async function syncConversationWithLatestMessage(conversation) {
-  if (!conversation?.id) return conversation;
-
-  try {
-    const messagesQuery = query(
-      collection(db, "conversations", conversation.id, "messages"),
-      orderBy("createdAt", "desc"),
-      limit(1)
-    );
-
-    const snapshot = await getDocs(messagesQuery);
-    if (snapshot.empty) return conversation;
-
-    const latestDoc = snapshot.docs[0];
-    const latest = {
-      id: latestDoc.id,
-      ...latestDoc.data()
-    };
-
-    const latestText = safeText(latest.text, "");
-    const latestTime = latest.createdAt || conversation.updatedAt || conversation.createdAt;
-
-    if (!latestText) return conversation;
-
-    return {
-      ...conversation,
-      lastMessage: latestText,
-      lastSenderId: safeText(latest.senderId, conversation.lastSenderId),
-      updatedAt: latestTime,
-      _syncedFromMessages: true
-    };
-  } catch (error) {
-    console.warn("Latest message sync skipped:", conversation.id, error.message);
-    return conversation;
-  }
-}
-
-async function syncConversationsWithLatestMessages(conversations) {
-  const synced = [];
-
-  for (const conversation of conversations) {
-    synced.push(await syncConversationWithLatestMessage(conversation));
-  }
-
-  return synced;
-}
-
 function renderConversations(conversations) {
-  const messageList = document.getElementById("messageList");
-  const sectionTitle = document.getElementById("sectionTitle");
+  const list = document.getElementById("conversationList");
+
+  updateCounts();
 
   if (!conversations.length) {
-    sectionTitle.textContent = currentEventId ? "Event Conversations" : "Recent Conversations";
-    renderEmptyState();
+    renderEmptyConversations();
     return;
   }
 
-  const unreadCount = conversations.filter((conversation) => {
+  list.innerHTML = conversations.map((conversation) => {
+    const otherName = getConversationTitle(conversation);
+    const otherRole = getOtherParticipantRole(conversation);
+    const preview = getConversationPreview(conversation);
+    const time = formatTime(conversation.updatedAt || conversation.lastMessageAt || conversation.createdAt);
     const unreadFor = conversation.unreadFor || {};
-    return currentUser && unreadFor[currentUser.uid];
-  }).length;
-
-  sectionTitle.textContent = currentEventId
-    ? `${conversations.length} Event Conversation${conversations.length === 1 ? "" : "s"}`
-    : unreadCount
-      ? `${unreadCount} Unread Conversation${unreadCount === 1 ? "" : "s"}`
-      : "Recent Conversations";
-
-  messageList.innerHTML = conversations.map((conversation) => {
-    const title = getConversationTitle(conversation);
-    const lastMessage = safeText(conversation.lastMessage, "No messages yet.");
-    const time = formatTime(conversation.updatedAt || conversation.createdAt);
-    const roleLabel = safeText(conversation.contextType, isVendorView() ? "Customer" : "Vendor");
+    const isUnread = !!unreadFor[currentUser.uid];
+    const eventName = safeText(conversation.eventName, "");
     const listingTitle = safeText(conversation.listingTitle, "");
-    const eventName = getConversationEventName(conversation);
+    const contextType = safeText(conversation.contextType, "");
     const bookingRequestId = safeText(conversation.bookingRequestId, "");
-    const eventId = safeText(conversation.eventId, currentEventId);
-    const initials = initialsFromName(title);
-    const unreadFor = conversation.unreadFor || {};
-    const isUnread = currentUser && unreadFor[currentUser.uid];
-    const hrefEventId = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
-    const chatId = safeText(conversation.id || conversation.conversationKey, "");
 
     return `
-      <a class="message-card thread-ready ${isUnread ? "unread" : ""}" href="chat-thread.html?id=${encodeURIComponent(chatId)}${hrefEventId}">
-        <div class="avatar"><span>${escapeHtml(initials)}</span></div>
+      <a class="conversation-card ${isUnread ? "unread" : ""}" href="${escapeHtml(getConversationHref(conversation))}">
+        <div class="avatar">${escapeHtml(getInitials(otherName))}</div>
 
-        <div class="message-content">
-          <div class="message-top">
-            <h3 class="message-name">${escapeHtml(title)}</h3>
-            <span class="message-time">${escapeHtml(time)}</span>
+        <div class="conversation-body">
+          <div class="conversation-top">
+            <h3 class="conversation-title">${escapeHtml(otherName)}</h3>
+            <span class="conversation-time">${escapeHtml(time)}</span>
           </div>
 
-          <p class="message-preview">${escapeHtml(lastMessage)}</p>
-          <p class="message-detail-line">${escapeHtml([eventName, listingTitle].filter(Boolean).join(" · ") || roleLabel)}</p>
+          <p class="conversation-preview">${escapeHtml(preview)}</p>
 
-          <div class="message-meta">
+          <div class="pill-row">
             ${isUnread ? `<span class="pill new">New</span>` : ""}
-            <span class="pill ${roleLabel.toLowerCase().includes("customer") ? "customer" : "vendor"}">${escapeHtml(roleLabel)}</span>
+            <span class="pill ${escapeHtml(otherRole)}">${escapeHtml(getRoleLabel(otherRole))}</span>
             ${eventName ? `<span class="pill event">${escapeHtml(eventName)}</span>` : ""}
             ${listingTitle ? `<span class="pill system">${escapeHtml(listingTitle)}</span>` : ""}
+            ${contextType ? `<span class="pill system">${escapeHtml(contextType)}</span>` : ""}
             ${bookingRequestId ? `<span class="pill system">Request</span>` : ""}
           </div>
         </div>
@@ -1740,18 +1408,23 @@ function getFilteredConversations() {
   const queryText = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
   return allConversations.filter((conversation) => {
-    const context = safeText(conversation.contextType, "").toLowerCase();
-    const category = safeText(conversation.listingCategory || conversation.category, "").toLowerCase();
-    const title = safeText(conversation.title, "").toLowerCase();
+    const unreadFor = conversation.unreadFor || {};
+    const isUnread = !!unreadFor[currentUser.uid];
 
-    if (activeMessageFilter === "support") {
-      const isSupport = context.includes("support") || category.includes("support") || title.includes("support");
-      if (!isSupport) return false;
+    if (activeMessageFilter === "unread" && !isUnread) return false;
+
+    if (activeMessageFilter === "requests") {
+      const hasRequest = !!safeText(conversation.bookingRequestId, "") ||
+        safeText(conversation.contextType, "").toLowerCase().includes("request");
+      if (!hasRequest) return false;
     }
 
-    if (activeMessageFilter === "primary") {
-      const isSupport = context.includes("support") || category.includes("support") || title.includes("support");
-      if (isSupport) return false;
+    if (activeMessageFilter === "support") {
+      const context = safeText(conversation.contextType, "").toLowerCase();
+      const title = safeText(conversation.title, "").toLowerCase();
+      const category = safeText(conversation.listingCategory, "").toLowerCase();
+      const isSupport = context.includes("support") || title.includes("support") || category.includes("support");
+      if (!isSupport) return false;
     }
 
     if (!queryText) return true;
@@ -1765,8 +1438,10 @@ function getFilteredConversations() {
       conversation.listingTitle,
       conversation.listingCategory,
       conversation.eventName,
-      conversation.sourceLabel,
-      conversation.bookingRequestId
+      conversation.bookingRequestId,
+      conversation.vendorName,
+      conversation.customerName,
+      conversation.plannerName
     ].join(" ").toLowerCase();
 
     return searchable.includes(queryText);
@@ -1787,86 +1462,197 @@ function setMessageFilter(filter) {
   renderConversations(getFilteredConversations());
 }
 
-async function loadConversations(user) {
+async function loadUnreadAppNotifications(user) {
+  let unreadNotifications = 0;
+
   try {
-    const conversationsRef = collection(db, "conversations");
-    const conversationsQuery = isAdminPreview()
-      ? query(conversationsRef)
-      : query(conversationsRef, where("participantIds", "array-contains", user.uid));
+    const notificationsQuery = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", user.uid),
+      where("read", "==", false)
+    );
 
-    const snapshot = await getDocs(conversationsQuery);
-    let conversations = [];
+    const snapshot = await getDocs(notificationsQuery);
+    unreadNotifications = snapshot.size;
+  } catch {
+    unreadNotifications = 0;
+  }
 
-    snapshot.forEach((docSnap) => {
-      conversations.push({
+  const unreadMessages = allConversations.filter((conversation) => {
+    const unreadFor = conversation.unreadFor || {};
+    return !!unreadFor[user.uid];
+  }).length;
+
+  setBadge("topNotificationBadge", unreadNotifications + unreadMessages);
+}
+
+function eventMatches(conversation) {
+  if (!currentEventId) return true;
+
+  const conversationEventId = safeText(conversation.eventId, "");
+  const requestEventId = safeText(conversation.requestEventId, "");
+
+  return conversationEventId === currentEventId || requestEventId === currentEventId;
+}
+
+function userCanSeeConversation(data, userId) {
+  if (isAdminPreview()) return true;
+
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
+async function loadDirectConversationQueries(user) {
+  const conversationsRef = collection(db, "conversations");
+  const snaps = [];
+
+  const queries = [
+    query(conversationsRef, where("participantIds", "array-contains", user.uid)),
+    query(conversationsRef, where("customerId", "==", user.uid)),
+    query(conversationsRef, where("vendorId", "==", user.uid)),
+    query(conversationsRef, where("plannerId", "==", user.uid)),
+    query(conversationsRef, where("requestOwnerId", "==", user.uid))
+  ];
+
+  if (isAdminPreview()) {
+    queries.splice(0, queries.length, query(conversationsRef));
+  }
+
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Conversation query skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (!userCanSeeConversation(data, user.uid)) return;
+
+      map.set(docSnap.id, normalizeConversation({
+        id: docSnap.id,
+        ...data
+      }));
+    });
+  });
+
+  return Array.from(map.values());
+}
+
+async function loadBookingRequestFallbacks(user, existingIds) {
+  const role = getActiveRole(currentUserData || {});
+  const requestsRef = collection(db, "bookingRequests");
+  const snaps = [];
+
+  const queries = [];
+
+  if (isAdminPreview()) {
+    queries.push(query(requestsRef));
+  } else if (role === "vendor") {
+    queries.push(query(requestsRef, where("vendorIds", "array-contains", user.uid)));
+  } else if (role === "planner") {
+    queries.push(query(requestsRef, where("plannerId", "==", user.uid)));
+    queries.push(query(requestsRef, where("requestOwnerId", "==", user.uid)));
+    queries.push(query(requestsRef, where("submittedBy", "==", user.uid)));
+  } else {
+    queries.push(query(requestsRef, where("customerId", "==", user.uid)));
+    queries.push(query(requestsRef, where("requestOwnerId", "==", user.uid)));
+    queries.push(query(requestsRef, where("submittedBy", "==", user.uid)));
+  }
+
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Booking request fallback query skipped:", error.message);
+    }
+  }
+
+  const fallbacks = [];
+  const seenRequests = new Set();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      if (seenRequests.has(docSnap.id)) return;
+
+      seenRequests.add(docSnap.id);
+
+      const request = {
         id: docSnap.id,
         ...docSnap.data()
+      };
+
+      const built = buildConversationsFromBookingRequest(request);
+
+      built.forEach((conversation) => {
+        if (!conversation?.id || existingIds.has(conversation.id)) return;
+        if (!eventMatches(conversation)) return;
+
+        existingIds.add(conversation.id);
+        fallbacks.push(conversation);
       });
     });
+  });
 
-    let existingIds = conversations.map((conversation) => conversation.id);
-
-    const notificationFallbacks = await loadConversationFallbacksFromNotifications(user, existingIds);
-    conversations = [...conversations, ...notificationFallbacks];
-    existingIds = conversations.map((conversation) => conversation.id);
-
-    const directNotificationFallbacks = await loadDirectConversationCardsFromNotifications(user, existingIds);
-    conversations = [...conversations, ...directNotificationFallbacks];
-    existingIds = conversations.map((conversation) => conversation.id);
-
-    const bookingRequestFallbacks = await loadBookingRequestConversationFallbacks(user, existingIds);
-    conversations = [...conversations, ...bookingRequestFallbacks];
-
-    const deduped = new Map();
-    conversations.forEach((conversation) => {
-      if (conversation.id) deduped.set(conversation.id, conversation);
-    });
-
-    conversations = Array.from(deduped.values());
-    conversations = await syncConversationsWithLatestMessages(conversations);
-
-    if (currentEventId) {
-      conversations = conversations.filter((conversation) => {
-        const conversationEventId = safeText(conversation.eventId, "");
-        const requestEventId = safeText(conversation.requestEventId, "");
-        return conversationEventId === currentEventId || requestEventId === currentEventId;
-      });
+  for (const fallback of fallbacks) {
+    try {
+      await setDoc(doc(db, "conversations", fallback.id), {
+        ...fallback,
+        repairedFromBookingRequest: true,
+        updatedAt: fallback.updatedAt || serverTimestamp(),
+        createdAt: fallback.createdAt || serverTimestamp()
+      }, { merge: true });
+    } catch (error) {
+      console.warn("Could not repair conversation:", fallback.id, error.message);
     }
+  }
+
+  return fallbacks;
+}
+
+async function loadConversations(user) {
+  try {
+    let conversations = await loadDirectConversationQueries(user);
+    conversations = conversations.filter(eventMatches);
+
+    const existingIds = new Set(conversations.map((conversation) => conversation.id));
+    const fallbacks = await loadBookingRequestFallbacks(user, existingIds);
+
+    conversations = [...conversations, ...fallbacks];
 
     conversations.sort((a, b) => {
       const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
       const bUnread = b.unreadFor && b.unreadFor[user.uid] ? 1 : 0;
 
-      if (aUnread !== bUnread) {
-        return bUnread - aUnread;
-      }
+      if (aUnread !== bUnread) return bUnread - aUnread;
 
-      const aTime = a.updatedAt && a.updatedAt.seconds ? a.updatedAt.seconds : Date.parse(a.updatedAt || "") / 1000 || 0;
-      const bTime = b.updatedAt && b.updatedAt.seconds ? b.updatedAt.seconds : Date.parse(b.updatedAt || "") / 1000 || 0;
-
-      return bTime - aTime;
+      return getSortTime(b) - getSortTime(a);
     });
 
     allConversations = conversations;
     renderConversations(getFilteredConversations());
+    await loadUnreadAppNotifications(user);
 
   } catch (error) {
-    console.warn("Conversations skipped:", error.message);
+    console.warn("Could not load conversations:", error.message);
     allConversations = [];
     renderConversations(allConversations);
   }
 }
 
 document.getElementById("searchInput").addEventListener("input", applySearch);
-
-document.getElementById("searchToggleBtn").addEventListener("click", () => {
-  const bar = document.getElementById("mobileSearchBar");
-  bar.classList.toggle("show");
-
-  if (bar.classList.contains("show")) {
-    document.getElementById("searchInput").focus();
-  }
-});
 
 document.querySelectorAll("[data-message-filter]").forEach((button) => {
   button.addEventListener("click", () => {
@@ -1884,6 +1670,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  currentUser = user;
+
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
 
@@ -1892,18 +1680,21 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  currentUser = user;
   currentUserData = userSnap.data();
 
   const activeRole = getActiveRole(currentUserData);
 
   renderRoleSwitcher(currentUserData);
   applyRoleLayout(activeRole);
+  renderBottomNav(activeRole);
 
-  await Promise.all([
-    loadUnreadAppNotifications(user),
-    loadConversations(user)
-  ]);
+  if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
+    allConversations = [];
+    renderConversations([]);
+    return;
+  }
+
+  await loadConversations(user);
 });
 </script>
 
