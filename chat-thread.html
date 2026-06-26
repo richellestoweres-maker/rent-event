@@ -14,9 +14,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -24,12 +22,10 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f4ede2;
       --soft-2: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
       --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
@@ -52,9 +48,7 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .admin-preview-bar {
       display: none;
@@ -111,7 +105,7 @@
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 128px;
+      padding: 20px 18px 142px;
     }
 
     .topbar {
@@ -156,32 +150,16 @@
       height: 52px;
       border-radius: 18px;
       background: linear-gradient(135deg, #ffe7c2, #f4a43a);
-      position: relative;
-      overflow: hidden;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-weight: 800;
+      text-transform: uppercase;
     }
 
-    .avatar::before {
-      content: "";
-      position: absolute;
-      inset: 12px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.22);
-    }
-
-    .avatar span {
-      position: relative;
-      z-index: 1;
-    }
-
-    .chat-meta {
-      min-width: 0;
-    }
+    .chat-meta { min-width: 0; }
 
     .chat-name {
       margin: 0 0 4px;
@@ -357,13 +335,8 @@
       display: flex;
     }
 
-    .message-row.other {
-      justify-content: flex-start;
-    }
-
-    .message-row.me {
-      justify-content: flex-end;
-    }
+    .message-row.other { justify-content: flex-start; }
+    .message-row.me { justify-content: flex-end; }
 
     .bubble {
       max-width: 82%;
@@ -417,6 +390,45 @@
       color: #aa6f12;
     }
 
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin: 2px 0 4px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding-left: 4px;
+    }
+
+    .typing-indicator.show {
+      display: flex;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      height: 12px;
+    }
+
+    .typing-dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: #9b9084;
+      display: block;
+      animation: typingBounce 1.1s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes typingBounce {
+      0%, 70%, 100% { transform: translateY(0); opacity: .45; }
+      35% { transform: translateY(-4px); opacity: 1; }
+    }
+
     .empty-card {
       background: var(--card);
       border-radius: 28px;
@@ -435,13 +447,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.2rem;
       font-weight: 800;
-    }
-
-    .empty-icon svg {
-      width: 34px;
-      height: 34px;
     }
 
     .empty-card h3 {
@@ -524,36 +531,24 @@
     }
 
     @media (max-width: 390px) {
-      .composer {
-        border-radius: 24px;
-      }
+      .composer { border-radius: 24px; }
 
       .send-btn {
         min-width: 78px;
         padding: 0 14px;
       }
 
-      .role-switcher {
-        max-width: 190px;
-      }
+      .role-switcher { max-width: 190px; }
 
-      .role-switcher-label {
-        display: none;
-      }
+      .role-switcher-label { display: none; }
     }
 
     @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
-      }
+      body { padding: 24px 0; }
 
-      .page {
-        max-width: 430px;
-      }
+      .page { max-width: 430px; }
 
-      .composer {
-        max-width: 406px;
-      }
+      .composer { max-width: 406px; }
     }
   </style>
 </head>
@@ -598,9 +593,7 @@
 
     <section class="banner">
       <h2 id="bannerTitle">Event Conversation</h2>
-      <p id="bannerText">
-        Keep pricing, setup times, and booking details organized in one place.
-      </p>
+      <p id="bannerText">Keep pricing, setup times, and booking details organized in one place.</p>
     </section>
 
     <section class="context-card" id="contextCard" style="display: none;">
@@ -627,11 +620,18 @@
 
     <section class="thread" id="thread">
       <div class="empty-card">
-        <div class="empty-icon">…</div>
+        <div class="empty-icon">...</div>
         <h3>Loading messages</h3>
         <p>We’re opening this conversation now.</p>
       </div>
     </section>
+
+    <div class="typing-indicator" id="typingIndicator">
+      <span id="typingText">Someone is typing</span>
+      <span class="typing-dots" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </div>
   </main>
 
   <form class="composer" id="composer">
@@ -680,9 +680,11 @@ let bookingRequestData = null;
 let unsubscribeMessages = null;
 let unsubscribeConversation = null;
 let latestMessages = [];
+let typingTimer = null;
+let lastTypingState = false;
 
 const params = new URLSearchParams(window.location.search);
-conversationId = params.get("id");
+conversationId = params.get("id") || params.get("threadId");
 const urlEventId = params.get("eventId");
 
 function safeText(value, fallback = "") {
@@ -702,9 +704,7 @@ function initialsFromName(name) {
   const cleanName = safeText(name, "RE");
   const parts = cleanName.split(" ").filter(Boolean);
 
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
 
   return cleanName.slice(0, 2).toUpperCase();
 }
@@ -881,9 +881,7 @@ async function switchDashboardRole(nextRole) {
     console.warn("Could not save active role:", error.message);
   }
 
-  const eventId = getEventId();
-  const suffix = eventId ? `?eventId=${encodeURIComponent(eventId)}` : "";
-  window.location.href = `${getDashboardForRole(normalizedRole)}`;
+  window.location.href = getDashboardForRole(normalizedRole);
 }
 
 function enableAdminPreviewMode() {
@@ -983,20 +981,9 @@ function parseBookingConversationId(id) {
   return null;
 }
 
-function buildBookingConversationId(requestId, ownerId, vendorId) {
-  return [
-    "booking",
-    makeSafeId(requestId),
-    makeSafeId(ownerId),
-    makeSafeId(vendorId)
-  ].join("__");
-}
-
 function getVendorItemsForParticipant(request, vendorId) {
   const vendors = Array.isArray(request.vendors) ? request.vendors : [];
-
   if (!vendorId) return vendors;
-
   return vendors.filter((vendor) => safeText(vendor.vendorId, "") === vendorId);
 }
 
@@ -1045,7 +1032,6 @@ async function repairConversationFromBookingRequest() {
 
   try {
     const requestSnap = await getDoc(doc(db, "bookingRequests", parsed.requestId));
-
     if (!requestSnap.exists()) return false;
 
     const request = {
@@ -1084,7 +1070,11 @@ async function repairConversationFromBookingRequest() {
       },
       customerId: safeText(request.customerId, ""),
       plannerId: safeText(request.plannerId, ""),
+      requestOwnerId: owner.id,
+      requestOwnerName: owner.name,
+      requestOwnerRole: owner.role,
       vendorId,
+      vendorName,
       bookingRequestId: request.id,
       eventId,
       eventName,
@@ -1096,6 +1086,8 @@ async function repairConversationFromBookingRequest() {
       lastMessage: messageText,
       lastSenderId: vendorResponse ? vendorId : owner.id,
       unreadFor: {},
+      typing: {},
+      typingUpdatedAt: {},
       repairedFromBookingRequest: true,
       createdAt: request.createdAt || serverTimestamp(),
       updatedAt: request.updatedAt || serverTimestamp()
@@ -1130,9 +1122,7 @@ async function repairConversationFromBookingRequest() {
 function getBackHref() {
   const eventId = getEventId();
 
-  if (isAdminPreview()) {
-    return "admin-dashboard.html";
-  }
+  if (isAdminPreview()) return "admin-dashboard.html";
 
   if ((isCustomerView() || isPlannerView()) && eventId) {
     return `messages.html?eventId=${encodeURIComponent(eventId)}`;
@@ -1144,8 +1134,10 @@ function getBackHref() {
 function renderError(title, message) {
   const thread = document.getElementById("thread");
   const composer = document.getElementById("composer");
+  const typingIndicator = document.getElementById("typingIndicator");
 
   composer.style.display = "none";
+  typingIndicator.classList.remove("show");
 
   thread.innerHTML = `
     <div class="empty-card">
@@ -1161,15 +1153,8 @@ function renderEmptyThread() {
 
   thread.innerHTML = `
     <div class="day-divider">Start Conversation</div>
-
     <div class="empty-card">
-      <div class="empty-icon">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-      </div>
+      <div class="empty-icon">MSG</div>
       <h3>No messages yet</h3>
       <p>Send the first message to start this event conversation.</p>
     </div>
@@ -1208,9 +1193,7 @@ function getDisplayMessages() {
   const messages = [...latestMessages];
   const previewMessage = getConversationPreviewMessage();
 
-  if (previewMessage) {
-    messages.push(previewMessage);
-  }
+  if (previewMessage) messages.push(previewMessage);
 
   messages.sort((a, b) => {
     const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
@@ -1258,16 +1241,20 @@ function renderMessages() {
   }, 50);
 }
 
+function getOtherParticipantId() {
+  if (!conversationData || !currentUser) return "";
+
+  const ids = Array.isArray(conversationData.participantIds) ? conversationData.participantIds : [];
+  return ids.find((id) => id !== currentUser.uid) || "";
+}
+
 function getOtherParticipantName() {
   if (!conversationData || !currentUser) return "Conversation";
 
   const participantNames = conversationData.participantNames || {};
-  const otherParticipantIds = (conversationData.participantIds || []).filter((id) => id !== currentUser.uid);
-  const otherId = otherParticipantIds[0];
+  const otherId = getOtherParticipantId();
 
-  if (otherId && participantNames[otherId]) {
-    return participantNames[otherId];
-  }
+  if (otherId && participantNames[otherId]) return participantNames[otherId];
 
   return safeText(conversationData.title, "Conversation");
 }
@@ -1351,10 +1338,6 @@ function updateContextCard() {
       eventLink.href = `event-builder.html?eventId=${encodeURIComponent(eventId)}`;
       eventLink.textContent = "Preview Event";
       eventLink.style.display = "inline-flex";
-    } else if (conversationData.bookingRequestId) {
-      eventLink.href = `booking-requests.html?id=${encodeURIComponent(conversationData.bookingRequestId)}`;
-      eventLink.textContent = "Preview Request";
-      eventLink.style.display = "inline-flex";
     } else {
       eventLink.href = "admin-dashboard.html";
       eventLink.textContent = "Back to Admin";
@@ -1402,9 +1385,7 @@ async function updateHeader() {
 
   const subParts = [listingTitle, listingCategory];
 
-  if (listingLocation) {
-    subParts.push(listingLocation);
-  }
+  if (listingLocation) subParts.push(listingLocation);
 
   setText("chatSub", subParts.join(" · "));
 
@@ -1413,11 +1394,8 @@ async function updateHeader() {
     safeText(conversationData.eventName, "") ||
     safeText(bookingRequestData?.eventDetails?.eventName, "");
 
-  setText("bannerTitle", eventName ? eventName : "Event Conversation");
-  setText(
-    "bannerText",
-    `Use this thread to ask questions, confirm details, and keep communication organized for ${listingTitle}.`
-  );
+  setText("bannerTitle", eventName || "Event Conversation");
+  setText("bannerText", `Use this thread to ask questions, confirm details, and keep communication organized for ${listingTitle}.`);
 
   const backLink = document.getElementById("backLink");
   backLink.href = getBackHref();
@@ -1455,7 +1433,8 @@ async function markConversationAsRead() {
     const conversationRef = doc(db, "conversations", conversationId);
 
     await updateDoc(conversationRef, {
-      unreadFor
+      unreadFor,
+      updatedAt: serverTimestamp()
     });
 
     conversationData.unreadFor = unreadFor;
@@ -1469,13 +1448,95 @@ function canCurrentUserAccessConversation(data = {}) {
 
   const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
 
-  return participantIds.includes(currentUser.uid);
+  return (
+    participantIds.includes(currentUser.uid) ||
+    data.customerId === currentUser.uid ||
+    data.vendorId === currentUser.uid ||
+    data.plannerId === currentUser.uid ||
+    data.requestOwnerId === currentUser.uid
+  );
+}
+
+function getTypingName(userId) {
+  const names = conversationData?.participantNames || {};
+  const roles = conversationData?.participantRoles || {};
+  const name = safeText(names[userId], "");
+  const role = normalizeRole(roles[userId]);
+
+  if (name) return name;
+  if (role === "vendor") return "Vendor";
+  if (role === "planner") return "Planner";
+  if (role === "customer") return "Customer";
+  return "Someone";
+}
+
+function renderTypingIndicator() {
+  const typingIndicator = document.getElementById("typingIndicator");
+  const typingText = document.getElementById("typingText");
+
+  if (!conversationData || !currentUser) {
+    typingIndicator.classList.remove("show");
+    return;
+  }
+
+  const typing = conversationData.typing || {};
+  const typingUpdatedAt = conversationData.typingUpdatedAt || {};
+  const now = Date.now();
+
+  const otherTypingIds = Object.keys(typing).filter((userId) => {
+    if (userId === currentUser.uid) return false;
+    if (typing[userId] !== true) return false;
+
+    const updated = typingUpdatedAt[userId];
+    if (!updated || !updated.seconds) return true;
+
+    const updatedMs = updated.seconds * 1000;
+    return now - updatedMs < 8000;
+  });
+
+  if (!otherTypingIds.length) {
+    typingIndicator.classList.remove("show");
+    return;
+  }
+
+  const name = getTypingName(otherTypingIds[0]);
+  typingText.textContent = `${name} is typing`;
+  typingIndicator.classList.add("show");
+
+  setTimeout(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
+  }, 50);
+}
+
+async function setTypingState(isTyping) {
+  if (!conversationId || !currentUser || !conversationData || isAdminPreview()) return;
+  if (lastTypingState === isTyping) return;
+
+  lastTypingState = isTyping;
+
+  try {
+    await updateDoc(doc(db, "conversations", conversationId), {
+      [`typing.${currentUser.uid}`]: isTyping,
+      [`typingUpdatedAt.${currentUser.uid}`]: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Typing status could not update:", error.message);
+  }
+}
+
+function scheduleTypingStop() {
+  if (typingTimer) clearTimeout(typingTimer);
+
+  typingTimer = setTimeout(() => {
+    setTypingState(false);
+  }, 1800);
 }
 
 function watchConversation() {
-  if (unsubscribeConversation) {
-    unsubscribeConversation();
-  }
+  if (unsubscribeConversation) unsubscribeConversation();
 
   const conversationRef = doc(db, "conversations", conversationId);
 
@@ -1504,6 +1565,7 @@ function watchConversation() {
 
     await updateHeader();
     renderMessages();
+    renderTypingIndicator();
     await markConversationAsRead();
   }, (error) => {
     renderError("Could not watch conversation", error.message);
@@ -1511,9 +1573,7 @@ function watchConversation() {
 }
 
 function watchMessages() {
-  if (unsubscribeMessages) {
-    unsubscribeMessages();
-  }
+  if (unsubscribeMessages) unsubscribeMessages();
 
   const messagesRef = collection(db, "conversations", conversationId, "messages");
   const messagesQuery = query(messagesRef, orderBy("createdAt", "asc"));
@@ -1529,6 +1589,7 @@ function watchMessages() {
     });
 
     renderMessages();
+    renderTypingIndicator();
   }, (error) => {
     console.warn("Could not load message documents:", error.message);
     latestMessages = [];
@@ -1573,7 +1634,6 @@ async function loadConversation() {
 
     watchConversation();
     watchMessages();
-
   } catch (error) {
     renderError("Could not open conversation", error.message);
   }
@@ -1584,33 +1644,49 @@ async function createMessageNotification(messageText, unreadFor) {
   if (!recipientIds.length || !conversationData) return;
 
   const senderName = getDisplayNameForCurrentUser();
+  const previewText = messageText.length > 120 ? `${messageText.slice(0, 120)}...` : messageText;
 
   for (const recipientId of recipientIds) {
     try {
       await addDoc(collection(db, "notifications"), {
         recipientId,
+        userId: recipientId,
         recipientRole: conversationData.participantRoles?.[recipientId] || "user",
+
         type: "message",
         typeLabel: "New Message",
         category: "Message",
+
         title: "New message",
-        body: `${senderName}: ${messageText}`,
+        body: `${senderName}: ${previewText}`,
+        message: `${senderName}: ${previewText}`,
+
         sourceId: conversationId,
         sourceCollection: "conversations",
         sourceLabel: conversationData.eventName || conversationData.listingTitle || "Conversation",
+
+        relatedId: conversationId,
+        relatedCollection: "conversations",
         conversationId,
+
         bookingRequestId: conversationData.bookingRequestId || "",
         eventId: getEventId() || "",
         eventName: conversationData.eventName || "",
         listingId: conversationData.listingId || "",
         listingTitle: conversationData.listingTitle || "",
+
         senderId: currentUser.uid,
         senderName,
         senderRole: getCurrentSenderRole(),
+
         customerId: conversationData.customerId || "",
         plannerId: conversationData.plannerId || "",
+        requestOwnerId: conversationData.requestOwnerId || "",
         vendorId: conversationData.vendorId || "",
+
         read: false,
+        isRead: false,
+
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -1633,9 +1709,7 @@ async function sendMessage(text) {
 
   const messageText = safeText(text, "");
 
-  if (!messageText || !conversationId || !currentUser || !conversationData) {
-    return;
-  }
+  if (!messageText || !conversationId || !currentUser || !conversationData) return;
 
   if (!canCurrentUserAccessConversation(conversationData)) {
     alert("You are not part of this conversation.");
@@ -1660,6 +1734,9 @@ async function sendMessage(text) {
       eventId: getEventId() || null,
       bookingRequestId: conversationData.bookingRequestId || null,
       listingId: conversationData.listingId || null,
+      readBy: {
+        [currentUser.uid]: true
+      },
       createdAt: serverTimestamp()
     });
 
@@ -1681,8 +1758,13 @@ async function sendMessage(text) {
         lastSenderRole: senderRole,
         eventId: getEventId() || conversationData.eventId || null,
         updatedAt: serverTimestamp(),
-        unreadFor
+        lastMessageAt: serverTimestamp(),
+        unreadFor,
+        [`typing.${currentUser.uid}`]: false,
+        [`typingUpdatedAt.${currentUser.uid}`]: serverTimestamp()
       });
+
+      lastTypingState = false;
     } catch (updateError) {
       console.warn("Message sent, but conversation summary could not update:", updateError.message);
     }
@@ -1690,7 +1772,6 @@ async function sendMessage(text) {
     await createMessageNotification(messageText, unreadFor);
 
     messageInput.value = "";
-
   } catch (error) {
     alert(error.message);
   } finally {
@@ -1708,11 +1789,28 @@ document.getElementById("composer").addEventListener("submit", (event) => {
   sendMessage(text);
 });
 
+document.getElementById("messageInput").addEventListener("input", () => {
+  const text = document.getElementById("messageInput").value.trim();
+
+  if (text) {
+    setTypingState(true);
+    scheduleTypingStop();
+  } else {
+    setTypingState(false);
+  }
+});
+
+document.getElementById("messageInput").addEventListener("blur", () => {
+  setTypingState(false);
+});
+
 document.getElementById("roleSelect").addEventListener("change", (event) => {
   switchDashboardRole(event.target.value);
 });
 
 window.addEventListener("beforeunload", () => {
+  setTypingState(false);
+
   if (unsubscribeMessages) unsubscribeMessages();
   if (unsubscribeConversation) unsubscribeConversation();
 });
