@@ -14,9 +14,7 @@
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f7f2e9;
@@ -53,9 +51,7 @@
       font-family: "Inter", sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .admin-preview-bar {
       display: none;
@@ -251,10 +247,30 @@
     }
 
     .hero-subtitle {
-      margin: 0;
+      margin: 0 0 16px;
       font-size: 0.95rem;
       line-height: 1.45;
       color: rgba(255, 255, 255, 0.95);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
     }
 
     .section {
@@ -607,25 +623,17 @@
     }
 
     @media (min-width: 768px) {
-      body {
-        padding: 24px 0;
-      }
+      body { padding: 24px 0; }
 
-      .page {
-        max-width: 960px;
-      }
+      .page { max-width: 960px; }
 
-      .hero-content {
-        max-width: 460px;
-      }
+      .hero-content { max-width: 460px; }
 
       .notification-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .bottom-nav {
-        max-width: 520px;
-      }
+      .bottom-nav { max-width: 520px; }
     }
   </style>
 </head>
@@ -668,8 +676,13 @@
         <div class="hero-label" id="heroLabel">Stay in the loop</div>
         <h2 class="hero-title">Everything important, all in one place.</h2>
         <p class="hero-subtitle" id="heroSubtitle">
-          Keep track of message replies, event-specific booking updates, confirmations, and reminders.
+          Keep track of message replies, booking updates, confirmations, and reminders.
         </p>
+
+        <div class="hero-meta">
+          <span class="hero-pill" id="totalCountPill">0 Alerts</span>
+          <span class="hero-pill" id="unreadCountPill">0 Unread</span>
+        </div>
       </div>
     </section>
 
@@ -742,9 +755,19 @@ function escapeHtml(value) {
 }
 
 function formatTime(value) {
-  if (!value || !value.seconds) return "New";
+  if (!value) return "New";
 
-  const date = new Date(value.seconds * 1000);
+  let date = null;
+
+  if (value.seconds) {
+    date = new Date(value.seconds * 1000);
+  } else {
+    const parsed = Date.parse(value);
+    if (!Number.isNaN(parsed)) date = new Date(parsed);
+  }
+
+  if (!date) return "New";
+
   const now = new Date();
   const diffMs = now - date;
   const diffMinutes = Math.floor(diffMs / 60000);
@@ -942,15 +965,19 @@ function getNotificationRequestId(notification) {
   return (
     safeText(notification.bookingRequestId, "") ||
     safeText(notification.requestId, "") ||
-    (sourceCollection === "bookingRequests" ? safeText(notification.sourceId, "") : "")
+    safeText(notification.relatedId, "") && safeText(notification.relatedCollection, "") === "bookingRequests" ? safeText(notification.relatedId, "") : "" ||
+    sourceCollection === "bookingRequests" ? safeText(notification.sourceId, "") : ""
   );
 }
 
 function getNotificationConversationId(notification) {
   const sourceCollection = safeText(notification.sourceCollection, "");
+  const relatedCollection = safeText(notification.relatedCollection, "");
   const sourceId = safeText(notification.sourceId, "");
+  const relatedId = safeText(notification.relatedId, "");
   const conversationId = safeText(notification.conversationId, "");
   const bookingRequestId = safeText(notification.bookingRequestId || notification.requestId, "");
+
   const ownerId = safeText(
     notification.requestOwnerId ||
     notification.plannerId ||
@@ -960,11 +987,13 @@ function getNotificationConversationId(notification) {
     notification.raw?.customerId,
     ""
   );
+
   const vendorId = safeText(notification.vendorId || notification.raw?.vendorId, "");
 
   if (conversationId) return conversationId;
   if (notification.collectionName === "conversations" && sourceId) return sourceId;
   if (sourceCollection === "conversations" && sourceId) return sourceId;
+  if (relatedCollection === "conversations" && relatedId) return relatedId;
 
   if (bookingRequestId && ownerId && vendorId) {
     return buildBookingConversationId(bookingRequestId, ownerId, vendorId);
@@ -1026,7 +1055,7 @@ async function getConversationIdFromBookingRequest(requestId) {
 }
 
 async function markNotificationRead(notification) {
-  if (!notification || notification.read !== false) return;
+  if (!notification) return;
 
   try {
     if (notification.collectionName === "conversations") {
@@ -1038,19 +1067,22 @@ async function markNotificationRead(notification) {
       delete updatedUnreadFor[currentUser.uid];
 
       await updateDoc(doc(db, "conversations", notification.sourceId), {
-        unreadFor: updatedUnreadFor
+        unreadFor: updatedUnreadFor,
+        updatedAt: serverTimestamp()
       });
     }
 
     if (notification.collectionName === "notifications") {
       await updateDoc(doc(db, "notifications", notification.id), {
         read: true,
+        isRead: true,
         readAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
     }
 
     notification.read = true;
+    notification.isRead = true;
   } catch (error) {
     console.warn("Could not mark notification read:", error.message);
   }
@@ -1180,7 +1212,6 @@ function renderBottomNav(role) {
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
           <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
         </svg>
         <span>Inbox</span>
       </a>
@@ -1213,13 +1244,12 @@ function renderBottomNav(role) {
       <span>Alerts</span>
     </a>
 
-    <a class="nav-item" href="my-requests.html">
+    <a class="nav-item" href="messages.html">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-        <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
       </svg>
-      <span>Requests</span>
+      <span>Inbox</span>
     </a>
   `;
 }
@@ -1341,7 +1371,7 @@ function getNotificationHref(notification) {
 function getIconClass(notification) {
   const type = safeText(notification.type, "");
 
-  if (notification.read === false) return "icon-coral";
+  if (notification.read === false || notification.isRead === false) return "icon-coral";
   if (type === "vendor_response") return "icon-green";
   if (type === "request_withdrawn") return "icon-gold";
   if (type === "booking_request") return "icon-purple";
@@ -1361,12 +1391,45 @@ function getIconText(notification) {
   return "NEW";
 }
 
+function isNotificationUnread(notification) {
+  return notification.read === false || notification.isRead === false;
+}
+
+function getNotificationTitle(notification) {
+  const type = safeText(notification.type, "");
+
+  if (type === "message") {
+    if (safeText(notification.senderName, "")) return `New message from ${notification.senderName}`;
+    return safeText(notification.title, "New message");
+  }
+
+  return safeText(notification.title, "Notification");
+}
+
+function getNotificationBody(notification) {
+  const type = safeText(notification.type, "");
+
+  if (type === "message") {
+    return safeText(notification.body || notification.message || notification.text, "Someone messaged you.");
+  }
+
+  return safeText(notification.body || notification.message || notification.text, "You have a new update.");
+}
+
 function updateFilterButtons() {
   const allBtn = document.getElementById("allFilterBtn");
   const unreadBtn = document.getElementById("unreadFilterBtn");
 
   if (allBtn) allBtn.classList.toggle("active", activeFilter === "all");
   if (unreadBtn) unreadBtn.classList.toggle("active", activeFilter === "unread");
+}
+
+function updateHeroCounts() {
+  const unreadCount = allNotifications.filter(isNotificationUnread).length;
+  const totalCount = allNotifications.length;
+
+  document.getElementById("totalCountPill").textContent = `${totalCount} Alert${totalCount === 1 ? "" : "s"}`;
+  document.getElementById("unreadCountPill").textContent = `${unreadCount} Unread`;
 }
 
 function setNotificationFilter(filter) {
@@ -1379,10 +1442,11 @@ function renderNotifications(notifications) {
   const sectionTitle = document.getElementById("sectionTitle");
 
   updateFilterButtons();
+  updateHeroCounts();
 
-  const unreadCount = allNotifications.filter((notification) => notification.read === false).length;
+  const unreadCount = allNotifications.filter(isNotificationUnread).length;
   const visibleNotifications = activeFilter === "unread"
-    ? notifications.filter((notification) => notification.read === false)
+    ? notifications.filter(isNotificationUnread)
     : notifications;
 
   if (!visibleNotifications.length) {
@@ -1396,9 +1460,9 @@ function renderNotifications(notifications) {
     : "Recent Activity";
 
   list.innerHTML = visibleNotifications.map((notification) => {
-    const isUnread = notification.read === false;
-    const title = safeText(notification.title, "Notification");
-    const text = safeText(notification.body || notification.text, "You have a new update.");
+    const isUnread = isNotificationUnread(notification);
+    const title = getNotificationTitle(notification);
+    const text = getNotificationBody(notification);
     const time = formatTime(notification.createdAt || notification.updatedAt);
     const href = getNotificationHref(notification);
     const typeLabel = safeText(notification.typeLabel || notification.category || "Update", "Update");
@@ -1418,7 +1482,7 @@ function renderNotifications(notifications) {
 
           <div class="notification-meta">
             ${isUnread ? `<span class="pill new">Unread</span>` : ""}
-            <span class="pill request">${escapeHtml(typeLabel.replaceAll("_", " "))}</span>
+            <span class="pill ${safeText(notification.type, "") === "message" ? "message" : "request"}">${escapeHtml(typeLabel.replaceAll("_", " "))}</span>
             ${sourceLabel ? `<span class="pill info">${escapeHtml(sourceLabel)}</span>` : ""}
           </div>
         </div>
@@ -1464,6 +1528,7 @@ function buildConversationNotification(conversation) {
     typeLabel: "Message",
     title: isUnread ? `New message from ${otherName}` : `Message thread with ${otherName}`,
     body: lastMessage,
+    message: lastMessage,
     sourceCollection: "conversations",
     sourceLabel: eventName || listingTitle,
     eventId: conversation.eventId || null,
@@ -1472,33 +1537,69 @@ function buildConversationNotification(conversation) {
     listingId: conversation.listingId || null,
     customerId: conversation.customerId || "",
     plannerId: conversation.plannerId || "",
+    requestOwnerId: conversation.requestOwnerId || "",
     vendorId: conversation.vendorId || "",
     read: !isUnread,
+    isRead: !isUnread,
     createdAt: conversation.updatedAt || conversation.createdAt,
     updatedAt: conversation.updatedAt || conversation.createdAt,
     raw: conversation
   };
 }
 
+function userCanSeeConversation(data, userId) {
+  if (isAdminPreview()) return true;
+
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
 async function loadConversationNotifications(user) {
   try {
     const conversationsRef = collection(db, "conversations");
-    const conversationsQuery = isAdminPreview()
-      ? query(conversationsRef)
-      : query(conversationsRef, where("participantIds", "array-contains", user.uid));
+    const snaps = [];
 
-    const snapshot = await getDocs(conversationsQuery);
+    const queries = isAdminPreview()
+      ? [query(conversationsRef)]
+      : [
+          query(conversationsRef, where("participantIds", "array-contains", user.uid)),
+          query(conversationsRef, where("customerId", "==", user.uid)),
+          query(conversationsRef, where("vendorId", "==", user.uid)),
+          query(conversationsRef, where("plannerId", "==", user.uid)),
+          query(conversationsRef, where("requestOwnerId", "==", user.uid))
+        ];
 
-    const conversations = [];
+    for (const q of queries) {
+      try {
+        snaps.push(await getDocs(q));
+      } catch (error) {
+        console.warn("Conversation notification query skipped:", error.message);
+      }
+    }
 
-    snapshot.forEach((docSnap) => {
-      conversations.push({
-        id: docSnap.id,
-        ...docSnap.data()
+    const map = new Map();
+
+    snaps.forEach((snap) => {
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+
+        if (!userCanSeeConversation(data, user.uid)) return;
+
+        map.set(docSnap.id, {
+          id: docSnap.id,
+          ...data
+        });
       });
     });
 
-    return conversations.map(buildConversationNotification);
+    return Array.from(map.values()).map(buildConversationNotification);
   } catch (error) {
     console.warn("Conversation notifications skipped:", error.message);
     return [];
@@ -1508,23 +1609,36 @@ async function loadConversationNotifications(user) {
 async function loadAppNotifications(user) {
   try {
     const notificationsRef = collection(db, "notifications");
-    const notificationsQuery = isAdminPreview()
-      ? query(notificationsRef)
-      : query(notificationsRef, where("recipientId", "==", user.uid));
+    const snaps = [];
 
-    const snapshot = await getDocs(notificationsQuery);
+    const queries = isAdminPreview()
+      ? [query(notificationsRef)]
+      : [
+          query(notificationsRef, where("recipientId", "==", user.uid)),
+          query(notificationsRef, where("userId", "==", user.uid))
+        ];
 
-    const notifications = [];
+    for (const q of queries) {
+      try {
+        snaps.push(await getDocs(q));
+      } catch (error) {
+        console.warn("App notification query skipped:", error.message);
+      }
+    }
 
-    snapshot.forEach((docSnap) => {
-      notifications.push({
-        id: docSnap.id,
-        collectionName: "notifications",
-        ...docSnap.data()
+    const map = new Map();
+
+    snaps.forEach((snap) => {
+      snap.forEach((docSnap) => {
+        map.set(docSnap.id, {
+          id: docSnap.id,
+          collectionName: "notifications",
+          ...docSnap.data()
+        });
       });
     });
 
-    return notifications;
+    return Array.from(map.values());
   } catch (error) {
     console.warn("App notifications skipped:", error.message);
     return [];
@@ -1547,9 +1661,11 @@ async function loadNotifications(user) {
   combined.forEach((notification) => {
     const conversationId = getNotificationConversationId(notification);
     const requestId = getNotificationRequestId(notification);
+    const type = safeText(notification.type, "");
+
     const key = conversationId
       ? `conversation_${conversationId}`
-      : requestId && safeText(notification.type, "") === "vendor_response"
+      : requestId && type === "vendor_response"
         ? `vendor_response_${requestId}_${safeText(notification.vendorId, "")}`
         : `${notification.collectionName || "item"}_${notification.id || Math.random()}`;
 
@@ -1560,8 +1676,10 @@ async function loadNotifications(user) {
       return;
     }
 
-    const existingScore = (existing.read === false ? 1000000000000 : 0) + getSortTime(existing);
-    const currentScore = (notification.read === false ? 1000000000000 : 0) + getSortTime(notification);
+    const existingUnread = isNotificationUnread(existing) ? 1000000000000 : 0;
+    const currentUnread = isNotificationUnread(notification) ? 1000000000000 : 0;
+    const existingScore = existingUnread + getSortTime(existing);
+    const currentScore = currentUnread + getSortTime(notification);
 
     if (currentScore >= existingScore) {
       deduped.set(key, notification);
@@ -1571,12 +1689,10 @@ async function loadNotifications(user) {
   const notifications = Array.from(deduped.values());
 
   notifications.sort((a, b) => {
-    const aUnread = a.read === false ? 1 : 0;
-    const bUnread = b.read === false ? 1 : 0;
+    const aUnread = isNotificationUnread(a) ? 1 : 0;
+    const bUnread = isNotificationUnread(b) ? 1 : 0;
 
-    if (aUnread !== bUnread) {
-      return bUnread - aUnread;
-    }
+    if (aUnread !== bUnread) return bUnread - aUnread;
 
     return getSortTime(b) - getSortTime(a);
   });
@@ -1620,7 +1736,7 @@ onAuthStateChanged(auth, async (user) => {
   renderRoleSwitcher(currentUserData);
   applyRoleLayout(activeRole);
 
-  loadNotifications(user);
+  await loadNotifications(user);
 });
 </script>
 
