@@ -138,7 +138,8 @@
       height:20px
     }
 
-    .notification-badge{
+    .notification-badge,
+    .nav-badge{
       position:absolute;
       min-width:20px;
       height:20px;
@@ -155,9 +156,21 @@
       align-items:center;
       justify-content:center;
       z-index:5;
-      top:-5px;
-      right:-5px;
       box-shadow:0 8px 16px rgba(255,95,103,.28)
+    }
+
+    .notification-badge{
+      top:-5px;
+      right:-5px
+    }
+
+    .nav-badge{
+      top:5px;
+      right:16px;
+      min-width:18px;
+      height:18px;
+      line-height:18px;
+      font-size:.62rem
     }
 
     .topbar-center{
@@ -530,7 +543,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:1.6rem;
+      font-size:1.2rem;
       font-weight:800
     }
 
@@ -730,9 +743,9 @@
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </header>
@@ -762,7 +775,7 @@
 
       <div class="request-list" id="requestList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon">...</div>
           <h3>Loading requests</h3>
           <p>We’re checking for booking requests connected to your vendor account.</p>
         </div>
@@ -775,7 +788,7 @@
       <div class="modal-label">Vendor Response</div>
       <h2 class="modal-title" id="responseModalTitle">Respond to request</h2>
       <p class="modal-text">
-        Let the customer know if you are available, need more details, or are not available for this event.
+        Let the customer or planner know if you are available, need more details, or are not available for this event.
       </p>
 
       <div class="modal-field">
@@ -789,7 +802,7 @@
 
       <div class="modal-field">
         <label for="responseNote">Optional note</label>
-        <textarea id="responseNote" placeholder="Add a short response for the customer..."></textarea>
+        <textarea id="responseNote" placeholder="Add a short response..."></textarea>
       </div>
 
       <div class="modal-actions">
@@ -803,7 +816,10 @@
     <a class="nav-item" href="vendor-dashboard.html" id="bottomHomeLink">Home</a>
     <a class="nav-item" href="add-listing.html" id="bottomAddLink">Add</a>
     <a class="nav-item active" href="booking-requests.html">Requests</a>
-    <a class="nav-item" href="messages.html" id="bottomInboxLink">Inbox</a>
+    <a class="nav-item" href="messages.html" id="bottomInboxLink">
+      <span class="nav-badge" id="bottomInboxBadge">0</span>
+      Inbox
+    </a>
   </nav>
 
 <script type="module">
@@ -900,10 +916,12 @@ function setBadge(id, count) {
 }
 
 function normalizeRole(role) {
-  if (role === "client") return "customer";
-  if (role === "host") return "customer";
-  if (role === "event_host") return "customer";
-  return role || "customer";
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
 }
 
 function getDashboardForRole(role) {
@@ -931,18 +949,27 @@ function getAllowedRoles(userData = {}) {
 
   if (Array.isArray(userData.roles)) {
     userData.roles.forEach((role) => {
-      if (role) roleSet.add(normalizeRole(role));
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
     });
   }
 
-  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
-  if (userData.role) roleSet.add(normalizeRole(userData.role));
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
 
   if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
     roleSet.add("customer");
   }
 
-  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
     roleSet.add("vendor");
   }
 
@@ -953,12 +980,13 @@ function getAllowedRoles(userData = {}) {
   if (
     userData.admin === true ||
     userData.isAdmin === true ||
-    normalizeRole(userData.role) === "admin" ||
-    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+    userData.permissions?.admin === true ||
+    legacy === "admin"
   ) {
     roleSet.add("admin");
     roleSet.add("vendor");
     roleSet.add("customer");
+    roleSet.add("planner");
   }
 
   if (!roleSet.size) roleSet.add("customer");
@@ -969,11 +997,13 @@ function getAllowedRoles(userData = {}) {
 
 function getActiveRole(userData = {}) {
   const allowedRoles = getAllowedRoles(userData);
-  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
 
-  if (allowedRoles.includes(requestedRole)) return requestedRole;
-  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
-  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
 
   return allowedRoles[0] || "customer";
 }
@@ -1021,7 +1051,7 @@ function renderRoleSwitcher(userData = {}) {
     return `<option value="${escapeHtml(role)}">${escapeHtml(getRoleLabel(role))}</option>`;
   }).join("");
 
-  select.value = activeRole === "admin" ? "admin" : "vendor";
+  select.value = activeRole;
   wrapper.style.display = "inline-flex";
 }
 
@@ -1031,7 +1061,7 @@ async function switchDashboardRole(nextRole) {
   const normalizedRole = normalizeRole(nextRole);
   const allowedRoles = getAllowedRoles(currentUserData);
 
-  if (!allowedRoles.includes(normalizedRole)) {
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
     alert("This dashboard is not enabled on your account yet.");
     renderRoleSwitcher(currentUserData);
     return;
@@ -1054,10 +1084,10 @@ function enableAdminPreviewMode() {
 
   document.getElementById("adminPreviewBar").style.display = "block";
   document.getElementById("backLink").href = "admin-dashboard.html";
-  document.getElementById("inboxLink").href = "admin-dashboard.html";
+  document.getElementById("inboxLink").href = "messages.html";
   document.getElementById("bottomHomeLink").href = "admin-dashboard.html";
   document.getElementById("bottomAddLink").href = "admin-dashboard.html";
-  document.getElementById("bottomInboxLink").href = "admin-dashboard.html";
+  document.getElementById("bottomInboxLink").href = "messages.html";
   document.getElementById("pageEyebrow").textContent = "Admin Preview";
 
   document.querySelector(".hero-label").textContent = "Admin Vendor Request Review";
@@ -1097,9 +1127,9 @@ function getStatusPillClass(status) {
   return "pending";
 }
 
-function getVendorResponse(request) {
-  if (!currentUser) return null;
-  return (request.vendorResponses || {})[currentUser.uid] || null;
+function getVendorResponse(request, vendorId = currentUser?.uid) {
+  if (!vendorId) return null;
+  return (request.vendorResponses || {})[vendorId] || null;
 }
 
 function getResponseLabel(status) {
@@ -1167,13 +1197,76 @@ function makeSafeId(value) {
     .slice(0, 180);
 }
 
-function buildBookingConversationId(requestId, customerId, vendorId) {
+function buildBookingConversationId(requestId, ownerId, vendorId) {
   return [
     "booking",
     makeSafeId(requestId),
-    makeSafeId(customerId),
+    makeSafeId(ownerId),
     makeSafeId(vendorId)
   ].join("__");
+}
+
+function getRequestOwnerId(request) {
+  return safeText(
+    request.requestOwnerId ||
+    request.plannerId ||
+    request.customerId ||
+    request.ownerId ||
+    request.submittedBy,
+    ""
+  );
+}
+
+function getRequestOwnerName(request) {
+  const ownerId = getRequestOwnerId(request);
+
+  if (ownerId && ownerId === safeText(request.plannerId, "")) {
+    return safeText(request.requestOwnerName || request.plannerName || "Planner", "Planner");
+  }
+
+  return safeText(request.requestOwnerName || request.customerName || request.plannerName || "Customer", "Customer");
+}
+
+function getRequestOwnerRole(request) {
+  if (safeText(request.requestOwnerRole, "")) return normalizeRole(request.requestOwnerRole);
+
+  const ownerId = getRequestOwnerId(request);
+
+  if (ownerId && ownerId === safeText(request.plannerId, "")) return "planner";
+  if (safeText(request.plannerId, "") && !safeText(request.customerId, "")) return "planner";
+
+  return "customer";
+}
+
+function getVendorName() {
+  return safeText(
+    currentUserData.businessName ||
+    currentUserData.vendorName ||
+    currentUserData.name ||
+    currentUser.displayName ||
+    currentUser.email,
+    "Vendor"
+  );
+}
+
+function getFirstVendorItem(request, vendorId = currentUser?.uid) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  return vendors.find((item) => safeText(item.vendorId, "") === vendorId) || vendors[0] || {};
+}
+
+function getConversationIdForRequest(request, vendorId = currentUser?.uid) {
+  const requestId = safeText(request.id, "");
+  const ownerId = getRequestOwnerId(request);
+  const vendorItem = getFirstVendorItem(request, vendorId);
+  const savedConversationId =
+    safeText(vendorItem.conversationId, "") ||
+    safeText(request.vendorConversationIds?.[vendorId], "") ||
+    safeText(request.vendorResponses?.[vendorId]?.conversationId, "");
+
+  if (savedConversationId) return savedConversationId;
+  if (!requestId || !ownerId || !vendorId) return "";
+
+  return buildBookingConversationId(requestId, ownerId, vendorId);
 }
 
 function renderEmptyRequests() {
@@ -1216,7 +1309,9 @@ function renderRequests() {
     const guestCount = safeText(eventDetails.guestCount || request.guestCount, "Not listed");
     const budget = safeText(eventDetails.eventBudget || request.eventBudget, "Not listed");
     const styleVibe = safeText(eventDetails.styleVibe || request.styleVibe, "Not listed");
-    const customerName = safeText(request.customerName || request.plannerName, "Customer");
+    const ownerName = getRequestOwnerName(request);
+    const ownerRole = getRequestOwnerRole(request);
+    const ownerLabel = ownerRole === "planner" ? "Planner" : "Customer";
     const status = safeText(request.requestStatus || request.status, "pending");
     const isWithdrawn = status === "withdrawn";
     const response = getVendorResponse(request);
@@ -1227,7 +1322,9 @@ function renderRequests() {
     const aiSummary = getAiSummary(request);
     const vendorItems = getVendorItemsForCurrentVendor(request);
     const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "No reason provided.");
-    const plannerBadge = request.plannerId ? `<span class="pill ai">Planner Request</span>` : "";
+    const plannerBadge = ownerRole === "planner" || request.plannerId ? `<span class="pill ai">Planner Request</span>` : "";
+    const conversationId = response?.conversationId || getConversationIdForRequest(request);
+    const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
 
     const vendorBox = vendorItems.length
       ? vendorItems.map((vendor) => {
@@ -1255,7 +1352,7 @@ function renderRequests() {
         <div class="request-top">
           <div>
             <h3 class="request-title">${escapeHtml(eventName)}</h3>
-            <p class="request-subtitle">${escapeHtml(customerName)} · Submitted ${escapeHtml(formatTime(request.createdAt))}</p>
+            <p class="request-subtitle">${escapeHtml(ownerName)} · ${escapeHtml(ownerLabel)} · Submitted ${escapeHtml(formatTime(request.createdAt))}</p>
           </div>
           <div class="request-total">${escapeHtml(formatMoney(request.totalDue || 0))}</div>
         </div>
@@ -1272,7 +1369,7 @@ function renderRequests() {
         ${isWithdrawn ? `
           <div class="withdrawn-box">
             <h4>Request Withdrawn</h4>
-            <p>The customer withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p>
+            <p>The customer or planner withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p>
           </div>
         ` : ""}
 
@@ -1290,11 +1387,6 @@ function renderRequests() {
           <div class="response-box">
             <h4>Your Response</h4>
             <p>${escapeHtml(responseLabel)}${responseNote ? ` · ${escapeHtml(responseNote)}` : ""}</p>
-            ${response.conversationId ? `
-              <div style="margin-top:12px;">
-                <a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(response.conversationId)}">Open Chat Thread</a>
-              </div>
-            ` : ""}
           </div>
         ` : ""}
 
@@ -1309,16 +1401,19 @@ function renderRequests() {
           <div class="request-actions">
             <a class="btn-secondary" href="admin-dashboard.html">Back to Admin</a>
             ${eventId ? `<a class="btn" href="event-builder.html?eventId=${encodeURIComponent(eventId)}">Preview Event</a>` : ""}
+            ${conversationId ? `<a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}">View Message Thread</a>` : ""}
           </div>
         ` : isWithdrawn ? `
           <div class="request-actions">
             <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
+            ${conversationId ? `<a class="btn" href="chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}">Message ${escapeHtml(ownerLabel)}</a>` : ""}
           </div>
         ` : `
           <div class="request-actions">
             <button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">Available</button>
             <button class="btn-warning" type="button" data-respond-request="${requestId}" data-response-status="needs_info">Need Info</button>
             <button class="btn-danger" type="button" data-respond-request="${requestId}" data-response-status="declined">Decline</button>
+            ${conversationId ? `<a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}">Message ${escapeHtml(ownerLabel)}</a>` : ""}
           </div>
         `}
       </article>
@@ -1351,105 +1446,144 @@ function closeResponseModal() {
   document.getElementById("responseModal").setAttribute("aria-hidden", "true");
 }
 
-async function createOrOpenCustomerConversation(request, responseStatus, responseNote) {
-  const customerId = safeText(request.customerId || request.ownerId, "");
+async function ensureOwnerConversation(request, responseStatus = "", responseNote = "") {
+  const ownerId = getRequestOwnerId(request);
+  const ownerName = getRequestOwnerName(request);
+  const ownerRole = getRequestOwnerRole(request);
   const vendorId = currentUser.uid;
   const requestId = safeText(request.id || pendingResponseRequestId, "");
-  const eventId = safeText(request.eventId, "");
+  const eventId = safeText(request.eventId || request.eventDetails?.id, "");
   const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
-  const customerName = safeText(request.customerName || request.plannerName, "Customer");
-  const vendorName = safeText(currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "Vendor", "Vendor");
-  const vendorItems = getVendorItemsForCurrentVendor(request);
-  const firstVendorItem = vendorItems[0] || {};
+  const vendorName = getVendorName();
+  const firstVendorItem = getFirstVendorItem(request, vendorId);
   const listingId = safeText(firstVendorItem.listingId, "");
   const listingTitle = safeText(firstVendorItem.listingTitle || firstVendorItem.title, "Event Request");
   const listingCategory = normalizeProfessionalLabel(safeText(firstVendorItem.category || firstVendorItem.listingCategory || firstVendorItem.mainCategory, "Event Service"));
-  const conversationId = buildBookingConversationId(requestId, customerId, vendorId);
-  const responseLabel = getResponseLabel(responseStatus);
+  const savedConversationId = getConversationIdForRequest(request, vendorId);
+  const conversationId = savedConversationId || buildBookingConversationId(requestId, ownerId, vendorId);
 
-  if (!customerId || !vendorId || !requestId) {
-    throw new Error("This response cannot open a message thread because the request is missing customer, vendor, or request information.");
+  if (!ownerId || !vendorId || !requestId) {
+    throw new Error("This request is missing owner, vendor, or request information, so a message thread cannot be opened.");
   }
 
-  const messageText = responseNote
-    ? `${responseLabel}: ${responseNote}`
-    : `${responseLabel}.`;
+  const responseLabel = responseStatus ? getResponseLabel(responseStatus) : "";
+  const messageText = responseStatus
+    ? responseNote
+      ? `${responseLabel}: ${responseNote}`
+      : `${responseLabel}.`
+    : `Message thread for ${eventName}.`;
 
   await setDoc(doc(db, "conversations", conversationId), {
     conversationKey: conversationId,
-    participantIds: [customerId, vendorId],
+    participantIds: [ownerId, vendorId],
     participantNames: {
-      [customerId]: customerName,
+      [ownerId]: ownerName,
       [vendorId]: vendorName
     },
     participantRoles: {
-      [customerId]: request.plannerId ? "planner" : "customer",
+      [ownerId]: ownerRole,
       [vendorId]: "vendor"
     },
-    customerId,
-    plannerId: request.plannerId || "",
+    customerId: safeText(request.customerId, ownerRole === "customer" ? ownerId : ""),
+    customerName: safeText(request.customerName, ownerRole === "customer" ? ownerName : ""),
+    plannerId: safeText(request.plannerId, ownerRole === "planner" ? ownerId : ""),
+    plannerName: safeText(request.plannerName, ownerRole === "planner" ? ownerName : ""),
+    requestOwnerId: ownerId,
+    requestOwnerName: ownerName,
+    requestOwnerRole: ownerRole,
     vendorId,
+    vendorName,
     bookingRequestId: requestId,
     eventId,
     eventName,
     listingId,
     listingTitle,
     listingCategory,
-    title: customerName,
+    listingLocation: getEventLocation(request.eventDetails || {}),
+    title: ownerName,
     contextType: "Booking Request",
     lastMessage: messageText,
-    lastSenderId: vendorId,
-    unreadFor: {
-      [customerId]: true
-    },
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
+    lastSenderId: responseStatus ? vendorId : safeText(request.lastSenderId, ownerId),
+    lastSenderName: responseStatus ? vendorName : safeText(request.lastSenderName, ownerName),
+    lastSenderRole: responseStatus ? "vendor" : ownerRole,
+    unreadFor: responseStatus ? { [ownerId]: true } : {},
+    source: "booking-requests",
+    createdAt: request.createdAt || serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    lastMessageAt: serverTimestamp()
   }, { merge: true });
 
-  await addDoc(collection(db, "conversations", conversationId, "messages"), {
-    text: messageText,
-    senderId: vendorId,
-    senderName: vendorName,
-    senderRole: "vendor",
-    bookingRequestId: requestId,
-    eventId,
-    responseStatus,
-    createdAt: serverTimestamp()
-  });
+  if (responseStatus) {
+    await addDoc(collection(db, "conversations", conversationId, "messages"), {
+      text: messageText,
+      senderId: vendorId,
+      senderName: vendorName,
+      senderRole: "vendor",
+      messageType: "vendor_response",
+      bookingRequestId: requestId,
+      eventId,
+      listingId,
+      responseStatus,
+      readBy: {
+        [vendorId]: true
+      },
+      createdAt: serverTimestamp()
+    });
+  }
 
   return conversationId;
 }
 
-async function createCustomerResponseNotification(request, responseStatus, responseNote, conversationId) {
+async function createOwnerResponseNotification(request, responseStatus, responseNote, conversationId) {
   try {
     const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
-    const vendorName = safeText(currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "A vendor", "A vendor");
-    const recipientId = safeText(request.customerId || request.ownerId, "");
+    const vendorName = getVendorName();
+    const recipientId = getRequestOwnerId(request);
+    const recipientRole = getRequestOwnerRole(request);
+    const responseLabel = getResponseLabel(responseStatus);
 
     if (!recipientId) return;
 
     await addDoc(collection(db, "notifications"), {
       recipientId,
-      recipientRole: request.plannerId ? "planner" : "customer",
+      userId: recipientId,
+      recipientRole,
+
       type: "vendor_response",
       typeLabel: "Vendor Response",
       category: "Booking Request",
+
       title: "Vendor responded to your request",
-      body: `${vendorName} responded: ${getResponseLabel(responseStatus)}${responseNote ? `. ${responseNote}` : ""}`,
-      sourceId: conversationId || request.id,
-      sourceCollection: conversationId ? "conversations" : "bookingRequests",
+      body: `${vendorName} responded: ${responseLabel}${responseNote ? `. ${responseNote}` : ""}`,
+      message: `${vendorName} responded: ${responseLabel}${responseNote ? `. ${responseNote}` : ""}`,
+
+      sourceId: conversationId,
+      sourceCollection: "conversations",
       sourceLabel: eventName,
+
+      relatedId: conversationId,
+      relatedCollection: "conversations",
+      conversationId,
+
       bookingRequestId: request.id,
-      eventId: request.eventId || "",
+      eventId: request.eventId || request.eventDetails?.id || "",
       eventName,
+
       vendorId: currentUser.uid,
       vendorName,
+
+      customerId: request.customerId || "",
+      plannerId: request.plannerId || "",
+      requestOwnerId: recipientId,
+
       read: false,
+      isRead: false,
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
   } catch (error) {
-    console.warn("Response saved, but customer notification could not be created:", error.message);
+    console.warn("Response saved, but owner notification could not be created:", error.message);
   }
 }
 
@@ -1476,17 +1610,19 @@ async function confirmResponse() {
 
   try {
     isBusy = true;
-    showStatus("Saving response and opening message thread...", "info");
+    showStatus("Saving response and updating the message thread...", "info");
 
     const responseData = {
       status: responseStatus,
       note: responseNote,
       vendorId: currentUser.uid,
-      vendorName: currentUserData.businessName || currentUserData.vendorName || currentUserData.name || currentUser.displayName || "Vendor",
+      vendorName: getVendorName(),
       respondedAt: new Date().toISOString()
     };
 
-    const conversationId = await createOrOpenCustomerConversation(request, responseStatus, responseNote);
+    const conversationId = await ensureOwnerConversation(request, responseStatus, responseNote);
+    const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+
     const updatedResponses = {
       ...(request.vendorResponses || {}),
       [currentUser.uid]: {
@@ -1500,27 +1636,43 @@ async function confirmResponse() {
       [currentUser.uid]: conversationId
     };
 
-    await updateDoc(doc(db, "bookingRequests", pendingResponseRequestId), {
+    const updatedVendors = vendors.map((vendor) => {
+      if (safeText(vendor.vendorId, "") !== currentUser.uid) return vendor;
+      return {
+        ...vendor,
+        conversationId
+      };
+    });
+
+    const updatePayload = {
       vendorResponses: updatedResponses,
       vendorConversationIds: updatedConversationIds,
-      requestStatus: responseStatus === "needs_info"
-        ? "needs_more_info"
-        : safeText(request.requestStatus || request.status, "pending"),
+      vendors: updatedVendors,
       updatedAt: serverTimestamp()
-    });
+    };
+
+    if (responseStatus === "needs_info") {
+      updatePayload.requestStatus = "needs_more_info";
+    }
+
+    await updateDoc(doc(db, "bookingRequests", pendingResponseRequestId), updatePayload);
 
     request.vendorResponses = updatedResponses;
     request.vendorConversationIds = updatedConversationIds;
+    request.vendors = updatedVendors;
 
-    await createCustomerResponseNotification(request, responseStatus, responseNote, conversationId);
+    await createOwnerResponseNotification(request, responseStatus, responseNote, conversationId);
 
     closeResponseModal();
     renderRequests();
-    showStatus(`${responseLabel} response saved. Opening chat thread...`, "success");
+    showStatus(`${responseLabel} response saved. Opening message thread...`, "success");
+
+    const eventId = safeText(request.eventId || request.eventDetails?.id, "");
+    const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
 
     setTimeout(() => {
-      window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}`;
-    }, 500);
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}`;
+    }, 450);
 
   } catch (error) {
     showStatus(`Could not save response: ${error.message}`, "error");
@@ -1529,51 +1681,131 @@ async function confirmResponse() {
   }
 }
 
-async function loadUnreadNotifications() {
+async function loadUnreadCounts() {
   let unreadNotifications = 0;
+  let unreadMessages = 0;
 
   try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", currentUser.uid),
-      where("read", "==", false)
-    );
+    const notificationsRef = collection(db, "notifications");
+    const notificationSnaps = [];
 
-    const snapshot = await getDocs(notificationsQuery);
-    unreadNotifications = snapshot.size;
+    const notificationQueries = [
+      query(notificationsRef, where("recipientId", "==", currentUser.uid)),
+      query(notificationsRef, where("userId", "==", currentUser.uid))
+    ];
+
+    for (const nq of notificationQueries) {
+      try {
+        notificationSnaps.push(await getDocs(nq));
+      } catch (error) {
+        console.warn("Notification count query skipped:", error.message);
+      }
+    }
+
+    const notificationMap = new Map();
+
+    notificationSnaps.forEach((snap) => {
+      snap.forEach((docSnap) => {
+        notificationMap.set(docSnap.id, docSnap.data());
+      });
+    });
+
+    notificationMap.forEach((data) => {
+      if (data.read === false || data.isRead === false) unreadNotifications += 1;
+    });
   } catch {
     unreadNotifications = 0;
   }
 
-  setBadge("topNotificationBadge", unreadNotifications);
+  try {
+    const conversationsRef = collection(db, "conversations");
+    const conversationSnaps = [];
+
+    const conversationQueries = [
+      query(conversationsRef, where("participantIds", "array-contains", currentUser.uid)),
+      query(conversationsRef, where("vendorId", "==", currentUser.uid)),
+      query(conversationsRef, where("requestOwnerId", "==", currentUser.uid))
+    ];
+
+    for (const cq of conversationQueries) {
+      try {
+        conversationSnaps.push(await getDocs(cq));
+      } catch (error) {
+        console.warn("Conversation count query skipped:", error.message);
+      }
+    }
+
+    const conversationMap = new Map();
+
+    conversationSnaps.forEach((snap) => {
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+        if (
+          participantIds.includes(currentUser.uid) ||
+          data.vendorId === currentUser.uid ||
+          data.requestOwnerId === currentUser.uid
+        ) {
+          conversationMap.set(docSnap.id, data);
+        }
+      });
+    });
+
+    conversationMap.forEach((data) => {
+      const unreadFor = data.unreadFor || {};
+      if (unreadFor[currentUser.uid]) unreadMessages += 1;
+    });
+  } catch {
+    unreadMessages = 0;
+  }
+
+  setBadge("topNotificationBadge", unreadNotifications + unreadMessages);
+  setBadge("bottomInboxBadge", unreadMessages);
 }
 
 async function loadRequestIdsFromNotifications() {
   const requestIds = [];
 
   try {
-    const notificationQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", currentUser.uid)
-    );
+    const notificationQueries = [
+      query(collection(db, "notifications"), where("recipientId", "==", currentUser.uid)),
+      query(collection(db, "notifications"), where("userId", "==", currentUser.uid))
+    ];
 
-    const snapshot = await getDocs(notificationQuery);
+    for (const notificationQuery of notificationQueries) {
+      try {
+        const snapshot = await getDocs(notificationQuery);
 
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const sourceCollection = safeText(data.sourceCollection, "");
-      const sourceId = safeText(data.sourceId, "");
-      const type = safeText(data.type, "");
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const sourceCollection = safeText(data.sourceCollection, "");
+          const sourceId = safeText(data.sourceId, "");
+          const relatedCollection = safeText(data.relatedCollection, "");
+          const relatedId = safeText(data.relatedId, "");
+          const type = safeText(data.type, "");
 
-      if (sourceId && (sourceCollection === "bookingRequests" || type === "booking_request")) {
-        requestIds.push(sourceId);
+          if (sourceId && (sourceCollection === "bookingRequests" || type === "booking_request")) {
+            requestIds.push(sourceId);
+          }
+
+          if (relatedId && relatedCollection === "bookingRequests") {
+            requestIds.push(relatedId);
+          }
+
+          if (data.bookingRequestId) {
+            requestIds.push(data.bookingRequestId);
+          }
+        });
+      } catch (error) {
+        console.warn("Booking request notification fallback skipped:", error.message);
       }
-    });
+    }
   } catch (error) {
     console.warn("Could not load booking request notification fallback:", error.message);
   }
 
-  return Array.from(new Set(requestIds));
+  return Array.from(new Set(requestIds.filter(Boolean)));
 }
 
 async function loadRequestsFromNotificationIds(existingRequestIds = []) {
@@ -1654,7 +1886,7 @@ async function loadBookingRequests() {
   renderRequests();
 
   if (!bookingRequests.length) {
-    showStatus("No connected booking requests found yet. If you see a request notification, hard refresh this page and confirm the notification sourceId matches the bookingRequests document ID.", "info");
+    showStatus("No connected booking requests found yet. When a customer submits a request with your listing, it will appear here.", "info");
   }
 }
 
@@ -1709,14 +1941,12 @@ onAuthStateChanged(auth, async (user) => {
     showStatus("This account is not currently active. Some actions may be limited.", "error");
   }
 
-  console.log("RentEvent booking requests UID:", currentUser.uid);
-
   if (selectedRequestId) {
     setText("requestCountPill", "1 Request");
   }
 
   await Promise.all([
-    loadUnreadNotifications(),
+    loadUnreadCounts(),
     loadBookingRequests()
   ]);
 });
