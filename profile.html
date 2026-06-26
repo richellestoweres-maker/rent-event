@@ -97,7 +97,8 @@
     }
 
     .notification-badge,
-    .nav-badge {
+    .nav-badge,
+    .menu-badge {
       position: absolute;
       min-width: 20px;
       height: 20px;
@@ -129,6 +130,12 @@
       height: 18px;
       line-height: 18px;
       font-size: 0.64rem;
+    }
+
+    .menu-badge {
+      position: static;
+      margin-left: auto;
+      border-color: rgba(255,255,255,.95);
     }
 
     .profile-card {
@@ -394,7 +401,8 @@
       border-top: 1px solid var(--line);
     }
 
-    .menu-item {
+    .menu-item,
+    .logout-btn {
       min-height: 76px;
       border-radius: 0;
       background: rgba(255, 255, 255, 0.94);
@@ -408,9 +416,17 @@
       gap: 14px;
       font-size: 1.18rem;
       font-weight: 500;
+      border: none;
       border-bottom: 1px solid var(--line);
       font-family: inherit;
       text-align: left;
+      width: 100%;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .menu-item.has-badge {
+      grid-template-columns: 52px 1fr auto 24px;
     }
 
     .menu-icon {
@@ -421,7 +437,7 @@
       align-items: center;
       justify-content: center;
       color: #161616;
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 900;
       background: var(--soft-2);
       border: 1px solid rgba(236, 226, 211, 0.8);
@@ -451,26 +467,6 @@
       font-weight: 800;
       flex-shrink: 0;
       font-size: 1.7rem;
-    }
-
-    .logout-btn {
-      width: 100%;
-      min-height: 76px;
-      border-radius: 0;
-      border: none;
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.94);
-      color: #161616;
-      font-family: inherit;
-      font-size: 1.18rem;
-      font-weight: 500;
-      cursor: pointer;
-      text-align: left;
-      padding: 0;
-      display: grid;
-      grid-template-columns: 52px 1fr 24px;
-      align-items: center;
-      gap: 14px;
     }
 
     .bottom-nav {
@@ -661,9 +657,9 @@
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </header>
@@ -731,12 +727,13 @@
             <span class="menu-arrow">›</span>
           </a>
 
-          <a class="menu-item" href="notifications.html">
+          <a class="menu-item has-badge" href="notifications.html">
             <span class="menu-icon">N</span>
             <span class="menu-copy">
               <span>Notifications</span>
               <span>See all alerts, replies, and message updates.</span>
             </span>
+            <span class="menu-badge" id="notificationMenuBadge">0</span>
             <span class="menu-arrow">›</span>
           </a>
         </div>
@@ -744,7 +741,6 @@
 
       <section class="section">
         <h2 class="section-title">Quick Access</h2>
-
         <div class="menu-list" id="quickAccessList"></div>
       </section>
     </div>
@@ -890,10 +886,12 @@ function setBadge(id, count) {
 }
 
 function normalizeRole(role) {
-  if (role === "client") return "customer";
-  if (role === "host") return "customer";
-  if (role === "event_host") return "customer";
-  return role || "customer";
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
 }
 
 function getDashboardForRole(role) {
@@ -921,23 +919,27 @@ function getAllowedRoles(userData = {}) {
 
   if (Array.isArray(userData.roles)) {
     userData.roles.forEach((role) => {
-      if (role) roleSet.add(normalizeRole(role));
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
     });
   }
 
-  if (userData.activeRole) {
-    roleSet.add(normalizeRole(userData.activeRole));
-  }
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
 
-  if (userData.role) {
-    roleSet.add(normalizeRole(userData.role));
-  }
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
 
   if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
     roleSet.add("customer");
   }
 
-  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
     roleSet.add("vendor");
   }
 
@@ -948,16 +950,16 @@ function getAllowedRoles(userData = {}) {
   if (
     userData.admin === true ||
     userData.isAdmin === true ||
-    normalizeRole(userData.role) === "admin" ||
-    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+    userData.permissions?.admin === true ||
+    legacy === "admin"
   ) {
     roleSet.add("admin");
     roleSet.add("customer");
+    roleSet.add("vendor");
+    roleSet.add("planner");
   }
 
-  if (!roleSet.size) {
-    roleSet.add("customer");
-  }
+  if (!roleSet.size) roleSet.add("customer");
 
   const preferredOrder = ["customer", "vendor", "planner", "admin"];
   return preferredOrder.filter((role) => roleSet.has(role));
@@ -965,19 +967,13 @@ function getAllowedRoles(userData = {}) {
 
 function getActiveRole(userData = {}) {
   const allowedRoles = getAllowedRoles(userData);
-  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
 
-  if (allowedRoles.includes(requestedRole)) {
-    return requestedRole;
-  }
-
-  if (userData.plannerPro === true && allowedRoles.includes("planner")) {
-    return "planner";
-  }
-
-  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) {
-    return "vendor";
-  }
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
+  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
 
   return allowedRoles[0] || "customer";
 }
@@ -1017,7 +1013,7 @@ async function switchDashboardRole(nextRole) {
   const normalizedRole = normalizeRole(nextRole);
   const allowedRoles = getAllowedRoles(currentUserData);
 
-  if (!allowedRoles.includes(normalizedRole)) {
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
     alert("This dashboard is not enabled on your account yet.");
     renderRoleSwitcher(currentUserData, getActiveRole(currentUserData));
     return;
@@ -1035,14 +1031,17 @@ async function switchDashboardRole(nextRole) {
   window.location.href = getDashboardForRole(normalizedRole);
 }
 
-function renderMenuItem(href, title, subtitle, icon = "›") {
+function renderMenuItem(href, title, subtitle, icon = "›", badgeId = "") {
+  const hasBadge = !!badgeId;
+
   return `
-    <a class="menu-item" href="${href}">
+    <a class="menu-item ${hasBadge ? "has-badge" : ""}" href="${escapeHtml(href)}">
       <span class="menu-icon">${escapeHtml(icon)}</span>
       <span class="menu-copy">
         <span>${escapeHtml(title)}</span>
         <span>${escapeHtml(subtitle)}</span>
       </span>
+      ${hasBadge ? `<span class="menu-badge" id="${escapeHtml(badgeId)}">0</span>` : ""}
       <span class="menu-arrow">›</span>
     </a>
   `;
@@ -1112,8 +1111,8 @@ function renderQuickAccess(activeRole) {
     list.innerHTML = [
       renderMenuItem("admin-dashboard.html", "Admin Dashboard", "Review users, listings, requests, and launch data.", "AD"),
       renderMenuItem("listings.html", "Marketplace", "Preview public listings and vendor categories.", "M"),
-      renderMenuItem("messages.html", "Messages", "Review marketplace conversations during testing.", "IN"),
-      renderMenuItem("notifications.html", "Notifications", "Check app alerts and system messages.", "N")
+      renderMenuItem("messages.html", "Messages", "Review marketplace conversations during testing.", "IN", "quickMessagesBadge"),
+      renderMenuItem("notifications.html", "Notifications", "Check app alerts and system messages.", "N", "quickNotificationsBadge")
     ].join("");
     return;
   }
@@ -1124,7 +1123,7 @@ function renderQuickAccess(activeRole) {
       renderMenuItem("vendor-profile.html", "Vendor profile", "Edit your business profile and service details.", "VP"),
       renderMenuItem("my-listings.html", "My listings", "Edit services, pricing, categories, and photos.", "L"),
       renderMenuItem("booking-requests.html", "Booking requests", "Review customer requests and respond quickly.", "R"),
-      renderMenuItem("messages.html", "Messages", "Keep customer conversations organized.", "IN")
+      renderMenuItem("messages.html", "Messages", "Keep customer conversations organized.", "IN", "quickMessagesBadge")
     ].join("");
     return;
   }
@@ -1135,7 +1134,7 @@ function renderQuickAccess(activeRole) {
       renderMenuItem("planner-profile.html", "Planner profile", "Edit planner details and service information.", "PP"),
       renderMenuItem("listings.html", "Browse Vendors", "Source venues, glam, rentals, music, and event services.", "V"),
       renderMenuItem("my-requests.html", "Client Requests", "Track submitted vendor requests across events.", "R"),
-      renderMenuItem("messages.html", "Messages", "Keep vendor conversations organized by client event.", "IN")
+      renderMenuItem("messages.html", "Messages", "Keep vendor conversations organized by client event.", "IN", "quickMessagesBadge")
     ].join("");
     return;
   }
@@ -1144,7 +1143,7 @@ function renderQuickAccess(activeRole) {
     renderMenuItem("dashboard.html#myEventsSection", "My Events", "Open your event project boards.", "E"),
     renderMenuItem("listings.html", "Explore vendors", "Find venues, glam, rentals, music, and event services.", "V"),
     renderMenuItem("my-requests.html", "My Requests", "Track submitted vendor requests.", "R"),
-    renderMenuItem("messages.html", "Messages", "Review vendor conversations.", "IN")
+    renderMenuItem("messages.html", "Messages", "Review vendor conversations.", "IN", "quickMessagesBadge")
   ].join("");
 }
 
@@ -1155,7 +1154,7 @@ function renderBottomNav(activeRole) {
     bottomNav.innerHTML = `
       <a class="nav-item" href="vendor-dashboard.html"><span>Home</span></a>
       <a class="nav-item" href="add-listing.html"><span>Add</span></a>
-      <a class="nav-item" href="booking-requests.html"><span>Requests</span></a>
+      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
       <a class="nav-item active" href="profile.html"><span>Profile</span></a>
     `;
     return;
@@ -1265,6 +1264,100 @@ function applyRoleLayout(userData, activeRole) {
   renderBottomNav(activeRole);
 }
 
+function userCanSeeConversation(data, userId) {
+  const activeRole = getActiveRole(currentUserData || {});
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  if (activeRole === "admin") return true;
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
+async function getUnreadMessages(user) {
+  const conversationsRef = collection(db, "conversations");
+  const activeRole = getActiveRole(currentUserData || {});
+  const snaps = [];
+
+  const queries = activeRole === "admin"
+    ? [query(conversationsRef)]
+    : [
+        query(conversationsRef, where("participantIds", "array-contains", user.uid)),
+        query(conversationsRef, where("customerId", "==", user.uid)),
+        query(conversationsRef, where("vendorId", "==", user.uid)),
+        query(conversationsRef, where("plannerId", "==", user.uid)),
+        query(conversationsRef, where("requestOwnerId", "==", user.uid))
+      ];
+
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Conversation count query skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (!userCanSeeConversation(data, user.uid)) return;
+
+      map.set(docSnap.id, data);
+    });
+  });
+
+  let unreadMessages = 0;
+
+  map.forEach((data) => {
+    const unreadFor = data.unreadFor || {};
+    if (unreadFor[user.uid]) unreadMessages += 1;
+  });
+
+  return unreadMessages;
+}
+
+async function getUnreadNotifications(user) {
+  const notificationsRef = collection(db, "notifications");
+  const snaps = [];
+
+  const queries = [
+    query(notificationsRef, where("recipientId", "==", user.uid)),
+    query(notificationsRef, where("userId", "==", user.uid))
+  ];
+
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Notification count query skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      map.set(docSnap.id, docSnap.data());
+    });
+  });
+
+  let unreadNotifications = 0;
+
+  map.forEach((data) => {
+    if (data.read === false || data.isRead === false) unreadNotifications += 1;
+  });
+
+  return unreadNotifications;
+}
+
 async function loadCounts(user) {
   const activeRole = getActiveRole(currentUserData);
 
@@ -1300,60 +1393,57 @@ async function loadCounts(user) {
   }
 
   try {
-    let requestsQuery;
+    let requestQueries = [];
 
     if (activeRole === "admin") {
-      requestsQuery = query(collection(db, "bookingRequests"));
+      requestQueries = [query(collection(db, "bookingRequests"))];
     } else if (activeRole === "vendor") {
-      requestsQuery = query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", user.uid));
+      requestQueries = [query(collection(db, "bookingRequests"), where("vendorIds", "array-contains", user.uid))];
     } else if (activeRole === "planner") {
-      requestsQuery = query(collection(db, "bookingRequests"), where("plannerId", "==", user.uid));
+      requestQueries = [
+        query(collection(db, "bookingRequests"), where("plannerId", "==", user.uid)),
+        query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid)),
+        query(collection(db, "bookingRequests"), where("submittedBy", "==", user.uid))
+      ];
     } else {
-      requestsQuery = query(collection(db, "bookingRequests"), where("customerId", "==", user.uid));
+      requestQueries = [
+        query(collection(db, "bookingRequests"), where("customerId", "==", user.uid)),
+        query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid)),
+        query(collection(db, "bookingRequests"), where("submittedBy", "==", user.uid))
+      ];
     }
 
-    const requestSnapshot = await getDocs(requestsQuery);
+    const requestMap = new Map();
 
-    requestSnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
+    for (const rq of requestQueries) {
+      try {
+        const requestSnapshot = await getDocs(rq);
 
-      if (activeRole === "admin" || activeRole === "vendor" || !data.hiddenForCustomer) {
-        requestCount += 1;
+        requestSnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+
+          if (activeRole === "admin" || activeRole === "vendor" || activeRole === "planner" || !data.hiddenForCustomer) {
+            requestMap.set(docSnap.id, data);
+          }
+        });
+      } catch (error) {
+        console.warn("Request count query skipped:", error.message);
       }
-    });
+    }
+
+    requestCount = requestMap.size;
   } catch {
     requestCount = 0;
   }
 
   try {
-    const conversationsQuery = query(
-      collection(db, "conversations"),
-      where("participantIds", "array-contains", user.uid)
-    );
-
-    const conversationSnapshot = await getDocs(conversationsQuery);
-
-    conversationSnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const unreadFor = data.unreadFor || {};
-
-      if (unreadFor[user.uid]) {
-        unreadMessages += 1;
-      }
-    });
+    unreadMessages = await getUnreadMessages(user);
   } catch {
     unreadMessages = 0;
   }
 
   try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid),
-      where("read", "==", false)
-    );
-
-    const notificationSnapshot = await getDocs(notificationsQuery);
-    unreadNotifications = notificationSnapshot.size;
+    unreadNotifications = await getUnreadNotifications(user);
   } catch {
     unreadNotifications = 0;
   }
@@ -1362,8 +1452,13 @@ async function loadCounts(user) {
   setText("tripStatLabel", activeRole === "planner" ? "Client Events" : "Events");
   setText("requestStat", requestCount);
   setText("messageStat", unreadMessages);
+
   setBadge("bottomInboxBadge", unreadMessages);
+  setBadge("quickMessagesBadge", unreadMessages);
+
   setBadge("topNotificationBadge", unreadMessages + unreadNotifications);
+  setBadge("notificationMenuBadge", unreadMessages + unreadNotifications);
+  setBadge("quickNotificationsBadge", unreadNotifications);
 }
 
 function renderProfile(user, userData) {
@@ -1428,7 +1523,7 @@ onAuthStateChanged(auth, async (user) => {
   currentUserData = userSnap.data();
 
   renderProfile(user, currentUserData);
-  loadCounts(user);
+  await loadCounts(user);
 });
 </script>
 
