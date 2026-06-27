@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Privacy Policy | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --gold-soft: #fff4df;
+      --gold-text: #9b6511;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 92px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.48;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .notice-card {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+      border: 1px solid rgba(155, 101, 17, 0.18);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .notice-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .notice-card p {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .privacy-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.45);
+    }
+
+    .updated {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .section {
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 1.12rem;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .section h3 {
+      margin: 14px 0 8px;
+      font-size: 0.98rem;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .section p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section ul {
+      margin: 0 0 12px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section li {
+      margin-bottom: 8px;
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .info-box {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 13px;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.86rem;
+      line-height: 1.25;
+    }
+
+    .info-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .pill.blue {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .pill.green {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.red {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 48px;
+      border-radius: 999px;
+      padding: 0 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      color: #4a433d;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 880px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .hero-content {
+        max-width: 560px;
+      }
+
+      .privacy-card {
+        padding: 28px;
+      }
+
+      .section h2 {
+        font-size: 1.25rem;
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="profile.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Legal</div>
+        <h1 class="page-title">Privacy</h1>
+      </div>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <h2 class="hero-title">Privacy Policy</h2>
+        <p class="hero-subtitle">
+          This policy explains what information RentEvent collects, how we use it, and how we protect marketplace, planning, vendor, and messaging data.
+        </p>
+      </div>
+    </section>
+
+    <section class="notice-card">
+      <strong>Important launch note</strong>
+      <p>
+        This is a practical starter Privacy Policy for launch preparation. Have a qualified attorney review it before using it as your final legal policy.
+      </p>
+    </section>
+
+    <section class="privacy-card">
+      <p class="updated">
+        Last updated: June 2026
+      </p>
+
+      <div class="section">
+        <h2>1. Overview</h2>
+        <p>
+          RentEvent is an event marketplace and planning platform for customers, vendors, event planners, and admins. This Privacy Policy explains how RentEvent collects, uses, stores, shares, and protects information when you use our website, app, listings, messaging, booking request tools, planning tools, notifications, and related services.
+        </p>
+        <p>
+          By using RentEvent, creating an account, submitting a booking request, sending messages, creating listings, or using our planning tools, you agree to the collection and use of information described in this Privacy Policy.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>2. Information We Collect</h2>
+        <p>
+          We collect information that you provide directly, information created through your use of the platform, and limited technical information needed to operate, secure, and improve RentEvent.
+        </p>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <strong>Account information</strong>
+            <span>Name, email address, phone number, location, ZIP code, account role, login details, preferences, and account status.</span>
+          </div>
+
+          <div class="info-box">
+            <strong>Customer event information</strong>
+            <span>Event names, dates, guest counts, location details, budget, style/vibe, event notes, saved listings, planning boards, and requests.</span>
+          </div>
+
+          <div class="info-box">
+            <strong>Vendor information</strong>
+            <span>Business name, vendor profile, categories, service areas, listing descriptions, prices, photos, availability details, insurance or verification-related information, and account status.</span>
+          </div>
+
+          <div class="info-box">
+            <strong>Planner information</strong>
+            <span>Planner account details, client event details, vendor sourcing information, submitted requests, planning activity, and communication history.</span>
+          </div>
+
+          <div class="info-box">
+            <strong>Messages and notifications</strong>
+            <span>Conversations, message content, timestamps, sender/recipient details, unread status, notification records, and related booking or event references.</span>
+          </div>
+
+          <div class="info-box">
+            <strong>Payment and billing information</strong>
+            <span>Subscription status, plan type, billing provider references, payment status, transaction references, and payout-related metadata when payment features are connected.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>3. How We Use Information</h2>
+        <p>
+          RentEvent uses information to provide and improve the marketplace, planning, booking, communication, safety, and account features.
+        </p>
+        <ul>
+          <li>Create and manage user accounts.</li>
+          <li>Show role-appropriate dashboards for customers, vendors, planners, and admins.</li>
+          <li>Display vendor listings and marketplace search results.</li>
+          <li>Allow customers and planners to create events and submit booking requests.</li>
+          <li>Allow vendors to review requests, respond, and manage listings.</li>
+          <li>Power messaging, chat threads, unread badges, and notifications.</li>
+          <li>Support booking workflows, vendor responses, and event planning tools.</li>
+          <li>Provide customer support, account troubleshooting, and report handling.</li>
+          <li>Monitor safety, prevent fraud, enforce policies, and protect users.</li>
+          <li>Improve the platform, test features, and understand marketplace activity.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>4. Role-Based Visibility</h2>
+        <p>
+          RentEvent uses role-based visibility so different users see different information based on their account type and relationship to a booking or event.
+        </p>
+        <ul>
+          <li>Customers see customer-facing planning, listings, booking request, and communication information.</li>
+          <li>Vendors see vendor-facing listing, request, payout, platform fee, subscription, and customer communication information relevant to their business.</li>
+          <li>Event planners may see client event details, vendor sourcing details, submitted requests, and planning information relevant to their role.</li>
+          <li>Admins may access marketplace data needed to operate, moderate, support, troubleshoot, secure, and improve RentEvent.</li>
+        </ul>
+        <p>
+          Vendor tools, vendor fees, vendor subscriptions, and payout information are not intended to be customer-facing. Customer-only planning and payment details are not intended to be vendor-facing unless connected to a booking, request, or support issue.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>5. Messaging and Booking Requests</h2>
+        <p>
+          RentEvent may store conversations, booking requests, request responses, message content, timestamps, unread status, participant IDs, sender roles, and related event or listing references.
+        </p>
+        <p>
+          Messages may be used to help users coordinate event details, support disputes, investigate reports, provide safety support, troubleshoot platform issues, and enforce platform rules. Users should avoid sending sensitive personal information through messages unless necessary for the booking.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>6. Payments and Third-Party Processors</h2>
+        <p>
+          RentEvent may use third-party payment processors, such as Stripe, to process payments, subscriptions, customer fees, vendor platform fees, payouts, invoices, refunds, or billing portal access.
+        </p>
+        <p>
+          Payment processors may collect and process payment information under their own privacy policies and terms. RentEvent may store payment status, subscription tier, billing references, payout references, and transaction metadata, but we do not intend to store full credit card numbers on our own servers.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>7. Firebase, Hosting, and Technical Services</h2>
+        <p>
+          RentEvent may use services such as Firebase, Google Cloud, GitHub Pages, Stripe, email providers, analytics tools, or other technical vendors to host the platform, store records, authenticate users, send notifications, process payments, and keep the app running.
+        </p>
+        <p>
+          These service providers may process information only as needed to provide their services to RentEvent, subject to their own terms, policies, and security practices.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>8. Safety, Reports, and Verification</h2>
+        <p>
+          RentEvent may collect and review information related to safety reports, account concerns, vendor verification, suspicious activity, fraud prevention, prohibited listings, disputes, or platform misuse.
+        </p>
+        <p>
+          Vendor verification information may include business names, tax or business identifiers, insurance details, licensing details, contact information, or other documentation. Verification does not guarantee a vendor’s performance, safety, legality, insurance coverage, or suitability for a particular event.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>9. How We Share Information</h2>
+        <p>
+          We may share information as needed to operate the platform, complete marketplace interactions, comply with law, protect users, and support the services.
+        </p>
+        <ul>
+          <li>With vendors when a customer or planner submits a request or communicates about a potential booking.</li>
+          <li>With customers or planners when a vendor responds to a request or message.</li>
+          <li>With service providers that host, secure, analyze, or process parts of the platform.</li>
+          <li>With payment processors when payments, subscriptions, billing, or payouts are connected.</li>
+          <li>With legal, safety, or law enforcement entities when required or appropriate under applicable law.</li>
+          <li>With admins, support, or moderation users when necessary to operate, investigate, or improve the platform.</li>
+        </ul>
+        <p>
+          We do not intend to sell personal information in the ordinary sense. If this changes, RentEvent should update this policy and provide any legally required choices.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>10. Cookies, Analytics, and Device Information</h2>
+        <p>
+          RentEvent may collect technical information such as browser type, device type, pages visited, links clicked, general location, timestamps, referral information, and diagnostic logs.
+        </p>
+        <p>
+          This information may be used to keep users signed in, improve the platform, debug errors, understand usage, prevent abuse, and measure marketplace performance.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>11. Data Retention</h2>
+        <p>
+          We keep information as long as needed to provide RentEvent, comply with legal obligations, resolve disputes, enforce agreements, prevent fraud, maintain business records, support tax or accounting needs, and protect users.
+        </p>
+        <p>
+          Some information may remain after account deactivation or deletion requests if it is connected to completed transactions, safety issues, disputes, fraud prevention, legal obligations, backups, or legitimate business records.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>12. Account Choices and Deletion Requests</h2>
+        <p>
+          Users may update certain profile and account details through account settings. Users may also request account deactivation or permanent deletion review.
+        </p>
+        <p>
+          Deletion requests may not immediately remove all records. RentEvent may retain certain information where needed for safety, legal compliance, tax records, dispute resolution, fraud prevention, completed bookings, or platform integrity.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>13. Security</h2>
+        <p>
+          RentEvent uses reasonable technical and organizational measures to protect information. However, no online platform, database, transmission, or storage system can be guaranteed to be completely secure.
+        </p>
+        <p>
+          Users are responsible for maintaining secure account credentials and should contact support if they believe their account has been accessed without permission.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>14. Children’s Privacy</h2>
+        <p>
+          RentEvent is intended for adults and businesses using the platform for event planning, vendor services, and marketplace activity. RentEvent is not intended for children to create accounts or submit personal information.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>15. State and Regional Privacy Rights</h2>
+        <p>
+          Depending on where you live, you may have rights to access, correct, delete, or request information about certain personal data. RentEvent will respond to valid requests as required by applicable law.
+        </p>
+        <p>
+          To make a privacy-related request, contact support or use the account settings and support tools available in the platform.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>16. Changes to This Policy</h2>
+        <p>
+          RentEvent may update this Privacy Policy from time to time. When we make changes, we may update the “Last updated” date or provide notice through the platform.
+        </p>
+        <p>
+          Continued use of RentEvent after updates means you acknowledge the revised Privacy Policy.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>17. Contact</h2>
+        <p>
+          For privacy questions, account requests, deletion requests, safety concerns, or support issues, contact RentEvent through the support page.
+        </p>
+
+        <div class="pill-row">
+          <span class="pill blue">Privacy</span>
+          <span class="pill green">Data Choices</span>
+          <span class="pill red">Safety Reports</span>
+        </div>
+
+        <div class="footer-actions">
+          <a class="btn" href="support.html">Contact Support</a>
+          <a class="btn-secondary" href="report.html">Report a Concern</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
