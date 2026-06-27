@@ -63,6 +63,56 @@
       padding: 20px 18px 132px;
     }
 
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .topbar {
       display: flex;
       align-items: center;
@@ -86,6 +136,34 @@
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       font-weight: 800;
       flex-shrink: 0;
+      position: relative;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.68rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      top: -5px;
+      right: -5px;
+      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
     }
 
     .topbar-center {
@@ -621,16 +699,32 @@
 </head>
 
 <body>
+  <div class="admin-preview-bar" id="adminPreviewBar">
+    <div class="admin-preview-inner">
+      <div class="admin-preview-text">
+        Admin Account
+        <span>You are viewing account settings with admin access.</span>
+      </div>
+      <a class="admin-preview-btn" href="admin-dashboard.html">Back to Admin</a>
+    </div>
+  </div>
+
   <main class="page">
     <header class="topbar">
-      <a href="profile.html" class="back-link" aria-label="Go back">←</a>
+      <a href="profile.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow">Account</div>
+        <div class="eyebrow" id="pageEyebrow">Account</div>
         <h1 class="page-title">Settings</h1>
       </div>
 
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">🔔</a>
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <span class="notification-badge" id="topNotificationBadge">0</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
     </header>
 
     <section class="hero-card">
@@ -664,7 +758,7 @@
                 <div>
                   <label for="emailInput">Email</label>
                   <input id="emailInput" class="input" type="email" placeholder="you@email.com" />
-                  <p class="helper-text">This updates your RentEvent profile record. Changing login email may require a separate Firebase auth flow later.</p>
+                  <p class="helper-text">This updates your RentEvent profile record. Changing login email can be added later with Firebase Auth email verification.</p>
                 </div>
 
                 <div>
@@ -865,6 +959,10 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -909,6 +1007,19 @@ function setValue(id, value) {
   if (el) el.value = safeText(value, "");
 }
 
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
 function showStatus(id, message, type = "") {
   const el = document.getElementById(id);
   if (!el) return;
@@ -917,13 +1028,6 @@ function showStatus(id, message, type = "") {
   el.className = "status-message";
   if (type) el.classList.add(type);
   el.style.display = "block";
-}
-
-function hideStatus(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.style.display = "none";
-  el.textContent = "";
 }
 
 function setSaving(isSaving) {
@@ -935,10 +1039,12 @@ function setSaving(isSaving) {
 }
 
 function normalizeRole(role) {
-  if (role === "client") return "customer";
-  if (role === "host") return "customer";
-  if (role === "event_host") return "customer";
-  return role || "customer";
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
 }
 
 function getDashboardForRole(role) {
@@ -966,18 +1072,27 @@ function getAllowedRoles(userData = {}) {
 
   if (Array.isArray(userData.roles)) {
     userData.roles.forEach((role) => {
-      if (role) roleSet.add(normalizeRole(role));
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
     });
   }
 
-  if (userData.activeRole) roleSet.add(normalizeRole(userData.activeRole));
-  if (userData.role) roleSet.add(normalizeRole(userData.role));
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
 
   if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
     roleSet.add("customer");
   }
 
-  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
     roleSet.add("vendor");
   }
 
@@ -988,11 +1103,13 @@ function getAllowedRoles(userData = {}) {
   if (
     userData.admin === true ||
     userData.isAdmin === true ||
-    normalizeRole(userData.role) === "admin" ||
-    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+    userData.permissions?.admin === true ||
+    legacy === "admin"
   ) {
     roleSet.add("admin");
     roleSet.add("customer");
+    roleSet.add("vendor");
+    roleSet.add("planner");
   }
 
   if (!roleSet.size) roleSet.add("customer");
@@ -1003,13 +1120,19 @@ function getAllowedRoles(userData = {}) {
 
 function getActiveRole(userData = {}) {
   const allowedRoles = getAllowedRoles(userData);
-  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
 
-  if (allowedRoles.includes(requestedRole)) return requestedRole;
-  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) return "vendor";
-  if (userData.plannerPro === true && allowedRoles.includes("planner")) return "planner";
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
 
   return allowedRoles[0] || "customer";
+}
+
+function isAdminPreview() {
+  return getAllowedRoles(currentUserData || {}).includes("admin") && getActiveRole(currentUserData || {}) === "admin";
 }
 
 function formatDateFromTimestamp(value) {
@@ -1048,6 +1171,22 @@ function getSubscriptionProvider(subscription = {}, userData = {}) {
   return safeText(subscription.provider || userData.subscription?.provider, "Not connected");
 }
 
+function applyRoleLayout(userData = {}) {
+  const activeRole = getActiveRole(userData);
+  const bar = document.getElementById("adminPreviewBar");
+
+  if (isAdminPreview()) {
+    bar.style.display = "block";
+    document.getElementById("pageEyebrow").textContent = "Admin Account";
+    document.getElementById("backLink").href = "admin-dashboard.html";
+    return;
+  }
+
+  bar.style.display = "none";
+  document.getElementById("pageEyebrow").textContent = `${getRoleLabel(activeRole)} Account`;
+  document.getElementById("backLink").href = "profile.html";
+}
+
 function renderRoleSwitcher(userData = {}) {
   const roleSwitcher = document.getElementById("roleSwitcher");
   const roleSelect = document.getElementById("roleSelect");
@@ -1083,7 +1222,7 @@ function renderRoleCards(userData = {}) {
     {
       role: "vendor",
       title: "Vendor",
-      description: "Manage your vendor profile, listings, requests, and customer conversations."
+      description: "Manage your vendor profile, listings, requests, payouts, and customer conversations."
     },
     {
       role: "planner",
@@ -1163,8 +1302,115 @@ function renderAccountData(userData = {}, subscription = {}) {
     reactivateBtn.style.display = "none";
   }
 
+  applyRoleLayout(userData);
   renderRoleSwitcher(userData);
   renderRoleCards(userData);
+}
+
+function userCanSeeConversation(data, userId) {
+  if (isAdminPreview()) return true;
+
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
+async function getUnreadMessages(user) {
+  const activeRole = getActiveRole(currentUserData || {});
+  const conversationsRef = collection(db, "conversations");
+  const snaps = [];
+
+  const queries = activeRole === "admin"
+    ? [query(conversationsRef)]
+    : [
+        query(conversationsRef, where("participantIds", "array-contains", user.uid)),
+        query(conversationsRef, where("customerId", "==", user.uid)),
+        query(conversationsRef, where("vendorId", "==", user.uid)),
+        query(conversationsRef, where("plannerId", "==", user.uid)),
+        query(conversationsRef, where("requestOwnerId", "==", user.uid))
+      ];
+
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Conversation badge query skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (!userCanSeeConversation(data, user.uid)) return;
+
+      map.set(docSnap.id, data);
+    });
+  });
+
+  let count = 0;
+
+  map.forEach((data) => {
+    const unreadFor = data.unreadFor || {};
+    if (unreadFor[user.uid]) count += 1;
+  });
+
+  return count;
+}
+
+async function getUnreadNotifications(user) {
+  const notificationsRef = collection(db, "notifications");
+  const snaps = [];
+
+  const queries = [
+    query(notificationsRef, where("recipientId", "==", user.uid)),
+    query(notificationsRef, where("userId", "==", user.uid))
+  ];
+
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Notification badge query skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      map.set(docSnap.id, docSnap.data());
+    });
+  });
+
+  let count = 0;
+
+  map.forEach((data) => {
+    if (data.read === false || data.isRead === false) count += 1;
+  });
+
+  return count;
+}
+
+async function loadUnreadBadge(user) {
+  try {
+    const [unreadMessages, unreadNotifications] = await Promise.all([
+      getUnreadMessages(user),
+      getUnreadNotifications(user)
+    ]);
+
+    setBadge("topNotificationBadge", unreadMessages + unreadNotifications);
+  } catch {
+    setBadge("topNotificationBadge", 0);
+  }
 }
 
 async function saveSettings() {
@@ -1231,7 +1477,7 @@ async function switchActiveRole(nextRole) {
   const normalizedRole = normalizeRole(nextRole);
   const allowedRoles = getAllowedRoles(currentUserData);
 
-  if (!allowedRoles.includes(normalizedRole)) {
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
     alert("This role is not enabled on your account yet.");
     renderRoleSwitcher(currentUserData);
     return;
@@ -1240,17 +1486,16 @@ async function switchActiveRole(nextRole) {
   try {
     await updateDoc(doc(db, "users", currentUser.uid), {
       activeRole: normalizedRole,
-      role: normalizedRole,
       updatedAt: serverTimestamp()
     });
 
     currentUserData = {
       ...currentUserData,
-      activeRole: normalizedRole,
-      role: normalizedRole
+      activeRole: normalizedRole
     };
 
     renderAccountData(currentUserData, currentSubscription || {});
+    await loadUnreadBadge(currentUser);
     showStatus("basicStatus", `Active role changed to ${getRoleLabel(normalizedRole)}.`, "success");
   } catch (error) {
     showStatus("basicStatus", error.message, "error");
@@ -1399,7 +1644,7 @@ function openBillingPortalPlaceholder() {
 function openPlansPlaceholder() {
   showStatus(
     "billingStatus",
-    "Plan selection is not connected yet. Later this can route to pricing.html or open a Stripe checkout flow.",
+    "Plan selection is not connected yet. Later this can route to billing.html, pricing.html, or open a Stripe checkout flow.",
     ""
   );
 }
@@ -1445,6 +1690,7 @@ onAuthStateChanged(auth, async (user) => {
   currentSubscription = subscriptionSnap && subscriptionSnap.exists() ? subscriptionSnap.data() : null;
 
   renderAccountData(currentUserData, currentSubscription || {});
+  await loadUnreadBadge(user);
 });
 </script>
 
