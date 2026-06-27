@@ -56,6 +56,56 @@
       min-height: 100vh;
     }
 
+    .admin-preview-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 18px;
+      background: #161616;
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
+    }
+
+    .admin-preview-inner {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-preview-text {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .admin-preview-text span {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 2px;
+    }
+
+    .admin-preview-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #fff;
+      color: #161616;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .page {
       width: 100%;
       max-width: 430px;
@@ -132,10 +182,6 @@
       box-shadow: 0 6px 14px rgba(120, 96, 60, 0.06);
     }
 
-    .role-select option {
-      color: var(--text);
-    }
-
     .top-actions {
       display: flex;
       align-items: center;
@@ -163,6 +209,8 @@
       height: 44px;
       border-radius: 50%;
       flex-shrink: 0;
+      cursor: pointer;
+      font-family: inherit;
     }
 
     .icon-btn svg {
@@ -213,6 +261,11 @@
       height: 18px;
       line-height: 18px;
       font-size: 0.64rem;
+    }
+
+    .quick-card > .notification-badge {
+      top: 12px;
+      right: 12px;
     }
 
     .notification-panel {
@@ -344,8 +397,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.92rem;
+      font-size: 0.74rem;
       font-weight: 900;
+      letter-spacing: 0.04em;
     }
 
     .notification-panel-card.unread .notification-panel-icon {
@@ -397,21 +451,6 @@
       font-size: 0.88rem;
       line-height: 1.45;
       font-weight: 700;
-    }
-
-    @media (max-width: 520px) {
-      .notification-panel {
-        position: fixed;
-        top: 74px;
-        left: 12px;
-        right: 12px;
-        width: auto;
-        max-height: calc(100vh - 112px);
-      }
-
-      .notification-panel-list {
-        max-height: calc(100vh - 250px);
-      }
     }
 
     .hero-card {
@@ -846,7 +885,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.35rem;
       font-weight: 800;
     }
 
@@ -1034,55 +1073,19 @@
       box-shadow: 0 10px 22px rgba(255, 107, 97, 0.24);
     }
 
-    .admin-preview-bar {
-      display: none;
-      position: sticky;
-      top: 0;
-      z-index: 90;
-      margin: -20px -18px 18px;
-      padding: 12px 18px;
-      background: #161616;
-      color: #fff;
-      box-shadow: 0 12px 28px rgba(22, 22, 22, 0.18);
-    }
+    @media (max-width: 520px) {
+      .notification-panel {
+        position: fixed;
+        top: 74px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-height: calc(100vh - 112px);
+      }
 
-    .admin-preview-inner {
-      width: 100%;
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .admin-preview-text {
-      font-size: 0.82rem;
-      line-height: 1.35;
-      font-weight: 700;
-    }
-
-    .admin-preview-text span {
-      display: block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.72);
-      margin-top: 2px;
-    }
-
-    .admin-preview-btn {
-      min-height: 38px;
-      padding: 0 13px;
-      border-radius: 999px;
-      background: #fff;
-      color: #161616;
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 800;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      .notification-panel-list {
+        max-height: calc(100vh - 250px);
+      }
     }
 
     @media (min-width: 768px) {
@@ -1145,9 +1148,9 @@
       <div class="top-actions">
         <button class="icon-btn" type="button" id="notificationBellBtn" aria-label="Notifications" aria-expanded="false">
           <span class="notification-badge" id="topNotificationBadge">0</span>
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-            <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
 
@@ -1174,7 +1177,7 @@
           </svg>
         </a>
 
-        <button class="logout-btn" onclick="logout()">Log Out</button>
+        <button class="logout-btn" type="button" id="logoutBtn">Log Out</button>
       </div>
     </header>
 
@@ -1224,7 +1227,7 @@
           </div>
           <div>
             <h3>My Events</h3>
-            <p>Open existing event boards and keep client projects separate.</p>
+            <p>Open existing event boards and keep projects separate.</p>
           </div>
         </a>
 
@@ -1267,7 +1270,7 @@
 
       <div class="event-list" id="eventList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon">...</div>
           <h3>Loading events</h3>
           <p>We’re pulling your event projects now.</p>
         </div>
@@ -1282,7 +1285,7 @@
 
       <div class="vendor-list" id="vendorList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon">...</div>
           <h3>Loading vendors</h3>
           <p>We’re pulling published listings now.</p>
         </div>
@@ -1322,6 +1325,9 @@
             <option>Holiday Party</option>
             <option>Styled Shoot</option>
             <option>Church Event</option>
+            <option>Pool Party</option>
+            <option>Quinceañera</option>
+            <option>Festival</option>
             <option>Other</option>
           </select>
         </div>
@@ -1460,10 +1466,28 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
+}
+
 function formatPrice(value) {
   const raw = safeText(value, "");
 
-  if (!raw) return "$0+";
+  if (!raw) return "Price varies";
 
   const numberMatch = raw.match(/\d+(\.\d+)?/);
 
@@ -1473,7 +1497,7 @@ function formatPrice(value) {
 
   if (Number.isNaN(number)) return raw;
 
-  return `$${Math.round(number)}+`;
+  return `$${Math.round(number).toLocaleString()}`;
 }
 
 function formatEventDate(value) {
@@ -1493,9 +1517,19 @@ function formatEventDate(value) {
 }
 
 function formatNotificationTime(value) {
-  if (!value || !value.seconds) return "New";
+  if (!value) return "New";
 
-  const date = new Date(value.seconds * 1000);
+  let date = null;
+
+  if (value.seconds) {
+    date = new Date(value.seconds * 1000);
+  } else {
+    const parsed = Date.parse(value);
+    if (!Number.isNaN(parsed)) date = new Date(parsed);
+  }
+
+  if (!date) return "New";
+
   const now = new Date();
   const diffMs = now - date;
   const diffMinutes = Math.floor(diffMs / 60000);
@@ -1513,7 +1547,9 @@ function formatNotificationTime(value) {
 
 function getSortTime(item) {
   const value = item.updatedAt || item.createdAt;
+
   if (value && value.seconds) return value.seconds;
+
   return Date.parse(value || "") / 1000 || 0;
 }
 
@@ -1523,20 +1559,22 @@ function makeSafeId(value) {
     .slice(0, 180);
 }
 
-function buildBookingConversationId(requestId, customerId, vendorId) {
+function buildBookingConversationId(requestId, ownerId, vendorId) {
   return [
     "booking",
     makeSafeId(requestId),
-    makeSafeId(customerId),
+    makeSafeId(ownerId),
     makeSafeId(vendorId)
   ].join("__");
 }
 
 function normalizeRole(role) {
-  if (role === "client") return "customer";
-  if (role === "host") return "customer";
-  if (role === "event_host") return "customer";
-  return role || "customer";
+  const clean = safeText(role, "").toLowerCase();
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
 }
 
 function getDashboardForRole(role) {
@@ -1564,23 +1602,27 @@ function getAllowedRoles(userData = {}) {
 
   if (Array.isArray(userData.roles)) {
     userData.roles.forEach((role) => {
-      if (role) roleSet.add(normalizeRole(role));
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
     });
   }
 
-  if (userData.activeRole) {
-    roleSet.add(normalizeRole(userData.activeRole));
-  }
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
 
-  if (userData.role) {
-    roleSet.add(normalizeRole(userData.role));
-  }
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
 
   if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
     roleSet.add("customer");
   }
 
-  if (userData.vendorAccount === true || userData.permissions?.canUseVendorDashboard === true) {
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
     roleSet.add("vendor");
   }
 
@@ -1591,11 +1633,13 @@ function getAllowedRoles(userData = {}) {
   if (
     userData.admin === true ||
     userData.isAdmin === true ||
-    normalizeRole(userData.role) === "admin" ||
-    (Array.isArray(userData.roles) && userData.roles.includes("admin"))
+    userData.permissions?.admin === true ||
+    legacy === "admin"
   ) {
     roleSet.add("admin");
     roleSet.add("customer");
+    roleSet.add("vendor");
+    roleSet.add("planner");
   }
 
   if (!roleSet.size) {
@@ -1608,19 +1652,13 @@ function getAllowedRoles(userData = {}) {
 
 function getActiveRole(userData = {}) {
   const allowedRoles = getAllowedRoles(userData);
-  const requestedRole = normalizeRole(userData.activeRole || userData.role || allowedRoles[0] || "customer");
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
 
-  if (allowedRoles.includes(requestedRole)) {
-    return requestedRole;
-  }
-
-  if (userData.plannerPro === true && allowedRoles.includes("planner")) {
-    return "planner";
-  }
-
-  if (userData.vendorAccount === true && allowedRoles.includes("vendor")) {
-    return "vendor";
-  }
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
+  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
 
   return allowedRoles[0] || "customer";
 }
@@ -1659,7 +1697,7 @@ async function switchDashboardRole(nextRole) {
   const normalizedRole = normalizeRole(nextRole);
   const allowedRoles = getAllowedRoles(currentUserData);
 
-  if (!allowedRoles.includes(normalizedRole)) {
+  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
     alert("This dashboard is not enabled on your account yet.");
     renderRoleSwitcher(currentUserData, getActiveRole(currentUserData));
     return;
@@ -1668,7 +1706,6 @@ async function switchDashboardRole(nextRole) {
   try {
     await updateDoc(doc(db, "users", currentUser.uid), {
       activeRole: normalizedRole,
-      role: normalizedRole,
       updatedAt: serverTimestamp()
     });
   } catch (error) {
@@ -1688,28 +1725,45 @@ function getDashboardNotificationEventId(notification) {
 
 function getDashboardNotificationRequestId(notification) {
   const sourceCollection = safeText(notification.sourceCollection, "");
+  const relatedCollection = safeText(notification.relatedCollection, "");
 
-  return (
-    safeText(notification.bookingRequestId, "") ||
-    safeText(notification.requestId, "") ||
-    (sourceCollection === "bookingRequests" ? safeText(notification.sourceId, "") : "")
+  if (safeText(notification.bookingRequestId, "")) return safeText(notification.bookingRequestId, "");
+  if (safeText(notification.requestId, "")) return safeText(notification.requestId, "");
+  if (sourceCollection === "bookingRequests") return safeText(notification.sourceId, "");
+  if (relatedCollection === "bookingRequests") return safeText(notification.relatedId, "");
+
+  return "";
+}
+
+function getRequestOwnerIdFromNotification(notification) {
+  return safeText(
+    notification.requestOwnerId ||
+    notification.plannerId ||
+    notification.customerId ||
+    notification.raw?.requestOwnerId ||
+    notification.raw?.plannerId ||
+    notification.raw?.customerId,
+    ""
   );
 }
 
 function getDashboardNotificationConversationId(notification) {
   const sourceCollection = safeText(notification.sourceCollection, "");
+  const relatedCollection = safeText(notification.relatedCollection, "");
   const sourceId = safeText(notification.sourceId, "");
+  const relatedId = safeText(notification.relatedId, "");
   const conversationId = safeText(notification.conversationId, "");
   const bookingRequestId = safeText(notification.bookingRequestId || notification.requestId, "");
-  const customerId = safeText(notification.customerId || notification.raw?.customerId, "");
+  const ownerId = getRequestOwnerIdFromNotification(notification);
   const vendorId = safeText(notification.vendorId || notification.raw?.vendorId, "");
 
   if (conversationId) return conversationId;
   if (notification.collectionName === "conversations" && sourceId) return sourceId;
   if (sourceCollection === "conversations" && sourceId) return sourceId;
+  if (relatedCollection === "conversations" && relatedId) return relatedId;
 
-  if (bookingRequestId && customerId && vendorId) {
-    return buildBookingConversationId(bookingRequestId, customerId, vendorId);
+  if (bookingRequestId && ownerId && vendorId) {
+    return buildBookingConversationId(bookingRequestId, ownerId, vendorId);
   }
 
   return "";
@@ -1730,7 +1784,14 @@ async function getConversationIdFromBookingRequest(requestId) {
 
     const vendors = Array.isArray(request.vendors) ? request.vendors : [];
     const responses = request.vendorResponses || {};
-    const customerId = safeText(request.customerId, currentUser.uid);
+    const ownerId = safeText(
+      request.requestOwnerId ||
+      request.plannerId ||
+      request.customerId ||
+      currentUser.uid,
+      currentUser.uid
+    );
+
     const vendor = vendors.find((item) => {
       const vendorId = safeText(item.vendorId, "");
       return vendorId && responses[vendorId]?.conversationId;
@@ -1742,7 +1803,7 @@ async function getConversationIdFromBookingRequest(requestId) {
     const vendorConversationIds = request.vendorConversationIds || {};
     const existingId = safeText(responses[vendorId]?.conversationId, "") || safeText(vendorConversationIds[vendorId], "");
 
-    return existingId || buildBookingConversationId(cleanRequestId, customerId, vendorId);
+    return existingId || buildBookingConversationId(cleanRequestId, ownerId, vendorId);
   } catch (error) {
     console.warn("Could not resolve booking conversation:", error.message);
     return "";
@@ -1805,15 +1866,20 @@ async function getResolvedDashboardNotificationHref(notification) {
 function getDashboardNotificationIcon(notification) {
   const type = safeText(notification.type, "");
 
-  if (type === "message") return "✉";
-  if (type === "vendor_response") return "✓";
-  if (type === "booking_request") return "◎";
+  if (type === "message") return "MSG";
+  if (type === "vendor_response") return "OK";
+  if (type === "booking_request") return "REQ";
+  if (type === "request_withdrawn") return "END";
 
-  return "•";
+  return "NEW";
+}
+
+function isDashboardNotificationUnread(notification) {
+  return notification.read === false || notification.isRead === false;
 }
 
 async function markDashboardNotificationRead(notification) {
-  if (!notification || notification.read !== false) return;
+  if (!notification) return;
 
   try {
     if (notification.collectionName === "conversations") {
@@ -1825,33 +1891,46 @@ async function markDashboardNotificationRead(notification) {
       delete updatedUnreadFor[currentUser.uid];
 
       await updateDoc(doc(db, "conversations", notification.sourceId), {
-        unreadFor: updatedUnreadFor
+        unreadFor: updatedUnreadFor,
+        updatedAt: serverTimestamp()
       });
     }
 
     if (notification.collectionName === "notifications") {
       await updateDoc(doc(db, "notifications", notification.id), {
-        read: true
+        read: true,
+        isRead: true,
+        readAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
     }
 
     notification.read = true;
+    notification.isRead = true;
   } catch (error) {
     console.warn("Could not mark dashboard notification read:", error.message);
   }
 }
 
-function buildDashboardConversationNotification(conversation) {
-  const unreadFor = conversation.unreadFor || {};
-  const isUnread = !!unreadFor[currentUser.uid];
+function getOtherParticipantName(conversation) {
   const participantNames = conversation.participantNames || {};
   const otherIds = Array.isArray(conversation.participantIds)
     ? conversation.participantIds.filter((id) => id !== currentUser.uid)
     : [];
+
   const otherId = otherIds[0];
-  const otherName = otherId && participantNames[otherId]
-    ? participantNames[otherId]
-    : safeText(conversation.title, "Conversation");
+
+  if (otherId && participantNames[otherId]) {
+    return participantNames[otherId];
+  }
+
+  return safeText(conversation.title || conversation.vendorName || conversation.customerName || conversation.plannerName, "Conversation");
+}
+
+function buildDashboardConversationNotification(conversation) {
+  const unreadFor = conversation.unreadFor || {};
+  const isUnread = !!unreadFor[currentUser.uid];
+  const otherName = getOtherParticipantName(conversation);
   const listingTitle = safeText(conversation.listingTitle, "Event listing");
   const eventName = safeText(conversation.eventName, "");
   const lastMessage = safeText(conversation.lastMessage, "Conversation updated.");
@@ -1865,65 +1944,110 @@ function buildDashboardConversationNotification(conversation) {
     typeLabel: "Message",
     title: isUnread ? `New message from ${otherName}` : `Message thread with ${otherName}`,
     body: lastMessage,
+    message: lastMessage,
     sourceLabel: eventName || listingTitle,
     eventId: conversation.eventId || null,
     eventName: eventName || null,
     bookingRequestId: conversation.bookingRequestId || null,
     listingId: conversation.listingId || null,
+    customerId: conversation.customerId || "",
+    plannerId: conversation.plannerId || "",
+    requestOwnerId: conversation.requestOwnerId || "",
+    vendorId: conversation.vendorId || "",
     read: !isUnread,
+    isRead: !isUnread,
     createdAt: conversation.updatedAt || conversation.createdAt,
     updatedAt: conversation.updatedAt || conversation.createdAt,
     raw: conversation
   };
 }
 
+function userCanSeeConversation(data, userId) {
+  const activeRole = getActiveRole(currentUserData || {});
+
+  if (activeRole === "admin") return true;
+
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
 async function loadDashboardConversationNotifications(user) {
-  try {
-    const conversationsQuery = query(
-      collection(db, "conversations"),
-      where("participantIds", "array-contains", user.uid)
-    );
-    const snapshot = await getDocs(conversationsQuery);
+  const conversationsRef = collection(db, "conversations");
+  const activeRole = getActiveRole(currentUserData || {});
+  const snaps = [];
 
-    const conversations = [];
+  const queries = activeRole === "admin"
+    ? [query(conversationsRef)]
+    : [
+        query(conversationsRef, where("participantIds", "array-contains", user.uid)),
+        query(conversationsRef, where("customerId", "==", user.uid)),
+        query(conversationsRef, where("plannerId", "==", user.uid)),
+        query(conversationsRef, where("requestOwnerId", "==", user.uid))
+      ];
 
-    snapshot.forEach((docSnap) => {
-      conversations.push({
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Dashboard conversation notification query skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (!userCanSeeConversation(data, user.uid)) return;
+
+      map.set(docSnap.id, {
         id: docSnap.id,
-        ...docSnap.data()
+        ...data
       });
     });
+  });
 
-    return conversations.map(buildDashboardConversationNotification);
-  } catch (error) {
-    console.warn("Dashboard conversation notifications skipped:", error.message);
-    return [];
-  }
+  return Array.from(map.values()).map(buildDashboardConversationNotification);
 }
 
 async function loadDashboardAppNotifications(user) {
-  try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid)
-    );
+  const notificationsRef = collection(db, "notifications");
+  const snaps = [];
 
-    const snapshot = await getDocs(notificationsQuery);
-    const notifications = [];
+  const queries = [
+    query(notificationsRef, where("recipientId", "==", user.uid)),
+    query(notificationsRef, where("userId", "==", user.uid))
+  ];
 
-    snapshot.forEach((docSnap) => {
-      notifications.push({
+  for (const q of queries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Dashboard app notification query skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      map.set(docSnap.id, {
         id: docSnap.id,
         collectionName: "notifications",
         ...docSnap.data()
       });
     });
+  });
 
-    return notifications;
-  } catch (error) {
-    console.warn("Dashboard app notifications skipped:", error.message);
-    return [];
-  }
+  return Array.from(map.values());
 }
 
 function dedupeDashboardNotifications(notifications) {
@@ -1945,8 +2069,8 @@ function dedupeDashboardNotifications(notifications) {
       return;
     }
 
-    const existingScore = (existing.read === false ? 1000000000000 : 0) + getSortTime(existing);
-    const currentScore = (notification.read === false ? 1000000000000 : 0) + getSortTime(notification);
+    const existingScore = (isDashboardNotificationUnread(existing) ? 1000000000000 : 0) + getSortTime(existing);
+    const currentScore = (isDashboardNotificationUnread(notification) ? 1000000000000 : 0) + getSortTime(notification);
 
     if (currentScore >= existingScore) {
       deduped.set(key, notification);
@@ -1967,7 +2091,7 @@ function renderDashboardNotifications() {
   if (unreadTab) unreadTab.classList.toggle("active", notificationFilter === "unread");
 
   const visibleNotifications = notificationFilter === "unread"
-    ? dashboardNotifications.filter((notification) => notification.read === false)
+    ? dashboardNotifications.filter(isDashboardNotificationUnread)
     : dashboardNotifications;
 
   if (!visibleNotifications.length) {
@@ -1982,9 +2106,9 @@ function renderDashboardNotifications() {
   }
 
   list.innerHTML = visibleNotifications.slice(0, 10).map((notification) => {
-    const isUnread = notification.read === false;
+    const isUnread = isDashboardNotificationUnread(notification);
     const title = safeText(notification.title, "Notification");
-    const text = safeText(notification.body || notification.text, "You have a new update.");
+    const text = safeText(notification.body || notification.message || notification.text, "You have a new update.");
     const time = formatNotificationTime(notification.createdAt || notification.updatedAt);
     const href = getDashboardNotificationHref(notification);
 
@@ -2033,8 +2157,8 @@ async function loadDashboardNotifications(user) {
   ]);
 
   combined.sort((a, b) => {
-    const aUnread = a.read === false ? 1 : 0;
-    const bUnread = b.read === false ? 1 : 0;
+    const aUnread = isDashboardNotificationUnread(a) ? 1 : 0;
+    const bUnread = isDashboardNotificationUnread(b) ? 1 : 0;
 
     if (aUnread !== bUnread) return bUnread - aUnread;
 
@@ -2043,8 +2167,8 @@ async function loadDashboardNotifications(user) {
 
   dashboardNotifications = combined;
 
-  const unreadMessages = combined.filter((notification) => notification.type === "message" && notification.read === false).length;
-  const unreadTotal = combined.filter((notification) => notification.read === false).length;
+  const unreadMessages = combined.filter((notification) => notification.type === "message" && isDashboardNotificationUnread(notification)).length;
+  const unreadTotal = combined.filter(isDashboardNotificationUnread).length;
 
   updateNotificationBadges(unreadMessages, unreadTotal - unreadMessages);
   renderDashboardNotifications();
@@ -2060,24 +2184,6 @@ function toggleNotificationPanel(forceOpen = null) {
 
   panel.classList.toggle("show", shouldOpen);
   button.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
-}
-
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value;
-}
-
-function setBadge(id, count) {
-  const badge = document.getElementById(id);
-  if (!badge) return;
-
-  if (count > 0) {
-    badge.textContent = count > 99 ? "99+" : String(count);
-    badge.style.display = "inline-flex";
-  } else {
-    badge.textContent = "0";
-    badge.style.display = "none";
-  }
 }
 
 function showCreateEventStatus(message, type = "info") {
@@ -2133,10 +2239,50 @@ async function loadUnreadCounts(user) {
   await loadDashboardNotifications(user);
 }
 
+function normalizeProfessionalLabel(value) {
+  const clean = safeText(value, "");
+
+  const labelMap = {
+    "Staffing, Safety & Event Support": "Staffing, Safety & Event Logistics",
+    "Drivers / Chauffeurs": "Professional Transportation Companies",
+    "Private Drivers": "Shuttle Companies",
+    "Chauffeur Service": "Limo / Chauffeur Companies",
+    "Party Bus Driver": "Party Bus Companies",
+    "Party Bus": "Party Bus Companies",
+    "Shuttle Service": "Shuttle Companies",
+    "Guest Transportation": "Wedding Guest Transportation Companies",
+    "Airport Transportation": "Airport Transportation Companies",
+    "Wedding Transportation": "Wedding Guest Transportation Companies",
+    "Corporate Transportation": "Corporate Transportation Companies",
+    "Transportation": "Transportation Companies",
+    "Luxury Car Rental": "Luxury Car Service",
+    "Vintage Car Rental": "Vintage Car Rentals",
+    "Getaway Car": "Getaway Car Rentals",
+    "Golf Cart Rentals": "Golf Cart Shuttle Services",
+    "Security": "Security Companies",
+    "Private Event Security": "Private Event Security Companies",
+    "Off-Duty Police Officers": "Off-Duty Officer Services",
+    "Crowd Control": "Crowd Control Services",
+    "Gate / Entry Security": "Gate / Entry Security Teams",
+    "Lifeguards": "Certified Lifeguard Providers",
+    "Pool Party Lifeguards": "Pool Party Lifeguard Companies",
+    "Water Safety Attendants": "Water Safety Providers",
+    "Parking Attendants": "Parking Attendant Companies",
+    "Valet / Parking": "Valet / Parking Companies",
+    "Traffic Control": "Traffic Control Providers",
+    "Bathroom Attendants": "Restroom Attendant Staffing",
+    "Setup Crew": "Setup Crew Companies",
+    "Breakdown Crew": "Breakdown Crew Companies",
+    "Cleanup Crew": "Cleanup Crew Companies"
+  };
+
+  return labelMap[clean] || clean;
+}
+
 function getCategoryLine(listing) {
-  const mainCategory = safeText(listing.mainCategory, "");
-  const category = safeText(listing.category || listing.listingCategory, "Event Service");
-  const customCategory = safeText(listing.customCategory, "");
+  const mainCategory = normalizeProfessionalLabel(safeText(listing.mainCategory, ""));
+  const category = normalizeProfessionalLabel(safeText(listing.category || listing.listingCategory, "Event Service"));
+  const customCategory = normalizeProfessionalLabel(safeText(listing.customCategory, ""));
 
   const typeLine = customCategory
     ? `${category} · ${customCategory}`
@@ -2174,10 +2320,10 @@ function renderVendors(listings) {
     const title = safeText(listing.title, "Untitled Listing");
     const vendorName = safeText(listing.vendorName, "Vendor");
     const categoryLine = getCategoryLine(listing);
-    const price = formatPrice(listing.startingPrice);
+    const price = formatPrice(listing.startingPrice || listing.price || listing.priceNumber);
     const rating = listing.rating ? `${listing.rating} rating` : "New vendor";
     const listingId = encodeURIComponent(listing.id || "");
-    const imageUrl = safeText(listing.imageUrl, "");
+    const imageUrl = safeText(listing.imageUrl || listing.coverImageUrl || listing.photoUrl, "");
 
     const avatarMarkup = imageUrl
       ? `<div class="vendor-avatar has-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}"></div>`
@@ -2212,7 +2358,6 @@ async function loadSuggestedVendors() {
     );
 
     const snapshot = await getDocs(listingsQuery);
-
     const listings = [];
 
     snapshot.forEach((docSnap) => {
@@ -2229,7 +2374,6 @@ async function loadSuggestedVendors() {
     });
 
     renderVendors(listings);
-
   } catch (error) {
     document.getElementById("vendorList").innerHTML = `
       <div class="empty-card">
@@ -2273,7 +2417,7 @@ function renderEvents() {
     const location = [eventCity, eventZip].filter(Boolean).join(" ") || "Location not set";
     const savedCount = eventBoardCounts[eventData.id] || 0;
     const requests = requestCounts[eventData.id] || 0;
-    const eventStatus = safeText(eventData.status, "planning");
+    const eventStatus = safeText(eventData.status || eventData.eventStatus, "planning");
 
     return `
       <article class="event-card">
@@ -2341,15 +2485,27 @@ async function loadRequestCounts(user) {
   requestCounts = {};
 
   try {
-    const requestQuery = query(
-      collection(db, "bookingRequests"),
-      where("customerId", "==", user.uid)
-    );
+    const requestQueries = [
+      query(collection(db, "bookingRequests"), where("customerId", "==", user.uid)),
+      query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid)),
+      query(collection(db, "bookingRequests"), where("submittedBy", "==", user.uid))
+    ];
 
-    const snapshot = await getDocs(requestQuery);
+    const map = new Map();
 
-    snapshot.forEach((docSnap) => {
-      const request = docSnap.data();
+    for (const rq of requestQueries) {
+      try {
+        const snapshot = await getDocs(rq);
+
+        snapshot.forEach((docSnap) => {
+          map.set(docSnap.id, docSnap.data());
+        });
+      } catch (error) {
+        console.warn("Request count query skipped:", error.message);
+      }
+    }
+
+    map.forEach((request) => {
       const eventId = safeText(request.eventId, "");
 
       if (eventId && !request.hiddenForCustomer) {
@@ -2364,35 +2520,40 @@ async function loadRequestCounts(user) {
 async function loadCustomerEvents(user) {
   try {
     const events = [];
+    const eventMap = new Map();
 
-    const eventsQuery = query(
-      collection(db, "customerEvents"),
-      where("customerId", "==", user.uid)
-    );
+    const eventQueries = [
+      query(collection(db, "customerEvents"), where("customerId", "==", user.uid)),
+      query(collection(db, "customerEvents"), where("ownerId", "==", user.uid))
+    ];
 
-    const snapshot = await getDocs(eventsQuery);
+    for (const eq of eventQueries) {
+      try {
+        const snapshot = await getDocs(eq);
 
-    snapshot.forEach((docSnap) => {
-      events.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
-    });
+        snapshot.forEach((docSnap) => {
+          eventMap.set(docSnap.id, {
+            id: docSnap.id,
+            ...docSnap.data()
+          });
+        });
+      } catch (error) {
+        console.warn("Event query skipped:", error.message);
+      }
+    }
 
     const legacyRef = doc(db, "customerEvents", user.uid);
     const legacySnap = await getDoc(legacyRef);
 
     if (legacySnap.exists()) {
-      const alreadyIncluded = events.some((eventData) => eventData.id === legacySnap.id);
-
-      if (!alreadyIncluded) {
-        events.push({
-          id: legacySnap.id,
-          legacy: true,
-          ...legacySnap.data()
-        });
-      }
+      eventMap.set(legacySnap.id, {
+        id: legacySnap.id,
+        legacy: true,
+        ...legacySnap.data()
+      });
     }
+
+    eventMap.forEach((eventData) => events.push(eventData));
 
     events.sort((a, b) => {
       const aTime = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
@@ -2402,7 +2563,6 @@ async function loadCustomerEvents(user) {
 
     customerEvents = events;
     renderEvents();
-
   } catch (error) {
     document.getElementById("eventList").innerHTML = `
       <div class="empty-card">
@@ -2445,6 +2605,8 @@ async function createEvent() {
     const eventRef = await addDoc(collection(db, "customerEvents"), {
       customerId: currentUser.uid,
       ownerId: currentUser.uid,
+      requestOwnerId: currentUser.uid,
+      createdBy: currentUser.uid,
       customerName: currentUserData?.name || currentUser.displayName || currentUser.email || "Customer",
       customerEmail: currentUserData?.email || currentUser.email || "",
 
@@ -2460,6 +2622,7 @@ async function createEvent() {
 
       status: "planning",
       eventStatus: "planning",
+      source: "customer-dashboard",
 
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
@@ -2468,7 +2631,6 @@ async function createEvent() {
     showCreateEventStatus("Event created. Opening your event board...", "success");
 
     window.location.href = `event-builder.html?eventId=${encodeURIComponent(eventRef.id)}`;
-
   } catch (error) {
     showCreateEventStatus(error.message, "error");
   } finally {
@@ -2504,6 +2666,11 @@ document.getElementById("notificationUnreadTab").addEventListener("click", (even
 
 document.getElementById("roleSelect").addEventListener("change", (event) => {
   switchDashboardRole(event.target.value);
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "index.html";
 });
 
 document.addEventListener("click", (event) => {
@@ -2586,11 +2753,6 @@ onAuthStateChanged(auth, async (user) => {
 
   await loadCustomerEvents(user);
 });
-
-window.logout = async function () {
-  await signOut(auth);
-  window.location.href = "index.html";
-};
 </script>
 
 </body>
