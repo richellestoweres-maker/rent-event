@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Report a Concern | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,24 +14,32 @@
   />
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     :root {
       --bg: #f7f2e9;
+      --card: #ffffff;
       --text: #161616;
-      --muted: #666666;
+      --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f6f6f6;
+      --soft: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --red-soft: #ffe7e2;
-      --red-text: #c74f4d;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
-      --yellow-soft: #fff4df;
-      --yellow-text: #8d5f11;
-      --shadow: 0 14px 36px rgba(0, 0, 0, 0.07);
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --gold-soft: #fff4df;
+      --gold-text: #9b6511;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
     }
 
     html,
@@ -42,15 +51,16 @@
       font-family: "Inter", sans-serif;
     }
 
-    body { min-height: 100vh; }
+    body {
+      min-height: 100vh;
+    }
 
     .page {
       width: 100%;
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 24px 24px 112px;
-      background: var(--bg);
+      padding: 20px 18px 92px;
     }
 
     .topbar {
@@ -58,51 +68,24 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 34px;
+      margin-bottom: 22px;
     }
 
     .back-link,
     .icon-btn {
-      width: 52px;
-      height: 52px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      border: none;
-      background: rgba(255, 255, 255, 0.88);
       border: 1px solid var(--line);
-      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #222;
-      text-decoration: none;
       box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      font-weight: 800;
       flex-shrink: 0;
-      font-weight: 800;
-      position: relative;
-      font-size: 1.1rem;
-      font-family: inherit;
-      cursor: pointer;
-    }
-
-    .notification-badge,
-    .nav-badge {
-      position: absolute;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
-      color: #fff;
-      font-size: 0.68rem;
-      line-height: 20px;
-      font-weight: 800;
-      text-align: center;
-      box-shadow: 0 8px 16px rgba(255, 95, 103, 0.28);
-      border: 2px solid #fff;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 5;
     }
 
     .icon-btn svg {
@@ -110,329 +93,300 @@
       height: 20px;
     }
 
-    .notification-badge {
-      top: -5px;
-      right: -5px;
-    }
-
-    .nav-badge {
-      top: 6px;
-      right: 16px;
-      min-width: 18px;
-      height: 18px;
-      line-height: 18px;
-      font-size: 0.64rem;
-    }
-
-    .hero {
-      margin-bottom: 28px;
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
     }
 
     .eyebrow {
-      margin: 0 0 10px;
-      color: #777;
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
     }
 
     .page-title {
-      margin: 0 0 14px;
-      font-size: clamp(3.1rem, 12vw, 4.65rem);
-      line-height: 0.9;
-      letter-spacing: -0.08em;
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
       font-weight: 800;
     }
 
-    .hero-copy {
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
       margin: 0;
-      color: #666;
-      font-size: 1.05rem;
-      line-height: 1.45;
-      max-width: 700px;
+      font-size: 0.95rem;
+      line-height: 1.48;
+      color: rgba(255, 255, 255, 0.95);
     }
 
-    .safety-note {
-      margin: 26px 0 34px;
-      border-radius: 26px;
-      padding: 18px;
-      background: var(--yellow-soft);
-      color: var(--yellow-text);
-      border: 1px solid rgba(141, 95, 17, 0.12);
-      display: grid;
-      grid-template-columns: 44px 1fr;
-      gap: 14px;
-      align-items: start;
+    .notice-card {
+      background: var(--red-soft);
+      color: var(--red-text);
+      border: 1px solid rgba(199, 79, 77, 0.22);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
     }
 
-    .safety-note-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      font-weight: 900;
+    .notice-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      line-height: 1.2;
     }
 
-    .safety-note h3 {
-      margin: 0 0 6px;
-      font-size: 1rem;
-      letter-spacing: -0.03em;
-    }
-
-    .safety-note p {
+    .notice-card p {
       margin: 0;
-      font-size: 0.9rem;
-      line-height: 1.42;
-      font-weight: 650;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      color: var(--red-text);
     }
 
     .section {
-      margin-top: 34px;
+      margin-top: 28px;
     }
 
     .section-title {
       margin: 0 0 14px;
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       line-height: 1.02;
-      letter-spacing: -0.045em;
+      letter-spacing: -0.04em;
       font-weight: 800;
     }
 
-    .report-form {
-      display: grid;
-      gap: 16px;
+    .form-card,
+    .info-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.45);
     }
 
-    .field {
+    .form-grid {
       display: grid;
-      gap: 8px;
+      gap: 14px;
     }
 
-    .field label {
-      font-size: 0.9rem;
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.84rem;
       font-weight: 800;
-      color: #222;
-    }
-
-    .field small {
-      color: #777;
-      font-size: 0.78rem;
-      line-height: 1.35;
-      font-weight: 600;
+      color: #574f47;
     }
 
     .input,
     .select,
     .textarea {
       width: 100%;
-      border: none;
-      background: rgba(255, 255, 255, 0.9);
-      color: #161616;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 0.94rem;
+      color: var(--text);
       outline: none;
-      border-radius: 20px;
     }
 
     .input,
     .select {
-      min-height: 58px;
-      padding: 0 18px;
+      min-height: 52px;
+      padding: 0 15px;
     }
 
     .textarea {
-      min-height: 160px;
-      padding: 17px 18px;
+      min-height: 140px;
+      padding: 14px 15px;
       resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #a49a8f;
+    }
+
+    .helper-text {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
       line-height: 1.45;
     }
 
-    .select {
-      appearance: none;
-      background-image: linear-gradient(45deg, transparent 50%, #777 50%), linear-gradient(135deg, #777 50%, transparent 50%);
-      background-position: calc(100% - 20px) calc(50% - 3px), calc(100% - 15px) calc(50% - 3px);
-      background-size: 5px 5px, 5px 5px;
-      background-repeat: no-repeat;
-    }
-
-    .two-grid {
-      display: grid;
-      gap: 16px;
-    }
-
     .checkbox-card {
-      border-radius: 22px;
-      background: #f8f8f8;
-      border: 1px solid #eeeeee;
-      padding: 15px;
-      display: grid;
+      display: flex;
+      align-items: flex-start;
       gap: 10px;
+      padding: 13px;
+      border-radius: 18px;
+      background: var(--soft);
+      border: 1px solid var(--line);
     }
 
-    .check-row {
+    .checkbox-card input {
+      margin-top: 3px;
+      accent-color: #ff6f64;
+    }
+
+    .checkbox-card span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .button-row {
       display: flex;
       gap: 10px;
-      align-items: flex-start;
-      color: #555;
-      font-size: 0.88rem;
-      line-height: 1.38;
-      font-weight: 650;
+      flex-wrap: wrap;
+      margin-top: 14px;
     }
 
-    .check-row input {
-      margin-top: 2px;
-      accent-color: #e31c5f;
-    }
-
-    .status-card {
-      display: none;
-      border-radius: 22px;
-      padding: 15px 16px;
+    .btn,
+    .btn-secondary {
+      min-height: 50px;
+      border-radius: 999px;
+      padding: 0 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: 0.9rem;
-      line-height: 1.42;
-      font-weight: 750;
+      font-weight: 800;
+      flex: 1;
+      text-align: center;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
     }
 
-    .status-card.success {
-      display: block;
+    .btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      color: #4a433d;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 12px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
       background: var(--green-soft);
       color: var(--green-text);
     }
 
-    .status-card.error {
-      display: block;
+    .info-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .info-card p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .info-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .info-card li {
+      margin-bottom: 8px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .pill.blue {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .pill.green {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.red {
       background: var(--red-soft);
       color: var(--red-text);
     }
 
-    .submit-btn {
-      min-height: 60px;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
-      color: #fff;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.18);
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .menu-list {
-      display: grid;
-      gap: 0;
-      border: 1px solid rgba(235, 225, 211, 0.95);
-    }
-
-    .menu-item {
-      min-height: 76px;
-      border-radius: 0;
-      background: rgba(255, 255, 255, 0.92);
-      color: var(--text);
-      text-decoration: none;
-      padding: 0;
-      display: grid;
-      grid-template-columns: 52px 1fr 24px;
-      align-items: center;
-      gap: 14px;
-      font-size: 1.18rem;
-      font-weight: 500;
-      border-bottom: 1px solid rgba(236, 226, 211, 0.9);
-      font-family: inherit;
-      text-align: left;
-    }
-
-    .menu-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #161616;
-      font-size: 1.25rem;
-      font-weight: 800;
-    }
-
-    .menu-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .menu-copy span:first-child {
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-    }
-
-    .menu-copy span:last-child {
-      color: #666;
-      font-size: 0.88rem;
-      font-weight: 500;
-      line-height: 1.32;
-    }
-
-    .menu-arrow {
-      color: #9a9a9a;
-      font-weight: 800;
-      flex-shrink: 0;
-      font-size: 1.7rem;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 0;
-      width: 100%;
-      max-width: 430px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(235, 225, 211, 0.95);
-      padding: 9px 6px 14px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-      gap: 2px;
-      box-shadow: 0 -8px 22px rgba(0, 0, 0, 0.04);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 50;
-    }
-
-    .nav-item {
-      min-height: 58px;
-      border-radius: 18px;
-      text-decoration: none;
-      color: #666;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      text-align: center;
-      padding: 0 3px;
-      position: relative;
-    }
-
-    .nav-item svg {
-      width: 23px;
-      height: 23px;
-    }
-
-    .nav-item.active {
-      color: #e31c5f;
+    .pill.purple {
+      background: var(--purple-soft);
+      color: var(--purple-text);
     }
 
     @media (min-width: 768px) {
@@ -441,34 +395,25 @@
       }
 
       .page {
-        max-width: 960px;
+        max-width: 880px;
         padding-left: 24px;
         padding-right: 24px;
       }
 
-      .hero,
-      .safety-note,
-      .section {
-        max-width: 840px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .two-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .bottom-nav {
+      .hero-content {
         max-width: 560px;
-        bottom: 16px;
-        border: 1px solid #eeeeee;
-        border-radius: 999px;
-        padding: 10px 8px;
-        box-shadow: 0 18px 38px rgba(120, 96, 60, 0.12);
       }
 
-      .nav-item.active {
-        background: #fff5f7;
+      .form-card,
+      .info-card {
+        padding: 24px;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 22px;
+        align-items: start;
       }
     }
   </style>
@@ -479,430 +424,245 @@
     <header class="topbar">
       <a href="profile.html" class="back-link" aria-label="Go back">←</a>
 
+      <div class="topbar-center">
+        <div class="eyebrow">Trust</div>
+        <h1 class="page-title">Report</h1>
+      </div>
+
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
-        <span class="notification-badge" id="topNotificationBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </header>
 
-    <section class="hero">
-      <p class="eyebrow">Trust & Safety</p>
-      <h1 class="page-title">Report a concern</h1>
-      <p class="hero-copy">
-        Use this page to report a listing, message, vendor, customer, event request, payment concern, or safety issue.
-      </p>
-    </section>
-
-    <section class="safety-note">
-      <div class="safety-note-icon">!</div>
-      <div>
-        <h3>Emergency safety notice</h3>
-        <p>
-          If there is immediate danger, call local emergency services first. This form is for RentEvent marketplace review and follow-up.
+    <section class="hero-card">
+      <div class="hero-content">
+        <h2 class="hero-title">Report a concern.</h2>
+        <p class="hero-subtitle">
+          Use this page to report unsafe conduct, suspicious listings, scams, harassment, booking issues, or marketplace policy concerns.
         </p>
       </div>
     </section>
 
-    <section class="section">
-      <h2 class="section-title">Submit a report</h2>
-
-      <form class="report-form" id="reportForm">
-        <div class="two-grid">
-          <div class="field">
-            <label for="reportName">Name</label>
-            <input class="input" id="reportName" name="name" type="text" placeholder="Your name" autocomplete="name" />
-          </div>
-
-          <div class="field">
-            <label for="reportEmail">Email</label>
-            <input class="input" id="reportEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
-          </div>
-        </div>
-
-        <div class="two-grid">
-          <div class="field">
-            <label for="reportType">What are you reporting?</label>
-            <select class="select" id="reportType" name="type" required>
-              <option value="">Choose report type</option>
-              <option value="listing">Listing</option>
-              <option value="vendor">Vendor</option>
-              <option value="customer">Customer</option>
-              <option value="message">Message or chat thread</option>
-              <option value="booking_request">Booking request</option>
-              <option value="payment_refund">Payment, cancellation, or refund issue</option>
-              <option value="safety">Safety concern</option>
-              <option value="fraud_spam">Fraud, spam, or suspicious behavior</option>
-              <option value="prohibited_listing">Prohibited listing or restricted service</option>
-              <option value="other">Other concern</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="reportPriority">Priority</label>
-            <select class="select" id="reportPriority" name="priority">
-              <option value="normal">Normal</option>
-              <option value="time_sensitive">Time-sensitive event issue</option>
-              <option value="urgent_safety">Urgent safety concern</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="relatedInfo">Who or what is this about?</label>
-          <input class="input" id="relatedInfo" name="relatedInfo" type="text" placeholder="Listing name, vendor/customer name, request ID, event name, or conversation details" />
-          <small>Add anything that helps identify the listing, person, request, or message thread.</small>
-        </div>
-
-        <div class="field">
-          <label for="reportMessage">What happened?</label>
-          <textarea class="textarea" id="reportMessage" name="message" required placeholder="Describe the concern clearly. Include dates, names, screenshots you may have, and what you want RentEvent to review."></textarea>
-        </div>
-
-        <div class="checkbox-card">
-          <label class="check-row">
-            <input type="checkbox" id="truthfulAcknowledge" required />
-            <span>I confirm this report is accurate to the best of my knowledge and is being submitted for RentEvent review.</span>
-          </label>
-
-          <label class="check-row">
-            <input type="checkbox" id="safetyAcknowledge" />
-            <span>I understand urgent safety emergencies should be handled through local emergency services first.</span>
-          </label>
-
-          <label class="check-row">
-            <input type="checkbox" id="contactConsent" checked />
-            <span>I agree RentEvent may contact me by email or in-app message about this report.</span>
-          </label>
-        </div>
-
-        <div class="status-card" id="statusCard"></div>
-
-        <button class="submit-btn" id="submitBtn" type="submit">Submit report</button>
-      </form>
+    <section class="notice-card">
+      <strong>Emergency warning</strong>
+      <p>
+        RentEvent is not an emergency service. If someone is in immediate danger, call 911 or local emergency services first.
+      </p>
     </section>
 
-    <section class="section">
-      <h2 class="section-title">Other help</h2>
+    <div class="two-col">
+      <section class="section" style="margin-top:0;">
+        <h2 class="section-title">Report Details</h2>
 
-      <div class="menu-list">
-        <a class="menu-item" href="support.html">
-          <span class="menu-icon">?</span>
-          <span class="menu-copy">
-            <span>Contact support</span>
-            <span>Get help with a booking request, message, account, or general question.</span>
-          </span>
-          <span class="menu-arrow">›</span>
-        </a>
+        <div class="form-card">
+          <div class="form-grid">
+            <div>
+              <label for="reportTypeInput">What are you reporting?</label>
+              <select class="select" id="reportTypeInput">
+                <option value="">Select report type</option>
+                <option>Unsafe conduct</option>
+                <option>Suspicious or fake listing</option>
+                <option>Scam or fraud concern</option>
+                <option>Harassment or threatening messages</option>
+                <option>Vendor no-show or service issue</option>
+                <option>Customer or planner misconduct</option>
+                <option>Payment or billing concern</option>
+                <option>Transportation safety concern</option>
+                <option>Lifeguard, security, staffing, or event support concern</option>
+                <option>Policy violation</option>
+                <option>Technical issue affecting safety</option>
+                <option>Other</option>
+              </select>
+            </div>
 
-        <a class="menu-item" href="safety.html">
-          <span class="menu-icon">◇</span>
-          <span class="menu-copy">
-            <span>Safety & marketplace guidelines</span>
-            <span>Review professional vendor expectations and prohibited listings.</span>
-          </span>
-          <span class="menu-arrow">›</span>
-        </a>
+            <div>
+              <label for="urgencyInput">Urgency</label>
+              <select class="select" id="urgencyInput">
+                <option value="">Select urgency</option>
+                <option>Low - General concern</option>
+                <option>Medium - Needs review soon</option>
+                <option>High - Serious safety or fraud concern</option>
+                <option>Emergency - I already contacted emergency services</option>
+              </select>
+            </div>
 
-        <a class="menu-item" href="terms.html">
-          <span class="menu-icon">▣</span>
-          <span class="menu-copy">
-            <span>Terms of Service</span>
-            <span>Review marketplace rules, policies, and responsibilities.</span>
-          </span>
-          <span class="menu-arrow">›</span>
-        </a>
-      </div>
-    </section>
+            <div>
+              <label for="yourRoleInput">Your role</label>
+              <select class="select" id="yourRoleInput">
+                <option value="">Select your role</option>
+                <option>Customer</option>
+                <option>Vendor</option>
+                <option>Planner</option>
+                <option>Admin</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="nameInput">Your name</label>
+              <input class="input" id="nameInput" type="text" placeholder="Your name" />
+            </div>
+
+            <div>
+              <label for="emailInput">Your email</label>
+              <input class="input" id="emailInput" type="email" placeholder="you@email.com" />
+            </div>
+
+            <div>
+              <label for="reportedUserInput">Who or what is this about?</label>
+              <input class="input" id="reportedUserInput" type="text" placeholder="Vendor name, customer name, planner name, listing title, etc." />
+            </div>
+
+            <div>
+              <label for="relatedInput">Related ID, page, or link</label>
+              <input class="input" id="relatedInput" type="text" placeholder="Request ID, listing ID, conversation ID, page name, etc." />
+              <p class="helper-text">
+                Include anything that helps RentEvent find the issue faster.
+              </p>
+            </div>
+
+            <div>
+              <label for="messageInput">What happened?</label>
+              <textarea class="textarea" id="messageInput" placeholder="Describe the concern. Include dates, names, listing details, message details, payment details, or anything important."></textarea>
+            </div>
+
+            <label class="checkbox-card">
+              <input id="truthInput" type="checkbox" />
+              <span>I confirm that the information I am submitting is accurate to the best of my knowledge.</span>
+            </label>
+
+            <label class="checkbox-card">
+              <input id="emergencyInput" type="checkbox" />
+              <span>I understand RentEvent is not an emergency service and I should contact emergency services first if there is immediate danger.</span>
+            </label>
+          </div>
+
+          <div class="button-row">
+            <button class="btn" type="button" id="sendReportBtn">Send Report Email</button>
+            <a class="btn-secondary" href="support.html">Contact Support</a>
+          </div>
+
+          <div class="status-message" id="reportStatus">
+            Your email app should open with your report filled in.
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="margin-top:0;">
+        <h2 class="section-title">What to Include</h2>
+
+        <div class="info-card">
+          <h3>Helpful details</h3>
+          <p>
+            Reports are easier to review when they include clear details and context.
+          </p>
+
+          <ul>
+            <li>Names of people or businesses involved.</li>
+            <li>Listing title, request ID, conversation ID, or event name.</li>
+            <li>Screenshots or message details.</li>
+            <li>Dates, times, and location details.</li>
+            <li>Payment, invoice, or booking information if relevant.</li>
+            <li>Why you believe the situation is unsafe, fraudulent, or against policy.</li>
+          </ul>
+
+          <div class="pill-row">
+            <span class="pill red">Safety</span>
+            <span class="pill blue">Fraud</span>
+            <span class="pill purple">Messages</span>
+            <span class="pill green">Marketplace</span>
+          </div>
+        </div>
+
+        <div class="info-card" style="margin-top:14px;">
+          <h3>After you report</h3>
+          <p>
+            RentEvent may review your report, preserve related records, contact users involved, hide a listing, restrict an account, or request more information.
+          </p>
+          <p>
+            Submitting a report does not guarantee a specific result, refund, cancellation, or outcome.
+          </p>
+        </div>
+      </section>
+    </div>
   </main>
 
-  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation"></nav>
+  <script>
+    const REPORT_EMAIL = "support@rentevent.com";
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
-  authDomain: "rent-event-f7abd.firebaseapp.com",
-  projectId: "rent-event-f7abd",
-  storageBucket: "rent-event-f7abd.firebasestorage.app",
-  messagingSenderId: "840686040363",
-  appId: "1:840686040363:web:3103c8c5b624deecee416e",
-  measurementId: "G-600Z95K9GX"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser = null;
-let currentUserData = null;
-
-function safeText(value, fallback = "") {
-  return value && String(value).trim() ? String(value).trim() : fallback;
-}
-
-function setBadge(id, count) {
-  const badge = document.getElementById(id);
-  if (!badge) return;
-
-  if (count > 0) {
-    badge.textContent = count > 99 ? "99+" : String(count);
-    badge.style.display = "inline-flex";
-  } else {
-    badge.textContent = "0";
-    badge.style.display = "none";
-  }
-}
-
-function getRole(userData) {
-  if (userData?.role === "admin") return "admin";
-  if (userData?.role === "vendor") return "vendor";
-  if (userData?.role === "planner" || userData?.plannerPro === true) return "planner";
-  return "customer";
-}
-
-function showStatus(message, type = "success") {
-  const card = document.getElementById("statusCard");
-  card.className = `status-card ${type}`;
-  card.textContent = message;
-}
-
-function renderBottomNav(role) {
-  const bottomNav = document.getElementById("bottomNav");
-
-  if (role === "vendor") {
-    bottomNav.innerHTML = `
-      <a class="nav-item" href="vendor-dashboard.html"><span>Home</span></a>
-      <a class="nav-item" href="add-listing.html"><span>Add</span></a>
-      <a class="nav-item" href="booking-requests.html"><span>Requests</span></a>
-      <a class="nav-item" href="profile.html"><span>Profile</span></a>
-    `;
-    return;
-  }
-
-  if (role === "admin") {
-    bottomNav.innerHTML = `
-      <a class="nav-item" href="admin-dashboard.html"><span>Admin</span></a>
-      <a class="nav-item" href="listings.html"><span>Listings</span></a>
-      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
-      <a class="nav-item" href="profile.html"><span>Profile</span></a>
-    `;
-    return;
-  }
-
-  bottomNav.innerHTML = `
-    <a class="nav-item" href="listings.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"></circle>
-        <path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Explore</span>
-    </a>
-
-    <a class="nav-item" href="event-builder.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 21C12 21 5 16.8 5 10.8C5 7.7 7 6 9.2 6C10.6 6 11.5 6.7 12 7.5C12.5 6.7 13.4 6 14.8 6C17 6 19 7.7 19 10.8C19 16.8 12 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-      </svg>
-      <span>Saved</span>
-    </a>
-
-    <a class="nav-item" href="my-requests.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M5 5H19V19H5V5Z" stroke="currentColor" stroke-width="2"></path>
-        <path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Requests</span>
-    </a>
-
-    <a class="nav-item" href="messages.html">
-      <span class="nav-badge" id="bottomInboxBadge">0</span>
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-      </svg>
-      <span>Messages</span>
-    </a>
-
-    <a class="nav-item active" href="profile.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"></circle>
-        <path d="M5 19C5.8 16.4 8.35 14.8 12 14.8C15.65 14.8 18.2 16.4 19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Profile</span>
-    </a>
-  `;
-}
-
-async function loadUnreadCounts(user) {
-  let unreadMessages = 0;
-  let unreadNotifications = 0;
-
-  try {
-    const conversationsQuery = query(
-      collection(db, "conversations"),
-      where("participantIds", "array-contains", user.uid)
-    );
-
-    const conversationSnapshot = await getDocs(conversationsQuery);
-
-    conversationSnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const unreadFor = data.unreadFor || {};
-
-      if (unreadFor[user.uid]) unreadMessages += 1;
-    });
-  } catch {
-    unreadMessages = 0;
-  }
-
-  try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid),
-      where("read", "==", false)
-    );
-
-    const notificationSnapshot = await getDocs(notificationsQuery);
-    unreadNotifications = notificationSnapshot.size;
-  } catch {
-    unreadNotifications = 0;
-  }
-
-  setBadge("bottomInboxBadge", unreadMessages);
-  setBadge("topNotificationBadge", unreadMessages + unreadNotifications);
-}
-
-function fillUserFields(user, userData) {
-  const nameField = document.getElementById("reportName");
-  const emailField = document.getElementById("reportEmail");
-
-  const name =
-    safeText(userData?.businessName, "") ||
-    safeText(userData?.name, "") ||
-    safeText(user?.displayName, "");
-
-  const email = safeText(userData?.email, user?.email || "");
-
-  if (name && !nameField.value) nameField.value = name;
-  if (email && !emailField.value) emailField.value = email;
-}
-
-document.getElementById("reportForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const submitBtn = document.getElementById("submitBtn");
-  const type = safeText(document.getElementById("reportType").value, "");
-  const priority = safeText(document.getElementById("reportPriority").value, "normal");
-  const name = safeText(document.getElementById("reportName").value, "");
-  const email = safeText(document.getElementById("reportEmail").value, "");
-  const relatedInfo = safeText(document.getElementById("relatedInfo").value, "");
-  const message = safeText(document.getElementById("reportMessage").value, "");
-  const truthfulAcknowledge = document.getElementById("truthfulAcknowledge").checked;
-  const safetyAcknowledge = document.getElementById("safetyAcknowledge").checked;
-  const contactConsent = document.getElementById("contactConsent").checked;
-
-  if (!type || !message) {
-    showStatus("Please choose what you are reporting and describe what happened.", "error");
-    return;
-  }
-
-  if (!truthfulAcknowledge) {
-    showStatus("Please confirm the report is accurate to the best of your knowledge.", "error");
-    return;
-  }
-
-  if (priority === "urgent_safety" && !safetyAcknowledge) {
-    showStatus("Please acknowledge the safety notice before submitting an urgent safety concern.", "error");
-    return;
-  }
-
-  if (!contactConsent) {
-    showStatus("Please allow RentEvent to contact you about this report so we can follow up.", "error");
-    return;
-  }
-
-  try {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-
-    const role = getRole(currentUserData || {});
-
-    await addDoc(collection(db, "reports"), {
-      type,
-      priority,
-      name,
-      email,
-      relatedInfo,
-      message,
-      truthfulAcknowledge,
-      safetyAcknowledge,
-      contactConsent,
-      status: "open",
-      source: "report.html",
-      userId: currentUser?.uid || "",
-      userRole: currentUser ? role : "guest",
-      userEmail: currentUser?.email || email || "",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-
-    showStatus("Your report has been submitted. RentEvent will review it and follow up if more information is needed.", "success");
-
-    document.getElementById("relatedInfo").value = "";
-    document.getElementById("reportMessage").value = "";
-    document.getElementById("reportType").value = "";
-    document.getElementById("reportPriority").value = "normal";
-    document.getElementById("truthfulAcknowledge").checked = false;
-    document.getElementById("safetyAcknowledge").checked = false;
-
-  } catch (error) {
-    showStatus(`Could not submit your report: ${error.message}`, "error");
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit report";
-  }
-});
-
-onAuthStateChanged(auth, async (user) => {
-  currentUser = user || null;
-  currentUserData = null;
-
-  if (!user) {
-    renderBottomNav("customer");
-    return;
-  }
-
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-      currentUserData = userSnap.data();
+    function safeText(value, fallback = "") {
+      return value && String(value).trim() ? String(value).trim() : fallback;
     }
 
-    fillUserFields(user, currentUserData || {});
-    renderBottomNav(getRole(currentUserData || {}));
-    loadUnreadCounts(user);
-  } catch {
-    fillUserFields(user, {});
-    renderBottomNav("customer");
-  }
-});
-</script>
+    function sendReportEmail() {
+      const reportType = safeText(document.getElementById("reportTypeInput").value, "");
+      const urgency = safeText(document.getElementById("urgencyInput").value, "");
+      const role = safeText(document.getElementById("yourRoleInput").value, "");
+      const name = safeText(document.getElementById("nameInput").value, "Not provided");
+      const email = safeText(document.getElementById("emailInput").value, "Not provided");
+      const reportedUser = safeText(document.getElementById("reportedUserInput").value, "Not provided");
+      const related = safeText(document.getElementById("relatedInput").value, "Not provided");
+      const message = safeText(document.getElementById("messageInput").value, "");
+      const truthChecked = document.getElementById("truthInput").checked;
+      const emergencyChecked = document.getElementById("emergencyInput").checked;
 
+      if (!reportType) {
+        alert("Please select what you are reporting.");
+        return;
+      }
+
+      if (!urgency) {
+        alert("Please select an urgency level.");
+        return;
+      }
+
+      if (!message) {
+        alert("Please describe what happened before sending.");
+        return;
+      }
+
+      if (!truthChecked) {
+        alert("Please confirm the report is accurate to the best of your knowledge.");
+        return;
+      }
+
+      if (!emergencyChecked) {
+        alert("Please confirm you understand RentEvent is not an emergency service.");
+        return;
+      }
+
+      const subject = `RentEvent Report: ${reportType}`;
+      const body = [
+        "RentEvent Report",
+        "",
+        `Report Type: ${reportType}`,
+        `Urgency: ${urgency}`,
+        `Reporter Role: ${role || "Not provided"}`,
+        `Reporter Name: ${name}`,
+        `Reporter Email: ${email}`,
+        `Reported User / Listing / Business: ${reportedUser}`,
+        `Related ID / Page / Link: ${related}`,
+        "",
+        "What happened:",
+        message,
+        "",
+        "Confirmations:",
+        `Accurate to best knowledge: ${truthChecked ? "Yes" : "No"}`,
+        `Understands RentEvent is not emergency service: ${emergencyChecked ? "Yes" : "No"}`,
+        "",
+        "Page: report.html"
+      ].join("\n");
+
+      const mailto = `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      document.getElementById("reportStatus").style.display = "block";
+      window.location.href = mailto;
+    }
+
+    document.getElementById("sendReportBtn").addEventListener("click", sendReportEmail);
+  </script>
 </body>
 </html>
