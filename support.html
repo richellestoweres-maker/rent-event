@@ -14,7 +14,9 @@
   />
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     :root {
       --bg: #f7f2e9;
@@ -22,24 +24,22 @@
       --text: #161616;
       --muted: #6a625a;
       --line: #ece2d3;
-      --soft: #f4ede2;
-      --soft-2: #faf5ee;
+      --soft: #faf5ee;
       --coral-1: #ff9a73;
       --coral-2: #ff7a63;
       --coral-3: #ff5f67;
-      --gold: #f4a43a;
-      --gold-dark: #d88914;
       --green-soft: #eaf7ef;
       --green-text: #2d7a49;
       --red-soft: #ffe7e2;
       --red-text: #c74f4d;
       --blue-soft: #edf4ff;
       --blue-text: #4067b2;
+      --gold-soft: #fff4df;
+      --gold-text: #9b6511;
       --purple-soft: #f0eaff;
       --purple-text: #6f4ab8;
       --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
       --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
-      --radius-xl: 34px;
     }
 
     html,
@@ -51,20 +51,21 @@
       font-family: "Inter", sans-serif;
     }
 
-    body { min-height: 100vh; }
+    body {
+      min-height: 100vh;
+    }
 
     .page {
       width: 100%;
       max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
-      padding: 20px 18px 112px;
-      background: var(--bg);
+      padding: 20px 18px 92px;
     }
 
     .topbar {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 22px;
@@ -76,59 +77,20 @@
       height: 44px;
       border-radius: 50%;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.85);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #222;
-      text-decoration: none;
-      box-shadow: 0 8px 20px rgba(140,111,75,.05);
-      flex-shrink: 0;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
       font-weight: 800;
-      position: relative;
-      font-family: inherit;
-      cursor: pointer;
+      flex-shrink: 0;
     }
 
-    .icon-btn svg,
-    .back-link svg {
+    .icon-btn svg {
       width: 20px;
       height: 20px;
-    }
-
-    .notification-badge,
-    .nav-badge {
-      position: absolute;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
-      color: #fff;
-      font-size: 0.68rem;
-      line-height: 20px;
-      font-weight: 800;
-      text-align: center;
-      box-shadow: 0 8px 16px rgba(255,95,103,.28);
-      border: 2px solid #fff;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 5;
-    }
-
-    .notification-badge {
-      top: -5px;
-      right: -5px;
-    }
-
-    .nav-badge {
-      top: 6px;
-      right: 16px;
-      min-width: 18px;
-      height: 18px;
-      line-height: 18px;
-      font-size: 0.64rem;
     }
 
     .topbar-center {
@@ -154,50 +116,12 @@
       font-weight: 800;
     }
 
-    .role-switcher {
-      margin: 10px auto 0;
-      display: none;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      max-width: 100%;
-      padding: 6px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.82);
-      border: 1px solid var(--line);
-      box-shadow: 0 8px 18px rgba(140,111,75,.05);
-    }
-
-    .role-switcher-label {
-      padding-left: 10px;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .role-select {
-      min-height: 34px;
-      border: none;
-      border-radius: 999px;
-      background: #fff;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.8rem;
-      font-weight: 800;
-      padding: 0 28px 0 12px;
-      outline: none;
-      cursor: pointer;
-      max-width: 190px;
-      box-shadow: 0 6px 14px rgba(120,96,60,.06);
-    }
-
     .hero-card {
       position: relative;
       overflow: hidden;
-      border-radius: var(--radius-xl);
-      padding: 24px 20px;
-      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
       color: #fff;
       box-shadow: var(--shadow-strong);
       margin-bottom: 24px;
@@ -211,20 +135,12 @@
       border-radius: 50%;
       right: -60px;
       top: -45px;
-      background: rgba(255,255,255,.12);
+      background: rgba(255, 255, 255, 0.12);
     }
 
     .hero-content {
       position: relative;
       z-index: 1;
-      max-width: 330px;
-    }
-
-    .hero-label {
-      font-size: 0.88rem;
-      font-weight: 600;
-      opacity: 0.95;
-      margin-bottom: 8px;
     }
 
     .hero-title {
@@ -236,61 +152,67 @@
     }
 
     .hero-subtitle {
-      margin: 0;
+      margin: 0 0 16px;
       font-size: 0.95rem;
-      line-height: 1.45;
-      color: rgba(255,255,255,.95);
+      line-height: 1.48;
+      color: rgba(255, 255, 255, 0.95);
     }
 
-    .quick-help {
-      display: grid;
-      gap: 12px;
-      margin: 24px 0 28px;
-    }
-
-    .quick-card {
-      min-height: 82px;
-      border-radius: 24px;
-      border: 1px solid var(--line);
-      background: var(--card);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      display: grid;
-      grid-template-columns: 48px 1fr;
-      gap: 14px;
-      align-items: center;
-    }
-
-    .quick-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
-      background: var(--soft-2);
+    .hero-actions {
       display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-btn,
+    .hero-btn-secondary {
+      min-height: 46px;
+      padding: 0 16px;
+      border-radius: 999px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: #161616;
-    }
-
-    .quick-icon svg {
-      width: 23px;
-      height: 23px;
-    }
-
-    .quick-card h3 {
-      margin: 0 0 4px;
-      font-size: 1rem;
-      line-height: 1.12;
-      letter-spacing: -0.03em;
+      text-decoration: none;
       font-weight: 800;
+      font-size: 0.9rem;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
     }
 
-    .quick-card p {
+    .hero-btn {
+      background: #fff;
+      color: #ff5f67;
+      box-shadow: 0 8px 20px rgba(169, 67, 62, 0.12);
+    }
+
+    .hero-btn-secondary {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .notice-card {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+      border: 1px solid rgba(155, 101, 17, 0.18);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .notice-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .notice-card p {
       margin: 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.35;
-      font-weight: 600;
+      font-size: 0.86rem;
+      line-height: 1.5;
     }
 
     .section {
@@ -305,36 +227,95 @@
       font-weight: 800;
     }
 
-    .support-panel,
-    .links-panel {
+    .support-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .support-card {
       background: var(--card);
-      border-radius: 30px;
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.45);
+      text-decoration: none;
+      color: inherit;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      align-items: start;
+      cursor: pointer;
+    }
+
+    .support-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      background: var(--blue-soft);
+      color: var(--blue-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .support-card:nth-child(2) .support-icon {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .support-card:nth-child(3) .support-icon {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .support-card:nth-child(4) .support-icon {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+    }
+
+    .support-card:nth-child(5) .support-icon {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .support-copy h3 {
+      margin: 0 0 5px;
+      font-size: 1rem;
+      line-height: 1.16;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .support-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .form-card {
+      background: var(--card);
+      border-radius: 28px;
       padding: 18px;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(236,226,211,.72);
+      border: 1px solid rgba(236, 226, 211, 0.45);
     }
 
-    .support-form {
+    .form-grid {
       display: grid;
-      gap: 16px;
+      gap: 14px;
     }
 
-    .field {
-      display: grid;
-      gap: 8px;
-    }
-
-    .field label {
-      font-size: 0.9rem;
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.84rem;
       font-weight: 800;
-      color: #222;
-    }
-
-    .field small {
-      color: #7b7268;
-      font-size: 0.78rem;
-      line-height: 1.35;
-      font-weight: 600;
+      color: #574f47;
     }
 
     .input,
@@ -342,238 +323,145 @@
     .textarea {
       width: 100%;
       border: 1px solid var(--line);
-      background: var(--soft-2);
-      color: var(--text);
+      background: #fff;
+      border-radius: 18px;
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 0.94rem;
+      color: var(--text);
       outline: none;
-      border-radius: 20px;
-      box-shadow: 0 6px 16px rgba(140,111,75,.03);
     }
 
     .input,
     .select {
-      min-height: 56px;
-      padding: 0 16px;
+      min-height: 52px;
+      padding: 0 15px;
     }
 
     .textarea {
-      min-height: 138px;
-      padding: 16px;
+      min-height: 132px;
+      padding: 14px 15px;
       resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #a49a8f;
+    }
+
+    .helper-text {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
       line-height: 1.45;
     }
 
-    .select {
-      appearance: none;
-      background-image: linear-gradient(45deg, transparent 50%, #777 50%), linear-gradient(135deg, #777 50%, transparent 50%);
-      background-position: calc(100% - 20px) calc(50% - 3px), calc(100% - 15px) calc(50% - 3px);
-      background-size: 5px 5px, 5px 5px;
-      background-repeat: no-repeat;
-    }
-
-    .two-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .checkbox-card {
-      border-radius: 22px;
-      background: var(--soft-2);
-      border: 1px solid var(--line);
-      padding: 15px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .check-row {
+    .button-row {
       display: flex;
       gap: 10px;
-      align-items: flex-start;
-      color: #574f47;
-      font-size: 0.88rem;
-      line-height: 1.38;
-      font-weight: 650;
+      flex-wrap: wrap;
+      margin-top: 14px;
     }
 
-    .check-row input {
-      margin-top: 2px;
-      accent-color: #ff5f67;
-    }
-
-    .status-card {
-      display: none;
-      border-radius: 22px;
-      padding: 15px 16px;
+    .btn,
+    .btn-secondary {
+      min-height: 50px;
+      border-radius: 999px;
+      padding: 0 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: 0.9rem;
-      line-height: 1.42;
-      font-weight: 750;
+      font-weight: 800;
+      flex: 1;
+      text-align: center;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
     }
 
-    .status-card.success {
-      display: block;
+    .btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      color: #4a433d;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 12px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.45;
       background: var(--green-soft);
       color: var(--green-text);
     }
 
-    .status-card.error {
-      display: block;
-      background: var(--red-soft);
-      color: var(--red-text);
+    .faq-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.45);
     }
 
-    .submit-btn {
-      min-height: 58px;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
-      color: #fff;
-      font-family: inherit;
-      font-size: 1rem;
+    .faq-item {
+      padding: 15px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .faq-item:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .faq-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .faq-item h3 {
+      margin: 0 0 7px;
+      font-size: 0.98rem;
+      line-height: 1.25;
       font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 14px 28px rgba(255,107,97,.18);
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .menu-list {
-      display: grid;
-      gap: 0;
-    }
-
-    .menu-item {
-      min-height: 76px;
-      color: var(--text);
-      text-decoration: none;
-      padding: 0;
-      display: grid;
-      grid-template-columns: 52px 1fr 24px;
-      align-items: center;
-      gap: 14px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      border-bottom: 1px solid var(--line);
-      font-family: inherit;
-      text-align: left;
-    }
-
-    .menu-item:last-child {
-      border-bottom: none;
-    }
-
-    .menu-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #161616;
-      background: var(--soft-2);
-    }
-
-    .menu-icon svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .menu-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .menu-copy span:first-child {
-      line-height: 1.1;
       letter-spacing: -0.03em;
     }
 
-    .menu-copy span:last-child {
+    .faq-item p {
+      margin: 0;
       color: var(--muted);
       font-size: 0.86rem;
-      font-weight: 600;
-      line-height: 1.32;
-    }
-
-    .menu-arrow {
-      color: #9a9084;
-      font-weight: 800;
-      flex-shrink: 0;
-      font-size: 1.6rem;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 16px;
-      width: calc(100% - 24px);
-      max-width: 406px;
-      background: rgba(255,255,255,.94);
-      border: 1px solid rgba(235,225,211,.95);
-      border-radius: 999px;
-      padding: 10px 8px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-      gap: 4px;
-      box-shadow: 0 18px 38px rgba(120,96,60,.14);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 50;
-    }
-
-    .nav-item {
-      min-height: 58px;
-      border-radius: 999px;
-      text-decoration: none;
-      color: #6c655d;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      text-align: center;
-      padding: 0 3px;
-      position: relative;
-    }
-
-    .nav-item svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .nav-item.active {
-      background: linear-gradient(135deg, var(--coral-1), var(--coral-2) 52%, var(--coral-3));
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(255,107,97,.24);
+      line-height: 1.5;
     }
 
     @media (min-width: 768px) {
-      body { padding: 24px 0; }
+      body {
+        padding: 24px 0;
+      }
 
       .page {
-        max-width: 960px;
+        max-width: 880px;
         padding-left: 24px;
         padding-right: 24px;
       }
 
-      .quick-help {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+      .hero-content {
+        max-width: 560px;
       }
 
-      .two-grid {
+      .support-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .bottom-nav {
-        max-width: 560px;
+      .form-card {
+        padding: 24px;
       }
     }
   </style>
@@ -582,20 +470,14 @@
 <body>
   <main class="page">
     <header class="topbar">
-      <a href="profile.html" class="back-link" id="backLink" aria-label="Go back">←</a>
+      <a href="profile.html" class="back-link" aria-label="Go back">←</a>
 
       <div class="topbar-center">
-        <div class="eyebrow" id="pageEyebrow">RentEvent Support</div>
+        <div class="eyebrow">Help</div>
         <h1 class="page-title">Support</h1>
-
-        <div class="role-switcher" id="roleSwitcher">
-          <span class="role-switcher-label">Viewing as</span>
-          <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
-        </div>
       </div>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
-        <span class="notification-badge" id="topNotificationBadge">0</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -605,698 +487,235 @@
 
     <section class="hero-card">
       <div class="hero-content">
-        <div class="hero-label">RentEvent Support</div>
         <h2 class="hero-title">How can we help?</h2>
         <p class="hero-subtitle">
-          Tell us what happened and we’ll route your request to the right place. For urgent safety concerns, contact local emergency services first.
+          Get help with accounts, booking requests, vendor listings, messages, safety concerns, payments, or launch questions.
         </p>
+
+        <div class="hero-actions">
+          <a class="hero-btn" href="#supportFormSection">Contact Support</a>
+          <a class="hero-btn-secondary" href="report.html">Report Concern</a>
+        </div>
       </div>
     </section>
 
-    <section class="quick-help" aria-label="Quick help topics">
-      <article class="quick-card">
-        <div class="quick-icon">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-            <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-            <path d="M10 12.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          </svg>
-        </div>
-        <div>
-          <h3>Messages & requests</h3>
-          <p>Help with vendor replies, booking requests, or missing conversations.</p>
-        </div>
-      </article>
-
-      <article class="quick-card">
-        <div class="quick-icon">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 3L21 19H3L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-            <path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-            <path d="M12 17H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
-          </svg>
-        </div>
-        <div>
-          <h3>Report an issue</h3>
-          <p>Report a listing, user, message, safety concern, or policy violation.</p>
-        </div>
-      </article>
-
-      <article class="quick-card">
-        <div class="quick-icon">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-            <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-            <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          </svg>
-        </div>
-        <div>
-          <h3>Policies</h3>
-          <p>Questions about cancellations, refunds, marketplace rules, or vendor terms.</p>
-        </div>
-      </article>
+    <section class="notice-card">
+      <strong>Emergency note</strong>
+      <p>
+        RentEvent support cannot handle emergencies. If there is immediate danger, injury, fire, crime, or a medical emergency, call 911 or local emergency services first.
+      </p>
     </section>
 
     <section class="section">
-      <h2 class="section-title">Contact support</h2>
+      <h2 class="section-title">Support Topics</h2>
 
-      <div class="support-panel">
-        <form class="support-form" id="supportForm">
-          <div class="two-grid">
-            <div class="field">
-              <label for="supportName">Name</label>
-              <input class="input" id="supportName" name="name" type="text" placeholder="Your name" autocomplete="name" />
-            </div>
+      <div class="support-grid">
+        <button class="support-card" type="button" data-topic="Account / Login Help">
+          <div class="support-icon">ACC</div>
+          <div class="support-copy">
+            <h3>Account or Login</h3>
+            <p>Help with signing in, role access, profiles, account settings, or deactivation.</p>
+          </div>
+        </button>
 
-            <div class="field">
-              <label for="supportEmail">Email</label>
-              <input class="input" id="supportEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
-            </div>
+        <button class="support-card" type="button" data-topic="Booking Request Help">
+          <div class="support-icon">REQ</div>
+          <div class="support-copy">
+            <h3>Booking Requests</h3>
+            <p>Help with request status, vendor responses, customer details, or missing request threads.</p>
+          </div>
+        </button>
+
+        <button class="support-card" type="button" data-topic="Messages / Notifications Help">
+          <div class="support-icon">MSG</div>
+          <div class="support-copy">
+            <h3>Messages or Alerts</h3>
+            <p>Help with chat threads, unread badges, notifications, or missing conversations.</p>
+          </div>
+        </button>
+
+        <button class="support-card" type="button" data-topic="Vendor Listing Help">
+          <div class="support-icon">VEN</div>
+          <div class="support-copy">
+            <h3>Vendor Listings</h3>
+            <p>Help creating, editing, publishing, or correcting a vendor listing or profile.</p>
+          </div>
+        </button>
+
+        <button class="support-card" type="button" data-topic="Safety / Trust Concern">
+          <div class="support-icon">SAFE</div>
+          <div class="support-copy">
+            <h3>Safety or Trust</h3>
+            <p>For concerning listings, suspicious users, unsafe behavior, or platform policy concerns.</p>
+          </div>
+        </button>
+
+        <button class="support-card" type="button" data-topic="Billing / Subscription Help">
+          <div class="support-icon">BILL</div>
+          <div class="support-copy">
+            <h3>Billing or Plans</h3>
+            <p>Help with vendor plans, planner plans, customer fees, subscriptions, or payment questions.</p>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <section class="section" id="supportFormSection">
+      <h2 class="section-title">Contact Support</h2>
+
+      <div class="form-card">
+        <div class="form-grid">
+          <div>
+            <label for="nameInput">Name</label>
+            <input class="input" id="nameInput" type="text" placeholder="Your name" />
           </div>
 
-          <div class="two-grid">
-            <div class="field">
-              <label for="supportType">What do you need help with?</label>
-              <select class="select" id="supportType" name="type" required>
-                <option value="">Choose a topic</option>
-                <option value="booking_request">Booking request</option>
-                <option value="messages">Messages or chat thread</option>
-                <option value="vendor_issue">Issue with a vendor</option>
-                <option value="customer_issue">Issue with a customer</option>
-                <option value="listing_report">Report a listing</option>
-                <option value="safety_concern">Safety concern</option>
-                <option value="payment_refund">Payment, cancellation, or refund</option>
-                <option value="account">Account or profile help</option>
-                <option value="vendor_verification">Vendor verification</option>
-                <option value="general">General question</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="supportPriority">Priority</label>
-              <select class="select" id="supportPriority" name="priority">
-                <option value="normal">Normal</option>
-                <option value="time_sensitive">Time-sensitive event issue</option>
-                <option value="urgent_safety">Urgent safety concern</option>
-              </select>
-            </div>
+          <div>
+            <label for="emailInput">Email</label>
+            <input class="input" id="emailInput" type="email" placeholder="you@email.com" />
           </div>
 
-          <div class="field">
-            <label for="relatedInfo">Related listing, request, or conversation</label>
-            <input class="input" id="relatedInfo" name="relatedInfo" type="text" placeholder="Optional listing name, request ID, vendor/customer name, or event name" />
-            <small>This helps us find the right event, vendor, or message thread faster.</small>
+          <div>
+            <label for="roleInput">I am a...</label>
+            <select class="select" id="roleInput">
+              <option value="">Select one</option>
+              <option>Customer</option>
+              <option>Vendor</option>
+              <option>Planner</option>
+              <option>Admin</option>
+              <option>Other</option>
+            </select>
           </div>
 
-          <div class="field">
-            <label for="supportMessage">Message</label>
-            <textarea class="textarea" id="supportMessage" name="message" required placeholder="Please describe what happened and what you need help with."></textarea>
+          <div>
+            <label for="topicInput">Support Topic</label>
+            <select class="select" id="topicInput">
+              <option value="">Select topic</option>
+              <option>Account / Login Help</option>
+              <option>Booking Request Help</option>
+              <option>Messages / Notifications Help</option>
+              <option>Vendor Listing Help</option>
+              <option>Planner Tools Help</option>
+              <option>Billing / Subscription Help</option>
+              <option>Safety / Trust Concern</option>
+              <option>Technical Bug</option>
+              <option>Other</option>
+            </select>
           </div>
 
-          <div class="checkbox-card">
-            <label class="check-row">
-              <input type="checkbox" id="safetyAcknowledge" />
-              <span>I understand RentEvent is a marketplace platform. Vendors and customers are independent users/businesses, and urgent safety emergencies should be handled through local emergency services first.</span>
-            </label>
-
-            <label class="check-row">
-              <input type="checkbox" id="contactConsent" checked />
-              <span>I agree RentEvent may contact me by email or in-app message about this support request.</span>
-            </label>
+          <div>
+            <label for="relatedInput">Related ID or Page</label>
+            <input class="input" id="relatedInput" type="text" placeholder="Optional: request ID, listing ID, page name, email, etc." />
+            <p class="helper-text">Include anything that helps us find the issue faster.</p>
           </div>
 
-          <div class="status-card" id="statusCard"></div>
+          <div>
+            <label for="messageInput">Message</label>
+            <textarea class="textarea" id="messageInput" placeholder="Tell us what happened or what you need help with."></textarea>
+          </div>
+        </div>
 
-          <button class="submit-btn" id="submitBtn" type="submit">Submit support request</button>
-        </form>
+        <div class="button-row">
+          <button class="btn" type="button" id="sendSupportBtn">Send Support Email</button>
+          <a class="btn-secondary" href="report.html">Report Concern</a>
+        </div>
+
+        <div class="status-message" id="supportStatus">
+          Your email app should open with your support request filled in.
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <h2 class="section-title">Helpful links</h2>
+      <h2 class="section-title">Quick Answers</h2>
 
-      <div class="links-panel">
-        <div class="menu-list">
-          <a class="menu-item" href="report.html">
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 3L21 19H3L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-                <path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-                <path d="M12 17H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
-              </svg>
-            </span>
-            <span class="menu-copy">
-              <span>Report a concern</span>
-              <span>Report a listing, user, message, or safety concern.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
+      <div class="faq-card">
+        <div class="faq-item">
+          <h3>Why can’t I see the same tools in every dashboard?</h3>
+          <p>
+            RentEvent uses role-based visibility. Customers, vendors, planners, and admins each see tools related to their role.
+          </p>
+        </div>
 
-          <a class="menu-item" href="terms.html">
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M6 4H18V20H6V4Z" stroke="currentColor" stroke-width="2"></path>
-                <path d="M9 8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-                <path d="M9 12H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-                <path d="M9 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-              </svg>
-            </span>
-            <span class="menu-copy">
-              <span>Terms of Service</span>
-              <span>Review marketplace rules, policies, and responsibilities.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
+        <div class="faq-item">
+          <h3>What should I do if a vendor or customer seems suspicious?</h3>
+          <p>
+            Use the report page and include screenshots, listing names, message details, request IDs, or anything that helps us review the concern.
+          </p>
+        </div>
 
-          <a class="menu-item" href="privacy.html">
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 3L19 6V11C19 15.5 16.2 19.1 12 21C7.8 19.1 5 15.5 5 11V6L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-                <path d="M9.5 12L11.3 13.8L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </span>
-            <span class="menu-copy">
-              <span>Privacy Policy</span>
-              <span>Learn how RentEvent handles account and event information.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
+        <div class="faq-item">
+          <h3>Why are messages or notifications missing?</h3>
+          <p>
+            During launch, message threads are tied to booking requests and conversations. Include the request ID, listing name, vendor name, and account email when contacting support.
+          </p>
+        </div>
 
-          <a class="menu-item" href="safety.html">
-            <span class="menu-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M12 3L20 7V12C20 16.4 16.7 20.1 12 21C7.3 20.1 4 16.4 4 12V7L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-                <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-                <path d="M12 16H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
-              </svg>
-            </span>
-            <span class="menu-copy">
-              <span>Safety & marketplace guidelines</span>
-              <span>Professional vendor expectations, prohibited listings, and reporting.</span>
-            </span>
-            <span class="menu-arrow">›</span>
-          </a>
+        <div class="faq-item">
+          <h3>Can RentEvent guarantee a vendor’s service?</h3>
+          <p>
+            Vendors are independent businesses. RentEvent provides marketplace tools, but customers and planners should verify vendor qualifications, insurance, contracts, and event requirements.
+          </p>
         </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation"></nav>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  updateDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
-  authDomain: "rent-event-f7abd.firebaseapp.com",
-  projectId: "rent-event-f7abd",
-  storageBucket: "rent-event-f7abd.firebasestorage.app",
-  messagingSenderId: "840686040363",
-  appId: "1:840686040363:web:3103c8c5b624deecee416e",
-  measurementId: "G-600Z95K9GX"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser = null;
-let currentUserData = null;
-
-function safeText(value, fallback = "") {
-  return value && String(value).trim() ? String(value).trim() : fallback;
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function setBadge(id, count) {
-  const badge = document.getElementById(id);
-  if (!badge) return;
-
-  if (count > 0) {
-    badge.textContent = count > 99 ? "99+" : String(count);
-    badge.style.display = "inline-flex";
-  } else {
-    badge.textContent = "0";
-    badge.style.display = "none";
-  }
-}
-
-function normalizeRole(role) {
-  const clean = safeText(role, "").toLowerCase();
-
-  if (["client", "host", "event_host"].includes(clean)) return "customer";
-  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
-
-  return "";
-}
-
-function getDashboardForRole(role) {
-  const normalizedRole = normalizeRole(role);
-
-  if (normalizedRole === "admin") return "admin-dashboard.html";
-  if (normalizedRole === "vendor") return "vendor-dashboard.html";
-  if (normalizedRole === "planner") return "planner-dashboard.html";
-
-  return "dashboard.html";
-}
-
-function getRoleLabel(role) {
-  const normalizedRole = normalizeRole(role);
-
-  if (normalizedRole === "admin") return "Admin";
-  if (normalizedRole === "vendor") return "Vendor";
-  if (normalizedRole === "planner") return "Planner";
-
-  return "Customer";
-}
-
-function getAllowedRoles(userData = {}) {
-  const roleSet = new Set();
-
-  if (Array.isArray(userData.roles)) {
-    userData.roles.forEach((role) => {
-      const normalized = normalizeRole(role);
-      if (normalized) roleSet.add(normalized);
-    });
-  }
-
-  const active = normalizeRole(userData.activeRole);
-  const legacy = normalizeRole(userData.role);
-
-  if (active) roleSet.add(active);
-  if (legacy) roleSet.add(legacy);
-
-  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
-    roleSet.add("customer");
-  }
-
-  if (
-    userData.vendorAccount === true ||
-    userData.permissions?.canUseVendorDashboard === true ||
-    userData.businessName ||
-    userData.vendorName
-  ) {
-    roleSet.add("vendor");
-  }
-
-  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
-    roleSet.add("planner");
-  }
-
-  if (
-    userData.admin === true ||
-    userData.isAdmin === true ||
-    userData.permissions?.admin === true ||
-    legacy === "admin"
-  ) {
-    roleSet.add("admin");
-    roleSet.add("customer");
-    roleSet.add("vendor");
-    roleSet.add("planner");
-  }
-
-  if (!roleSet.size) roleSet.add("customer");
-
-  const preferredOrder = ["customer", "vendor", "planner", "admin"];
-  return preferredOrder.filter((role) => roleSet.has(role));
-}
-
-function getActiveRole(userData = {}) {
-  const allowedRoles = getAllowedRoles(userData);
-  const active = normalizeRole(userData.activeRole);
-  const legacy = normalizeRole(userData.role);
-
-  if (active && allowedRoles.includes(active)) return active;
-  if (legacy && allowedRoles.includes(legacy)) return legacy;
-  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
-  if (allowedRoles.includes("vendor") && userData.vendorAccount === true) return "vendor";
-
-  return allowedRoles[0] || "customer";
-}
-
-function renderRoleSwitcher(userData = {}) {
-  const wrapper = document.getElementById("roleSwitcher");
-  const select = document.getElementById("roleSelect");
-  const roles = getAllowedRoles(userData);
-  const activeRole = getActiveRole(userData);
-
-  if (!wrapper || !select) return;
-
-  if (roles.length <= 1) {
-    wrapper.style.display = "none";
-    return;
-  }
-
-  select.innerHTML = roles.map((role) => {
-    return `<option value="${escapeHtml(role)}" ${role === activeRole ? "selected" : ""}>${escapeHtml(getRoleLabel(role))}</option>`;
-  }).join("");
-
-  wrapper.style.display = "inline-flex";
-}
-
-async function switchDashboardRole(nextRole) {
-  if (!currentUser || !currentUserData) return;
-
-  const normalizedRole = normalizeRole(nextRole);
-  const allowedRoles = getAllowedRoles(currentUserData);
-
-  if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
-    alert("This dashboard is not enabled on your account yet.");
-    renderRoleSwitcher(currentUserData);
-    return;
-  }
-
-  try {
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      activeRole: normalizedRole,
-      updatedAt: serverTimestamp()
-    });
-  } catch (error) {
-    console.warn("Could not save active role:", error.message);
-  }
-
-  window.location.href = getDashboardForRole(normalizedRole);
-}
-
-function getHomeHref(role) {
-  return getDashboardForRole(role);
-}
-
-function showStatus(message, type = "success") {
-  const card = document.getElementById("statusCard");
-  card.className = `status-card ${type}`;
-  card.textContent = message;
-}
-
-function setRoleLayout(role) {
-  const backLink = document.getElementById("backLink");
-  const pageEyebrow = document.getElementById("pageEyebrow");
-
-  if (backLink) {
-    backLink.href = role === "admin"
-      ? "admin-dashboard.html"
-      : role === "vendor"
-        ? "vendor-dashboard.html"
-        : role === "planner"
-          ? "planner-dashboard.html"
-          : "profile.html";
-  }
-
-  if (pageEyebrow) {
-    pageEyebrow.textContent = role === "admin"
-      ? "Admin Support"
-      : role === "vendor"
-        ? "Vendor Support"
-        : role === "planner"
-          ? "Planner Support"
-          : "RentEvent Support";
-  }
-}
-
-function renderBottomNav(role) {
-  const bottomNav = document.getElementById("bottomNav");
-
-  if (role === "admin") {
-    bottomNav.innerHTML = `
-      <a class="nav-item" href="admin-dashboard.html"><span>Admin</span></a>
-      <a class="nav-item" href="listings.html"><span>Listings</span></a>
-      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
-      <a class="nav-item active" href="support.html"><span>Support</span></a>
-    `;
-    return;
-  }
-
-  if (role === "vendor") {
-    bottomNav.innerHTML = `
-      <a class="nav-item" href="vendor-dashboard.html">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
-        </svg>
-        <span>Home</span>
-      </a>
-
-      <a class="nav-item" href="booking-requests.html">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 4H18C19.1 4 20 4.9 20 6V20L16 17H6C4.9 17 4 16.1 4 15V6C4 4.9 4.9 4 6 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-          <path d="M8 8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M8 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-        <span>Requests</span>
-      </a>
-
-      <a class="nav-item" href="messages.html">
-        <span class="nav-badge" id="bottomInboxBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-          <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-        <span>Inbox</span>
-      </a>
-
-      <a class="nav-item active" href="support.html">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M12 18H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
-          <path d="M9.5 9.5C9.7 7.9 10.8 7 12.3 7C13.8 7 15 8 15 9.5C15 11.8 12 11.7 12 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
-        </svg>
-        <span>Support</span>
-      </a>
-    `;
-    return;
-  }
-
-  if (role === "planner") {
-    bottomNav.innerHTML = `
-      <a class="nav-item" href="planner-dashboard.html"><span>Planner</span></a>
-      <a class="nav-item" href="listings.html"><span>Vendors</span></a>
-      <a class="nav-item" href="messages.html"><span class="nav-badge" id="bottomInboxBadge">0</span><span>Inbox</span></a>
-      <a class="nav-item active" href="support.html"><span>Support</span></a>
-    `;
-    return;
-  }
-
-  bottomNav.innerHTML = `
-    <a class="nav-item" href="dashboard.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor"></path>
-      </svg>
-      <span>Home</span>
-    </a>
-
-    <a class="nav-item" href="listings.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
-        <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Listings</span>
-    </a>
-
-    <a class="nav-item" href="messages.html">
-      <span class="nav-badge" id="bottomInboxBadge">0</span>
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M7 8.5C7 6.57 8.57 5 10.5 5H17C18.1 5 19 5.9 19 7V12.5C19 14.43 17.43 16 15.5 16H12L8.2 19V16.2C7.5 15.7 7 14.87 7 14V8.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-        <path d="M10 9.5H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-      </svg>
-      <span>Inbox</span>
-    </a>
-
-    <a class="nav-item active" href="support.html">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 18H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
-        <path d="M9.5 9.5C9.7 7.9 10.8 7 12.3 7C13.8 7 15 8 15 9.5C15 11.8 12 11.7 12 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
-      </svg>
-      <span>Support</span>
-    </a>
-  `;
-}
-
-async function loadUnreadCounts(user) {
-  let unreadMessages = 0;
-  let unreadNotifications = 0;
-
-  try {
-    const conversationsQuery = query(
-      collection(db, "conversations"),
-      where("participantIds", "array-contains", user.uid)
-    );
-
-    const conversationSnapshot = await getDocs(conversationsQuery);
-
-    conversationSnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const unreadFor = data.unreadFor || {};
-
-      if (unreadFor[user.uid]) unreadMessages += 1;
-    });
-  } catch {
-    unreadMessages = 0;
-  }
-
-  try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid),
-      where("read", "==", false)
-    );
-
-    const notificationSnapshot = await getDocs(notificationsQuery);
-    unreadNotifications = notificationSnapshot.size;
-  } catch {
-    unreadNotifications = 0;
-  }
-
-  setBadge("bottomInboxBadge", unreadMessages);
-  setBadge("topNotificationBadge", unreadMessages + unreadNotifications);
-}
-
-function fillUserFields(user, userData) {
-  const nameField = document.getElementById("supportName");
-  const emailField = document.getElementById("supportEmail");
-
-  const name =
-    safeText(userData?.businessName, "") ||
-    safeText(userData?.vendorName, "") ||
-    safeText(userData?.plannerName, "") ||
-    safeText(userData?.name, "") ||
-    safeText(user?.displayName, "");
-
-  const email = safeText(userData?.email, user?.email || "");
-
-  if (name && !nameField.value) nameField.value = name;
-  if (email && !emailField.value) emailField.value = email;
-}
-
-document.getElementById("supportForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const submitBtn = document.getElementById("submitBtn");
-  const type = safeText(document.getElementById("supportType").value, "");
-  const priority = safeText(document.getElementById("supportPriority").value, "normal");
-  const name = safeText(document.getElementById("supportName").value, "");
-  const email = safeText(document.getElementById("supportEmail").value, "");
-  const relatedInfo = safeText(document.getElementById("relatedInfo").value, "");
-  const message = safeText(document.getElementById("supportMessage").value, "");
-  const safetyAcknowledge = document.getElementById("safetyAcknowledge").checked;
-  const contactConsent = document.getElementById("contactConsent").checked;
-
-  if (!type || !message) {
-    showStatus("Please choose a topic and describe what you need help with.", "error");
-    return;
-  }
-
-  if (priority === "urgent_safety" && !safetyAcknowledge) {
-    showStatus("Please acknowledge the safety notice before submitting an urgent safety concern.", "error");
-    return;
-  }
-
-  if (!contactConsent) {
-    showStatus("Please allow RentEvent to contact you about this support request so we can follow up.", "error");
-    return;
-  }
-
-  try {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-
-    const role = getActiveRole(currentUserData || {});
-    const roles = getAllowedRoles(currentUserData || {});
-
-    await addDoc(collection(db, "supportTickets"), {
-      type,
-      priority,
-      name,
-      email,
-      relatedInfo,
-      message,
-      safetyAcknowledge,
-      contactConsent,
-      status: "open",
-      source: "support.html",
-      userId: currentUser?.uid || "",
-      activeRole: role,
-      roles,
-      userRole: currentUser ? role : "guest",
-      userEmail: currentUser?.email || email || "",
-      accountStatus: currentUserData?.accountStatus || "active",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-
-    showStatus("Your support request has been submitted. RentEvent will review it and follow up as soon as possible.", "success");
-
-    document.getElementById("relatedInfo").value = "";
-    document.getElementById("supportMessage").value = "";
-    document.getElementById("supportType").value = "";
-    document.getElementById("supportPriority").value = "normal";
-    document.getElementById("safetyAcknowledge").checked = false;
-
-  } catch (error) {
-    showStatus(`Could not submit your support request: ${error.message}`, "error");
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit support request";
-  }
-});
-
-document.getElementById("roleSelect").addEventListener("change", (event) => {
-  switchDashboardRole(event.target.value);
-});
-
-onAuthStateChanged(auth, async (user) => {
-  currentUser = user || null;
-  currentUserData = null;
-
-  if (!user) {
-    renderBottomNav("customer");
-    setRoleLayout("customer");
-    return;
-  }
-
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-      currentUserData = userSnap.data();
+  <script>
+    const SUPPORT_EMAIL = "support@rentevent.com";
+
+    function safeText(value, fallback = "") {
+      return value && String(value).trim() ? String(value).trim() : fallback;
     }
 
-    const activeRole = getActiveRole(currentUserData || {});
+    function setTopic(topic) {
+      const topicInput = document.getElementById("topicInput");
+      topicInput.value = topic;
+      document.getElementById("supportFormSection").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 
-    fillUserFields(user, currentUserData || {});
-    renderRoleSwitcher(currentUserData || {});
-    setRoleLayout(activeRole);
-    renderBottomNav(activeRole);
-    loadUnreadCounts(user);
-  } catch {
-    fillUserFields(user, {});
-    renderBottomNav("customer");
-    setRoleLayout("customer");
-  }
-});
-</script>
+    function sendSupportEmail() {
+      const name = safeText(document.getElementById("nameInput").value, "Not provided");
+      const email = safeText(document.getElementById("emailInput").value, "Not provided");
+      const role = safeText(document.getElementById("roleInput").value, "Not provided");
+      const topic = safeText(document.getElementById("topicInput").value, "Support Request");
+      const related = safeText(document.getElementById("relatedInput").value, "Not provided");
+      const message = safeText(document.getElementById("messageInput").value, "");
 
+      if (!message) {
+        alert("Please add a message before sending.");
+        return;
+      }
+
+      const subject = `RentEvent Support: ${topic}`;
+      const body = [
+        "RentEvent Support Request",
+        "",
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Role: ${role}`,
+        `Topic: ${topic}`,
+        `Related ID / Page: ${related}`,
+        "",
+        "Message:",
+        message,
+        "",
+        "Page: support.html"
+      ].join("\n");
+
+      const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      document.getElementById("supportStatus").style.display = "block";
+      window.location.href = mailto;
+    }
+
+    document.querySelectorAll("[data-topic]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setTopic(button.dataset.topic);
+      });
+    });
+
+    document.getElementById("sendSupportBtn").addEventListener("click", sendSupportEmail);
+  </script>
 </body>
 </html>
