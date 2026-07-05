@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://js.stripe.com/v3/"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -541,6 +542,24 @@
       text-align: center;
     }
 
+    .stripe-checkout-card {
+      display: none;
+      margin-top: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .stripe-checkout-card.show {
+      display: block;
+    }
+
+    #stripeEmbeddedCheckout {
+      min-height: 420px;
+    }
+
     .payment-icon {
       width: 58px;
       height: 58px;
@@ -941,10 +960,14 @@
 
       <div class="payment-placeholder" id="paymentMount">
         <div class="payment-icon">◎</div>
-        <h3>No payment collected yet</h3>
+        <h3>Stripe-ready checkout</h3>
         <p>
-          Clicking Submit Request saves this event request in Firebase and creates a Messages thread for each selected vendor.
+          For launch testing, Submit Request saves this event request in Firebase and creates a Messages thread for each selected vendor. Stripe Embedded Checkout can be turned on once the secure Firebase Function is deployed.
         </p>
+      </div>
+
+      <div class="stripe-checkout-card" id="stripeCheckoutCard">
+        <div id="stripeEmbeddedCheckout"></div>
       </div>
     </section>
 
@@ -956,7 +979,7 @@
       <div class="note-card">
         <h3 class="note-title">Important MVP Note</h3>
         <p class="note-text">
-          This creates a pending booking request and a real in-app conversation thread. Later, Stripe Embedded Checkout can be connected after the request and messaging flow is working.
+          This creates a pending booking request and a real in-app conversation thread. Stripe Embedded Checkout is wired as a safe frontend hook, but it stays off until the secure Firebase Function creates a Stripe Checkout Session.
         </p>
       </div>
 
@@ -1009,6 +1032,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+/*
+  STRIPE SETUP NOTE:
+  Keep this false until your Firebase Function is deployed.
+  Never place your Stripe secret key in this HTML file.
+*/
+const STRIPE_ENABLED = false;
+const STRIPE_PUBLISHABLE_KEY = "pk_test_REPLACE_ME";
+const CREATE_STRIPE_CHECKOUT_SESSION_URL = ""; // Example: https://us-central1-rent-event-f7abd.cloudfunctions.net/createStripeCheckoutSession
+
 
 const params = new URLSearchParams(window.location.search);
 const activeEventId = params.get("eventId") || params.get("event") || "";
@@ -1133,6 +1166,7 @@ function getAllowedRoles(userData = {}) {
   ) {
     roleSet.add("admin");
     roleSet.add("customer");
+    roleSet.add("planner");
   }
 
   if (!roleSet.size) roleSet.add("customer");
@@ -1408,7 +1442,7 @@ function normalizeProfessionalLabel(value) {
 function getCategoryLine(source) {
   const mainCategory = normalizeProfessionalLabel(safeText(source.mainCategory, ""));
   const category = normalizeProfessionalLabel(safeText(source.listingCategory || source.category, "Event Service"));
-  const customCategory = safeText(source.customCategory, "");
+  const customCategory = normalizeProfessionalLabel(safeText(source.customCategory, ""));
 
   const typeLine = customCategory
     ? `${category} · ${customCategory}`
@@ -1731,7 +1765,7 @@ function sanitizeVendorForRequest(vendor) {
     listingTitle: safeText(vendor.listingTitle || vendor.title, "Requested Listing"),
     mainCategory: normalizeProfessionalLabel(safeText(vendor.mainCategory, "")),
     category: normalizeProfessionalLabel(safeText(vendor.category || vendor.listingCategory, "Event Service")),
-    customCategory: safeText(vendor.customCategory, ""),
+    customCategory: normalizeProfessionalLabel(safeText(vendor.customCategory, "")),
     eventTypes: getEventTypes(vendor),
     startingPrice: safeText(vendor.startingPrice, ""),
     priceNumber: Number(vendor.priceNumber || 0),
@@ -1779,7 +1813,11 @@ function buildBookingRequestPayload() {
     processingPercent: PROCESSING_PERCENT,
     processingFixed: PROCESSING_FIXED,
 
-    paymentStatus: "not_collected",
+    paymentStatus: STRIPE_ENABLED ? "checkout_not_started" : "not_collected",
+    stripeEnabled: STRIPE_ENABLED,
+    stripeCheckoutSessionId: "",
+    stripePaymentIntentId: "",
+    stripeClientReferenceId: "",
     requestStatus: "pending",
     status: "pending",
 
@@ -1901,6 +1939,10 @@ async function createConversationForVendor(requestId, payload, vendor) {
       [ownerId]: ownerRole,
       [vendorId]: "vendor"
     },
+    participantEmails: {
+      [ownerId]: payload.plannerEmail || payload.customerEmail || currentUser?.email || "",
+      [vendorId]: vendor.vendorEmail || ""
+    },
 
     customerId: payload.customerId || "",
     customerName: payload.customerName || "",
@@ -1923,9 +1965,15 @@ async function createConversationForVendor(requestId, payload, vendor) {
     listingLocation: vendor.location || payload.eventDetails?.eventCity || "",
 
     title: ownerRole === "vendor" ? ownerName : vendorName,
+    type: "booking_request",
     contextType: "Booking Request",
+    status: "active",
 
     lastMessage: firstMessage,
+    lastMessageAt: serverTimestamp(),
+    lastMessageSenderId: ownerId,
+    lastMessageSenderName: ownerName,
+    lastMessageSenderRole: ownerRole,
     lastSenderId: ownerId,
     lastSenderName: ownerName,
     lastSenderRole: ownerRole,
@@ -1995,6 +2043,8 @@ async function createVendorBookingNotifications(requestId, payload, conversation
         vendorId,
 
         read: false,
+        isRead: false,
+        readAt: null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -2084,6 +2134,86 @@ async function createConversationsForBookingRequest(requestId, payload) {
   return conversationMap;
 }
 
+
+function stripeConfigured() {
+  return Boolean(
+    STRIPE_ENABLED &&
+    STRIPE_PUBLISHABLE_KEY &&
+    STRIPE_PUBLISHABLE_KEY !== "pk_test_REPLACE_ME" &&
+    CREATE_STRIPE_CHECKOUT_SESSION_URL
+  );
+}
+
+async function startStripeEmbeddedCheckout(bookingRequestId, payload) {
+  if (!STRIPE_ENABLED) return false;
+
+  if (!stripeConfigured()) {
+    setCheckoutStatus("Stripe is turned on, but the publishable key or Firebase Function URL is missing.", "error");
+    return false;
+  }
+
+  if (!window.Stripe) {
+    setCheckoutStatus("Stripe.js did not load yet. Refresh the page and try again.", "error");
+    return false;
+  }
+
+  const stripeCard = document.getElementById("stripeCheckoutCard");
+  const stripeMount = document.getElementById("stripeEmbeddedCheckout");
+
+  if (!stripeCard || !stripeMount) return false;
+
+  stripeCard.classList.add("show");
+  stripeMount.innerHTML = "";
+
+  const response = await fetch(CREATE_STRIPE_CHECKOUT_SESSION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      bookingRequestId,
+      eventId: payload.eventId,
+      requestOwnerId: payload.requestOwnerId,
+      customerId: payload.customerId || "",
+      plannerId: payload.plannerId || "",
+      amount: Math.round(Number(payload.totalDue || 0) * 100),
+      currency: "usd",
+      eventName: payload.eventName,
+      customerEmail: payload.customerEmail || payload.plannerEmail || currentUser?.email || "",
+      customerName: payload.customerName || payload.plannerName || getCurrentUserDisplayName(),
+      vendorIds: payload.vendorIds || [],
+      listingIds: payload.listingIds || [],
+      returnUrl: `${window.location.origin}${window.location.pathname}?eventId=${encodeURIComponent(payload.eventId)}&bookingRequestId=${encodeURIComponent(bookingRequestId)}&stripe_return=true`
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.clientSecret) {
+    throw new Error(data.error || "Stripe checkout could not be started.");
+  }
+
+  await updateDoc(doc(db, "bookingRequests", bookingRequestId), {
+    paymentStatus: "checkout_started",
+    stripeClientReferenceId: bookingRequestId,
+    stripeCheckoutSessionId: data.sessionId || "",
+    stripeCheckoutStartedAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+
+  const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
+  const checkout = await stripe.initEmbeddedCheckout({
+    clientSecret: data.clientSecret
+  });
+
+  checkout.mount("#stripeEmbeddedCheckout");
+
+  setCheckoutStatus("Stripe checkout is ready below. Complete payment securely through Stripe.", "success");
+  stripeCard.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  return true;
+}
+
 async function submitBookingRequest() {
   if (isSubmitting) return;
 
@@ -2131,13 +2261,24 @@ async function submitBookingRequest() {
       createRequesterConfirmationNotification(bookingRef.id, payload)
     ]);
 
+    let stripeStarted = false;
+
+    if (STRIPE_ENABLED) {
+      stripeStarted = await startStripeEmbeddedCheckout(bookingRef.id, payload);
+    }
+
     document.getElementById("successSection").style.display = "block";
     document.getElementById("successMessage").textContent =
       isPlannerView()
         ? "Your client request was submitted successfully. Vendor conversations were created in Messages."
         : "Your request was submitted successfully. Vendor conversations were created in Messages.";
 
-    setCheckoutStatus("Request submitted. Vendor message threads were created and vendors were notified.", "success");
+    setCheckoutStatus(
+      stripeStarted
+        ? "Request submitted. Vendor threads were created and Stripe checkout is ready."
+        : "Request submitted. Vendor message threads were created and vendors were notified.",
+      "success"
+    );
 
     document.getElementById("successSection").scrollIntoView({
       behavior: "smooth",
@@ -2155,23 +2296,85 @@ async function submitBookingRequest() {
   }
 }
 
+function userCanSeeConversation(data, userId) {
+  if (isAdminPreview()) return true;
+
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
 async function loadUnreadNotifications() {
   let unreadNotifications = 0;
+  let unreadMessages = 0;
 
   try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", currentUser.uid),
-      where("read", "==", false)
-    );
+    const notificationQueries = [
+      query(collection(db, "notifications"), where("recipientId", "==", currentUser.uid)),
+      query(collection(db, "notifications"), where("userId", "==", currentUser.uid))
+    ];
 
-    const snapshot = await getDocs(notificationsQuery);
-    unreadNotifications = snapshot.size;
+    const notificationMap = new Map();
+
+    for (const notificationQuery of notificationQueries) {
+      try {
+        const snapshot = await getDocs(notificationQuery);
+        snapshot.forEach((docSnap) => notificationMap.set(docSnap.id, docSnap.data()));
+      } catch (error) {
+        console.warn("Notification badge query skipped:", error.message);
+      }
+    }
+
+    notificationMap.forEach((notification) => {
+      if (notification.read === false || notification.isRead === false) {
+        unreadNotifications += 1;
+      }
+    });
   } catch {
     unreadNotifications = 0;
   }
 
-  setBadge("topNotificationBadge", unreadNotifications);
+  try {
+    const conversationQueries = [
+      query(collection(db, "conversations"), where("participantIds", "array-contains", currentUser.uid)),
+      query(collection(db, "conversations"), where("customerId", "==", currentUser.uid)),
+      query(collection(db, "conversations"), where("plannerId", "==", currentUser.uid)),
+      query(collection(db, "conversations"), where("requestOwnerId", "==", currentUser.uid))
+    ];
+
+    const conversationMap = new Map();
+
+    for (const conversationQuery of conversationQueries) {
+      try {
+        const snapshot = await getDocs(conversationQuery);
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+
+          if (!userCanSeeConversation(data, currentUser.uid)) return;
+
+          conversationMap.set(docSnap.id, data);
+        });
+      } catch (error) {
+        console.warn("Conversation badge query skipped:", error.message);
+      }
+    }
+
+    conversationMap.forEach((conversation) => {
+      const unreadFor = conversation.unreadFor || {};
+      if (unreadFor[currentUser.uid]) unreadMessages += 1;
+    });
+  } catch {
+    unreadMessages = 0;
+  }
+
+  setBadge("topNotificationBadge", unreadNotifications + unreadMessages);
 }
 
 async function loadPage() {
