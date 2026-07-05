@@ -944,9 +944,9 @@
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M6 17H18L16.8 15.2V10.2C16.8 7.5 14.9 5.25 12.3 4.75V4.2C12.3 3.54 11.76 3 11.1 3C10.44 3 9.9 3.54 9.9 4.2V4.78C7.34 5.32 5.5 7.56 5.5 10.2V15.2L4.3 17H6Z" fill="currentColor"></path>
-          <path d="M9 18C9.3 19.2 10.3 20 11.5 20C12.7 19.2 13.7 20 14 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </header>
@@ -1040,6 +1040,9 @@
                     <option>Anniversary Parties</option>
                     <option>Luxury Dinner Parties</option>
                     <option>Open Houses</option>
+                    <option>Pool Parties</option>
+                    <option>Quinceañeras</option>
+                    <option>Festivals</option>
                     <option>Other Event Type</option>
                   </select>
                 </div>
@@ -1140,7 +1143,7 @@
 
           <div class="vendor-list" id="selectedVendorList">
             <div class="empty-card">
-              <div class="empty-icon">…</div>
+              <div class="empty-icon">...</div>
               <h3>Loading event board</h3>
               <p>We’re pulling your selected vendors now.</p>
             </div>
@@ -1155,7 +1158,7 @@
 
           <div class="vendor-list" id="availableVendorList">
             <div class="empty-card">
-              <div class="empty-icon">…</div>
+              <div class="empty-icon">...</div>
               <h3>Loading vendors</h3>
               <p>We’re pulling published listings now.</p>
             </div>
@@ -1283,13 +1286,13 @@ function formatMoney(value) {
 function formatPrice(value) {
   const raw = safeText(value, "");
 
-  if (!raw) return "$0+";
+  if (!raw) return "Price varies";
 
   const number = extractNumber(raw);
 
   if (!number) return raw;
 
-  return `${formatMoney(number)}+`;
+  return formatMoney(number);
 }
 
 function setText(id, value) {
@@ -1385,6 +1388,7 @@ function getAllowedRoles(userData = {}) {
   ) {
     roleSet.add("admin");
     roleSet.add("customer");
+    roleSet.add("planner");
   }
 
   if (!roleSet.size) roleSet.add("customer");
@@ -1661,7 +1665,7 @@ function normalizeProfessionalLabel(value) {
 function getCategoryLine(source) {
   const mainCategory = normalizeProfessionalLabel(safeText(source.mainCategory, ""));
   const category = normalizeProfessionalLabel(safeText(source.listingCategory || source.category, "Event Service"));
-  const customCategory = safeText(source.customCategory, "");
+  const customCategory = normalizeProfessionalLabel(safeText(source.customCategory, ""));
 
   const typeLine = customCategory
     ? `${category} · ${customCategory}`
@@ -2145,7 +2149,7 @@ function renderAvailableVendors() {
     const title = safeText(listing.title, "Untitled Listing");
     const vendorName = safeText(listing.vendorName, "Vendor");
     const imageUrl = safeText(listing.imageUrl, "");
-    const price = formatPrice(listing.startingPrice);
+    const price = formatPrice(listing.startingPrice || listing.price || listing.priceNumber);
     const categoryLine = getCategoryLine(listing);
     const eventTypePills = renderEventTypePills(listing, 2);
 
@@ -2205,12 +2209,10 @@ async function loadPublishedListings() {
       : query(listingsRef, where("status", "==", "published"));
 
     const snapshot = await getDocs(listingsQuery);
-
     const listings = [];
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
-
       const visible = safeText(data.listingVisibility, "visible") !== "hidden";
 
       if (isAdminPreview() || (data.status === "published" && visible)) {
@@ -2233,22 +2235,12 @@ async function loadPublishedListings() {
 
 async function loadSelectedVendors() {
   try {
-    let boardQuery;
-
-    if (isAdminPreview()) {
-      boardQuery = query(
-        collection(db, "eventBoardItems"),
-        where("eventId", "==", currentEventId)
-      );
-    } else {
-      boardQuery = query(
-        collection(db, "eventBoardItems"),
-        where("eventId", "==", currentEventId)
-      );
-    }
+    const boardQuery = query(
+      collection(db, "eventBoardItems"),
+      where("eventId", "==", currentEventId)
+    );
 
     const snapshot = await getDocs(boardQuery);
-
     const items = [];
 
     snapshot.forEach((docSnap) => {
@@ -2334,7 +2326,7 @@ async function addVendorToBoard(listingId) {
   try {
     isBusy = true;
 
-    const priceNumber = extractNumber(listing.startingPrice);
+    const priceNumber = extractNumber(listing.startingPrice || listing.price || listing.priceNumber);
     const eventTypes = getEventTypes(listing);
     const eventType = eventTypes.join(", ");
     const ownershipPayload = getBoardOwnershipPayload();
@@ -2350,12 +2342,12 @@ async function addVendorToBoard(listingId) {
       mainCategory: normalizeProfessionalLabel(safeText(listing.mainCategory, "")),
       listingCategory: normalizeProfessionalLabel(safeText(listing.category, "Event Service")),
       category: normalizeProfessionalLabel(safeText(listing.category, "Event Service")),
-      customCategory: safeText(listing.customCategory, ""),
+      customCategory: normalizeProfessionalLabel(safeText(listing.customCategory, "")),
 
       eventTypes,
       eventType,
 
-      startingPrice: safeText(listing.startingPrice, ""),
+      startingPrice: safeText(listing.startingPrice || listing.price || "", ""),
       priceNumber,
 
       vendorId: safeText(listing.vendorId, ""),
@@ -2387,7 +2379,6 @@ async function addVendorToBoard(listingId) {
 
     renderAll();
     showStatus("Vendor added to this event board.", "success");
-
   } catch (error) {
     showStatus(error.message, "error");
   } finally {
@@ -2430,7 +2421,6 @@ async function removeVendorFromBoard(boardId) {
 
     renderAll();
     showStatus("Vendor removed from this event board.", "success");
-
   } catch (error) {
     showStatus(error.message, "error");
   } finally {
@@ -2444,9 +2434,10 @@ function makeSafeId(value) {
     .slice(0, 180);
 }
 
-function buildConversationId(customerId, vendorId, listingId, eventId) {
+function buildConversationId(actorId, vendorId, listingId, eventId) {
   return [
-    makeSafeId(customerId),
+    "listing",
+    makeSafeId(actorId),
     makeSafeId(vendorId),
     makeSafeId(listingId),
     makeSafeId(eventId || "general")
@@ -2478,7 +2469,7 @@ async function openMessageForListing(listingId) {
     showStatus("Opening vendor conversation...", "info");
 
     const actorRole = getCurrentActorRole();
-    const customerName = currentUserData.name || currentUser.displayName || currentUser.email || (actorRole === "planner" ? "Planner" : "Customer");
+    const actorName = currentUserData.name || currentUser.displayName || currentUser.email || (actorRole === "planner" ? "Planner" : "Customer");
     const eventName = safeText(currentEventData?.eventName, "my event");
     const conversationId = buildConversationId(currentUser.uid, vendorId, cleanListingId, currentEventId);
     const firstMessage = `Conversation opened for ${eventName}. You can message ${vendor.vendorName || "this vendor"} here.`;
@@ -2487,35 +2478,58 @@ async function openMessageForListing(listingId) {
       conversationKey: conversationId,
       participantIds: [currentUser.uid, vendorId],
       participantNames: {
-        [currentUser.uid]: customerName,
+        [currentUser.uid]: actorName,
         [vendorId]: vendor.vendorName || "Vendor"
+      },
+      participantEmails: {
+        [currentUser.uid]: currentUserData?.email || currentUser.email || "",
+        [vendorId]: vendor.vendorEmail || ""
       },
       participantRoles: {
         [currentUser.uid]: actorRole,
         [vendorId]: "vendor"
       },
+
       customerId: currentEventData?.customerId || (actorRole === "customer" ? currentUser.uid : ""),
       plannerId: currentEventData?.plannerId || (actorRole === "planner" ? currentUser.uid : ""),
+      requestOwnerId: currentUser.uid,
+      requestOwnerName: actorName,
+      requestOwnerRole: actorRole,
+
       vendorId,
+      vendorName: vendor.vendorName || "Vendor",
+
       eventId: currentEventId,
       eventName,
+
       listingId: cleanListingId,
       listingTitle: vendor.listingTitle || "Event Listing",
       listingCategory: normalizeProfessionalLabel(vendor.listingCategory || "Event Service"),
       listingLocation: vendor.location || "",
+
       title: vendor.vendorName || "Vendor",
+      type: "listing_question",
       contextType: "Vendor",
+      status: "active",
+
       lastMessage: firstMessage,
+      lastMessageAt: serverTimestamp(),
+      lastMessageSenderId: currentUser.uid,
+      lastMessageSenderName: actorName,
+      lastMessageSenderRole: actorRole,
       lastSenderId: currentUser.uid,
+      lastSenderName: actorName,
+      lastSenderRole: actorRole,
+
       unreadFor: {
         [vendorId]: true
       },
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     }, { merge: true });
 
     window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}&eventId=${encodeURIComponent(currentEventId)}`;
-
   } catch (error) {
     showStatus(`Could not open messages: ${error.message}`, "error");
   }
@@ -2539,23 +2553,88 @@ async function handleUrlAddParam() {
   window.history.replaceState({}, document.title, getEventUrl("event-builder.html"));
 }
 
+function userCanSeeConversation(data, userId) {
+  if (isAdminPreview()) return true;
+
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
 async function loadUnreadNotifications() {
   let unreadNotifications = 0;
+  let unreadMessages = 0;
 
   try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", currentUser.uid),
-      where("read", "==", false)
-    );
+    const notificationQueries = [
+      query(collection(db, "notifications"), where("recipientId", "==", currentUser.uid)),
+      query(collection(db, "notifications"), where("userId", "==", currentUser.uid))
+    ];
 
-    const snapshot = await getDocs(notificationsQuery);
-    unreadNotifications = snapshot.size;
+    const notificationMap = new Map();
+
+    for (const notificationQuery of notificationQueries) {
+      try {
+        const snapshot = await getDocs(notificationQuery);
+
+        snapshot.forEach((docSnap) => {
+          notificationMap.set(docSnap.id, docSnap.data());
+        });
+      } catch (error) {
+        console.warn("Notification badge query skipped:", error.message);
+      }
+    }
+
+    notificationMap.forEach((notification) => {
+      if (notification.read === false || notification.isRead === false) {
+        unreadNotifications += 1;
+      }
+    });
   } catch {
     unreadNotifications = 0;
   }
 
-  setBadge("topNotificationBadge", unreadNotifications);
+  try {
+    const conversationQueries = [
+      query(collection(db, "conversations"), where("participantIds", "array-contains", currentUser.uid)),
+      query(collection(db, "conversations"), where("customerId", "==", currentUser.uid)),
+      query(collection(db, "conversations"), where("plannerId", "==", currentUser.uid)),
+      query(collection(db, "conversations"), where("requestOwnerId", "==", currentUser.uid))
+    ];
+
+    const conversationMap = new Map();
+
+    for (const conversationQuery of conversationQueries) {
+      try {
+        const snapshot = await getDocs(conversationQuery);
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+
+          if (!userCanSeeConversation(data, currentUser.uid)) return;
+
+          conversationMap.set(docSnap.id, data);
+        });
+      } catch (error) {
+        console.warn("Conversation badge query skipped:", error.message);
+      }
+    }
+
+    conversationMap.forEach((conversation) => {
+      const unreadFor = conversation.unreadFor || {};
+      if (unreadFor[currentUser.uid]) unreadMessages += 1;
+    });
+  } catch {
+    unreadMessages = 0;
+  }
+
+  setBadge("topNotificationBadge", unreadNotifications + unreadMessages);
 }
 
 async function loadPage() {
