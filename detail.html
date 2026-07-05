@@ -131,6 +131,33 @@
       -webkit-backdrop-filter: blur(8px);
     }
 
+    .hero-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--coral-2), var(--coral-3));
+      color: #fff;
+      font-size: 0.68rem;
+      line-height: 20px;
+      font-weight: 800;
+      text-align: center;
+      border: 2px solid #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      top: -5px;
+      right: -5px;
+      box-shadow: 0 8px 16px rgba(255,95,103,.28);
+    }
+
     .hero-bottom {
       position: absolute;
       left: 20px;
@@ -625,7 +652,13 @@
     <section class="hero" id="hero">
       <div class="hero-topbar">
         <a href="listings.html" class="hero-btn" id="backToListingsBtn" aria-label="Go back">←</a>
-        <a href="notifications.html" class="hero-btn" aria-label="Notifications">🔔</a>
+        <a href="notifications.html" class="hero-btn" aria-label="Notifications">
+          <span class="notification-badge" id="topNotificationBadge">0</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </div>
 
       <div class="hero-bottom">
@@ -639,7 +672,7 @@
       <div class="summary-card">
         <div class="summary-top">
           <h2 class="summary-name" id="summaryName">Loading listing...</h2>
-          <div class="summary-price" id="summaryPrice">$0+</div>
+          <div class="summary-price" id="summaryPrice">Price varies</div>
         </div>
 
         <div class="summary-meta" id="summaryMeta">
@@ -720,7 +753,7 @@
   <div class="action-bar">
     <div class="action-info">
       <span class="action-label">Starting At</span>
-      <span class="action-value" id="bottomPrice">$0+</span>
+      <span class="action-value" id="bottomPrice">Price varies</span>
     </div>
 
     <button class="action-btn-secondary" id="messageBtn" type="button">Message Vendor</button>
@@ -737,6 +770,7 @@ import {
   collection,
   getDocs,
   addDoc,
+  setDoc,
   serverTimestamp,
   query,
   where
@@ -778,7 +812,8 @@ function escapeHtml(value) {
 
 function formatPrice(value) {
   const raw = safeText(value, "");
-  if (!raw) return "$0+";
+
+  if (!raw) return "Price varies";
 
   const numberMatch = raw.match(/\d+(\.\d+)?/);
   if (!numberMatch) return raw;
@@ -786,7 +821,127 @@ function formatPrice(value) {
   const number = Number(numberMatch[0]);
   if (Number.isNaN(number)) return raw;
 
-  return `$${Math.round(number)}+`;
+  return `$${Math.round(number).toLocaleString()}`;
+}
+
+
+function normalize(value) {
+  return safeText(value, "").toLowerCase().trim();
+}
+
+function normalizeRole(role) {
+  const clean = normalize(role);
+
+  if (["client", "host", "event_host"].includes(clean)) return "customer";
+  if (["customer", "vendor", "planner", "admin"].includes(clean)) return clean;
+
+  return "";
+}
+
+function getAllowedRoles(userData = {}) {
+  const roleSet = new Set();
+
+  if (Array.isArray(userData.roles)) {
+    userData.roles.forEach((role) => {
+      const normalized = normalizeRole(role);
+      if (normalized) roleSet.add(normalized);
+    });
+  }
+
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active) roleSet.add(active);
+  if (legacy) roleSet.add(legacy);
+
+  if (userData.customerAccount === true || userData.permissions?.canUseClientDashboard === true) {
+    roleSet.add("customer");
+  }
+
+  if (
+    userData.vendorAccount === true ||
+    userData.permissions?.canUseVendorDashboard === true ||
+    userData.businessName ||
+    userData.vendorName
+  ) {
+    roleSet.add("vendor");
+  }
+
+  if (userData.plannerPro === true || userData.permissions?.canUsePlannerDashboard === true) {
+    roleSet.add("planner");
+  }
+
+  if (
+    userData.admin === true ||
+    userData.isAdmin === true ||
+    userData.permissions?.admin === true ||
+    legacy === "admin"
+  ) {
+    roleSet.add("admin");
+    roleSet.add("customer");
+    roleSet.add("planner");
+  }
+
+  if (!roleSet.size) roleSet.add("customer");
+
+  const preferredOrder = ["customer", "vendor", "planner", "admin"];
+  return preferredOrder.filter((role) => roleSet.has(role));
+}
+
+function getActiveRole(userData = {}) {
+  const allowedRoles = getAllowedRoles(userData);
+  const active = normalizeRole(userData.activeRole);
+  const legacy = normalizeRole(userData.role);
+
+  if (active && allowedRoles.includes(active)) return active;
+  if (legacy && allowedRoles.includes(legacy)) return legacy;
+  if (allowedRoles.includes("planner") && userData.plannerPro === true) return "planner";
+
+  return allowedRoles[0] || "customer";
+}
+
+function isAdminUser() {
+  return getAllowedRoles(currentUserData || {}).includes("admin");
+}
+
+function isAdminPreview() {
+  return isAdminUser() && getActiveRole(currentUserData || {}) === "admin";
+}
+
+function getCurrentActorRole() {
+  const activeRole = getActiveRole(currentUserData || {});
+  if (activeRole === "planner") return "planner";
+  if (activeRole === "admin") return "admin";
+  return "customer";
+}
+
+function makeSafeId(value) {
+  return safeText(value, "item")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
+}
+
+function buildConversationId(actorId, vendorId, listingId, eventId) {
+  return [
+    "listing",
+    makeSafeId(actorId),
+    makeSafeId(vendorId),
+    makeSafeId(listingId),
+    makeSafeId(eventId || "general")
+  ].join("__");
+}
+
+function setBadge(id, count) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.style.display = "inline-flex";
+  } else {
+    badge.textContent = "0";
+    badge.style.display = "none";
+  }
 }
 
 function titleCase(value) {
@@ -839,15 +994,15 @@ function getEventAwareUrl(baseUrl, params = {}) {
 function updateEventAwareLinks() {
   const backBtn = document.getElementById("backToListingsBtn");
   const addBtn = document.getElementById("addToEventBtn");
-  const role = currentUserData?.role || "";
+  const activeRole = getActiveRole(currentUserData || {});
 
   if (backBtn) {
-    backBtn.href = role === "admin" ? "listings.html" : getEventAwareUrl("listings.html");
+    backBtn.href = isAdminPreview() ? "listings.html" : getEventAwareUrl("listings.html");
   }
 
   if (!addBtn) return;
 
-  if (role === "admin") {
+  if (activeRole === "admin") {
     addBtn.href = "admin-dashboard.html";
     addBtn.textContent = "Back to Admin";
     return;
@@ -1065,7 +1220,7 @@ function renderListing(listing) {
   const rawCategory = safeText(listing.category, "Event Service");
   const mainCategory = normalizeProfessionalLabel(rawMainCategory);
   const category = normalizeProfessionalLabel(rawCategory);
-  const customCategory = safeText(listing.customCategory, "");
+  const customCategory = normalizeProfessionalLabel(safeText(listing.customCategory, ""));
   const eventTypesText = getEventTypesText(listing);
   const eventTypes = getEventTypes(listing);
   const location = getLocationText(listing);
@@ -1076,7 +1231,7 @@ function renderListing(listing) {
   const vendorName = safeText(listing.vendorName, "RentEvent Vendor");
   const status = safeText(listing.status, "published");
   const imageUrl = safeText(listing.imageUrl, "");
-  const price = formatPrice(listing.startingPrice);
+  const price = formatPrice(listing.startingPrice || listing.price || listing.priceNumber);
   const rating = listing.rating ? `★ ${listing.rating}` : "★ New";
   const zipCode = safeText(listing.zipCode, "Not listed");
 
@@ -1183,22 +1338,16 @@ async function loadListing() {
   }
 }
 
-async function findExistingConversation(customerId, vendorId, listingId, eventId = "") {
-  const conversationKey = eventId
-    ? `${customerId}_${vendorId}_${listingId}_${eventId}`
-    : `${customerId}_${vendorId}_${listingId}`;
+async function findExistingConversation(actorId, vendorId, listingId, eventId = "") {
+  const conversationId = buildConversationId(actorId, vendorId, listingId, eventId);
+  const conversationSnap = await getDoc(doc(db, "conversations", conversationId));
 
-  const q = query(collection(db, "conversations"), where("conversationKey", "==", conversationKey));
-  const snapshot = await getDocs(q);
+  if (!conversationSnap.exists()) return null;
 
-  if (snapshot.empty) return null;
-
-  let conversation = null;
-  snapshot.forEach((docSnap) => {
-    conversation = { id: docSnap.id, ...docSnap.data() };
-  });
-
-  return conversation;
+  return {
+    id: conversationSnap.id,
+    ...conversationSnap.data()
+  };
 }
 
 
@@ -1224,6 +1373,8 @@ async function notifyVendorOfMessage(conversationId, vendorId, customerName, lis
       senderId: currentUser.uid,
       senderName: customerName,
       read: false,
+      isRead: false,
+      readAt: null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
@@ -1240,8 +1391,8 @@ async function startConversation() {
     return;
   }
 
-  if (currentUserData?.role === "admin") {
-    showStatus("Admin preview mode is view-only. Use a customer test account to test messaging.", "error");
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only. Use a customer or planner test account to test messaging.", "error");
     return;
   }
 
@@ -1273,13 +1424,12 @@ async function startConversation() {
       vendorSectionMessageBtn.textContent = "Opening...";
     }
 
-    const customerId = currentUser.uid;
+    const actorRole = getCurrentActorRole();
+    const actorId = currentUser.uid;
     const listingId = currentListingId;
-    const conversationKey = currentEventId
-      ? `${customerId}_${vendorId}_${listingId}_${currentEventId}`
-      : `${customerId}_${vendorId}_${listingId}`;
+    const conversationId = buildConversationId(actorId, vendorId, listingId, currentEventId);
 
-    const existingConversation = await findExistingConversation(customerId, vendorId, listingId, currentEventId);
+    const existingConversation = await findExistingConversation(actorId, vendorId, listingId, currentEventId);
 
     if (existingConversation) {
       const eventPart = currentEventId ? `&eventId=${encodeURIComponent(currentEventId)}` : "";
@@ -1287,55 +1437,81 @@ async function startConversation() {
       return;
     }
 
-    const customerName = currentUserData?.name || currentUser.displayName || currentUser.email || "Customer";
+    const actorName = currentUserData?.name || currentUser.displayName || currentUser.email || (actorRole === "planner" ? "Planner" : "Customer");
     const vendorName = safeText(currentListing.vendorName, "Vendor");
     const listingTitle = safeText(currentListing.title, "Event Listing");
     const listingCategory = normalizeProfessionalLabel(safeText(currentListing.category, "Event Service"));
     const listingLocation = getLocationText(currentListing);
-
+    const eventName = currentEventId ? "this event" : "";
     const initialMessage = `Hi! I’m interested in ${listingTitle}.`;
 
-    const conversationRef = await addDoc(collection(db, "conversations"), {
-      conversationKey,
-      participantIds: [customerId, vendorId],
+    await setDoc(doc(db, "conversations", conversationId), {
+      conversationKey: conversationId,
+      participantIds: [actorId, vendorId],
       participantNames: {
-        [customerId]: customerName,
+        [actorId]: actorName,
         [vendorId]: vendorName
       },
+      participantEmails: {
+        [actorId]: currentUserData?.email || currentUser.email || "",
+        [vendorId]: currentListing.vendorEmail || ""
+      },
       participantRoles: {
-        [customerId]: "customer",
+        [actorId]: actorRole,
         [vendorId]: "vendor"
       },
-      customerId,
+
+      customerId: actorRole === "customer" ? actorId : "",
+      plannerId: actorRole === "planner" ? actorId : "",
+      requestOwnerId: actorId,
+      requestOwnerName: actorName,
+      requestOwnerRole: actorRole,
+
       vendorId,
+      vendorName,
+
       listingId,
-      eventId: currentEventId || "",
       listingTitle,
       listingCategory,
       listingLocation,
+
+      eventId: currentEventId || "",
+      eventName,
+
       title: vendorName,
+      type: "listing_question",
       contextType: currentEventId ? "Event Vendor" : "Vendor",
+      status: "active",
+
       lastMessage: initialMessage,
-      lastSenderId: customerId,
+      lastMessageAt: serverTimestamp(),
+      lastMessageSenderId: actorId,
+      lastMessageSenderName: actorName,
+      lastMessageSenderRole: actorRole,
+      lastSenderId: actorId,
+      lastSenderName: actorName,
+      lastSenderRole: actorRole,
+
       unreadFor: {
         [vendorId]: true
       },
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
-    });
+    }, { merge: true });
 
-    await addDoc(collection(db, "conversations", conversationRef.id, "messages"), {
+    await addDoc(collection(db, "conversations", conversationId, "messages"), {
       text: initialMessage,
-      senderId: customerId,
-      senderName: customerName,
-      senderRole: "customer",
+      senderId: actorId,
+      senderName: actorName,
+      senderRole: actorRole,
       createdAt: serverTimestamp()
     });
 
-    await notifyVendorOfMessage(conversationRef.id, vendorId, customerName, listingTitle, initialMessage);
+    await notifyVendorOfMessage(conversationId, vendorId, actorName, listingTitle, initialMessage);
 
     const eventPart = currentEventId ? `&eventId=${encodeURIComponent(currentEventId)}` : "";
-    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationRef.id)}${eventPart}`;
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}`;
 
   } catch (error) {
     showStatus(error.message, "error");
@@ -1348,6 +1524,89 @@ async function startConversation() {
       vendorSectionMessageBtn.textContent = "Message Vendor";
     }
   }
+}
+
+
+
+function userCanSeeConversation(data, userId) {
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+
+  return (
+    participantIds.includes(userId) ||
+    data.customerId === userId ||
+    data.vendorId === userId ||
+    data.plannerId === userId ||
+    data.requestOwnerId === userId
+  );
+}
+
+async function loadUnreadNotifications() {
+  if (!currentUser) return;
+
+  let unreadNotifications = 0;
+  let unreadMessages = 0;
+
+  try {
+    const notificationQueries = [
+      query(collection(db, "notifications"), where("recipientId", "==", currentUser.uid)),
+      query(collection(db, "notifications"), where("userId", "==", currentUser.uid))
+    ];
+
+    const notificationMap = new Map();
+
+    for (const notificationQuery of notificationQueries) {
+      try {
+        const snapshot = await getDocs(notificationQuery);
+        snapshot.forEach((docSnap) => notificationMap.set(docSnap.id, docSnap.data()));
+      } catch (error) {
+        console.warn("Notification badge query skipped:", error.message);
+      }
+    }
+
+    notificationMap.forEach((notification) => {
+      if (notification.read === false || notification.isRead === false) {
+        unreadNotifications += 1;
+      }
+    });
+  } catch {
+    unreadNotifications = 0;
+  }
+
+  try {
+    const conversationQueries = [
+      query(collection(db, "conversations"), where("participantIds", "array-contains", currentUser.uid)),
+      query(collection(db, "conversations"), where("customerId", "==", currentUser.uid)),
+      query(collection(db, "conversations"), where("plannerId", "==", currentUser.uid)),
+      query(collection(db, "conversations"), where("requestOwnerId", "==", currentUser.uid))
+    ];
+
+    const conversationMap = new Map();
+
+    for (const conversationQuery of conversationQueries) {
+      try {
+        const snapshot = await getDocs(conversationQuery);
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+
+          if (!userCanSeeConversation(data, currentUser.uid)) return;
+
+          conversationMap.set(docSnap.id, data);
+        });
+      } catch (error) {
+        console.warn("Conversation badge query skipped:", error.message);
+      }
+    }
+
+    conversationMap.forEach((conversation) => {
+      const unreadFor = conversation.unreadFor || {};
+      if (unreadFor[currentUser.uid]) unreadMessages += 1;
+    });
+  } catch {
+    unreadMessages = 0;
+  }
+
+  setBadge("topNotificationBadge", unreadNotifications + unreadMessages);
 }
 
 document.getElementById("messageBtn").addEventListener("click", startConversation);
@@ -1364,7 +1623,7 @@ onAuthStateChanged(auth, async (user) => {
     if (userSnap.exists()) {
       currentUserData = userSnap.data();
 
-      if (currentUserData.role === "admin") {
+      if (isAdminPreview()) {
         const adminPreviewBar = document.getElementById("adminPreviewBar");
         if (adminPreviewBar) {
           adminPreviewBar.style.display = "block";
@@ -1386,6 +1645,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   loadListing();
+  await loadUnreadNotifications();
 });
 </script>
 
