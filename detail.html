@@ -727,7 +727,7 @@
           </div>
 
           <div class="vendor-profile-note">
-            Ask availability questions, confirm details, or share event notes before adding this vendor to your event plan.
+            To protect your booking, vendor messages are tied to an event. Choose or create an event first, then message through RentEvent.
           </div>
         </div>
       </section>
@@ -1016,6 +1016,30 @@ function updateEventAwareLinks() {
     addBtn.textContent = "Choose Event";
   }
 }
+
+function requireEventBeforeMessaging() {
+  if (currentEventId) return false;
+
+  showStatus("Choose or create an event first so this vendor conversation is tied to a real RentEvent request.", "info");
+
+  const addBtn = document.getElementById("addToEventBtn");
+  if (addBtn) {
+    addBtn.textContent = "Choose Event First";
+    addBtn.href = "dashboard.html#myEventsSection";
+  }
+
+  setTimeout(() => {
+    window.location.href = "dashboard.html#myEventsSection";
+  }, 900);
+
+  return true;
+}
+
+function getEventConversationTitle() {
+  if (!currentEventId) return "";
+  return safeText(currentListing?.eventName, "") || "Event Inquiry";
+}
+
 
 function getEventTypes(listing) {
   if (Array.isArray(listing.eventTypes) && listing.eventTypes.length) {
@@ -1385,6 +1409,31 @@ async function notifyVendorOfMessage(conversationId, vendorId, customerName, lis
 
 async function startConversation() {
   const messageBtn = document.getElementById("messageBtn");
+  const vendorSectionMessageBtn = document.getElementById("vendorSectionMessageBtn");
+
+  function resetMessageButtons() {
+    if (messageBtn) {
+      messageBtn.disabled = false;
+      messageBtn.textContent = "Message Vendor";
+    }
+
+    if (vendorSectionMessageBtn) {
+      vendorSectionMessageBtn.disabled = false;
+      vendorSectionMessageBtn.textContent = "Message Vendor";
+    }
+  }
+
+  function setMessageButtonsLoading() {
+    if (messageBtn) {
+      messageBtn.disabled = true;
+      messageBtn.textContent = "Opening...";
+    }
+
+    if (vendorSectionMessageBtn) {
+      vendorSectionMessageBtn.disabled = true;
+      vendorSectionMessageBtn.textContent = "Opening...";
+    }
+  }
 
   if (!currentUser) {
     window.location.href = "index.html";
@@ -1401,6 +1450,10 @@ async function startConversation() {
     return;
   }
 
+  if (requireEventBeforeMessaging()) {
+    return;
+  }
+
   const vendorId = safeText(currentListing.vendorId, "");
 
   if (!vendorId) {
@@ -1414,15 +1467,7 @@ async function startConversation() {
   }
 
   try {
-    const vendorSectionMessageBtn = document.getElementById("vendorSectionMessageBtn");
-
-    messageBtn.disabled = true;
-    messageBtn.textContent = "Opening...";
-
-    if (vendorSectionMessageBtn) {
-      vendorSectionMessageBtn.disabled = true;
-      vendorSectionMessageBtn.textContent = "Opening...";
-    }
+    setMessageButtonsLoading();
 
     const actorRole = getCurrentActorRole();
     const actorId = currentUser.uid;
@@ -1442,8 +1487,8 @@ async function startConversation() {
     const listingTitle = safeText(currentListing.title, "Event Listing");
     const listingCategory = normalizeProfessionalLabel(safeText(currentListing.category, "Event Service"));
     const listingLocation = getLocationText(currentListing);
-    const eventName = currentEventId ? "this event" : "";
-    const initialMessage = `Hi! I’m interested in ${listingTitle}.`;
+    const eventName = getEventConversationTitle() || "Event Inquiry";
+    const initialMessage = `Hi! I’m interested in ${listingTitle} for my event.`;
 
     await setDoc(doc(db, "conversations", conversationId), {
       conversationKey: conversationId,
@@ -1451,10 +1496,6 @@ async function startConversation() {
       participantNames: {
         [actorId]: actorName,
         [vendorId]: vendorName
-      },
-      participantEmails: {
-        [actorId]: currentUserData?.email || currentUser.email || "",
-        [vendorId]: currentListing.vendorEmail || ""
       },
       participantRoles: {
         [actorId]: actorRole,
@@ -1475,13 +1516,21 @@ async function startConversation() {
       listingCategory,
       listingLocation,
 
-      eventId: currentEventId || "",
+      eventId: currentEventId,
       eventName,
 
       title: vendorName,
-      type: "listing_question",
-      contextType: currentEventId ? "Event Vendor" : "Vendor",
+      type: "event_listing_question",
+      contextType: "Event Vendor",
       status: "active",
+
+      platformSafetyPolicy: {
+        keepCommunicationOnPlatform: true,
+        blocksPhoneNumbers: true,
+        blocksEmails: true,
+        blocksOutsidePaymentLinks: true,
+        blocksSocialHandles: true
+      },
 
       lastMessage: initialMessage,
       lastMessageAt: serverTimestamp(),
@@ -1496,6 +1545,9 @@ async function startConversation() {
         [vendorId]: true
       },
 
+      typing: {},
+      typingUpdatedAt: {},
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     }, { merge: true });
@@ -1505,6 +1557,10 @@ async function startConversation() {
       senderId: actorId,
       senderName: actorName,
       senderRole: actorRole,
+      eventId: currentEventId,
+      listingId,
+      systemGenerated: false,
+      messageType: "listing_inquiry",
       createdAt: serverTimestamp()
     });
 
@@ -1514,17 +1570,16 @@ async function startConversation() {
     window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}`;
 
   } catch (error) {
-    showStatus(error.message, "error");
-    messageBtn.disabled = false;
-    messageBtn.textContent = "Message Vendor";
+    const rawMessage = safeText(error.message, "Could not open this vendor message thread.");
+    const friendlyMessage = rawMessage.includes("Missing or insufficient permissions")
+      ? "Messaging is protected. Please add this vendor to an event first, then open the conversation from your event board or request."
+      : rawMessage;
 
-    const vendorSectionMessageBtn = document.getElementById("vendorSectionMessageBtn");
-    if (vendorSectionMessageBtn) {
-      vendorSectionMessageBtn.disabled = false;
-      vendorSectionMessageBtn.textContent = "Message Vendor";
-    }
+    showStatus(friendlyMessage, "error");
+    resetMessageButtons();
   }
 }
+
 
 
 
