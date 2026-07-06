@@ -1036,7 +1036,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const STRIPE_ENABLED = true;
-const STRIPE_PUBLISHABLE_KEY = "PASTE_YOUR_PK_LIVE_KEY_HERE";
+const STRIPE_PUBLISHABLE_KEY = "pk_live_51RuISLAYFXDWEqMrqOJagrtkOncGquYJb2kxsLTx0K8QVM6XQBQpIIIRX023baUpFH3rQpWttoRSpVLI4UFiDu5v00C6hx0iof";
 const CREATE_STRIPE_CHECKOUT_SESSION_URL = "https://us-central1-rent-event-f7abd.cloudfunctions.net/createStripeCheckoutSession";
 
 const params = new URLSearchParams(window.location.search);
@@ -2079,7 +2079,7 @@ function validateStripeSetup() {
     throw new Error("Stripe.js did not load. Refresh the page and try again.");
   }
 
-  if (!STRIPE_PUBLISHABLE_KEY || STRIPE_PUBLISHABLE_KEY === "pk_live_51RuISLAYFXDWEqMrqOJagrtkOncGquYJb2kxsLTx0K8QVM6XQBQpIIIRX023baUpFH3rQpWttoRSpVLI4UFiDu5v00C6hx0iof") {
+  if (!STRIPE_PUBLISHABLE_KEY || STRIPE_PUBLISHABLE_KEY === "PASTE_YOUR_PK_LIVE_KEY_HERE") {
     throw new Error("Stripe publishable key is missing in checkout.html.");
   }
 
