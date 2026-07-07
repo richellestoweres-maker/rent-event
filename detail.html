@@ -727,7 +727,7 @@
           </div>
 
           <div class="vendor-profile-note">
-            To protect your booking, vendor messages are tied to an event. Choose or create an event first, then message through RentEvent.
+            Message through RentEvent’s protected chat. Phone numbers, emails, outside links, social handles, and off-platform payment requests are blocked in chat.
           </div>
         </div>
       </section>
@@ -1016,30 +1016,6 @@ function updateEventAwareLinks() {
     addBtn.textContent = "Choose Event";
   }
 }
-
-function requireEventBeforeMessaging() {
-  if (currentEventId) return false;
-
-  showStatus("Choose or create an event first so this vendor conversation is tied to a real RentEvent request.", "info");
-
-  const addBtn = document.getElementById("addToEventBtn");
-  if (addBtn) {
-    addBtn.textContent = "Choose Event First";
-    addBtn.href = "dashboard.html#myEventsSection";
-  }
-
-  setTimeout(() => {
-    window.location.href = "dashboard.html#myEventsSection";
-  }, 900);
-
-  return true;
-}
-
-function getEventConversationTitle() {
-  if (!currentEventId) return "";
-  return safeText(currentListing?.eventName, "") || "Event Inquiry";
-}
-
 
 function getEventTypes(listing) {
   if (Array.isArray(listing.eventTypes) && listing.eventTypes.length) {
@@ -1450,10 +1426,6 @@ async function startConversation() {
     return;
   }
 
-  if (requireEventBeforeMessaging()) {
-    return;
-  }
-
   const vendorId = safeText(currentListing.vendorId, "");
 
   if (!vendorId) {
@@ -1472,9 +1444,12 @@ async function startConversation() {
     const actorRole = getCurrentActorRole();
     const actorId = currentUser.uid;
     const listingId = currentListingId;
-    const conversationId = buildConversationId(actorId, vendorId, listingId, currentEventId);
 
-    const existingConversation = await findExistingConversation(actorId, vendorId, listingId, currentEventId);
+    // If an eventId exists, the chat is tied to that event.
+    // If not, it still opens a protected general listing inquiry.
+    const conversationId = buildConversationId(actorId, vendorId, listingId, currentEventId || "general");
+
+    const existingConversation = await findExistingConversation(actorId, vendorId, listingId, currentEventId || "general");
 
     if (existingConversation) {
       const eventPart = currentEventId ? `&eventId=${encodeURIComponent(currentEventId)}` : "";
@@ -1487,8 +1462,10 @@ async function startConversation() {
     const listingTitle = safeText(currentListing.title, "Event Listing");
     const listingCategory = normalizeProfessionalLabel(safeText(currentListing.category, "Event Service"));
     const listingLocation = getLocationText(currentListing);
-    const eventName = getEventConversationTitle() || "Event Inquiry";
-    const initialMessage = `Hi! I’m interested in ${listingTitle} for my event.`;
+    const eventName = currentEventId ? "Event Inquiry" : "General Listing Inquiry";
+    const initialMessage = currentEventId
+      ? `Hi! I’m interested in ${listingTitle} for my event.`
+      : `Hi! I’m interested in ${listingTitle}.`;
 
     await setDoc(doc(db, "conversations", conversationId), {
       conversationKey: conversationId,
@@ -1516,12 +1493,12 @@ async function startConversation() {
       listingCategory,
       listingLocation,
 
-      eventId: currentEventId,
+      eventId: currentEventId || "",
       eventName,
 
       title: vendorName,
-      type: "event_listing_question",
-      contextType: "Event Vendor",
+      type: currentEventId ? "event_listing_question" : "general_listing_question",
+      contextType: currentEventId ? "Event Vendor" : "Protected Vendor Chat",
       status: "active",
 
       platformSafetyPolicy: {
@@ -1557,10 +1534,10 @@ async function startConversation() {
       senderId: actorId,
       senderName: actorName,
       senderRole: actorRole,
-      eventId: currentEventId,
+      eventId: currentEventId || "",
       listingId,
       systemGenerated: false,
-      messageType: "listing_inquiry",
+      messageType: currentEventId ? "event_listing_inquiry" : "general_listing_inquiry",
       createdAt: serverTimestamp()
     });
 
@@ -1572,7 +1549,7 @@ async function startConversation() {
   } catch (error) {
     const rawMessage = safeText(error.message, "Could not open this vendor message thread.");
     const friendlyMessage = rawMessage.includes("Missing or insufficient permissions")
-      ? "Messaging is protected. Please add this vendor to an event first, then open the conversation from your event board or request."
+      ? "Messaging is protected, but Firebase rules are still blocking this general inquiry. We may need to update the Firestore rule for conversations."
       : rawMessage;
 
     showStatus(friendlyMessage, "error");
