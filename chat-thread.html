@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -588,6 +589,7 @@
       .composer { max-width: 406px; }
     }
   </style>
+
 </head>
 
 <body>
@@ -605,74 +607,75 @@
     <header class="topbar">
       <a href="messages.html" class="back-link" id="backLink" aria-label="Go back">←</a>
 
-      <div class="chat-head">
-        <div class="avatar"><span id="avatarInitials">RE</span></div>
+  <div class="chat-head">
+    <div class="avatar"><span id="avatarInitials">RE</span></div>
 
-        <div class="chat-meta">
-          <h1 class="chat-name" id="chatName">Loading conversation...</h1>
-          <p class="chat-sub" id="chatSub">Please wait while we load this thread.</p>
+    <div class="chat-meta">
+      <h1 class="chat-name" id="chatName">Loading conversation...</h1>
+      <p class="chat-sub" id="chatSub">Please wait while we load this thread.</p>
 
-          <div class="role-switcher" id="roleSwitcher">
-            <span class="role-switcher-label">Viewing as</span>
-            <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
-          </div>
-        </div>
+      <div class="role-switcher" id="roleSwitcher">
+        <span class="role-switcher-label">Viewing as</span>
+        <select class="role-select" id="roleSelect" aria-label="Switch dashboard role"></select>
       </div>
-
-      <a href="listings.html" class="icon-btn" id="listingLink" aria-label="View listing">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
-          <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-      </a>
-    </header>
-
-    <section class="banner">
-      <h2 id="bannerTitle">Event Conversation</h2>
-      <p id="bannerText">Keep pricing, setup times, and booking details organized in one place.</p>
-    </section>
-
-    <div class="platform-safety-note">
-      For safety, payment protection, and booking support, keep communication on RentEvent. Phone numbers, emails, social handles, outside links, and off-platform payment requests are not allowed.
     </div>
+  </div>
 
-    <section class="context-card" id="contextCard" style="display: none;">
-      <div class="context-row">
-        <span class="context-label">Event</span>
-        <span class="context-value" id="contextEventName">Not listed</span>
-      </div>
+  <a href="listings.html" class="icon-btn" id="listingLink" aria-label="View listing">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
+      <path d="M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      <path d="M8 14H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+  </a>
+</header>
 
-      <div class="context-row">
-        <span class="context-label">Service</span>
-        <span class="context-value" id="contextListingTitle">Not listed</span>
-      </div>
+<section class="banner">
+  <h2 id="bannerTitle">Event Conversation</h2>
+  <p id="bannerText">Keep pricing, setup times, and booking details organized in one place.</p>
+</section>
 
-      <div class="context-row">
-        <span class="context-label">Request</span>
-        <span class="context-value" id="contextRequest">Conversation</span>
-      </div>
+<div class="platform-safety-note">
+  For safety, payment protection, and booking support, keep communication on RentEvent. Phone numbers, emails, social handles, outside links, and off-platform payment requests are not allowed.
+</div>
 
-      <div class="context-actions">
-        <a class="mini-btn" href="messages.html" id="messagesContextLink">Back to Inbox</a>
-        <a class="mini-btn-secondary" href="event-builder.html" id="eventContextLink">Open Event</a>
-      </div>
-    </section>
+<section class="context-card" id="contextCard" style="display: none;">
+  <div class="context-row">
+    <span class="context-label">Event</span>
+    <span class="context-value" id="contextEventName">Not listed</span>
+  </div>
 
-    <section class="thread" id="thread">
-      <div class="empty-card">
-        <div class="empty-icon">...</div>
-        <h3>Loading messages</h3>
-        <p>We’re opening this conversation now.</p>
-      </div>
-    </section>
+  <div class="context-row">
+    <span class="context-label">Service</span>
+    <span class="context-value" id="contextListingTitle">Not listed</span>
+  </div>
 
-    <div class="typing-indicator" id="typingIndicator">
-      <span id="typingText">Someone is typing</span>
-      <span class="typing-dots" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </span>
-    </div>
+  <div class="context-row">
+    <span class="context-label">Request</span>
+    <span class="context-value" id="contextRequest">Conversation</span>
+  </div>
+
+  <div class="context-actions">
+    <a class="mini-btn" href="messages.html" id="messagesContextLink">Back to Inbox</a>
+    <a class="mini-btn-secondary" href="event-builder.html" id="eventContextLink">Open Event</a>
+  </div>
+</section>
+
+<section class="thread" id="thread">
+  <div class="empty-card">
+    <div class="empty-icon">...</div>
+    <h3>Loading messages</h3>
+    <p>We’re opening this conversation now.</p>
+  </div>
+</section>
+
+<div class="typing-indicator" id="typingIndicator">
+  <span id="typingText">Someone is typing</span>
+  <span class="typing-dots" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </span>
+</div>
+
   </main>
 
   <div class="platform-warning" id="platformWarning">
@@ -680,7 +683,8 @@
   </div>
 
   <form class="composer" id="composer">
-        <button class="send-btn" id="sendBtn" type="submit">Send</button>
+    <input id="messageInput" type="text" placeholder="Message through RentEvent. No phone numbers, emails, outside links, or off-platform payments." autocomplete="off" />
+    <button class="send-btn" id="sendBtn" type="submit">Send</button>
   </form>
 
 <script type="module">
