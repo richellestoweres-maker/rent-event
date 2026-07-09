@@ -502,20 +502,6 @@
     .composer input::placeholder {
       color: #a49a8f;
     }
-
-    .platform-safety-note {
-      margin: 0 0 12px;
-      background: var(--blue-soft);
-      color: var(--blue-text);
-      border: 1px solid rgba(64,103,178,0.12);
-      border-radius: 22px;
-      padding: 12px 14px;
-      font-size: 0.82rem;
-      line-height: 1.4;
-      font-weight: 700;
-      box-shadow: var(--shadow);
-    }
-
     .platform-warning {
       display: none;
       position: fixed;
@@ -634,11 +620,6 @@
   <h2 id="bannerTitle">Event Conversation</h2>
   <p id="bannerText">Keep pricing, setup times, and booking details organized in one place.</p>
 </section>
-
-<div class="platform-safety-note">
-  For safety, payment protection, and booking support, keep communication on RentEvent. Phone numbers, emails, social handles, outside links, and off-platform payment requests are not allowed.
-</div>
-
 <section class="context-card" id="contextCard" style="display: none;">
   <div class="context-row">
     <span class="context-label">Event</span>
@@ -683,7 +664,7 @@
   </div>
 
   <form class="composer" id="composer">
-    <input id="messageInput" type="text" placeholder="Message through RentEvent. No phone numbers, emails, outside links, or off-platform payments." autocomplete="off" />
+    <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off" />
     <button class="send-btn" id="sendBtn" type="submit">Send</button>
   </form>
 
