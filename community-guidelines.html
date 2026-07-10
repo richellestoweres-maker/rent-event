@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Community Guidelines | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --gold-soft: #fff4df;
+      --gold-text: #9b6511;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 92px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.42rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.48;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .guidelines-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.45);
+    }
+
+    .updated {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .section {
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 1.12rem;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .section h3 {
+      margin: 14px 0 8px;
+      font-size: 0.98rem;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .section p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section ul {
+      margin: 0 0 12px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section li {
+      margin-bottom: 8px;
+    }
+
+    .guideline-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .guideline-box {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 13px;
+    }
+
+    .guideline-box strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.86rem;
+      line-height: 1.25;
+    }
+
+    .guideline-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .notice-card {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+      border: 1px solid rgba(155, 101, 17, 0.18);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .notice-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .notice-card p {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .alert-box {
+      background: var(--red-soft);
+      color: var(--red-text);
+      border: 1px solid rgba(199, 79, 77, 0.2);
+      border-radius: 22px;
+      padding: 15px;
+      margin: 12px 0;
+    }
+
+    .alert-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    .alert-box p {
+      color: var(--red-text);
+      margin: 0;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .pill.blue {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .pill.green {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.red {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .pill.purple {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 48px;
+      border-radius: 999px;
+      padding: 0 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      color: #4a433d;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 880px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .hero-content {
+        max-width: 560px;
+      }
+
+      .guidelines-card {
+        padding: 28px;
+      }
+
+      .section h2 {
+        font-size: 1.25rem;
+      }
+
+      .guideline-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="profile.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Community</div>
+        <h1 class="page-title">Guidelines</h1>
+      </div>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <h2 class="hero-title">Community Guidelines</h2>
+        <p class="hero-subtitle">
+          RentEvent is built to help customers, vendors, and planners coordinate events with trust, professionalism, and clear communication.
+        </p>
+      </div>
+    </section>
+
+    <section class="notice-card">
+      <strong>These guidelines apply to everyone</strong>
+      <p>
+        Customers, vendors, planners, and account users are expected to follow these guidelines when using RentEvent listings, messages, booking tools, reviews, reports, and planning features.
+      </p>
+    </section>
+
+    <section class="guidelines-card">
+      <p class="updated">
+        Last updated: July 2026
+      </p>
+
+      <div class="section">
+        <h2>1. Be Respectful and Professional</h2>
+        <p>
+          RentEvent users should communicate in a respectful, honest, and professional way. Event planning can involve stress, timelines, budgets, and many details, so clear and kind communication matters.
+        </p>
+        <ul>
+          <li>No harassment, threats, intimidation, bullying, hate speech, or abusive language.</li>
+          <li>No discriminatory comments or conduct based on race, color, religion, sex, gender identity, sexual orientation, disability, age, national origin, marital status, pregnancy, military status, or any other protected status.</li>
+          <li>No sexually explicit, graphic, violent, or inappropriate messages.</li>
+          <li>No repeated unwanted contact after someone has asked you to stop.</li>
+          <li>Keep conversations related to the event, booking, vendor service, or planning need.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>2. Keep Communication on RentEvent</h2>
+        <p>
+          Booking-related communication should stay inside RentEvent so event details, questions, agreements, payment history, and support records stay connected to the booking.
+        </p>
+        <ul>
+          <li>Do not share phone numbers, email addresses, social media handles, outside links, or requests to move the conversation off RentEvent through RentEvent messages.</li>
+          <li>Do not pressure another user to call, text, email, DM, or contact you outside the platform.</li>
+          <li>Do not try to bypass message protections by spacing out numbers, spelling out emails, or disguising outside contact details.</li>
+          <li>Use RentEvent reporting tools if someone asks you to go off-platform or makes you uncomfortable.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>3. Keep Payments and Booking Records Protected</h2>
+        <p>
+          When RentEvent payment tools are available, booking-related payments, deposits, balances, and payment questions should stay inside RentEvent unless RentEvent clearly provides another approved option.
+        </p>
+        <ul>
+          <li>No requests to pay by Venmo, Cash App, Zelle, PayPal, direct invoice, wire transfer, or another outside payment method through RentEvent messages.</li>
+          <li>No pressure tactics, rushed payment demands, or attempts to avoid documented booking records.</li>
+          <li>No collecting leads on RentEvent and then moving the booking off-platform to avoid fees, support records, or platform protections.</li>
+          <li>No false claims about payment status, refunds, deposits, cancellation fees, or chargebacks.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>4. Be Honest in Listings, Profiles, and Requests</h2>
+        <p>
+          RentEvent depends on accurate information. Users may not mislead others about services, pricing, availability, identity, business status, qualifications, or event needs.
+        </p>
+
+        <div class="guideline-grid">
+          <div class="guideline-box">
+            <strong>Vendors</strong>
+            <span>Use accurate listings, photos, prices, service areas, availability, business details, licensing, certifications, and insurance information.</span>
+          </div>
+
+          <div class="guideline-box">
+            <strong>Customers</strong>
+            <span>Give accurate event details, guest counts, locations, timing, venue rules, setup expectations, and service needs.</span>
+          </div>
+
+          <div class="guideline-box">
+            <strong>Planners</strong>
+            <span>Represent clients, budgets, vendor needs, timelines, and event details truthfully and professionally.</span>
+          </div>
+
+          <div class="guideline-box">
+            <strong>Everyone</strong>
+            <span>No impersonation, fake accounts, fake reviews, misleading claims, or deceptive behavior.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>5. No Scams, Fraud, or Platform Abuse</h2>
+        <p>
+          Users may not use RentEvent to deceive, exploit, spam, scrape, manipulate, or harm other users or the marketplace.
+        </p>
+        <ul>
+          <li>No fake listings, fake businesses, fake bookings, fake reviews, or fake support claims.</li>
+          <li>No phishing, suspicious links, malware, password requests, or attempts to access another user’s account.</li>
+          <li>No spam, mass messaging, duplicate listings, bot activity, scraping, or automated misuse.</li>
+          <li>No attempts to manipulate search results, reviews, availability, pricing, or platform tools.</li>
+          <li>No using RentEvent to collect personal information unrelated to a legitimate booking.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>6. Vendor Professional Standards</h2>
+        <p>
+          Vendors are independent businesses or professionals and are responsible for the services they offer, including staffing, equipment, supplies, safety practices, licenses, insurance, permits, and legal compliance.
+        </p>
+        <ul>
+          <li>Only offer services you are qualified and prepared to provide.</li>
+          <li>Show up on time and communicate promptly if something changes.</li>
+          <li>Honor agreed service details, pricing, cancellation terms, and booking expectations.</li>
+          <li>Follow applicable laws, venue rules, fire codes, food safety rules, alcohol rules, pool safety rules, transportation requirements, and local regulations.</li>
+          <li>Do not misrepresent experience, availability, insurance, licensing, certifications, staff, equipment, or service limits.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>7. Transportation Must Be Professional Event Transportation</h2>
+        <p>
+          RentEvent is not a rideshare platform. Transportation categories are for professional event logistics providers, not random individual ride offers or gig-driver style listings.
+        </p>
+        <ul>
+          <li>Allowed examples include licensed and insured shuttle companies, party bus companies, limo or chauffeur companies, valet and parking companies, venue transportation providers, and professional guest transportation providers.</li>
+          <li>Transportation vendors should comply with applicable licensing, insurance, driver, vehicle, safety, and local legal requirements.</li>
+          <li>Do not list individual on-demand rides, casual personal driving, or services that function like a rideshare replacement.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>8. Safety-Sensitive Services Must Be Responsible</h2>
+        <p>
+          Services involving safety, staffing, water, alcohol, transportation, security, guest access, parking, setup, or cleanup should be handled with extra care.
+        </p>
+        <ul>
+          <li>Lifeguards, security, off-duty officers, valet teams, bartenders, servers, setup crews, cleanup crews, drivers, and shuttle providers should be qualified for the job they accept.</li>
+          <li>Users should confirm staffing levels, certifications, licensing, insurance, venue rules, and safety expectations when appropriate.</li>
+          <li>No reckless instructions, knowingly unsafe services, or services that violate laws, venue rules, or public safety requirements.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>9. Prohibited Services and Content</h2>
+        <p>
+          Users may not use RentEvent to post, request, coordinate, promote, or sell unlawful, unsafe, abusive, misleading, or prohibited services or content.
+        </p>
+        <ul>
+          <li>No illegal substances, stolen goods, counterfeit goods, unlawful weapons, or prohibited services.</li>
+          <li>No adult sexual services, exploitative content, or inappropriate sexual conduct.</li>
+          <li>No dangerous instructions, reckless safety advice, or services likely to cause harm.</li>
+          <li>No hate, harassment, threats, stalking, intimidation, or violent content.</li>
+          <li>No content that violates another person’s privacy, intellectual property, or legal rights.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>10. Reviews, Reports, and Marketplace Integrity</h2>
+        <p>
+          Reviews and reports should be honest, relevant, and based on real experiences. They should help other users understand what happened, not be used to threaten or manipulate someone.
+        </p>
+        <ul>
+          <li>No fake reviews, paid reviews, review swapping, or review manipulation.</li>
+          <li>No threats to leave a bad review unless someone gives a discount, refund, payment, or special treatment.</li>
+          <li>No false reports or retaliatory reports.</li>
+          <li>Do report scams, unsafe conduct, harassment, no-shows, misleading listings, payment concerns, or policy violations.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>11. Account Actions</h2>
+        <p>
+          RentEvent may review activity and take action when guidelines, safety expectations, or platform rules appear to be violated.
+        </p>
+        <ul>
+          <li>RentEvent may warn users, remove content, hide listings, limit features, restrict messaging, pause payouts, review bookings, suspend accounts, or remove accounts.</li>
+          <li>RentEvent may preserve records and review messages, listings, booking details, payment records, reports, and account history when needed for safety, support, dispute, fraud, or policy purposes.</li>
+          <li>Serious or repeated violations may result in permanent removal from RentEvent.</li>
+        </ul>
+
+        <div class="alert-box">
+          <strong>Report guideline violations</strong>
+          <p>
+            If someone pressures you to go off-platform, sends suspicious payment requests, misrepresents a service, harasses you, or creates an unsafe situation, report it to RentEvent.
+          </p>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill blue">Respect</span>
+          <span class="pill green">Professional Vendors</span>
+          <span class="pill purple">On-Platform Booking</span>
+          <span class="pill red">Report Issues</span>
+        </div>
+
+        <div class="footer-actions">
+          <a class="btn" href="report.html">Report a Concern</a>
+          <a class="btn-secondary" href="safety.html">View Safety</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
