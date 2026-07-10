@@ -1,1 +1,557 @@
-terms.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Terms of Service | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --gold-soft: #fff4df;
+      --gold-text: #9b6511;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body { min-height: 100vh; }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 92px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link, .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .icon-btn svg { width: 20px; height: 20px; }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.42rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.48;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .notice-card {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+      border: 1px solid rgba(155, 101, 17, 0.18);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .notice-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .notice-card p {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .terms-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.45);
+    }
+
+    .updated {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .section {
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-of-type { border-top: none; padding-top: 0; }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 1.12rem;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .section p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section ul {
+      margin: 0 0 12px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section li { margin-bottom: 8px; }
+
+    .alert-box {
+      background: var(--red-soft);
+      color: var(--red-text);
+      border: 1px solid rgba(199, 79, 77, 0.2);
+      border-radius: 22px;
+      padding: 15px;
+      margin: 12px 0;
+    }
+
+    .alert-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    .alert-box p { color: var(--red-text); margin: 0; }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .pill.blue { background: var(--blue-soft); color: var(--blue-text); }
+    .pill.green { background: var(--green-soft); color: var(--green-text); }
+    .pill.red { background: var(--red-soft); color: var(--red-text); }
+    .pill.purple { background: var(--purple-soft); color: var(--purple-text); }
+
+    .footer-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn, .btn-secondary {
+      min-height: 48px;
+      border-radius: 999px;
+      padding: 0 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      color: #4a433d;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    @media (min-width: 768px) {
+      body { padding: 24px 0; }
+      .page { max-width: 880px; padding-left: 24px; padding-right: 24px; }
+      .hero-content { max-width: 560px; }
+      .terms-card { padding: 28px; }
+      .section h2 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="profile.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Legal</div>
+        <h1 class="page-title">Terms</h1>
+      </div>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <h2 class="hero-title">Terms of Service</h2>
+        <p class="hero-subtitle">
+          These Terms explain the basic rules for using RentEvent’s marketplace, planning tools, listings, messaging, booking requests, payments, and related services.
+        </p>
+      </div>
+    </section>
+
+    <section class="notice-card">
+      <strong>Attorney review recommended</strong>
+      <p>
+        This is a starter Terms page for RentEvent. Before public launch, fundraising, or large-scale marketplace transactions, have a qualified attorney review and customize it for your business, state, payment model, insurance, and app store plans.
+      </p>
+    </section>
+
+    <section class="terms-card">
+      <p class="updated">Last updated: July 2026</p>
+
+      <div class="section">
+        <h2>1. Acceptance of These Terms</h2>
+        <p>
+          By accessing or using RentEvent, you agree to these Terms of Service, our Safety Guidelines, Community Guidelines, Privacy Policy, and any other policies or notices made available through RentEvent.
+        </p>
+        <p>
+          If you do not agree, do not use RentEvent. If you use RentEvent on behalf of a business, organization, client, venue, or another person, you represent that you have authority to do so.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>2. What RentEvent Provides</h2>
+        <p>
+          RentEvent provides marketplace and planning tools that help customers, vendors, and planners discover event services, organize event details, communicate, submit booking requests, and coordinate event-related needs.
+        </p>
+        <p>
+          RentEvent is not the vendor, venue, transportation provider, staffing provider, planner, security provider, lifeguard provider, caterer, rental company, or service provider listed by independent users unless RentEvent expressly states otherwise in writing.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>3. Accounts and User Responsibilities</h2>
+        <ul>
+          <li>You are responsible for keeping your account information accurate and protecting your login credentials.</li>
+          <li>You may not create fake accounts, impersonate another person or business, or provide misleading account information.</li>
+          <li>You must use RentEvent lawfully and responsibly.</li>
+          <li>You must notify RentEvent if you believe your account has been accessed without permission.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>4. User Roles and Feature Access</h2>
+        <p>
+          RentEvent may allow different account types, including customers, vendors, planners, and administrators. Features, dashboards, permissions, pricing, subscriptions, messages, payouts, and available tools may vary by role.
+        </p>
+        <p>
+          Users may only access features intended for their account type and may not bypass role-based visibility, permissions, fees, subscriptions, verification, or platform controls.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>5. Vendor Listings and Independent Services</h2>
+        <p>
+          Vendors are independent businesses or professionals. Vendors are responsible for their own listings, services, staff, equipment, supplies, vehicles, insurance, licenses, permits, certifications, taxes, safety protocols, and legal compliance.
+        </p>
+        <ul>
+          <li>Vendors must accurately describe services, pricing, availability, service area, photos, business details, and qualifications.</li>
+          <li>Vendors must not misrepresent experience, insurance, licenses, certifications, staff, equipment, or availability.</li>
+          <li>RentEvent may review, hide, remove, or restrict listings that appear inaccurate, unsafe, misleading, prohibited, or policy-violating.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>6. Transportation and Safety-Sensitive Services</h2>
+        <p>
+          RentEvent transportation categories are intended for professional event transportation and logistics providers, not random individual rideshare-style drivers or casual ride offers.
+        </p>
+        <ul>
+          <li>Transportation vendors should be appropriate licensed and insured event transportation businesses or providers.</li>
+          <li>Safety-sensitive services, including lifeguards, security, off-duty officers, valet or parking teams, bartenders, servers, setup crews, cleanup crews, drivers, and shuttle providers, must be handled responsibly and lawfully.</li>
+          <li>Customers and planners should verify insurance, licensing, staffing, certifications, venue approval, and safety expectations where appropriate.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>7. Booking Requests, Messaging, and On-Platform Communication</h2>
+        <p>
+          RentEvent messaging and booking tools help keep event details, questions, agreements, payment history, and support records organized in one place.
+        </p>
+        <ul>
+          <li>Users may not share phone numbers, email addresses, social media handles, outside links, or requests to move booking-related communication off RentEvent through RentEvent messages.</li>
+          <li>Users may not bypass message protections by disguising phone numbers, emails, handles, outside payment details, or off-platform contact requests.</li>
+          <li>Users may not pressure another user to call, text, email, DM, pay, or complete a booking outside RentEvent.</li>
+          <li>RentEvent may use automated or manual tools to prevent, review, restrict, or remove off-platform contact attempts, unsafe messages, spam, fraud, harassment, or policy violations.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>8. Payments, Fees, Subscriptions, and Payouts</h2>
+        <p>
+          RentEvent may charge customer service fees, vendor platform fees, subscriptions, featured listing fees, AI planning upgrades, processing-related fees, or other charges shown through the platform.
+        </p>
+        <p>
+          When RentEvent payment tools are available, booking-related payments, deposits, balances, refunds, and payment questions should stay inside RentEvent unless RentEvent clearly provides another approved option.
+        </p>
+        <ul>
+          <li>Users may not use RentEvent to collect leads and then move bookings off-platform to avoid fees, records, or platform protections.</li>
+          <li>Vendors are responsible for taxes, reporting obligations, and payout account information associated with their services unless otherwise required by law.</li>
+          <li>Payment processors, banks, card networks, app stores, or other third parties may have their own terms and fees.</li>
+          <li>RentEvent may delay, hold, cancel, reverse, or review payments or payouts when required by law, processor rules, fraud concerns, disputes, chargebacks, account issues, or policy violations.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>9. Cancellations, Refunds, Disputes, and Event Changes</h2>
+        <p>
+          Cancellations, refunds, deposits, rescheduling, weather plans, overtime, no-shows, vendor substitutions, and event changes may depend on vendor terms, booking details, RentEvent policies, and payment processor rules.
+        </p>
+        <p>
+          Users should review and confirm all booking terms before paying or accepting a request. RentEvent may provide tools to help users document disputes, but RentEvent is not responsible for every independent vendor’s acts, omissions, cancellations, or service quality.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>10. AI Planning Tools</h2>
+        <p>
+          RentEvent may provide AI-generated suggestions, checklists, timelines, budgets, vendor recommendations, and planning support. AI outputs are for informational and planning support only.
+        </p>
+        <ul>
+          <li>Users are responsible for verifying pricing, availability, vendor qualifications, safety requirements, venue rules, laws, insurance needs, and event details.</li>
+          <li>AI suggestions may be incomplete, inaccurate, outdated, or not appropriate for every event.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>11. Prohibited Conduct</h2>
+        <ul>
+          <li>No fake listings, fake businesses, fake bookings, fake reviews, impersonation, scams, phishing, spam, or fraud.</li>
+          <li>No harassment, threats, hate speech, stalking, intimidation, explicit content, or abusive conduct.</li>
+          <li>No illegal substances, stolen goods, counterfeit goods, unlawful weapons, prohibited services, or dangerous activity.</li>
+          <li>No attempts to bypass platform messaging, payment, safety, verification, subscription, fee, payout, or account restrictions.</li>
+          <li>No scraping, reverse engineering, automated misuse, bot activity, security testing without permission, or interference with RentEvent systems.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>12. Reviews, Reports, and Content</h2>
+        <p>
+          Users are responsible for the content they post, including listings, messages, photos, reviews, reports, profile details, and event information.
+        </p>
+        <ul>
+          <li>Content must be truthful, lawful, respectful, and not misleading.</li>
+          <li>No fake reviews, review manipulation, retaliatory reports, or threats based on reviews.</li>
+          <li>RentEvent may review, remove, restrict, preserve, or disclose content when needed for safety, support, fraud prevention, legal compliance, dispute handling, or policy enforcement.</li>
+          <li>By submitting content, you grant RentEvent permission to host, display, process, and use it to operate, improve, promote, and protect the platform, subject to our Privacy Policy.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>13. Account Reviews, Restrictions, and Removal</h2>
+        <p>
+          RentEvent may warn users, remove content, hide listings, limit features, restrict messaging, pause payouts, cancel transactions, review bookings, suspend accounts, or remove accounts if we believe a user has violated these Terms, other policies, law, safety expectations, or marketplace trust.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>14. Third-Party Services</h2>
+        <p>
+          RentEvent may use or link to third-party services, including payment processors, identity or business verification tools, maps, hosting services, communication tools, analytics, app stores, or vendor websites.
+        </p>
+        <p>
+          RentEvent is not responsible for third-party services, their availability, their terms, their fees, their errors, or their handling of information except as required by law.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>15. Disclaimers</h2>
+        <p>
+          RentEvent is provided on an “as is” and “as available” basis. RentEvent does not guarantee that the platform will always be available, error-free, secure, uninterrupted, or that every vendor, customer, planner, listing, message, price, recommendation, booking, or event outcome will meet your expectations.
+        </p>
+        <p>
+          RentEvent does not guarantee the acts, omissions, availability, quality, legality, safety, insurance, licensing, suitability, or performance of independent users, vendors, planners, venues, or service providers.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>16. Limitation of Liability</h2>
+        <p>
+          To the maximum extent permitted by law, RentEvent and its owners, employees, contractors, service providers, and affiliates will not be liable for indirect, incidental, special, consequential, punitive, or exemplary damages, or for lost profits, lost business, lost data, event disruption, vendor conduct, customer conduct, planner conduct, or third-party services.
+        </p>
+        <p>
+          Some jurisdictions do not allow certain limitations, so some parts of this section may not apply to you.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>17. Indemnity</h2>
+        <p>
+          You agree to be responsible for claims, damages, losses, liabilities, costs, and expenses, including reasonable attorneys’ fees, arising out of your use of RentEvent, your content, your services, your event, your violation of these Terms, your violation of law, or your violation of another person’s rights.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>18. Changes to RentEvent or These Terms</h2>
+        <p>
+          RentEvent may update features, fees, subscriptions, policies, tools, availability, and these Terms from time to time. Updated Terms may be posted in the app or on the website. Continued use of RentEvent after updates means you accept the updated Terms.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>19. Contact and Support</h2>
+        <p>
+          If you have questions about these Terms, your account, safety concerns, booking records, or a platform issue, contact RentEvent support through the support tools provided in the app or website.
+        </p>
+
+        <div class="alert-box">
+          <strong>Emergency reminder</strong>
+          <p>
+            RentEvent is not an emergency service. If there is an immediate threat, injury, fire, crime, medical emergency, or unsafe situation, call 911 or local emergency services first.
+          </p>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill blue">Marketplace Rules</span>
+          <span class="pill green">Vendor Standards</span>
+          <span class="pill purple">Protected Booking</span>
+          <span class="pill red">Policy Enforcement</span>
+        </div>
+
+        <div class="footer-actions">
+          <a class="btn" href="support.html">Contact Support</a>
+          <a class="btn-secondary" href="community-guidelines.html">Community Guidelines</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
