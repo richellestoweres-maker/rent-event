@@ -709,8 +709,8 @@
 
     @media (min-width:768px){
       body{padding:24px 0}
-      .page{max-width:960px}
-      .request-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .page{max-width:760px}
+      .request-list{grid-template-columns:1fr}
       .bottom-nav{max-width:520px}
     }
   </style>
@@ -1257,15 +1257,12 @@ function getFirstVendorItem(request, vendorId = currentUser?.uid) {
 function getConversationIdForRequest(request, vendorId = currentUser?.uid) {
   const requestId = safeText(request.id, "");
   const ownerId = getRequestOwnerId(request);
-  const vendorItem = getFirstVendorItem(request, vendorId);
-  const savedConversationId =
-    safeText(vendorItem.conversationId, "") ||
-    safeText(request.vendorConversationIds?.[vendorId], "") ||
-    safeText(request.vendorResponses?.[vendorId]?.conversationId, "");
 
-  if (savedConversationId) return savedConversationId;
   if (!requestId || !ownerId || !vendorId) return "";
 
+  // IMPORTANT:
+  // Always use the same canonical conversation ID for this booking request + owner + vendor.
+  // This prevents Message Customer, Message Client, request responses, and inbox links from creating duplicate chats.
   return buildBookingConversationId(requestId, ownerId, vendorId);
 }
 
@@ -1401,19 +1398,19 @@ function renderRequests() {
           <div class="request-actions">
             <a class="btn-secondary" href="admin-dashboard.html">Back to Admin</a>
             ${eventId ? `<a class="btn" href="event-builder.html?eventId=${encodeURIComponent(eventId)}">Preview Event</a>` : ""}
-            ${conversationId ? `<a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}">View Message Thread</a>` : ""}
+            ${conversationId ? `<button class="btn-secondary" type="button" data-message-request="${requestId}">View Message Thread</button>` : ""}
           </div>
         ` : isWithdrawn ? `
           <div class="request-actions">
             <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
-            ${conversationId ? `<a class="btn" href="chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}">Message ${escapeHtml(ownerLabel)}</a>` : ""}
+            ${conversationId ? `<button class="btn" type="button" data-message-request="${requestId}">Message ${escapeHtml(ownerLabel)}</button>` : ""}
           </div>
         ` : `
           <div class="request-actions">
             <button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">Available</button>
             <button class="btn-warning" type="button" data-respond-request="${requestId}" data-response-status="needs_info">Need Info</button>
             <button class="btn-danger" type="button" data-respond-request="${requestId}" data-response-status="declined">Decline</button>
-            ${conversationId ? `<a class="btn-secondary" href="chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}">Message ${escapeHtml(ownerLabel)}</a>` : ""}
+            ${conversationId ? `<button class="btn-secondary" type="button" data-message-request="${requestId}">Message ${escapeHtml(ownerLabel)}</button>` : ""}
           </div>
         `}
       </article>
@@ -1423,6 +1420,12 @@ function renderRequests() {
   document.querySelectorAll("[data-respond-request]").forEach((button) => {
     button.addEventListener("click", () => {
       openResponseModal(button.dataset.respondRequest, button.dataset.responseStatus);
+    });
+  });
+
+  document.querySelectorAll("[data-message-request]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openMessageThreadForRequest(button.dataset.messageRequest);
     });
   });
 }
@@ -1508,6 +1511,11 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
     lastSenderRole: responseStatus ? "vendor" : ownerRole,
     unreadFor: responseStatus ? { [ownerId]: true } : {},
     source: "booking-requests",
+    canonicalThread: true,
+    platformSafetyPolicy: {
+      keepCommunicationOnPlatform: true,
+      noPhoneEmailSocialHandlesOrOutsidePayments: true
+    },
     createdAt: request.createdAt || serverTimestamp(),
     updatedAt: serverTimestamp(),
     lastMessageAt: serverTimestamp()
@@ -1584,6 +1592,71 @@ async function createOwnerResponseNotification(request, responseStatus, response
     });
   } catch (error) {
     console.warn("Response saved, but owner notification could not be created:", error.message);
+  }
+}
+
+async function openMessageThreadForRequest(encodedRequestId) {
+  if (isBusy) return;
+
+  const requestId = decodeURIComponent(encodedRequestId || "");
+  const request = bookingRequests.find((item) => item.id === requestId);
+
+  if (!request) {
+    showStatus("Could not find that request.", "error");
+    return;
+  }
+
+  if (isAdminPreview()) {
+    const vendorItem = getFirstVendorItem(request, currentUser?.uid);
+    const vendorId = safeText(vendorItem.vendorId || currentUser?.uid, "");
+    const conversationId = getConversationIdForRequest(request, vendorId);
+    const eventId = safeText(request.eventId || request.eventDetails?.id, "");
+    const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
+
+    if (conversationId) {
+      window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}`;
+    }
+
+    return;
+  }
+
+  try {
+    isBusy = true;
+    showStatus("Opening the message thread...", "info");
+
+    const conversationId = await ensureOwnerConversation(request);
+    const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+
+    const updatedConversationIds = {
+      ...(request.vendorConversationIds || {}),
+      [currentUser.uid]: conversationId
+    };
+
+    const updatedVendors = vendors.map((vendor) => {
+      if (safeText(vendor.vendorId, "") !== currentUser.uid) return vendor;
+      return {
+        ...vendor,
+        conversationId
+      };
+    });
+
+    await updateDoc(doc(db, "bookingRequests", request.id), {
+      vendorConversationIds: updatedConversationIds,
+      vendors: updatedVendors,
+      updatedAt: serverTimestamp()
+    });
+
+    request.vendorConversationIds = updatedConversationIds;
+    request.vendors = updatedVendors;
+
+    const eventId = safeText(request.eventId || request.eventDetails?.id, "");
+    const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
+
+    window.location.href = `chat-thread.html?id=${encodeURIComponent(conversationId)}${eventPart}`;
+  } catch (error) {
+    showStatus(`Could not open message thread: ${error.message}`, "error");
+  } finally {
+    isBusy = false;
   }
 }
 
