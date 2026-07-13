@@ -204,14 +204,7 @@
     }
 
     .hero-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--radius-xl);
-      padding: 22px 20px;
-      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
-      color: #fff;
-      box-shadow: var(--shadow-strong);
-      margin-bottom: 24px;
+      display: none;
     }
 
     .hero-card::after {
@@ -323,19 +316,40 @@
       box-shadow: 0 8px 18px rgba(120, 96, 60, 0.08);
     }
 
+    .notification-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .small-action-btn {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.86);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: .8rem;
+      font-weight: 800;
+      padding: 0 13px;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(140,111,75,.04);
+    }
+
     .notification-list {
       display: grid;
-      gap: 14px;
+      gap: 8px;
     }
 
     .notification-card {
       background: var(--card);
-      border-radius: 24px;
-      padding: 16px;
-      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 10px 24px rgba(123, 96, 58, 0.06);
       display: flex;
-      gap: 14px;
-      align-items: flex-start;
+      gap: 12px;
+      align-items: center;
       text-decoration: none;
       color: inherit;
       border: 1px solid transparent;
@@ -373,8 +387,8 @@
     }
 
     .notification-icon {
-      width: 52px;
-      height: 52px;
+      width: 48px;
+      height: 48px;
       border-radius: 16px;
       flex-shrink: 0;
       display: flex;
@@ -443,16 +457,20 @@
     }
 
     .notification-text {
-      margin: 0 0 10px;
+      margin: 0 0 5px;
       font-size: 0.9rem;
-      line-height: 1.48;
+      line-height: 1.35;
       color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .notification-meta {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      flex-wrap: nowrap;
+      gap: 6px;
+      overflow: hidden;
     }
 
     .pill {
@@ -625,12 +643,33 @@
     @media (min-width: 768px) {
       body { padding: 24px 0; }
 
-      .page { max-width: 960px; }
+      .page { max-width: 760px; }
 
       .hero-content { max-width: 460px; }
 
-      .notification-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .notification-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .small-action-btn {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.86);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: .8rem;
+      font-weight: 800;
+      padding: 0 13px;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(140,111,75,.04);
+    }
+
+    .notification-list {
+        grid-template-columns: 1fr;
       }
 
       .bottom-nav { max-width: 520px; }
@@ -674,9 +713,9 @@
     <section class="hero-card">
       <div class="hero-content">
         <div class="hero-label" id="heroLabel">Stay in the loop</div>
-        <h2 class="hero-title">Everything important, all in one place.</h2>
+        <h2 class="hero-title">Your alerts.</h2>
         <p class="hero-subtitle" id="heroSubtitle">
-          Keep track of message replies, booking updates, confirmations, and reminders.
+          Message replies, booking updates, and request alerts.
         </p>
 
         <div class="hero-meta">
@@ -688,11 +727,15 @@
 
     <section class="section">
       <div class="section-header">
-        <h2 class="section-title" id="sectionTitle">Recent Activity</h2>
+        <h2 class="section-title" id="sectionTitle">Alerts</h2>
         <div class="filter-tabs" aria-label="Notification filters">
           <button class="filter-tab active" id="allFilterBtn" type="button">All</button>
           <button class="filter-tab" id="unreadFilterBtn" type="button">Unread</button>
         </div>
+      </div>
+
+      <div class="notification-actions">
+        <button class="small-action-btn" type="button" id="markAllReadBtn">Mark all read</button>
       </div>
 
       <div class="notification-list" id="notificationList">
@@ -961,13 +1004,14 @@ function getNotificationEventId(notification) {
 
 function getNotificationRequestId(notification) {
   const sourceCollection = safeText(notification.sourceCollection, "");
+  const relatedCollection = safeText(notification.relatedCollection, "");
 
-  return (
-    safeText(notification.bookingRequestId, "") ||
-    safeText(notification.requestId, "") ||
-    safeText(notification.relatedId, "") && safeText(notification.relatedCollection, "") === "bookingRequests" ? safeText(notification.relatedId, "") : "" ||
-    sourceCollection === "bookingRequests" ? safeText(notification.sourceId, "") : ""
-  );
+  if (safeText(notification.bookingRequestId, "")) return safeText(notification.bookingRequestId, "");
+  if (safeText(notification.requestId, "")) return safeText(notification.requestId, "");
+  if (relatedCollection === "bookingRequests" && safeText(notification.relatedId, "")) return safeText(notification.relatedId, "");
+  if (sourceCollection === "bookingRequests" && safeText(notification.sourceId, "")) return safeText(notification.sourceId, "");
+
+  return "";
 }
 
 function getNotificationConversationId(notification) {
@@ -1450,14 +1494,14 @@ function renderNotifications(notifications) {
     : notifications;
 
   if (!visibleNotifications.length) {
-    sectionTitle.textContent = activeFilter === "unread" ? "No Unread Alerts" : "Recent Activity";
+    sectionTitle.textContent = activeFilter === "unread" ? "No Unread Alerts" : "Alerts";
     renderEmptyState();
     return;
   }
 
   sectionTitle.textContent = unreadCount
     ? `${unreadCount} Unread Alert${unreadCount === 1 ? "" : "s"}`
-    : "Recent Activity";
+    : "Alerts";
 
   list.innerHTML = visibleNotifications.map((notification) => {
     const isUnread = isNotificationUnread(notification);
@@ -1547,6 +1591,20 @@ function buildConversationNotification(conversation) {
   };
 }
 
+function isConversationHiddenForUser(conversation, userId) {
+  const deletedFor = conversation.deletedFor || {};
+  const archivedFor = conversation.archivedFor || {};
+  const hiddenFor = conversation.hiddenFor || {};
+  const hiddenForUserIds = Array.isArray(conversation.hiddenForUserIds) ? conversation.hiddenForUserIds : [];
+
+  return (
+    deletedFor[userId] === true ||
+    archivedFor[userId] === true ||
+    hiddenFor[userId] === true ||
+    hiddenForUserIds.includes(userId)
+  );
+}
+
 function userCanSeeConversation(data, userId) {
   if (isAdminPreview()) return true;
 
@@ -1591,6 +1649,7 @@ async function loadConversationNotifications(user) {
         const data = docSnap.data();
 
         if (!userCanSeeConversation(data, user.uid)) return;
+        if (isConversationHiddenForUser(data, user.uid)) return;
 
         map.set(docSnap.id, {
           id: docSnap.id,
@@ -1701,6 +1760,24 @@ async function loadNotifications(user) {
   renderNotifications(allNotifications);
 }
 
+async function markAllRead() {
+  if (!currentUser || !allNotifications.length) return;
+
+  const unreadItems = allNotifications.filter(isNotificationUnread);
+
+  for (const notification of unreadItems) {
+    await markNotificationRead(notification);
+  }
+
+  allNotifications = allNotifications.map((notification) => ({
+    ...notification,
+    read: true,
+    isRead: true
+  }));
+
+  renderNotifications(allNotifications);
+}
+
 document.getElementById("allFilterBtn").addEventListener("click", () => {
   setNotificationFilter("all");
 });
@@ -1708,6 +1785,8 @@ document.getElementById("allFilterBtn").addEventListener("click", () => {
 document.getElementById("unreadFilterBtn").addEventListener("click", () => {
   setNotificationFilter("unread");
 });
+
+document.getElementById("markAllReadBtn").addEventListener("click", markAllRead);
 
 document.getElementById("roleSelect").addEventListener("change", (event) => {
   switchDashboardRole(event.target.value);
