@@ -1462,10 +1462,9 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
   const listingId = safeText(firstVendorItem.listingId, "");
   const listingTitle = safeText(firstVendorItem.listingTitle || firstVendorItem.title, "Event Request");
   const listingCategory = normalizeProfessionalLabel(safeText(firstVendorItem.category || firstVendorItem.listingCategory || firstVendorItem.mainCategory, "Event Service"));
-  const savedConversationId = getConversationIdForRequest(request, vendorId);
-  const conversationId = savedConversationId || buildBookingConversationId(requestId, ownerId, vendorId);
+  const conversationId = getConversationIdForRequest(request, vendorId);
 
-  if (!ownerId || !vendorId || !requestId) {
+  if (!ownerId || !vendorId || !requestId || !conversationId) {
     throw new Error("This request is missing owner, vendor, or request information, so a message thread cannot be opened.");
   }
 
@@ -1474,9 +1473,9 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
     ? responseNote
       ? `${responseLabel}: ${responseNote}`
       : `${responseLabel}.`
-    : `Message thread for ${eventName}.`;
+    : "";
 
-  await setDoc(doc(db, "conversations", conversationId), {
+  const conversationPayload = {
     conversationKey: conversationId,
     participantIds: [ownerId, vendorId],
     participantNames: {
@@ -1505,11 +1504,6 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
     listingLocation: getEventLocation(request.eventDetails || {}),
     title: ownerName,
     contextType: "Booking Request",
-    lastMessage: messageText,
-    lastSenderId: responseStatus ? vendorId : safeText(request.lastSenderId, ownerId),
-    lastSenderName: responseStatus ? vendorName : safeText(request.lastSenderName, ownerName),
-    lastSenderRole: responseStatus ? "vendor" : ownerRole,
-    unreadFor: responseStatus ? { [ownerId]: true } : {},
     source: "booking-requests",
     canonicalThread: true,
     platformSafetyPolicy: {
@@ -1517,9 +1511,19 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
       noPhoneEmailSocialHandlesOrOutsidePayments: true
     },
     createdAt: request.createdAt || serverTimestamp(),
-    updatedAt: serverTimestamp(),
-    lastMessageAt: serverTimestamp()
-  }, { merge: true });
+    updatedAt: serverTimestamp()
+  };
+
+  if (responseStatus) {
+    conversationPayload.lastMessage = messageText;
+    conversationPayload.lastSenderId = vendorId;
+    conversationPayload.lastSenderName = vendorName;
+    conversationPayload.lastSenderRole = "vendor";
+    conversationPayload.unreadFor = { [ownerId]: true };
+    conversationPayload.lastMessageAt = serverTimestamp();
+  }
+
+  await setDoc(doc(db, "conversations", conversationId), conversationPayload, { merge: true });
 
   if (responseStatus) {
     await addDoc(collection(db, "conversations", conversationId, "messages"), {
