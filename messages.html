@@ -1297,7 +1297,7 @@ async function hideSelectedConversations(mode = "archived") {
   if (!selectedCards.length) return;
 
   const confirmText = mode === "deleted"
-    ? "Delete these conversations from your inbox? This hides them from your view, but RentEvent may keep records for booking, safety, and support history."
+    ? "This will permanently delete the selected conversation from your inbox. Are you sure you want to delete it?"
     : "Archive these conversations from your inbox?";
 
   if (!confirm(confirmText)) return;
