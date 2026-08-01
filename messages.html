@@ -704,57 +704,7 @@
         grid-template-columns: 1fr;
       }
 
-      .bulk-actions {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 0 0 14px;
-      padding: 10px;
-      border-radius: 22px;
-      background: rgba(255,255,255,.86);
-      border: 1px solid var(--line);
-      box-shadow: 0 10px 24px rgba(140,111,75,.05);
-    }
-
-    .bulk-actions.show {
-      display: flex;
-    }
-
-    .bulk-count {
-      color: var(--muted);
-      font-size: 0.84rem;
-      font-weight: 800;
-      padding-left: 6px;
-      white-space: nowrap;
-    }
-
-    .bulk-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .bulk-btn {
-      min-height: 34px;
-      border: none;
-      border-radius: 999px;
-      padding: 0 12px;
-      font-family: inherit;
-      font-size: 0.78rem;
-      font-weight: 800;
-      cursor: pointer;
-      background: var(--soft-2);
-      color: #4a433d;
-    }
-
-    .bulk-btn.danger {
-      background: var(--red-soft);
-      color: var(--red-text);
-    }
-
-    .bottom-nav { max-width: 560px; }
+      .bottom-nav { max-width: 560px; }
 
       .conversation-title { max-width: 300px; }
     }
@@ -1381,6 +1331,32 @@ function getRequestOwnerRole(request) {
   return "customer";
 }
 
+
+function getBookingRequestIdFromNotification(data = {}) {
+  const sourceCollection = safeText(data.sourceCollection, "");
+  const relatedCollection = safeText(data.relatedCollection, "");
+
+  if (safeText(data.bookingRequestId, "")) return safeText(data.bookingRequestId, "");
+  if (safeText(data.requestId, "")) return safeText(data.requestId, "");
+  if (relatedCollection === "bookingRequests" && safeText(data.relatedId, "")) return safeText(data.relatedId, "");
+  if (sourceCollection === "bookingRequests" && safeText(data.sourceId, "")) return safeText(data.sourceId, "");
+
+  return "";
+}
+
+function getConversationIdFromNotification(data = {}) {
+  const sourceCollection = safeText(data.sourceCollection, "");
+  const relatedCollection = safeText(data.relatedCollection, "");
+
+  if (safeText(data.conversationId, "")) return safeText(data.conversationId, "");
+  if (sourceCollection === "conversations" && safeText(data.sourceId, "")) return safeText(data.sourceId, "");
+  if (relatedCollection === "conversations" && safeText(data.relatedId, "")) return safeText(data.relatedId, "");
+
+  return "";
+}
+
+
+
 function canSeeRequest(request) {
   if (isAdminPreview()) return true;
 
@@ -1418,12 +1394,7 @@ function buildConversationsFromBookingRequest(request) {
     const vendorId = safeText(vendor.vendorId, "");
     if (!vendorId || !ownerId) return null;
 
-    const savedConversationId =
-      safeText(vendor.conversationId, "") ||
-      safeText(request.vendorConversationIds?.[vendorId], "") ||
-      safeText(request.vendorResponses?.[vendorId]?.conversationId, "");
-
-    const conversationId = savedConversationId || buildBookingConversationId(requestId, ownerId, vendorId);
+    const conversationId = buildBookingConversationId(requestId, ownerId, vendorId);
     const vendorName = safeText(vendor.vendorName, "Vendor");
     const listingTitle = safeText(vendor.listingTitle || vendor.title, "Requested Listing");
     const lastMessage = safeText(request.vendorResponses?.[vendorId]?.note, `Booking request for ${eventName}.`);
@@ -1647,7 +1618,7 @@ function renderEmptyConversations() {
     <div class="empty-card">
       <div class="empty-icon">MSG</div>
       <h3>No messages yet</h3>
-      <p>Once a customer, planner, or vendor conversation is created, it will show here automatically.</p>
+      <p>Message threads connected to booking requests will show here. If you just received a request alert, open it once or refresh this page.</p>
       <div class="empty-actions">
         <a class="btn" href="${escapeHtml(href)}">${escapeHtml(label)}</a>
       </div>
@@ -1775,14 +1746,31 @@ async function loadUnreadAppNotifications(user) {
   let unreadNotifications = 0;
 
   try {
-    const notificationsQuery = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid),
-      where("read", "==", false)
-    );
+    const notificationSnaps = [];
+    const notificationQueries = [
+      query(collection(db, "notifications"), where("recipientId", "==", user.uid)),
+      query(collection(db, "notifications"), where("userId", "==", user.uid))
+    ];
 
-    const snapshot = await getDocs(notificationsQuery);
-    unreadNotifications = snapshot.size;
+    for (const q of notificationQueries) {
+      try {
+        notificationSnaps.push(await getDocs(q));
+      } catch (error) {
+        console.warn("Notification badge query skipped:", error.message);
+      }
+    }
+
+    const map = new Map();
+
+    notificationSnaps.forEach((snap) => {
+      snap.forEach((docSnap) => {
+        map.set(docSnap.id, docSnap.data());
+      });
+    });
+
+    map.forEach((data) => {
+      if (data.read === false || data.isRead === false) unreadNotifications += 1;
+    });
   } catch {
     unreadNotifications = 0;
   }
@@ -1931,15 +1919,146 @@ async function loadBookingRequestFallbacks(user, existingIds) {
   return fallbacks;
 }
 
+async function loadConversationIdsFromNotifications(user, existingIds) {
+  const notificationsRef = collection(db, "notifications");
+  const snaps = [];
+  const notificationQueries = [
+    query(notificationsRef, where("recipientId", "==", user.uid)),
+    query(notificationsRef, where("userId", "==", user.uid))
+  ];
+
+  for (const q of notificationQueries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Conversation notification lookup skipped:", error.message);
+    }
+  }
+
+  const conversationIds = new Set();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      const conversationId = getConversationIdFromNotification(data);
+      if (conversationId && !existingIds.has(conversationId)) conversationIds.add(conversationId);
+    });
+  });
+
+  const conversations = [];
+
+  for (const conversationId of conversationIds) {
+    try {
+      const conversationSnap = await getDoc(doc(db, "conversations", conversationId));
+      if (!conversationSnap.exists()) continue;
+
+      const data = conversationSnap.data();
+      if (!userCanSeeConversation(data, user.uid)) continue;
+
+      const normalized = normalizeConversation({
+        id: conversationSnap.id,
+        ...data
+      });
+
+      if (!eventMatches(normalized)) continue;
+
+      existingIds.add(conversationSnap.id);
+      conversations.push(normalized);
+    } catch (error) {
+      console.warn("Could not load conversation linked from notification:", conversationId, error.message);
+    }
+  }
+
+  return conversations;
+}
+
+async function loadBookingRequestNotificationFallbacks(user, existingIds) {
+  const notificationsRef = collection(db, "notifications");
+  const snaps = [];
+  const notificationQueries = [
+    query(notificationsRef, where("recipientId", "==", user.uid)),
+    query(notificationsRef, where("userId", "==", user.uid))
+  ];
+
+  for (const q of notificationQueries) {
+    try {
+      snaps.push(await getDocs(q));
+    } catch (error) {
+      console.warn("Booking request notification lookup skipped:", error.message);
+    }
+  }
+
+  const requestIds = new Set();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      const requestId = getBookingRequestIdFromNotification(data);
+      if (requestId) requestIds.add(requestId);
+    });
+  });
+
+  const fallbacks = [];
+
+  for (const requestId of requestIds) {
+    try {
+      const requestSnap = await getDoc(doc(db, "bookingRequests", requestId));
+      if (!requestSnap.exists()) continue;
+
+      const request = {
+        id: requestSnap.id,
+        ...requestSnap.data()
+      };
+
+      const built = buildConversationsFromBookingRequest(request);
+
+      for (const conversation of built) {
+        if (!conversation?.id || existingIds.has(conversation.id)) continue;
+        if (!eventMatches(conversation)) continue;
+
+        existingIds.add(conversation.id);
+        fallbacks.push(conversation);
+
+        try {
+          await setDoc(doc(db, "conversations", conversation.id), {
+            ...conversation,
+            repairedFromNotification: true,
+            canonicalThread: true,
+            platformSafetyPolicy: {
+              keepCommunicationOnPlatform: true,
+              noPhoneEmailSocialHandlesOrOutsidePayments: true
+            },
+            updatedAt: conversation.updatedAt || serverTimestamp(),
+            createdAt: conversation.createdAt || serverTimestamp()
+          }, { merge: true });
+        } catch (error) {
+          console.warn("Could not repair conversation from notification:", conversation.id, error.message);
+        }
+      }
+    } catch (error) {
+      console.warn("Could not load booking request linked from notification:", requestId, error.message);
+    }
+  }
+
+  return fallbacks;
+}
+
 async function loadConversations(user) {
   try {
     let conversations = await loadDirectConversationQueries(user);
     conversations = conversations.filter(eventMatches);
 
     const existingIds = new Set(conversations.map((conversation) => conversation.id));
+    const notificationConversations = await loadConversationIdsFromNotifications(user, existingIds);
     const fallbacks = await loadBookingRequestFallbacks(user, existingIds);
+    const notificationFallbacks = await loadBookingRequestNotificationFallbacks(user, existingIds);
 
-    conversations = dedupeConversations([...conversations, ...fallbacks]);
+    conversations = dedupeConversations([
+      ...conversations,
+      ...notificationConversations,
+      ...fallbacks,
+      ...notificationFallbacks
+    ]);
 
     conversations.sort((a, b) => {
       const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
