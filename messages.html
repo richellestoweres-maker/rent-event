@@ -1355,11 +1355,21 @@ function getRequestOwnerRole(request) {
 function getBookingRequestIdFromNotification(data = {}) {
   const sourceCollection = safeText(data.sourceCollection, "");
   const relatedCollection = safeText(data.relatedCollection, "");
+  const type = safeText(data.type, "").toLowerCase();
+  const sourceId = safeText(data.sourceId, "");
+  const relatedId = safeText(data.relatedId, "");
 
   if (safeText(data.bookingRequestId, "")) return safeText(data.bookingRequestId, "");
   if (safeText(data.requestId, "")) return safeText(data.requestId, "");
-  if (relatedCollection === "bookingRequests" && safeText(data.relatedId, "")) return safeText(data.relatedId, "");
-  if (sourceCollection === "bookingRequests" && safeText(data.sourceId, "")) return safeText(data.sourceId, "");
+  if (relatedCollection === "bookingRequests" && relatedId) return relatedId;
+  if (sourceCollection === "bookingRequests" && sourceId) return sourceId;
+
+  // Older vendor-response notifications sometimes stored the booking request
+  // only as sourceId or relatedId without the collection name.
+  if (["vendor_response", "booking_request", "request_withdrawn"].includes(type)) {
+    if (sourceId && sourceCollection !== "conversations") return sourceId;
+    if (relatedId && relatedCollection !== "conversations") return relatedId;
+  }
 
   return "";
 }
@@ -1443,6 +1453,53 @@ function getRequestVendorItems(request = {}) {
       listingId: safeText(request.listingIds?.[vendorId], ""),
       listingTitle: safeText(request.listingTitles?.[vendorId], "Requested Listing"),
       category: safeText(request.vendorCategories?.[vendorId], "")
+    });
+  });
+
+  // Some older requests only reveal the selected vendor through response maps.
+  const responseVendorIds = new Set([
+    ...Object.keys(request.vendorResponses || {}),
+    ...Object.keys(request.vendorConversationIds || {})
+  ]);
+
+  responseVendorIds.forEach((rawVendorId) => {
+    const vendorId = safeText(rawVendorId, "");
+    if (!vendorId) return;
+
+    const alreadyIncluded = Array.from(vendorMap.values()).some((item) => item.vendorId === vendorId);
+    if (alreadyIncluded) return;
+
+    const response = request.vendorResponses?.[vendorId] || {};
+
+    vendorMap.set(`${vendorId}__response`, {
+      vendorId,
+      vendorName: safeText(
+        response.vendorName ||
+        response.businessName ||
+        request.vendorNames?.[vendorId] ||
+        request.vendorName,
+        "Vendor"
+      ),
+      listingId: safeText(
+        response.listingId ||
+        request.listingIds?.[vendorId] ||
+        request.listingId,
+        ""
+      ),
+      listingTitle: safeText(
+        response.listingTitle ||
+        response.serviceName ||
+        request.listingTitles?.[vendorId] ||
+        request.listingTitle,
+        "Requested Listing"
+      ),
+      category: safeText(
+        response.category ||
+        response.listingCategory ||
+        request.vendorCategories?.[vendorId] ||
+        request.listingCategory,
+        ""
+      )
     });
   });
 
@@ -1544,10 +1601,22 @@ function getNotificationOtherParticipantName(data = {}, otherId = "") {
     );
   }
 
-  return safeText(
+  const explicitName = safeText(
     data.senderName || data.vendorName || data.requestOwnerName || data.customerName || data.plannerName,
-    "RentEvent User"
+    ""
   );
+
+  if (explicitName) return explicitName;
+
+  const title = safeText(data.title, "");
+  const titleMatch = title.match(/(?:new\s+message\s+from|message\s+from|response\s+from)\s+(.+)/i);
+  if (titleMatch?.[1]) return safeText(titleMatch[1], "RentEvent User");
+
+  const body = safeText(data.body || data.message || data.text, "");
+  const bodyMatch = body.match(/^([^:]{2,60}):\s+/);
+  if (bodyMatch?.[1]) return safeText(bodyMatch[1], "RentEvent User");
+
+  return "RentEvent Update";
 }
 
 function getNotificationOtherParticipantRole(data = {}, otherId = "") {
@@ -1614,16 +1683,26 @@ function getNotificationFallbackHref(data = {}) {
 }
 
 function buildConversationFromNotification(data = {}, user) {
-  const conversationId = getNotificationConversationCandidateId(data, user.uid);
-  const otherId = getNotificationOtherParticipantId(data, user.uid);
+  const notificationId = safeText(data.id, "");
+  const directConversationId = getConversationIdFromNotification(data);
+  const candidateId = getNotificationConversationCandidateId(data, user.uid);
+  const realOtherId = getNotificationOtherParticipantId(data, user.uid);
+  const fallbackRowId = `notification__${makeSafeId(
+    notificationId ||
+    data.sourceId ||
+    data.relatedId ||
+    data.title ||
+    "update"
+  )}`;
+  const conversationId = candidateId || fallbackRowId;
+  const otherId = realOtherId || `notification_actor__${makeSafeId(notificationId || conversationId)}`;
 
-  if (!conversationId || !otherId) return null;
-
-  const otherName = getNotificationOtherParticipantName(data, otherId);
-  const otherRole = getNotificationOtherParticipantRole(data, otherId);
+  const otherName = getNotificationOtherParticipantName(data, realOtherId);
+  const otherRole = getNotificationOtherParticipantRole(data, realOtherId);
   const currentRole = getActiveRole(currentUserData || {});
   const ownerId = getNotificationOwnerId(data);
   const vendorId = getNotificationVendorId(data);
+  const bookingRequestId = getBookingRequestIdFromNotification(data);
   const participantIds = Array.from(new Set([
     ...(Array.isArray(data.participantIds) ? data.participantIds : []),
     user.uid,
@@ -1634,6 +1713,14 @@ function buildConversationFromNotification(data = {}, user) {
   };
 
   if (isNotificationUnread(data)) unreadFor[user.uid] = true;
+
+  const hasRealThreadIdentity = Boolean(
+    realOtherId &&
+    (
+      directConversationId ||
+      (bookingRequestId && ownerId && vendorId)
+    )
+  );
 
   return normalizeConversation({
     id: conversationId,
@@ -1651,27 +1738,29 @@ function buildConversationFromNotification(data = {}, user) {
     },
     customerId: safeText(data.customerId, currentRole === "customer" ? user.uid : ""),
     plannerId: safeText(data.plannerId, currentRole === "planner" ? user.uid : ""),
-    requestOwnerId: ownerId || (currentRole === "vendor" ? otherId : user.uid),
+    requestOwnerId: ownerId || (currentRole === "vendor" && realOtherId ? realOtherId : user.uid),
     requestOwnerName: safeText(data.requestOwnerName || data.customerName || data.plannerName, ""),
     requestOwnerRole: safeText(data.requestOwnerRole, ""),
-    vendorId: vendorId || (currentRole === "vendor" ? user.uid : otherId),
+    vendorId: vendorId || (currentRole === "vendor" ? user.uid : (realOtherId || "")),
     vendorName: safeText(data.vendorName, otherRole === "vendor" ? otherName : ""),
-    bookingRequestId: getBookingRequestIdFromNotification(data),
+    bookingRequestId,
     eventId: safeText(data.eventId, ""),
     eventName: safeText(data.eventName || data.sourceLabel, ""),
     listingId: safeText(data.listingId, ""),
     listingTitle: safeText(data.listingTitle, ""),
     listingCategory: safeText(data.listingCategory || data.category, "Event Service"),
     title: otherName,
-    contextType: safeText(data.typeLabel || data.type, "Notification Message"),
+    contextType: safeText(data.typeLabel || data.type, "Notification Update"),
     lastMessage: getNotificationMessageText(data),
-    lastSenderId: safeText(data.senderId, otherId),
+    lastSenderId: safeText(data.senderId, realOtherId || ""),
     lastSenderName: safeText(data.senderName, otherName),
     unreadFor,
     createdAt: data.createdAt || data.updatedAt || null,
     updatedAt: data.updatedAt || data.createdAt || null,
     notificationFallback: true,
-    notificationId: safeText(data.id, "")
+    notificationOnly: !hasRealThreadIdentity,
+    notificationId,
+    fallbackHref: !hasRealThreadIdentity ? getNotificationFallbackHref(data) : ""
   });
 }
 
@@ -2109,13 +2198,10 @@ async function loadUnreadAppNotifications(user) {
   setBadge("topNotificationBadge", unreadNotifications + unreadMessages);
 }
 
-function eventMatches(conversation) {
-  if (!currentEventId) return true;
-
-  const conversationEventId = safeText(conversation.eventId, "");
-  const requestEventId = safeText(conversation.requestEventId, "");
-
-  return conversationEventId === currentEventId || requestEventId === currentEventId;
+function eventMatches() {
+  // Messages is the user's complete inbox. An eventId in the URL is retained
+  // only for navigation context and must never hide otherwise valid threads.
+  return true;
 }
 
 function userCanSeeConversation(data, userId) {
@@ -2340,17 +2426,35 @@ async function loadNotificationFallbackConversations(user, existingIds, notifica
   for (const notification of sortedNotifications) {
     const type = safeText(notification.type, "").toLowerCase();
     const sourceCollection = safeText(notification.sourceCollection, "");
+    const notificationText = [
+      type,
+      safeText(notification.typeLabel, ""),
+      safeText(notification.title, ""),
+      safeText(notification.body || notification.message || notification.text, "")
+    ].join(" ").toLowerCase();
+
     const isMessageRelated =
       type === "message" ||
       type === "vendor_response" ||
+      type.includes("message") ||
+      type.includes("response") ||
       sourceCollection === "conversations" ||
+      notificationText.includes("message") ||
+      notificationText.includes("responded") ||
       !!getConversationIdFromNotification(notification);
 
     if (!isMessageRelated) continue;
 
     const fallback = buildConversationFromNotification(notification, user);
     if (!fallback || existingIds.has(fallback.id)) continue;
-    if (!eventMatches(fallback)) continue;
+
+    // A notification-only row must still appear in the inbox. It links back to
+    // the related request/notification instead of being silently discarded.
+    if (fallback.notificationOnly) {
+      existingIds.add(fallback.id);
+      fallbacks.push(fallback);
+      continue;
+    }
 
     let threadReady = false;
 
@@ -2372,8 +2476,15 @@ async function loadNotificationFallbackConversations(user, existingIds, notifica
         }
       }
 
+      const repairPayload = {
+        ...fallback
+      };
+
+      delete repairPayload.fallbackHref;
+      delete repairPayload.notificationOnly;
+
       await setDoc(doc(db, "conversations", fallback.id), {
-        ...fallback,
+        ...repairPayload,
         repairedFromNotificationRecord: true,
         canonicalThread: !!fallback.bookingRequestId,
         platformSafetyPolicy: {
