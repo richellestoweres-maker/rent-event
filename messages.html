@@ -1100,6 +1100,10 @@ function getOtherParticipantRole(conversation) {
 }
 
 function getConversationHref(conversation) {
+  if (safeText(conversation.fallbackHref, "")) {
+    return conversation.fallbackHref;
+  }
+
   const eventId = safeText(conversation.eventId || currentEventId, "");
   const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
 
@@ -1318,11 +1322,27 @@ function buildBookingConversationId(requestId, ownerId, vendorId) {
 }
 
 function getRequestOwnerId(request) {
-  return safeText(request.requestOwnerId || request.plannerId || request.customerId || request.submittedBy, "");
+  return safeText(
+    request.requestOwnerId ||
+    request.plannerId ||
+    request.customerId ||
+    request.submittedBy ||
+    request.userId ||
+    request.ownerId ||
+    request.createdBy,
+    ""
+  );
 }
 
 function getRequestOwnerName(request) {
-  return safeText(request.requestOwnerName || request.plannerName || request.customerName, "Customer");
+  return safeText(
+    request.requestOwnerName ||
+    request.plannerName ||
+    request.customerName ||
+    request.ownerName ||
+    request.createdByName,
+    "Customer"
+  );
 }
 
 function getRequestOwnerRole(request) {
@@ -1355,155 +1375,327 @@ function getConversationIdFromNotification(data = {}) {
   return "";
 }
 
-function getOwnerIdFromNotification(data = {}) {
-  const role = getActiveRole(currentUserData || {});
+function getRequestVendorItems(request = {}) {
+  const possibleArrays = [
+    request.vendors,
+    request.selectedVendors,
+    request.requestedVendors,
+    request.vendorSelections,
+    request.selectedListings
+  ];
 
+  const vendorMap = new Map();
+
+  possibleArrays.forEach((items) => {
+    if (!Array.isArray(items)) return;
+
+    items.forEach((item) => {
+      if (!item || typeof item !== "object") return;
+
+      const vendorId = safeText(
+        item.vendorId || item.vendorUid || item.ownerId || item.userId,
+        ""
+      );
+
+      if (!vendorId) return;
+
+      const listingId = safeText(item.listingId || item.serviceId || "", "");
+      const key = `${vendorId}__${listingId}`;
+
+      vendorMap.set(key, {
+        ...item,
+        vendorId,
+        vendorName: safeText(item.vendorName || item.businessName || item.name, "Vendor"),
+        listingId,
+        listingTitle: safeText(item.listingTitle || item.title || item.serviceName, "Requested Listing")
+      });
+    });
+  });
+
+  const topLevelVendorId = safeText(request.vendorId || request.vendorUid, "");
+
+  if (topLevelVendorId) {
+    const listingId = safeText(request.listingId || request.serviceId, "");
+    vendorMap.set(`${topLevelVendorId}__${listingId}`, {
+      vendorId: topLevelVendorId,
+      vendorName: safeText(request.vendorName || request.businessName, "Vendor"),
+      listingId,
+      listingTitle: safeText(request.listingTitle || request.serviceName, "Requested Listing"),
+      category: request.category || request.listingCategory || request.mainCategory || ""
+    });
+  }
+
+  const vendorIds = [
+    ...(Array.isArray(request.vendorIds) ? request.vendorIds : []),
+    ...(Array.isArray(request.selectedVendorIds) ? request.selectedVendorIds : [])
+  ];
+
+  vendorIds.forEach((rawVendorId) => {
+    const vendorId = safeText(rawVendorId, "");
+    if (!vendorId) return;
+
+    const alreadyIncluded = Array.from(vendorMap.values()).some((item) => item.vendorId === vendorId);
+    if (alreadyIncluded) return;
+
+    vendorMap.set(`${vendorId}__`, {
+      vendorId,
+      vendorName: safeText(request.vendorNames?.[vendorId], "Vendor"),
+      listingId: safeText(request.listingIds?.[vendorId], ""),
+      listingTitle: safeText(request.listingTitles?.[vendorId], "Requested Listing"),
+      category: safeText(request.vendorCategories?.[vendorId], "")
+    });
+  });
+
+  return Array.from(vendorMap.values());
+}
+
+async function loadNotificationRecords(user) {
+  const notificationsRef = collection(db, "notifications");
+  const snaps = [];
+  const notificationQueries = isAdminPreview()
+    ? [query(notificationsRef)]
+    : [
+        query(notificationsRef, where("recipientId", "==", user.uid)),
+        query(notificationsRef, where("userId", "==", user.uid))
+      ];
+
+  for (const notificationQuery of notificationQueries) {
+    try {
+      snaps.push(await getDocs(notificationQuery));
+    } catch (error) {
+      console.warn("Notification lookup skipped:", error.message);
+    }
+  }
+
+  const map = new Map();
+
+  snaps.forEach((snap) => {
+    snap.forEach((docSnap) => {
+      map.set(docSnap.id, {
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+  });
+
+  return Array.from(map.values());
+}
+
+function isNotificationUnread(data = {}) {
+  return data.read === false || data.isRead === false;
+}
+
+function getNotificationOwnerId(data = {}) {
   return safeText(
     data.requestOwnerId ||
     data.plannerId ||
     data.customerId ||
-    data.raw?.requestOwnerId ||
-    data.raw?.plannerId ||
-    data.raw?.customerId ||
-    (role === "customer" || role === "planner" ? currentUser?.uid : ""),
+    data.submittedBy ||
+    data.ownerId ||
+    data.createdBy,
     ""
   );
 }
 
-function getVendorIdFromNotification(data = {}) {
-  const role = getActiveRole(currentUserData || {});
+function getNotificationVendorId(data = {}) {
+  return safeText(data.vendorId || data.vendorUid || data.businessOwnerId, "");
+}
 
-  return safeText(
-    data.vendorId ||
-    data.raw?.vendorId ||
-    (role === "vendor" ? currentUser?.uid : ""),
+function getNotificationOtherParticipantId(data = {}, userId = "") {
+  const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
+  const explicitOtherId = participantIds.find((id) => safeText(id, "") && id !== userId);
+
+  if (explicitOtherId) return explicitOtherId;
+
+  const senderId = safeText(
+    data.senderId || data.actorId || data.fromUserId || data.fromId || data.createdBy,
     ""
   );
+
+  if (senderId && senderId !== userId) return senderId;
+
+  const vendorId = getNotificationVendorId(data);
+  if (vendorId && vendorId !== userId) return vendorId;
+
+  const ownerId = getNotificationOwnerId(data);
+  if (ownerId && ownerId !== userId) return ownerId;
+
+  return "";
 }
 
-function getNotificationLastMessage(data = {}) {
+function getNotificationOtherParticipantName(data = {}, otherId = "") {
+  const participantNames = data.participantNames || {};
+
+  if (otherId && safeText(participantNames[otherId], "")) {
+    return safeText(participantNames[otherId], "RentEvent User");
+  }
+
+  const vendorId = getNotificationVendorId(data);
+  const ownerId = getNotificationOwnerId(data);
+
+  if (otherId && otherId === vendorId) {
+    return safeText(data.vendorName || data.businessName || data.senderName, "Vendor");
+  }
+
+  if (otherId && otherId === ownerId) {
+    return safeText(
+      data.requestOwnerName || data.plannerName || data.customerName || data.senderName,
+      "Customer"
+    );
+  }
+
   return safeText(
-    data.body ||
-    data.message ||
-    data.text ||
-    data.lastMessage ||
-    data.title,
-    "Open this thread to continue the conversation."
+    data.senderName || data.vendorName || data.requestOwnerName || data.customerName || data.plannerName,
+    "RentEvent User"
   );
 }
 
-function getNotificationEventId(data = {}) {
-  return safeText(data.eventId || data.raw?.eventId || data.raw?.eventDetails?.id, "");
-}
+function getNotificationOtherParticipantRole(data = {}, otherId = "") {
+  const participantRoles = data.participantRoles || {};
+  const explicitRole = normalizeRole(participantRoles[otherId] || data.senderRole || data.actorRole);
 
-function getNotificationEventName(data = {}) {
-  return safeText(data.eventName || data.sourceLabel || data.raw?.eventName || data.raw?.eventDetails?.eventName, "");
-}
-
-function buildConversationFromNotification(notification) {
-  const requestId = getBookingRequestIdFromNotification(notification);
-  const ownerId = getOwnerIdFromNotification(notification);
-  const vendorId = getVendorIdFromNotification(notification);
-
-  let conversationId = getConversationIdFromNotification(notification);
-
-  if (!conversationId && requestId && ownerId && vendorId) {
-    conversationId = buildBookingConversationId(requestId, ownerId, vendorId);
+  if (explicitRole) return explicitRole;
+  if (otherId && otherId === getNotificationVendorId(data)) return "vendor";
+  if (otherId && otherId === safeText(data.plannerId, "")) return "planner";
+  if (otherId && otherId === getNotificationOwnerId(data)) {
+    return safeText(data.plannerId, "") === otherId ? "planner" : "customer";
   }
 
-  if (!conversationId) return null;
+  return getActiveRole(currentUserData || {}) === "vendor" ? "customer" : "vendor";
+}
 
+function getNotificationMessageText(data = {}) {
+  return safeText(
+    data.body || data.message || data.text || data.preview || data.title,
+    "Open this conversation to view the latest update."
+  );
+}
+
+function getNotificationConversationCandidateId(data = {}, userId = "") {
+  const directId = getConversationIdFromNotification(data);
+  if (directId) return directId;
+
+  const bookingRequestId = getBookingRequestIdFromNotification(data);
+  const activeRole = getActiveRole(currentUserData || {});
+  let ownerId = getNotificationOwnerId(data);
+  let vendorId = getNotificationVendorId(data);
+
+  if (bookingRequestId && !ownerId && activeRole !== "vendor") ownerId = userId;
+  if (bookingRequestId && !vendorId && activeRole === "vendor") vendorId = userId;
+
+  if (bookingRequestId && ownerId && vendorId) {
+    return buildBookingConversationId(bookingRequestId, ownerId, vendorId);
+  }
+
+  const otherId = getNotificationOtherParticipantId(data, userId);
+  if (!userId || !otherId) return "";
+
+  const participants = [userId, otherId].sort().map(makeSafeId).join("__");
+  const eventOrListing = safeText(data.eventId || data.listingId, "general");
+
+  return `direct__${participants}__${makeSafeId(eventOrListing)}`;
+}
+
+function getNotificationFallbackHref(data = {}) {
+  const requestId = getBookingRequestIdFromNotification(data);
+  const eventId = safeText(data.eventId, "");
   const role = getActiveRole(currentUserData || {});
-  const isOwner = ownerId && ownerId === currentUser.uid;
-  const isVendor = vendorId && vendorId === currentUser.uid;
 
-  if (!isOwner && !isVendor && !isAdminPreview()) return null;
+  if (requestId) {
+    if (role === "vendor") {
+      return `booking-requests.html?id=${encodeURIComponent(requestId)}`;
+    }
 
-  const ownerName = safeText(
-    notification.requestOwnerName ||
-    notification.customerName ||
-    notification.plannerName ||
-    (isOwner ? getCurrentUserName() : ""),
-    "Customer"
-  );
-
-  const vendorName = safeText(
-    notification.vendorName ||
-    notification.senderName ||
-    (isVendor ? getCurrentUserName() : ""),
-    "Vendor"
-  );
-
-  const participantIds = Array.from(new Set([ownerId, vendorId].filter(Boolean)));
-  const participantNames = {};
-  const participantRoles = {};
-
-  if (ownerId) {
-    participantNames[ownerId] = ownerName;
-    participantRoles[ownerId] = safeText(notification.requestOwnerRole, role === "planner" ? "planner" : "customer");
+    const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
+    return `my-requests.html?id=${encodeURIComponent(requestId)}${eventPart}`;
   }
 
-  if (vendorId) {
-    participantNames[vendorId] = vendorName;
-    participantRoles[vendorId] = "vendor";
-  }
+  return "notifications.html";
+}
 
-  const unread = notification.read === false || notification.isRead === false;
-  const eventId = getNotificationEventId(notification);
-  const eventName = getNotificationEventName(notification);
-  const sourceLabel = safeText(notification.sourceLabel || notification.listingTitle || eventName, "");
+function buildConversationFromNotification(data = {}, user) {
+  const conversationId = getNotificationConversationCandidateId(data, user.uid);
+  const otherId = getNotificationOtherParticipantId(data, user.uid);
 
-  return {
+  if (!conversationId || !otherId) return null;
+
+  const otherName = getNotificationOtherParticipantName(data, otherId);
+  const otherRole = getNotificationOtherParticipantRole(data, otherId);
+  const currentRole = getActiveRole(currentUserData || {});
+  const ownerId = getNotificationOwnerId(data);
+  const vendorId = getNotificationVendorId(data);
+  const participantIds = Array.from(new Set([
+    ...(Array.isArray(data.participantIds) ? data.participantIds : []),
+    user.uid,
+    otherId
+  ].filter(Boolean)));
+  const unreadFor = {
+    ...(data.unreadFor || {})
+  };
+
+  if (isNotificationUnread(data)) unreadFor[user.uid] = true;
+
+  return normalizeConversation({
     id: conversationId,
     conversationKey: conversationId,
     participantIds,
-    participantNames,
-    participantRoles,
-    customerId: safeText(notification.customerId, ownerId && participantRoles[ownerId] === "customer" ? ownerId : ""),
-    plannerId: safeText(notification.plannerId, ownerId && participantRoles[ownerId] === "planner" ? ownerId : ""),
-    requestOwnerId: ownerId,
-    requestOwnerName: ownerName,
-    requestOwnerRole: participantRoles[ownerId] || "customer",
-    vendorId,
-    vendorName,
-    bookingRequestId: requestId,
-    eventId,
-    eventName,
-    listingId: safeText(notification.listingId, ""),
-    listingTitle: sourceLabel,
-    listingCategory: safeText(notification.category || notification.typeLabel, "Booking Update"),
-    title: isVendor ? ownerName : vendorName,
-    contextType: safeText(notification.typeLabel || notification.category || "Message", "Message"),
-    lastMessage: getNotificationLastMessage(notification),
-    lastSenderId: safeText(notification.senderId || notification.vendorId, ""),
-    unreadFor: unread ? { [currentUser.uid]: true } : {},
-    createdAt: notification.createdAt || null,
-    updatedAt: notification.updatedAt || notification.createdAt || null,
-    repairedFromNotification: true,
-    canonicalThread: true
-  };
+    participantNames: {
+      ...(data.participantNames || {}),
+      [user.uid]: getCurrentUserName(),
+      [otherId]: otherName
+    },
+    participantRoles: {
+      ...(data.participantRoles || {}),
+      [user.uid]: currentRole,
+      [otherId]: otherRole
+    },
+    customerId: safeText(data.customerId, currentRole === "customer" ? user.uid : ""),
+    plannerId: safeText(data.plannerId, currentRole === "planner" ? user.uid : ""),
+    requestOwnerId: ownerId || (currentRole === "vendor" ? otherId : user.uid),
+    requestOwnerName: safeText(data.requestOwnerName || data.customerName || data.plannerName, ""),
+    requestOwnerRole: safeText(data.requestOwnerRole, ""),
+    vendorId: vendorId || (currentRole === "vendor" ? user.uid : otherId),
+    vendorName: safeText(data.vendorName, otherRole === "vendor" ? otherName : ""),
+    bookingRequestId: getBookingRequestIdFromNotification(data),
+    eventId: safeText(data.eventId, ""),
+    eventName: safeText(data.eventName || data.sourceLabel, ""),
+    listingId: safeText(data.listingId, ""),
+    listingTitle: safeText(data.listingTitle, ""),
+    listingCategory: safeText(data.listingCategory || data.category, "Event Service"),
+    title: otherName,
+    contextType: safeText(data.typeLabel || data.type, "Notification Message"),
+    lastMessage: getNotificationMessageText(data),
+    lastSenderId: safeText(data.senderId, otherId),
+    lastSenderName: safeText(data.senderName, otherName),
+    unreadFor,
+    createdAt: data.createdAt || data.updatedAt || null,
+    updatedAt: data.updatedAt || data.createdAt || null,
+    notificationFallback: true,
+    notificationId: safeText(data.id, "")
+  });
 }
-
-
 
 function canSeeRequest(request) {
   if (isAdminPreview()) return true;
 
   const uid = currentUser.uid;
   const role = getActiveRole(currentUserData || {});
-  const vendorIds = Array.isArray(request.vendorIds) ? request.vendorIds : [];
+  const vendorIds = getRequestVendorItems(request).map((vendor) => vendor.vendorId);
+  const ownerId = getRequestOwnerId(request);
 
   if (role === "vendor") return vendorIds.includes(uid);
-  if (role === "planner") return request.plannerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
+  if (role === "planner") {
+    return request.plannerId === uid || request.requestOwnerId === uid || request.submittedBy === uid || ownerId === uid;
+  }
 
-  return request.customerId === uid || request.requestOwnerId === uid || request.submittedBy === uid;
+  return request.customerId === uid || request.requestOwnerId === uid || request.submittedBy === uid || ownerId === uid;
 }
 
 function buildConversationsFromBookingRequest(request) {
   if (!currentUser || !canSeeRequest(request)) return [];
 
   const role = getActiveRole(currentUserData || {});
-  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const vendors = getRequestVendorItems(request);
   const requestId = safeText(request.id, "");
   const ownerId = getRequestOwnerId(request);
   const ownerName = getRequestOwnerName(request);
@@ -1511,7 +1703,7 @@ function buildConversationsFromBookingRequest(request) {
   const eventId = safeText(request.eventId, "") || safeText(request.eventDetails?.id, "");
   const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
 
-  if (!requestId || !vendors.length) return [];
+  if (!requestId || !vendors.length || !ownerId) return [];
 
   let visibleVendors = vendors;
 
@@ -1521,16 +1713,21 @@ function buildConversationsFromBookingRequest(request) {
 
   return visibleVendors.map((vendor) => {
     const vendorId = safeText(vendor.vendorId, "");
-    if (!vendorId || !ownerId) return null;
+    if (!vendorId) return null;
 
-    const conversationId = buildBookingConversationId(requestId, ownerId, vendorId);
+    const response = request.vendorResponses?.[vendorId] || null;
+    const savedConversationId = safeText(
+      response?.conversationId || request.vendorConversationIds?.[vendorId],
+      ""
+    );
+    const conversationId = savedConversationId || buildBookingConversationId(requestId, ownerId, vendorId);
     const vendorName = safeText(vendor.vendorName, "Vendor");
     const listingTitle = safeText(vendor.listingTitle || vendor.title, "Requested Listing");
-    const lastMessage = safeText(request.vendorResponses?.[vendorId]?.note, `Booking request for ${eventName}.`);
+    const lastMessage = safeText(response?.note, `Booking request for ${eventName}.`);
 
     return {
       id: conversationId,
-      conversationKey: conversationId,
+      conversationKey: buildBookingConversationId(requestId, ownerId, vendorId),
       participantIds: [ownerId, vendorId],
       participantNames: {
         [ownerId]: ownerName,
@@ -1556,10 +1753,10 @@ function buildConversationsFromBookingRequest(request) {
       title: role === "vendor" ? ownerName : vendorName,
       contextType: "Booking Request",
       lastMessage,
-      lastSenderId: request.vendorResponses?.[vendorId] ? vendorId : ownerId,
+      lastSenderId: response ? vendorId : ownerId,
       unreadFor: {},
       createdAt: request.createdAt || null,
-      updatedAt: request.vendorResponses?.[vendorId]?.respondedAt || request.updatedAt || request.createdAt || null,
+      updatedAt: response?.respondedAt || request.updatedAt || request.createdAt || null,
       repairedFromBookingRequest: true
     };
   }).filter(Boolean);
@@ -1824,8 +2021,7 @@ function getFilteredConversations() {
 
     if (activeMessageFilter === "requests") {
       const hasRequest = !!safeText(conversation.bookingRequestId, "") ||
-        safeText(conversation.contextType, "").toLowerCase().includes("request") ||
-        safeText(conversation.contextType, "").toLowerCase().includes("vendor response");
+        safeText(conversation.contextType, "").toLowerCase().includes("request");
       if (!hasRequest) return false;
     }
 
@@ -2049,30 +2245,12 @@ async function loadBookingRequestFallbacks(user, existingIds) {
   return fallbacks;
 }
 
-async function loadConversationIdsFromNotifications(user, existingIds) {
-  const notificationsRef = collection(db, "notifications");
-  const snaps = [];
-  const notificationQueries = [
-    query(notificationsRef, where("recipientId", "==", user.uid)),
-    query(notificationsRef, where("userId", "==", user.uid))
-  ];
-
-  for (const q of notificationQueries) {
-    try {
-      snaps.push(await getDocs(q));
-    } catch (error) {
-      console.warn("Conversation notification lookup skipped:", error.message);
-    }
-  }
-
+async function loadConversationIdsFromNotifications(user, existingIds, notificationRecords = []) {
   const conversationIds = new Set();
 
-  snaps.forEach((snap) => {
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const conversationId = getConversationIdFromNotification(data);
-      if (conversationId && !existingIds.has(conversationId)) conversationIds.add(conversationId);
-    });
+  notificationRecords.forEach((data) => {
+    const conversationId = getConversationIdFromNotification(data);
+    if (conversationId && !existingIds.has(conversationId)) conversationIds.add(conversationId);
   });
 
   const conversations = [];
@@ -2102,70 +2280,124 @@ async function loadConversationIdsFromNotifications(user, existingIds) {
   return conversations;
 }
 
-async function loadNotificationConversationFallbacks(user, existingIds) {
-  const notificationsRef = collection(db, "notifications");
-  const snaps = [];
-  const notificationQueries = [
-    query(notificationsRef, where("recipientId", "==", user.uid)),
-    query(notificationsRef, where("userId", "==", user.uid))
-  ];
+async function loadBookingRequestNotificationFallbacks(user, existingIds, notificationRecords = []) {
+  const requestIds = new Set();
 
-  for (const q of notificationQueries) {
+  notificationRecords.forEach((data) => {
+    const requestId = getBookingRequestIdFromNotification(data);
+    if (requestId) requestIds.add(requestId);
+  });
+
+  const fallbacks = [];
+
+  for (const requestId of requestIds) {
     try {
-      snaps.push(await getDocs(q));
+      const requestSnap = await getDoc(doc(db, "bookingRequests", requestId));
+      if (!requestSnap.exists()) continue;
+
+      const request = {
+        id: requestSnap.id,
+        ...requestSnap.data()
+      };
+
+      const built = buildConversationsFromBookingRequest(request);
+
+      for (const conversation of built) {
+        if (!conversation?.id || existingIds.has(conversation.id)) continue;
+        if (!eventMatches(conversation)) continue;
+
+        existingIds.add(conversation.id);
+        fallbacks.push(conversation);
+
+        try {
+          await setDoc(doc(db, "conversations", conversation.id), {
+            ...conversation,
+            repairedFromNotification: true,
+            canonicalThread: true,
+            platformSafetyPolicy: {
+              keepCommunicationOnPlatform: true,
+              noPhoneEmailSocialHandlesOrOutsidePayments: true
+            },
+            updatedAt: conversation.updatedAt || serverTimestamp(),
+            createdAt: conversation.createdAt || serverTimestamp()
+          }, { merge: true });
+        } catch (error) {
+          console.warn("Could not repair conversation from notification:", conversation.id, error.message);
+        }
+      }
     } catch (error) {
-      console.warn("Notification conversation fallback query skipped:", error.message);
+      console.warn("Could not load booking request linked from notification:", requestId, error.message);
     }
   }
 
+  return fallbacks;
+}
+
+async function loadNotificationFallbackConversations(user, existingIds, notificationRecords = []) {
   const fallbacks = [];
-  const seenNotificationKeys = new Set();
+  const sortedNotifications = [...notificationRecords].sort((a, b) => getSortTime(b) - getSortTime(a));
 
-  snaps.forEach((snap) => {
-    snap.forEach((docSnap) => {
-      const notification = {
-        id: docSnap.id,
-        ...docSnap.data()
-      };
+  for (const notification of sortedNotifications) {
+    const type = safeText(notification.type, "").toLowerCase();
+    const sourceCollection = safeText(notification.sourceCollection, "");
+    const isMessageRelated =
+      type === "message" ||
+      type === "vendor_response" ||
+      sourceCollection === "conversations" ||
+      !!getConversationIdFromNotification(notification);
 
-      const type = safeText(notification.type, "");
-      const sourceCollection = safeText(notification.sourceCollection, "");
+    if (!isMessageRelated) continue;
 
-      if (!["message", "vendor_response"].includes(type) && sourceCollection !== "conversations") return;
+    const fallback = buildConversationFromNotification(notification, user);
+    if (!fallback || existingIds.has(fallback.id)) continue;
+    if (!eventMatches(fallback)) continue;
 
-      const conversation = buildConversationFromNotification(notification);
-      if (!conversation?.id || existingIds.has(conversation.id)) return;
-      if (!eventMatches(conversation)) return;
-
-      const key = `${conversation.id}_${safeText(notification.id, "")}`;
-      if (seenNotificationKeys.has(key)) return;
-
-      seenNotificationKeys.add(key);
-      existingIds.add(conversation.id);
-      fallbacks.push(conversation);
-    });
-  });
-
-  for (const fallback of fallbacks) {
-    const ownerCanRepair = safeText(fallback.requestOwnerId, "") === user.uid;
-
-    if (!ownerCanRepair && !isAdminPreview()) continue;
+    let threadReady = false;
 
     try {
+      const existingSnap = await getDoc(doc(db, "conversations", fallback.id));
+
+      if (existingSnap.exists()) {
+        const existingData = existingSnap.data();
+
+        if (userCanSeeConversation(existingData, user.uid)) {
+          const normalized = normalizeConversation({
+            id: existingSnap.id,
+            ...existingData
+          });
+
+          existingIds.add(existingSnap.id);
+          fallbacks.push(normalized);
+          continue;
+        }
+      }
+
       await setDoc(doc(db, "conversations", fallback.id), {
         ...fallback,
-        repairedFromNotification: true,
-        canonicalThread: true,
+        repairedFromNotificationRecord: true,
+        canonicalThread: !!fallback.bookingRequestId,
         platformSafetyPolicy: {
           keepCommunicationOnPlatform: true,
           noPhoneEmailSocialHandlesOrOutsidePayments: true
         },
+        typing: {},
+        typingUpdatedAt: {},
         updatedAt: fallback.updatedAt || serverTimestamp(),
         createdAt: fallback.createdAt || serverTimestamp()
       }, { merge: true });
+
+      threadReady = true;
     } catch (error) {
-      console.warn("Could not repair conversation from notification:", fallback.id, error.message);
+      console.warn("Notification row could not repair its conversation document:", fallback.id, error.message);
     }
+
+    if (!threadReady) {
+      fallback.fallbackHref = getNotificationFallbackHref(notification);
+      fallback.contextType = "Notification Update";
+    }
+
+    existingIds.add(fallback.id);
+    fallbacks.push(fallback);
   }
 
   return fallbacks;
@@ -2177,15 +2409,18 @@ async function loadConversations(user) {
     conversations = conversations.filter(eventMatches);
 
     const existingIds = new Set(conversations.map((conversation) => conversation.id));
-    const notificationConversations = await loadConversationIdsFromNotifications(user, existingIds);
+    const notificationRecords = await loadNotificationRecords(user);
+    const notificationConversations = await loadConversationIdsFromNotifications(user, existingIds, notificationRecords);
     const fallbacks = await loadBookingRequestFallbacks(user, existingIds);
-    const notificationFallbacks = await loadNotificationConversationFallbacks(user, existingIds);
+    const notificationFallbacks = await loadBookingRequestNotificationFallbacks(user, existingIds, notificationRecords);
+    const notificationRows = await loadNotificationFallbackConversations(user, existingIds, notificationRecords);
 
     conversations = dedupeConversations([
       ...conversations,
       ...notificationConversations,
       ...fallbacks,
-      ...notificationFallbacks
+      ...notificationFallbacks,
+      ...notificationRows
     ]);
 
     conversations.sort((a, b) => {
@@ -2195,6 +2430,15 @@ async function loadConversations(user) {
       if (aUnread !== bUnread) return bUnread - aUnread;
 
       return getSortTime(b) - getSortTime(a);
+    });
+
+    console.info("[RentEvent Messages] load summary", {
+      directConversations: conversations.length,
+      notificationRecords: notificationRecords.length,
+      notificationLinked: notificationConversations.length,
+      bookingRequestFallbacks: fallbacks.length,
+      notificationRequestFallbacks: notificationFallbacks.length,
+      notificationRows: notificationRows.length
     });
 
     allConversations = conversations;
