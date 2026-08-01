@@ -1355,6 +1355,135 @@ function getConversationIdFromNotification(data = {}) {
   return "";
 }
 
+function getOwnerIdFromNotification(data = {}) {
+  const role = getActiveRole(currentUserData || {});
+
+  return safeText(
+    data.requestOwnerId ||
+    data.plannerId ||
+    data.customerId ||
+    data.raw?.requestOwnerId ||
+    data.raw?.plannerId ||
+    data.raw?.customerId ||
+    (role === "customer" || role === "planner" ? currentUser?.uid : ""),
+    ""
+  );
+}
+
+function getVendorIdFromNotification(data = {}) {
+  const role = getActiveRole(currentUserData || {});
+
+  return safeText(
+    data.vendorId ||
+    data.raw?.vendorId ||
+    (role === "vendor" ? currentUser?.uid : ""),
+    ""
+  );
+}
+
+function getNotificationLastMessage(data = {}) {
+  return safeText(
+    data.body ||
+    data.message ||
+    data.text ||
+    data.lastMessage ||
+    data.title,
+    "Open this thread to continue the conversation."
+  );
+}
+
+function getNotificationEventId(data = {}) {
+  return safeText(data.eventId || data.raw?.eventId || data.raw?.eventDetails?.id, "");
+}
+
+function getNotificationEventName(data = {}) {
+  return safeText(data.eventName || data.sourceLabel || data.raw?.eventName || data.raw?.eventDetails?.eventName, "");
+}
+
+function buildConversationFromNotification(notification) {
+  const requestId = getBookingRequestIdFromNotification(notification);
+  const ownerId = getOwnerIdFromNotification(notification);
+  const vendorId = getVendorIdFromNotification(notification);
+
+  let conversationId = getConversationIdFromNotification(notification);
+
+  if (!conversationId && requestId && ownerId && vendorId) {
+    conversationId = buildBookingConversationId(requestId, ownerId, vendorId);
+  }
+
+  if (!conversationId) return null;
+
+  const role = getActiveRole(currentUserData || {});
+  const isOwner = ownerId && ownerId === currentUser.uid;
+  const isVendor = vendorId && vendorId === currentUser.uid;
+
+  if (!isOwner && !isVendor && !isAdminPreview()) return null;
+
+  const ownerName = safeText(
+    notification.requestOwnerName ||
+    notification.customerName ||
+    notification.plannerName ||
+    (isOwner ? getCurrentUserName() : ""),
+    "Customer"
+  );
+
+  const vendorName = safeText(
+    notification.vendorName ||
+    notification.senderName ||
+    (isVendor ? getCurrentUserName() : ""),
+    "Vendor"
+  );
+
+  const participantIds = Array.from(new Set([ownerId, vendorId].filter(Boolean)));
+  const participantNames = {};
+  const participantRoles = {};
+
+  if (ownerId) {
+    participantNames[ownerId] = ownerName;
+    participantRoles[ownerId] = safeText(notification.requestOwnerRole, role === "planner" ? "planner" : "customer");
+  }
+
+  if (vendorId) {
+    participantNames[vendorId] = vendorName;
+    participantRoles[vendorId] = "vendor";
+  }
+
+  const unread = notification.read === false || notification.isRead === false;
+  const eventId = getNotificationEventId(notification);
+  const eventName = getNotificationEventName(notification);
+  const sourceLabel = safeText(notification.sourceLabel || notification.listingTitle || eventName, "");
+
+  return {
+    id: conversationId,
+    conversationKey: conversationId,
+    participantIds,
+    participantNames,
+    participantRoles,
+    customerId: safeText(notification.customerId, ownerId && participantRoles[ownerId] === "customer" ? ownerId : ""),
+    plannerId: safeText(notification.plannerId, ownerId && participantRoles[ownerId] === "planner" ? ownerId : ""),
+    requestOwnerId: ownerId,
+    requestOwnerName: ownerName,
+    requestOwnerRole: participantRoles[ownerId] || "customer",
+    vendorId,
+    vendorName,
+    bookingRequestId: requestId,
+    eventId,
+    eventName,
+    listingId: safeText(notification.listingId, ""),
+    listingTitle: sourceLabel,
+    listingCategory: safeText(notification.category || notification.typeLabel, "Booking Update"),
+    title: isVendor ? ownerName : vendorName,
+    contextType: safeText(notification.typeLabel || notification.category || "Message", "Message"),
+    lastMessage: getNotificationLastMessage(notification),
+    lastSenderId: safeText(notification.senderId || notification.vendorId, ""),
+    unreadFor: unread ? { [currentUser.uid]: true } : {},
+    createdAt: notification.createdAt || null,
+    updatedAt: notification.updatedAt || notification.createdAt || null,
+    repairedFromNotification: true,
+    canonicalThread: true
+  };
+}
+
 
 
 function canSeeRequest(request) {
@@ -1695,7 +1824,8 @@ function getFilteredConversations() {
 
     if (activeMessageFilter === "requests") {
       const hasRequest = !!safeText(conversation.bookingRequestId, "") ||
-        safeText(conversation.contextType, "").toLowerCase().includes("request");
+        safeText(conversation.contextType, "").toLowerCase().includes("request") ||
+        safeText(conversation.contextType, "").toLowerCase().includes("vendor response");
       if (!hasRequest) return false;
     }
 
@@ -1972,7 +2102,7 @@ async function loadConversationIdsFromNotifications(user, existingIds) {
   return conversations;
 }
 
-async function loadBookingRequestNotificationFallbacks(user, existingIds) {
+async function loadNotificationConversationFallbacks(user, existingIds) {
   const notificationsRef = collection(db, "notifications");
   const snaps = [];
   const notificationQueries = [
@@ -1984,59 +2114,57 @@ async function loadBookingRequestNotificationFallbacks(user, existingIds) {
     try {
       snaps.push(await getDocs(q));
     } catch (error) {
-      console.warn("Booking request notification lookup skipped:", error.message);
+      console.warn("Notification conversation fallback query skipped:", error.message);
     }
   }
 
-  const requestIds = new Set();
+  const fallbacks = [];
+  const seenNotificationKeys = new Set();
 
   snaps.forEach((snap) => {
     snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const requestId = getBookingRequestIdFromNotification(data);
-      if (requestId) requestIds.add(requestId);
+      const notification = {
+        id: docSnap.id,
+        ...docSnap.data()
+      };
+
+      const type = safeText(notification.type, "");
+      const sourceCollection = safeText(notification.sourceCollection, "");
+
+      if (!["message", "vendor_response"].includes(type) && sourceCollection !== "conversations") return;
+
+      const conversation = buildConversationFromNotification(notification);
+      if (!conversation?.id || existingIds.has(conversation.id)) return;
+      if (!eventMatches(conversation)) return;
+
+      const key = `${conversation.id}_${safeText(notification.id, "")}`;
+      if (seenNotificationKeys.has(key)) return;
+
+      seenNotificationKeys.add(key);
+      existingIds.add(conversation.id);
+      fallbacks.push(conversation);
     });
   });
 
-  const fallbacks = [];
+  for (const fallback of fallbacks) {
+    const ownerCanRepair = safeText(fallback.requestOwnerId, "") === user.uid;
 
-  for (const requestId of requestIds) {
+    if (!ownerCanRepair && !isAdminPreview()) continue;
+
     try {
-      const requestSnap = await getDoc(doc(db, "bookingRequests", requestId));
-      if (!requestSnap.exists()) continue;
-
-      const request = {
-        id: requestSnap.id,
-        ...requestSnap.data()
-      };
-
-      const built = buildConversationsFromBookingRequest(request);
-
-      for (const conversation of built) {
-        if (!conversation?.id || existingIds.has(conversation.id)) continue;
-        if (!eventMatches(conversation)) continue;
-
-        existingIds.add(conversation.id);
-        fallbacks.push(conversation);
-
-        try {
-          await setDoc(doc(db, "conversations", conversation.id), {
-            ...conversation,
-            repairedFromNotification: true,
-            canonicalThread: true,
-            platformSafetyPolicy: {
-              keepCommunicationOnPlatform: true,
-              noPhoneEmailSocialHandlesOrOutsidePayments: true
-            },
-            updatedAt: conversation.updatedAt || serverTimestamp(),
-            createdAt: conversation.createdAt || serverTimestamp()
-          }, { merge: true });
-        } catch (error) {
-          console.warn("Could not repair conversation from notification:", conversation.id, error.message);
-        }
-      }
+      await setDoc(doc(db, "conversations", fallback.id), {
+        ...fallback,
+        repairedFromNotification: true,
+        canonicalThread: true,
+        platformSafetyPolicy: {
+          keepCommunicationOnPlatform: true,
+          noPhoneEmailSocialHandlesOrOutsidePayments: true
+        },
+        updatedAt: fallback.updatedAt || serverTimestamp(),
+        createdAt: fallback.createdAt || serverTimestamp()
+      }, { merge: true });
     } catch (error) {
-      console.warn("Could not load booking request linked from notification:", requestId, error.message);
+      console.warn("Could not repair conversation from notification:", fallback.id, error.message);
     }
   }
 
@@ -2051,7 +2179,7 @@ async function loadConversations(user) {
     const existingIds = new Set(conversations.map((conversation) => conversation.id));
     const notificationConversations = await loadConversationIdsFromNotifications(user, existingIds);
     const fallbacks = await loadBookingRequestFallbacks(user, existingIds);
-    const notificationFallbacks = await loadBookingRequestNotificationFallbacks(user, existingIds);
+    const notificationFallbacks = await loadNotificationConversationFallbacks(user, existingIds);
 
     conversations = dedupeConversations([
       ...conversations,
