@@ -712,6 +712,13 @@ let latestMessages = [];
 let typingTimer = null;
 let lastTypingState = false;
 
+// Captures WHY the most recent repair attempt failed, so the UI can show an
+// accurate message instead of a generic "not found" for every failure case
+// (missing booking request vs. access denied vs. an actual Firestore error,
+// e.g. a rules gap blocking the write). Reset at the start of every attempt.
+let lastRepairFailureReason = "";
+let lastRepairFailureError = null;
+
 const params = new URLSearchParams(window.location.search);
 conversationId = params.get("id") || params.get("threadId");
 const urlEventId = params.get("eventId");
@@ -1055,13 +1062,22 @@ function getRequestOwnerForConversation(request, parsedOwnerId) {
 }
 
 async function repairConversationFromBookingRequest() {
+  lastRepairFailureReason = "";
+  lastRepairFailureError = null;
+
   const parsed = parseBookingConversationId(conversationId);
 
-  if (!parsed || !parsed.requestId || !parsed.ownerId || !parsed.vendorId) return false;
+  if (!parsed || !parsed.requestId || !parsed.ownerId || !parsed.vendorId) {
+    lastRepairFailureReason = "unrecognized-id";
+    return false;
+  }
 
   try {
     const requestSnap = await getDoc(doc(db, "bookingRequests", parsed.requestId));
-    if (!requestSnap.exists()) return false;
+    if (!requestSnap.exists()) {
+      lastRepairFailureReason = "request-missing";
+      return false;
+    }
 
     const request = {
       id: requestSnap.id,
@@ -1072,7 +1088,10 @@ async function repairConversationFromBookingRequest() {
     const vendorId = parsed.vendorId;
     const participantIds = [owner.id, vendorId].filter(Boolean);
 
-    if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) return false;
+    if (!participantIds.includes(currentUser.uid) && !isAdminPreview()) {
+      lastRepairFailureReason = "access-denied";
+      return false;
+    }
 
     const eventName = safeText(request.eventDetails?.eventName || request.eventName, "Event Request");
     const vendorItem = getVendorItemsForParticipant(request, vendorId)[0] || (Array.isArray(request.vendors) ? request.vendors[0] : {}) || {};
@@ -1143,9 +1162,46 @@ async function repairConversationFromBookingRequest() {
 
     return true;
   } catch (error) {
-    console.warn("Could not repair conversation from booking request:", error.message);
+    lastRepairFailureReason = error?.code === "permission-denied" ? "repair-denied" : "repair-error";
+    lastRepairFailureError = error;
+    console.error("[RentEvent Chat] Could not repair conversation from booking request:", error);
     return false;
   }
+}
+
+function getRepairFailureMessage() {
+  if (lastRepairFailureReason === "access-denied") {
+    return {
+      title: "Access denied",
+      message: "You are not part of this booking request, so this conversation can't be opened."
+    };
+  }
+
+  if (lastRepairFailureReason === "request-missing") {
+    return {
+      title: "Conversation not found",
+      message: "The booking request behind this conversation could not be found. It may have been removed."
+    };
+  }
+
+  if (lastRepairFailureReason === "repair-denied") {
+    return {
+      title: "Could not open conversation",
+      message: "RentEvent could not create this conversation due to a permissions issue. Please try again, or contact support if this keeps happening."
+    };
+  }
+
+  if (lastRepairFailureReason === "repair-error" && lastRepairFailureError) {
+    return {
+      title: "Could not open conversation",
+      message: lastRepairFailureError.message || "Something went wrong while opening this conversation."
+    };
+  }
+
+  return {
+    title: "Conversation not found",
+    message: "This conversation may have been removed or the link may be outdated."
+  };
 }
 
 function getBackHref() {
@@ -1578,7 +1634,8 @@ function watchConversation() {
         return;
       }
 
-      renderError("Conversation not found", "This conversation may have been removed or the link may be outdated.");
+      const failure = getRepairFailureMessage();
+      renderError(failure.title, failure.message);
       return;
     }
 
@@ -1597,6 +1654,7 @@ function watchConversation() {
     renderTypingIndicator();
     await markConversationAsRead();
   }, (error) => {
+    console.error("[RentEvent Chat] Conversation listener error:", error);
     renderError("Could not watch conversation", error.message);
   });
 }
@@ -1644,7 +1702,8 @@ async function loadConversation() {
         return;
       }
 
-      renderError("Conversation not found", "This conversation may have been removed or the link may be outdated.");
+      const failure = getRepairFailureMessage();
+      renderError(failure.title, failure.message);
       return;
     }
 
@@ -1664,6 +1723,7 @@ async function loadConversation() {
     watchConversation();
     watchMessages();
   } catch (error) {
+    console.error("[RentEvent Chat] Could not open conversation:", error);
     renderError("Could not open conversation", error.message);
   }
 }
