@@ -2298,12 +2298,19 @@ async function loadBookingRequestFallbacks(user, existingIds) {
 
       seenRequests.add(docSnap.id);
 
-      const request = {
-        id: docSnap.id,
-        ...docSnap.data()
-      };
+      let built = [];
 
-      const built = buildConversationsFromBookingRequest(request);
+      try {
+        const request = {
+          id: docSnap.id,
+          ...docSnap.data()
+        };
+
+        built = buildConversationsFromBookingRequest(request);
+      } catch (error) {
+        console.error("[RentEvent Messages] Could not build a row from booking request:", docSnap.id, error);
+        return;
+      }
 
       built.forEach((conversation) => {
         if (!conversation?.id || existingIds.has(conversation.id)) return;
@@ -2445,7 +2452,15 @@ async function loadNotificationFallbackConversations(user, existingIds, notifica
 
     if (!isMessageRelated) continue;
 
-    const fallback = buildConversationFromNotification(notification, user);
+    let fallback = null;
+
+    try {
+      fallback = buildConversationFromNotification(notification, user);
+    } catch (error) {
+      console.error("[RentEvent Messages] Could not build a row from notification:", notification.id, error);
+      continue;
+    }
+
     if (!fallback || existingIds.has(fallback.id)) continue;
 
     // A notification-only row must still appear in the inbox. It links back to
@@ -2515,18 +2530,65 @@ async function loadNotificationFallbackConversations(user, existingIds, notifica
 }
 
 async function loadConversations(user) {
+  let conversations = [];
+  let notificationRecords = [];
+  let notificationConversations = [];
+  let fallbacks = [];
+  let notificationFallbacks = [];
+  let notificationRows = [];
+
+  // Each stage below is isolated in its own try/catch. Earlier attempts ran
+  // every stage inside one shared try block, so a single bad/legacy record
+  // in ANY stage (a malformed notification, an old booking request with an
+  // unexpected shape, etc.) threw, and the single catch at the bottom reset
+  // allConversations to [] and rendered "No messages yet" -- discarding
+  // conversations that had already loaded successfully in earlier stages.
+  // Isolating each stage means one bad record only drops that stage's
+  // contribution, never the whole inbox.
+
   try {
-    let conversations = await loadDirectConversationQueries(user);
+    conversations = await loadDirectConversationQueries(user);
     conversations = conversations.filter(eventMatches);
+  } catch (error) {
+    console.error("[RentEvent Messages] Direct conversation query stage failed:", error);
+  }
 
-    const existingIds = new Set(conversations.map((conversation) => conversation.id));
-    const notificationRecords = await loadNotificationRecords(user);
-    const notificationConversations = await loadConversationIdsFromNotifications(user, existingIds, notificationRecords);
-    const fallbacks = await loadBookingRequestFallbacks(user, existingIds);
-    const notificationFallbacks = await loadBookingRequestNotificationFallbacks(user, existingIds, notificationRecords);
-    const notificationRows = await loadNotificationFallbackConversations(user, existingIds, notificationRecords);
+  const existingIds = new Set(conversations.map((conversation) => conversation.id));
 
-    conversations = dedupeConversations([
+  try {
+    notificationRecords = await loadNotificationRecords(user);
+  } catch (error) {
+    console.error("[RentEvent Messages] Notification record stage failed:", error);
+  }
+
+  try {
+    notificationConversations = await loadConversationIdsFromNotifications(user, existingIds, notificationRecords);
+  } catch (error) {
+    console.error("[RentEvent Messages] Notification-linked conversation stage failed:", error);
+  }
+
+  try {
+    fallbacks = await loadBookingRequestFallbacks(user, existingIds);
+  } catch (error) {
+    console.error("[RentEvent Messages] Booking request fallback stage failed:", error);
+  }
+
+  try {
+    notificationFallbacks = await loadBookingRequestNotificationFallbacks(user, existingIds, notificationRecords);
+  } catch (error) {
+    console.error("[RentEvent Messages] Notification booking-request fallback stage failed:", error);
+  }
+
+  try {
+    notificationRows = await loadNotificationFallbackConversations(user, existingIds, notificationRecords);
+  } catch (error) {
+    console.error("[RentEvent Messages] Notification row fallback stage failed:", error);
+  }
+
+  let mergedConversations = [];
+
+  try {
+    mergedConversations = dedupeConversations([
       ...conversations,
       ...notificationConversations,
       ...fallbacks,
@@ -2534,7 +2596,7 @@ async function loadConversations(user) {
       ...notificationRows
     ]);
 
-    conversations.sort((a, b) => {
+    mergedConversations.sort((a, b) => {
       const aUnread = a.unreadFor && a.unreadFor[user.uid] ? 1 : 0;
       const bUnread = b.unreadFor && b.unreadFor[user.uid] ? 1 : 0;
 
@@ -2542,25 +2604,26 @@ async function loadConversations(user) {
 
       return getSortTime(b) - getSortTime(a);
     });
-
-    console.info("[RentEvent Messages] load summary", {
-      directConversations: conversations.length,
-      notificationRecords: notificationRecords.length,
-      notificationLinked: notificationConversations.length,
-      bookingRequestFallbacks: fallbacks.length,
-      notificationRequestFallbacks: notificationFallbacks.length,
-      notificationRows: notificationRows.length
-    });
-
-    allConversations = conversations;
-    renderConversations(getFilteredConversations());
-    await loadUnreadAppNotifications(user);
-
   } catch (error) {
-    console.warn("Could not load conversations:", error.message);
-    allConversations = [];
-    renderConversations(allConversations);
+    // Even the merge/sort step is guarded. If it somehow fails, fall back to
+    // the raw direct-query conversations rather than an empty inbox.
+    console.error("[RentEvent Messages] Merge/sort stage failed, showing unmerged direct conversations:", error);
+    mergedConversations = conversations;
   }
+
+  console.info("[RentEvent Messages] load summary", {
+    totalConversations: mergedConversations.length,
+    directConversations: conversations.length,
+    notificationRecords: notificationRecords.length,
+    notificationLinked: notificationConversations.length,
+    bookingRequestFallbacks: fallbacks.length,
+    notificationRequestFallbacks: notificationFallbacks.length,
+    notificationRows: notificationRows.length
+  });
+
+  allConversations = mergedConversations;
+  renderConversations(getFilteredConversations());
+  await loadUnreadAppNotifications(user);
 }
 
 document.getElementById("searchInput").addEventListener("input", applySearch);
