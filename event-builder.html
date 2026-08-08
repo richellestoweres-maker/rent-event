@@ -1110,7 +1110,7 @@
 
         <section class="section">
           <div class="section-header">
-            <h2 class="section-title">AI Event Planner</h2>
+            <h2 class="section-title">RentEvent Concierge</h2>
           </div>
 
           <div class="ai-card">
@@ -1121,7 +1121,7 @@
                 Save your event details, then generate personalized vendor and add-on suggestions based on your event type, location, guest count, budget, style, and selected vendors.
               </p>
 
-              <button class="generate-ai-btn" id="generateAiBtn" type="button">Generate AI Ideas</button>
+              <button class="generate-ai-btn" id="generateAiBtn" type="button">Generate Concierge Ideas</button>
               <div class="status-message" id="aiStatus"></div>
               <div class="ai-results" id="aiResults"></div>
 
@@ -1175,7 +1175,7 @@
       <div class="note-card">
         <h3 class="note-title">Event Reminder</h3>
         <p class="note-text">
-          Add vendors to this specific event board, save your event details, message vendors for availability, and use the AI Event Planner for ideas on what to add next.
+          Add vendors to this specific event board, save your event details, message vendors for availability, and use the RentEvent Concierge for ideas on what to add next.
         </p>
       </div>
 
@@ -1512,7 +1512,7 @@ function enableAdminPreviewMode() {
 
   const aiBtn = document.getElementById("generateAiBtn");
   if (aiBtn) {
-    aiBtn.textContent = "AI Disabled in Preview";
+    aiBtn.textContent = "Concierge Disabled in Preview";
     aiBtn.disabled = true;
   }
 }
@@ -1818,7 +1818,7 @@ async function loadEventDetails() {
   if (currentEventData?.aiPlannerSuggestions) {
     currentAiPlannerResult = currentEventData.aiPlannerSuggestions;
     renderAiSuggestions(currentAiPlannerResult);
-    document.getElementById("generateAiBtn").textContent = "Regenerate AI Ideas";
+    document.getElementById("generateAiBtn").textContent = "Regenerate Concierge Ideas";
   }
 }
 
@@ -1923,7 +1923,7 @@ function getAvailableCategories() {
 }
 
 function renderAiSuggestions(result) {
-  const headline = safeText(result?.headline, "AI Event Planner Suggestions");
+  const headline = safeText(result?.headline, "RentEvent Concierge Suggestions");
   const summary = safeText(result?.summary, "Here are a few ideas to help complete your event.");
   const plannerTip = safeText(result?.plannerTip, "");
   const suggestions = Array.isArray(result?.suggestions) ? result.suggestions : [];
@@ -1979,19 +1979,19 @@ function renderAiSuggestions(result) {
     setText("aiTipText", "");
   }
 
-  document.getElementById("generateAiBtn").textContent = "Regenerate AI Ideas";
+  document.getElementById("generateAiBtn").textContent = "Regenerate Concierge Ideas";
 }
 
 async function generateAiIdeas() {
   if (isGeneratingAi) return;
 
   if (isAdminPreview()) {
-    showAiStatus("AI generation is disabled in admin preview mode. Use a customer or planner test account to test it.", "error");
+    showAiStatus("Concierge suggestions are disabled in admin preview mode. Use a customer or planner test account to test it.", "error");
     return;
   }
 
   if (currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion") {
-    showAiStatus("This account is not active, so AI generation is disabled.", "error");
+    showAiStatus("This account is not active, so Concierge suggestions are disabled.", "error");
     return;
   }
 
@@ -2005,7 +2005,7 @@ async function generateAiIdeas() {
     const eventDetails = getEventDetailsFromForm();
 
     if (!eventDetails.eventType && !eventDetails.eventNotes && !eventDetails.styleVibe) {
-      showAiStatus("Add at least an event type, style/vibe, or notes so the AI planner has something to work with.", "error");
+      showAiStatus("Add at least an event type, style/vibe, or notes so RentEvent Concierge has something to work with.", "error");
       return;
     }
 
@@ -2034,7 +2034,7 @@ async function generateAiIdeas() {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(data.error || "AI planner could not generate suggestions yet.");
+      throw new Error(data.error || "RentEvent Concierge could not generate suggestions yet.");
     }
 
     currentAiPlannerResult = data.result;
@@ -2057,7 +2057,7 @@ async function generateAiIdeas() {
   } finally {
     isGeneratingAi = false;
     generateBtn.disabled = false;
-    generateBtn.textContent = "Generate AI Ideas";
+    generateBtn.textContent = "Generate Concierge Ideas";
   }
 }
 
