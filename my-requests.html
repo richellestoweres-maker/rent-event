@@ -814,7 +814,7 @@
         <div class="hero-label">Submitted Event Requests</div>
         <h2 class="hero-title">Track your event requests.</h2>
         <p class="hero-subtitle">
-          Review submitted requests, vendor responses, AI planner context, and estimated totals.
+          Review submitted requests, vendor responses, RentEvent Concierge context, and estimated totals.
         </p>
 
         <div class="hero-meta">
@@ -1576,7 +1576,7 @@ function renderRequests() {
           <span class="pill type">${escapeHtml(eventType)}</span>
           ${plannerBadge}
           ${responseSummary.available > 0 ? `<span class="pill safe">${responseSummary.available} Available</span>` : ""}
-          ${aiSummary ? `<span class="pill ai">AI Planned</span>` : ""}
+          ${aiSummary ? `<span class="pill ai">Concierge Planned</span>` : ""}
         </div>
 
         ${isWithdrawn ? `
@@ -1618,7 +1618,7 @@ function renderRequests() {
 
         ${aiSummary ? `
           <div class="ai-box">
-            <h4>AI Planner Context</h4>
+            <h4>RentEvent Concierge Context</h4>
             <p>${escapeHtml(aiSummary)}</p>
           </div>
         ` : ""}
