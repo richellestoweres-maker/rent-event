@@ -2487,8 +2487,7 @@ async function loadRequestCounts(user) {
   try {
     const requestQueries = [
       query(collection(db, "bookingRequests"), where("customerId", "==", user.uid)),
-      query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid)),
-      query(collection(db, "bookingRequests"), where("submittedBy", "==", user.uid))
+      query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid))
     ];
 
     const map = new Map();
