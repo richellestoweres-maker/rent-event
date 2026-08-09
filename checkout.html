@@ -1711,7 +1711,8 @@ async function loadSelectedVendors() {
   try {
     const boardQuery = query(
       collection(db, "eventBoardItems"),
-      where("eventId", "==", activeEventId)
+      where("eventId", "==", activeEventId),
+            where("ownerId", "==", currentUser.uid)
     );
 
     const snapshot = await getDocs(boardQuery);
