@@ -59,23 +59,23 @@
 
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 28px;
+      margin-bottom: 22px;
     }
 
     .page-title {
       margin: 0;
-      font-size: clamp(2.65rem, 10vw, 4rem);
-      line-height: 0.92;
-      letter-spacing: -0.075em;
+      font-size: 1.4rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
       font-weight: 800;
     }
 
     .icon-btn {
-      width: 56px;
-      height: 56px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       border: 1px solid var(--line);
       background: rgba(255, 255, 255, 0.88);
@@ -637,7 +637,97 @@
         background: #fff4e2;
       }
     }
-  </style>
+  
+    .back-link {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      flex-shrink: 0;
+      font-weight: 800;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl, 28px);
+      padding: 22px 20px;
+      background: linear-gradient(160deg, var(--coral-1) 0%, var(--coral-2) 52%, var(--coral-3) 100%);
+      color: #fff;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 340px;
+    }
+
+    .hero-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-pill {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+</style>
 </head>
 
 <body>
@@ -653,7 +743,12 @@
 
   <main class="page">
     <header class="topbar">
-      <h1 class="page-title">Profile</h1>
+      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Your Account</div>
+        <h1 class="page-title">Profile</h1>
+      </div>
 
       <a href="notifications.html" class="icon-btn" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
@@ -663,6 +758,20 @@
         </svg>
       </a>
     </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-label">Account Overview</div>
+        <h2 class="hero-title">Manage your profile and roles.</h2>
+        <p class="hero-subtitle">
+          Update your info, review your saved events and requests, and switch between customer, vendor, and planner tools whenever you need.
+        </p>
+        <div class="hero-meta">
+          <span class="hero-pill">Account Settings</span>
+          <span class="hero-pill">Roles &amp; Access</span>
+        </div>
+      </div>
+    </section>
 
     <section class="profile-card">
       <div class="avatar" id="profileAvatar">RE</div>
