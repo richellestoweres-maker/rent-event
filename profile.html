@@ -1411,14 +1411,12 @@ async function loadCounts(user) {
     } else if (activeRole === "planner") {
       requestQueries = [
         query(collection(db, "bookingRequests"), where("plannerId", "==", user.uid)),
-        query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid)),
-        query(collection(db, "bookingRequests"), where("submittedBy", "==", user.uid))
+        query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid))
       ];
     } else {
       requestQueries = [
         query(collection(db, "bookingRequests"), where("customerId", "==", user.uid)),
-        query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid)),
-        query(collection(db, "bookingRequests"), where("submittedBy", "==", user.uid))
+        query(collection(db, "bookingRequests"), where("requestOwnerId", "==", user.uid))
       ];
     }
 
