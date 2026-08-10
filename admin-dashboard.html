@@ -1350,6 +1350,7 @@ import {
   startAfter,
   where,
   getCountFromServer,
+  or,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -1715,12 +1716,33 @@ async function loadRequestsPageImpl(reset) {
 
 async function loadCountsImpl() {
   try {
+    var vendorQ = query(collection(db2, "users"), or(
+      where("vendorAccount", "==", true),
+      where("role", "==", "vendor"),
+      where("activeRole", "==", "vendor")
+    ));
+    var plannerQ = query(collection(db2, "users"), or(
+      where("plannerPro", "==", true),
+      where("role", "==", "planner"),
+      where("activeRole", "==", "planner")
+    ));
+    var adminQ = query(collection(db2, "users"), or(
+      where("admin", "==", true),
+      where("role", "==", "admin"),
+      where("activeRole", "==", "admin")
+    ));
+    var customerQ = query(collection(db2, "users"), or(
+      where("customerAccount", "==", true),
+      where("role", "==", "customer"),
+      where("activeRole", "==", "customer"),
+      where("admin", "==", true)
+    ));
     var results = await Promise.all([
       getCountFromServer(collection(db2, "users")),
-      getCountFromServer(query(collection(db2, "users"), where("vendorAccount", "==", true))),
-      getCountFromServer(query(collection(db2, "users"), where("plannerPro", "==", true))),
-      getCountFromServer(query(collection(db2, "users"), where("admin", "==", true))),
-      getCountFromServer(query(collection(db2, "users"), where("customerAccount", "==", true))),
+      getCountFromServer(vendorQ),
+      getCountFromServer(plannerQ),
+      getCountFromServer(adminQ),
+      getCountFromServer(customerQ),
       getCountFromServer(collection(db2, "listings")),
       getCountFromServer(collection(db2, "bookingRequests")),
       getCountFromServer(collection(db2, "waitlist"))
