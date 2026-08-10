@@ -1357,6 +1357,70 @@ var app2 = getApp();
 var auth2 = getAuth(app2);
 var db2 = getFirestore(app2);
 
+function showConfirm(message) {
+  return new Promise(function (resolve) {
+    var overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(20,15,10,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;";
+    var box = document.createElement("div");
+    box.style.cssText = "background:#fff;border-radius:22px;padding:22px;max-width:340px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,0.25);font-family:inherit;";
+    var msg = document.createElement("p");
+    msg.style.cssText = "margin:0 0 18px;color:#161616;font-size:0.95rem;line-height:1.4;font-weight:600;";
+    msg.textContent = message;
+    var actions = document.createElement("div");
+    actions.style.cssText = "display:flex;gap:10px;";
+    var cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.style.cssText = "flex:1;min-height:44px;border:none;border-radius:999px;background:#f3ebde;color:#4a433d;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.9rem;";
+    var okBtn = document.createElement("button");
+    okBtn.type = "button";
+    okBtn.textContent = "Confirm";
+    okBtn.style.cssText = "flex:1;min-height:44px;border:none;border-radius:999px;background:linear-gradient(135deg,#ff9a73,#ff7a63 52%,#ff5f67);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.9rem;";
+    actions.appendChild(cancelBtn);
+    actions.appendChild(okBtn);
+    box.appendChild(msg);
+    box.appendChild(actions);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    function cleanup(result) {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      resolve(result);
+    }
+    cancelBtn.addEventListener("click", function () { cleanup(false); });
+    okBtn.addEventListener("click", function () { cleanup(true); });
+    overlay.addEventListener("click", function (e) { if (e.target === overlay) cleanup(false); });
+  });
+}
+
+function showToast(message) {
+  var toast = document.createElement("div");
+  toast.textContent = message;
+  toast.style.cssText = "position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#161616;color:#fff;padding:12px 18px;border-radius:999px;font-size:0.85rem;font-weight:700;z-index:9999;max-width:90%;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,0.25);";
+  document.body.appendChild(toast);
+  setTimeout(function () {
+    if (toast.parentNode) toast.parentNode.removeChild(toast);
+  }, 3200);
+}
+
+async function appendMissingUsers() {
+  try {
+    var snap = await getDocs(collection(db2, "users"));
+    var existingIds = {};
+    usersLoaded.forEach(function (u) { existingIds[u.id] = true; });
+    var added = false;
+    snap.forEach(function (d) {
+      if (!existingIds[d.id]) {
+        usersLoaded.push(Object.assign({ id: d.id }, d.data()));
+        added = true;
+      }
+    });
+    if (added) renderUsersList();
+  } catch (error) {
+    console.warn("Could not load additional users:", error.message);
+  }
+}
+
 var PAGE_SIZE = 20;
 
 var usersLoaded = [];
@@ -1613,6 +1677,7 @@ async function loadUsersPageImpl(reset) {
   snap.forEach(function (d) { usersLoaded.push(Object.assign({ id: d.id }, d.data())); });
   if (snap.docs.length) usersLastDoc = snap.docs[snap.docs.length - 1];
   usersHasMore = snap.docs.length === PAGE_SIZE;
+  if (!usersHasMore) { appendMissingUsers(); }
   renderUsersList();
   var wrap = document.getElementById("usersLoadMoreWrap");
   if (wrap) wrap.style.display = usersHasMore ? "block" : "none";
@@ -1695,11 +1760,11 @@ window.loadAllData = async function () {
 
 window.handleAdminRoleChange = async function (uid, newRole) {
   if (auth2.currentUser && uid === auth2.currentUser.uid) {
-    alert("You cannot change your own role from here.");
+    showToast("You cannot change your own role from here.");
     renderUsersList();
     return;
   }
-  if (!confirm("Change this account role to " + roleLabel2(newRole) + "?")) {
+  if (!await showConfirm("Change this account role to " + roleLabel2(newRole) + "?")) {
     renderUsersList();
     return;
   }
@@ -1715,40 +1780,40 @@ window.handleAdminRoleChange = async function (uid, newRole) {
     renderUsersList();
     loadCountsImpl();
   } catch (error) {
-    alert("Could not update role: " + error.message);
+    showToast("Could not update role: " + error.message);
   }
 };
 
 window.handleAdminSuspendToggle = async function (uid, nextSuspended) {
   if (auth2.currentUser && uid === auth2.currentUser.uid) {
-    alert("You cannot suspend your own account.");
+    showToast("You cannot suspend your own account.");
     return;
   }
   var verb = nextSuspended ? "suspend" : "unsuspend";
-  if (!confirm("Are you sure you want to " + verb + " this user?")) return;
+  if (!await showConfirm("Are you sure you want to " + verb + " this user?")) return;
   try {
     await updateDoc(doc(db2, "users", uid), { suspended: nextSuspended, updatedAt: serverTimestamp() });
     var idx = usersLoaded.findIndex(function (u) { return u.id === uid; });
     if (idx > -1) usersLoaded[idx].suspended = nextSuspended;
     renderUsersList();
   } catch (error) {
-    alert("Could not update account: " + error.message);
+    showToast("Could not update account: " + error.message);
   }
 };
 
 window.handleAdminDeleteUser = async function (uid) {
   if (auth2.currentUser && uid === auth2.currentUser.uid) {
-    alert("You cannot delete your own account.");
+    showToast("You cannot delete your own account.");
     return;
   }
-  if (!confirm("Delete this profile data? This removes app access and profile info but does not delete sign-in credentials. This cannot be undone.")) return;
+  if (!await showConfirm("Delete this profile data? This removes app access and profile info but does not delete sign-in credentials. This cannot be undone.")) return;
   try {
     await deleteDoc(doc(db2, "users", uid));
     usersLoaded = usersLoaded.filter(function (u) { return u.id !== uid; });
     renderUsersList();
     loadCountsImpl();
   } catch (error) {
-    alert("Could not delete user: " + error.message);
+    showToast("Could not delete user: " + error.message);
   }
 };
 
