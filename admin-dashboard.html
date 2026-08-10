@@ -780,6 +780,10 @@
           <p>We’re pulling account data now.</p>
         </div>
       </div>
+    <div class="load-more-wrap" id="usersLoadMoreWrap" style="display:none;margin-top:14px;">
+      <button class="btn-secondary" type="button" style="width:100%;" onclick="window.loadUsersPage(false)">Load more users</button>
+    </div>
+
     </section>
 
     <section class="section" id="listingsSection">
@@ -795,6 +799,10 @@
           <p>We’re pulling vendor listings now.</p>
         </div>
       </div>
+    <div class="load-more-wrap" id="listingsLoadMoreWrap" style="display:none;margin-top:14px;">
+      <button class="btn-secondary" type="button" style="width:100%;" onclick="window.loadListingsPage(false)">Load more listings</button>
+    </div>
+
     </section>
 
     <section class="section" id="requestsSection">
@@ -810,6 +818,10 @@
           <p>We’re pulling booking requests now.</p>
         </div>
       </div>
+    <div class="load-more-wrap" id="requestsLoadMoreWrap" style="display:none;margin-top:14px;">
+      <button class="btn-secondary" type="button" style="width:100%;" onclick="window.loadRequestsPage(false)">Load more requests</button>
+    </div>
+
     </section>
   </main>
 
@@ -1321,6 +1333,442 @@ window.logout = async function () {
   await signOut(auth);
   window.location.href = "index.html";
 };
+</script>
+<script type="module">
+import { getApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  startAfter,
+  where,
+  getCountFromServer,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+var app2 = getApp();
+var auth2 = getAuth(app2);
+var db2 = getFirestore(app2);
+
+var PAGE_SIZE = 20;
+
+var usersLoaded = [];
+var usersLastDoc = null;
+var usersHasMore = true;
+
+var listingsLoaded = [];
+var listingsLastDoc = null;
+var listingsHasMore = true;
+
+var requestsLoaded = [];
+var requestsLastDoc = null;
+var requestsHasMore = true;
+
+function esc2(value) {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .split("&").join("&amp;")
+    .split("<").join("&lt;")
+    .split(">").join("&gt;")
+    .split(String.fromCharCode(34)).join("&quot;")
+    .split(String.fromCharCode(39)).join('&#039;');
+}
+
+function safe2(value, fallback) {
+  var f = fallback === undefined ? "" : fallback;
+  return value && String(value).trim() ? String(value).trim() : f;
+}
+
+function fmtTime2(value) {
+  if (!value || !value.seconds) return "New";
+  var d = new Date(value.seconds * 1000);
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function fmtMoney2(value) {
+  var raw = safe2(value, "");
+  if (!raw) return "$0+";
+  var m = raw.match(/\d+(\.\d+)?/);
+  if (!m) return raw;
+  var n = Number(m[0]);
+  if (Number.isNaN(n)) return raw;
+  return "$" + Math.round(n) + "+";
+}
+
+function normRole2(role) {
+  if (role === "client" || role === "host" || role === "event_host") return "customer";
+  return role || "customer";
+}
+
+function roleLabel2(role) {
+  var r = normRole2(role);
+  if (r === "admin") return "Admin";
+  if (r === "vendor") return "Vendor";
+  if (r === "planner") return "Planner";
+  return "Customer";
+}
+
+function allowedRoles2(u) {
+  var set = {};
+  if (Array.isArray(u.roles)) {
+    u.roles.forEach(function (r) { if (r) set[normRole2(r)] = true; });
+  }
+  if (u.activeRole) set[normRole2(u.activeRole)] = true;
+  if (u.role) set[normRole2(u.role)] = true;
+  if (u.customerAccount === true) set.customer = true;
+  if (u.vendorAccount === true) set.vendor = true;
+  if (u.plannerPro === true) set.planner = true;
+  if (u.admin === true || u.isAdmin === true || normRole2(u.role) === "admin") {
+    set.admin = true;
+    set.customer = true;
+  }
+  var order = ["customer", "vendor", "planner", "admin"];
+  var out = [];
+  order.forEach(function (r) { if (set[r]) out.push(r); });
+  if (!out.length) out.push("customer");
+  return out;
+}
+
+function hasRole2(u, role) {
+  return allowedRoles2(u).indexOf(role) !== -1;
+}
+
+function activeRole2(u) {
+  var allowed = allowedRoles2(u);
+  var requested = normRole2(u.activeRole || u.role || allowed[0] || "customer");
+  if (allowed.indexOf(requested) !== -1) return requested;
+  return allowed[0] || "customer";
+}
+
+function roleSummary2(u) {
+  return allowedRoles2(u).map(roleLabel2).join(" + ");
+}
+
+function categoryLine2(listing) {
+  var main = safe2(listing.mainCategory, "");
+  var cat = safe2(listing.category || listing.listingCategory, "Event Service");
+  var custom = safe2(listing.customCategory, "");
+  var type = custom ? (cat + " \u00b7 " + custom) : cat;
+  return main ? (main + " \u00b7 " + type) : type;
+}
+
+function setTxt2(id, value) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderEmpty2(id, title, text) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML =
+    '<div class="empty-card">' +
+    '<div class="empty-icon">\u2713</div>' +
+    "<h3>" + esc2(title) + "</h3>" +
+    "<p>" + esc2(text) + "</p>" +
+    "</div>";
+}
+function userCardHtml(u) {
+  var id = u.id;
+  var isSelf = auth2.currentUser && auth2.currentUser.uid === id;
+  var name = safe2(u.name || u.businessName || u.plannerBusinessName, "Unnamed User");
+  var email = safe2(u.email, "No email");
+  var active = roleLabel2(activeRole2(u));
+  var summary = roleSummary2(u);
+  var created = fmtTime2(u.createdAt);
+  var opt = u.emailOptIn === true ? "Email Opt-In" : "No Email Opt-In";
+  var suspended = u.suspended === true;
+
+  var pills = '<span class="pill purple">' + esc2(summary) + "</span>" +
+    '<span class="pill ' + (u.emailOptIn === true ? "safe" : "info") + '">' + esc2(opt) + "</span>";
+  if (hasRole2(u, "admin")) pills += '<span class="pill red">Admin</span>';
+  if (hasRole2(u, "planner")) pills += '<span class="pill blue">Planner</span>';
+  if (hasRole2(u, "vendor")) pills += '<span class="pill blue">Vendor</span>';
+  if (hasRole2(u, "customer")) pills += '<span class="pill safe">Customer</span>';
+  if (suspended) pills += '<span class="pill red">Suspended</span>';
+
+  var roleOptions = ["customer", "vendor", "planner", "admin"].map(function (r) {
+    var sel = activeRole2(u) === r ? " selected" : "";
+    return '<option value="' + r + '"' + sel + ">" + roleLabel2(r) + "</option>";
+  }).join("");
+
+  var controls;
+  if (isSelf) {
+    controls = '<div class="card-actions"><span class="pill info" style="flex:1;text-align:center;">This is you</span></div>';
+  } else {
+    controls =
+      '<div class="card-actions">' +
+      '<select class="btn-secondary admin-role-select" data-uid="' + esc2(id) + '" style="flex:1;">' + roleOptions + "</select>" +
+      "</div>" +
+      '<div class="card-actions">' +
+      '<button class="btn-secondary" type="button" data-action="suspend" data-suspended="' + (suspended ? "true" : "false") + '" data-uid="' + esc2(id) + '">' + (suspended ? "Unsuspend" : "Suspend") + "</button>" +
+      '<button class="btn" type="button" data-action="delete-user" data-uid="' + esc2(id) + '" style="background:linear-gradient(135deg,#ff8a7a,#c74f4d 70%);">Delete</button>' +
+      "</div>";
+  }
+
+  return '<article class="item-card">' +
+    '<div class="item-top">' +
+    "<div>" +
+    '<h3 class="item-title">' + esc2(name) + "</h3>" +
+    '<p class="item-subtitle">' + esc2(email) + " \u00b7 Joined " + esc2(created) + "</p>" +
+    "</div>" +
+    '<div class="price">' + esc2(active) + "</div>" +
+    "</div>" +
+    '<div class="pill-row">' + pills + "</div>" +
+    controls +
+    "</article>";
+}
+
+function renderUsersList() {
+  if (!usersLoaded.length) {
+    renderEmpty2("usersList", "No users yet", "New signups will appear here.");
+    return;
+  }
+  document.getElementById("usersList").innerHTML = usersLoaded.map(userCardHtml).join("");
+}
+function listingCardHtml(listing) {
+  var title = safe2(listing.title, "Untitled Listing");
+  var vendor = safe2(listing.vendorName, "Vendor");
+  var category = categoryLine2(listing);
+  var price = fmtMoney2(listing.startingPrice);
+  var status = safe2(listing.status, "draft");
+  var id = encodeURIComponent(listing.id || "");
+
+  return '<article class="item-card">' +
+    '<div class="item-top">' +
+    "<div>" +
+    '<h3 class="item-title">' + esc2(title) + "</h3>" +
+    '<p class="item-subtitle">' + esc2(vendor) + " \u00b7 " + esc2(category) + "</p>" +
+    "</div>" +
+    '<div class="price">' + esc2(price) + "</div>" +
+    "</div>" +
+    '<div class="pill-row">' +
+    '<span class="pill ' + (status === "published" ? "safe" : "info") + '">' + esc2(status) + "</span>" +
+    '<span class="pill blue">Listing</span>' +
+    "</div>" +
+    '<div class="card-actions">' +
+    '<a class="btn" href="detail.html?id=' + id + '">View</a>' +
+    '<a class="btn-secondary" href="edit-listing.html?id=' + id + '">Edit</a>' +
+    "</div>" +
+    "</article>";
+}
+
+function renderListingsList() {
+  if (!listingsLoaded.length) {
+    renderEmpty2("listingsList", "No listings yet", "Vendor listings will appear here.");
+    return;
+  }
+  document.getElementById("listingsList").innerHTML = listingsLoaded.map(listingCardHtml).join("");
+}
+
+function requestCardHtml(request) {
+  var details = request.eventDetails || {};
+  var eventName = safe2(details.eventName || request.eventName, "Unnamed Event");
+  var eventType = safe2(details.eventType || request.eventType, "Event");
+  var customer = safe2(request.customerName || request.plannerName, "Customer");
+  var status = safe2(request.requestStatus || request.status, "pending");
+  var created = fmtTime2(request.createdAt);
+  var id = encodeURIComponent(request.id || "");
+  var plannerBadge = request.plannerId ? '<span class="pill purple">Planner Request</span>' : "";
+
+  return '<article class="item-card">' +
+    '<div class="item-top">' +
+    "<div>" +
+    '<h3 class="item-title">' + esc2(eventName) + "</h3>" +
+    '<p class="item-subtitle">' + esc2(customer) + " \u00b7 " + esc2(created) + "</p>" +
+    "</div>" +
+    '<div class="price">' + esc2(status) + "</div>" +
+    "</div>" +
+    '<div class="pill-row">' +
+    '<span class="pill ' + (status === "withdrawn" ? "red" : "purple") + '">' + esc2(status) + "</span>" +
+    '<span class="pill blue">' + esc2(eventType) + "</span>" +
+    plannerBadge +
+    "</div>" +
+    '<div class="card-actions">' +
+    '<a class="btn" href="booking-requests.html?id=' + id + '">View Request</a>' +
+    "</div>" +
+    "</article>";
+}
+
+function renderRequestsList() {
+  if (!requestsLoaded.length) {
+    renderEmpty2("requestsList", "No requests yet", "Booking requests will appear here.");
+    return;
+  }
+  document.getElementById("requestsList").innerHTML = requestsLoaded.map(requestCardHtml).join("");
+}
+async function loadUsersPageImpl(reset) {
+  if (reset) { usersLoaded = []; usersLastDoc = null; usersHasMore = true; }
+  if (!usersHasMore) return;
+  var q = usersLastDoc
+    ? query(collection(db2, "users"), orderBy("createdAt", "desc"), startAfter(usersLastDoc), limit(PAGE_SIZE))
+    : query(collection(db2, "users"), orderBy("createdAt", "desc"), limit(PAGE_SIZE));
+  var snap = await getDocs(q);
+  snap.forEach(function (d) { usersLoaded.push(Object.assign({ id: d.id }, d.data())); });
+  if (snap.docs.length) usersLastDoc = snap.docs[snap.docs.length - 1];
+  usersHasMore = snap.docs.length === PAGE_SIZE;
+  renderUsersList();
+  var wrap = document.getElementById("usersLoadMoreWrap");
+  if (wrap) wrap.style.display = usersHasMore ? "block" : "none";
+}
+
+async function loadListingsPageImpl(reset) {
+  if (reset) { listingsLoaded = []; listingsLastDoc = null; listingsHasMore = true; }
+  if (!listingsHasMore) return;
+  var q = listingsLastDoc
+    ? query(collection(db2, "listings"), orderBy("createdAt", "desc"), startAfter(listingsLastDoc), limit(PAGE_SIZE))
+    : query(collection(db2, "listings"), orderBy("createdAt", "desc"), limit(PAGE_SIZE));
+  var snap = await getDocs(q);
+  snap.forEach(function (d) { listingsLoaded.push(Object.assign({ id: d.id }, d.data())); });
+  if (snap.docs.length) listingsLastDoc = snap.docs[snap.docs.length - 1];
+  listingsHasMore = snap.docs.length === PAGE_SIZE;
+  renderListingsList();
+  var wrap = document.getElementById("listingsLoadMoreWrap");
+  if (wrap) wrap.style.display = listingsHasMore ? "block" : "none";
+}
+
+async function loadRequestsPageImpl(reset) {
+  if (reset) { requestsLoaded = []; requestsLastDoc = null; requestsHasMore = true; }
+  if (!requestsHasMore) return;
+  var q = requestsLastDoc
+    ? query(collection(db2, "bookingRequests"), orderBy("createdAt", "desc"), startAfter(requestsLastDoc), limit(PAGE_SIZE))
+    : query(collection(db2, "bookingRequests"), orderBy("createdAt", "desc"), limit(PAGE_SIZE));
+  var snap = await getDocs(q);
+  snap.forEach(function (d) { requestsLoaded.push(Object.assign({ id: d.id }, d.data())); });
+  if (snap.docs.length) requestsLastDoc = snap.docs[snap.docs.length - 1];
+  requestsHasMore = snap.docs.length === PAGE_SIZE;
+  renderRequestsList();
+  var wrap = document.getElementById("requestsLoadMoreWrap");
+  if (wrap) wrap.style.display = requestsHasMore ? "block" : "none";
+}
+
+async function loadCountsImpl() {
+  try {
+    var results = await Promise.all([
+      getCountFromServer(collection(db2, "users")),
+      getCountFromServer(query(collection(db2, "users"), where("vendorAccount", "==", true))),
+      getCountFromServer(query(collection(db2, "users"), where("plannerPro", "==", true))),
+      getCountFromServer(query(collection(db2, "users"), where("admin", "==", true))),
+      getCountFromServer(query(collection(db2, "users"), where("customerAccount", "==", true))),
+      getCountFromServer(collection(db2, "listings")),
+      getCountFromServer(collection(db2, "bookingRequests")),
+      getCountFromServer(collection(db2, "waitlist"))
+    ]);
+    setTxt2("totalUsers", results[0].data().count);
+    setTxt2("vendorCount", results[1].data().count);
+    setTxt2("plannerCount", results[2].data().count);
+    setTxt2("adminCount", results[3].data().count);
+    setTxt2("customerCount", results[4].data().count);
+    setTxt2("listingCount", results[5].data().count);
+    setTxt2("requestCount", results[6].data().count);
+    setTxt2("waitlistCount", results[7].data().count);
+  } catch (error) {
+    console.warn("Count load failed:", error.message);
+  }
+}
+window.loadUsersPage = function (reset) { loadUsersPageImpl(reset !== false); };
+window.loadListingsPage = function (reset) { loadListingsPageImpl(reset !== false); };
+window.loadRequestsPage = function (reset) { loadRequestsPageImpl(reset !== false); };
+
+window.loadAllData = async function () {
+  try {
+    await Promise.all([
+      loadCountsImpl(),
+      loadUsersPageImpl(true),
+      loadListingsPageImpl(true),
+      loadRequestsPageImpl(true)
+    ]);
+  } catch (error) {
+    var warn = document.getElementById("adminWarning");
+    if (warn) {
+      warn.style.display = "block";
+      warn.textContent = "Could not load admin data: " + error.message;
+    }
+  }
+};
+
+window.handleAdminRoleChange = async function (uid, newRole) {
+  if (auth2.currentUser && uid === auth2.currentUser.uid) {
+    alert("You cannot change your own role from here.");
+    renderUsersList();
+    return;
+  }
+  if (!confirm("Change this account role to " + roleLabel2(newRole) + "?")) {
+    renderUsersList();
+    return;
+  }
+  var updates = { role: newRole, activeRole: newRole, updatedAt: serverTimestamp() };
+  if (newRole === "vendor") updates.vendorAccount = true;
+  if (newRole === "planner") updates.plannerPro = true;
+  if (newRole === "admin") { updates.admin = true; updates.customerAccount = true; }
+  if (newRole === "customer") updates.customerAccount = true;
+  try {
+    await updateDoc(doc(db2, "users", uid), updates);
+    var idx = usersLoaded.findIndex(function (u) { return u.id === uid; });
+    if (idx > -1) Object.assign(usersLoaded[idx], updates);
+    renderUsersList();
+    loadCountsImpl();
+  } catch (error) {
+    alert("Could not update role: " + error.message);
+  }
+};
+
+window.handleAdminSuspendToggle = async function (uid, nextSuspended) {
+  if (auth2.currentUser && uid === auth2.currentUser.uid) {
+    alert("You cannot suspend your own account.");
+    return;
+  }
+  var verb = nextSuspended ? "suspend" : "unsuspend";
+  if (!confirm("Are you sure you want to " + verb + " this user?")) return;
+  try {
+    await updateDoc(doc(db2, "users", uid), { suspended: nextSuspended, updatedAt: serverTimestamp() });
+    var idx = usersLoaded.findIndex(function (u) { return u.id === uid; });
+    if (idx > -1) usersLoaded[idx].suspended = nextSuspended;
+    renderUsersList();
+  } catch (error) {
+    alert("Could not update account: " + error.message);
+  }
+};
+
+window.handleAdminDeleteUser = async function (uid) {
+  if (auth2.currentUser && uid === auth2.currentUser.uid) {
+    alert("You cannot delete your own account.");
+    return;
+  }
+  if (!confirm("Delete this profile data? This removes app access and profile info but does not delete sign-in credentials. This cannot be undone.")) return;
+  try {
+    await deleteDoc(doc(db2, "users", uid));
+    usersLoaded = usersLoaded.filter(function (u) { return u.id !== uid; });
+    renderUsersList();
+    loadCountsImpl();
+  } catch (error) {
+    alert("Could not delete user: " + error.message);
+  }
+};
+
+document.addEventListener("change", function (e) {
+  var sel = e.target.closest && e.target.closest(".admin-role-select");
+  if (!sel) return;
+  window.handleAdminRoleChange(sel.getAttribute("data-uid"), sel.value);
+});
+
+document.addEventListener("click", function (e) {
+  var btn = e.target.closest && e.target.closest("[data-action]");
+  if (!btn) return;
+  var uid = btn.getAttribute("data-uid");
+  var action = btn.getAttribute("data-action");
+  if (action === "suspend") {
+    window.handleAdminSuspendToggle(uid, btn.getAttribute("data-suspended") !== "true");
+  } else if (action === "delete-user") {
+    window.handleAdminDeleteUser(uid);
+  }
+});
 </script>
 </body>
 </html>
