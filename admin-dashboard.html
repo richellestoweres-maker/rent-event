@@ -1603,7 +1603,7 @@ function listingCardHtml(listing) {
   var category = categoryLine2(listing);
   var price = fmtMoney2(listing.startingPrice);
   var status = safe2(listing.status, "draft");
-  var id = encodeURIComponent(listing.id || "");
+  var rawId = listing.id || ""; var id = encodeURIComponent(rawId); var isPublished = status === "published";
 
   return '<article class="item-card">' +
     '<div class="item-top">' +
@@ -1614,12 +1614,12 @@ function listingCardHtml(listing) {
     '<div class="price">' + esc2(price) + "</div>" +
     "</div>" +
     '<div class="pill-row">' +
-    '<span class="pill ' + (status === "published" ? "safe" : "info") + '">' + esc2(status) + "</span>" +
+    '<span class="pill ' + (isPublished ? "safe" : "info") + '">' + esc2(status) + "</span>" +
     '<span class="pill blue">Listing</span>' +
     "</div>" +
     '<div class="card-actions">' +
     '<a class="btn" href="detail.html?id=' + id + '">View</a>' +
-    '<a class="btn-secondary" href="edit-listing.html?id=' + id + '">Edit</a>' +
+    '<a class="btn-secondary" href="edit-listing.html?id=' + id + '">Edit</a>' + "</div>" + '<div class="card-actions">' + '<button class="btn-secondary" type="button" data-action="toggle-listing" data-status="' + esc2(status) + '" data-id="' + esc2(rawId) + '">' + (isPublished ? "Unpublish" : "Publish") + "</button>" + '<button class="btn" type="button" data-action="delete-listing" data-id="' + esc2(rawId) + '" style="background:linear-gradient(135deg,#ff8a7a,#c74f4d 70%);">Delete</button>' +
     "</div>" +
     "</article>";
 }
@@ -1839,7 +1839,7 @@ window.handleAdminDeleteUser = async function (uid) {
   }
 };
 
-document.addEventListener("change", function (e) {
+window.handleAdminToggleListingStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "published" ? "draft" : "published"; var verb = nextStatus === "published" ? "publish" : "unpublish"; if (!await showConfirm("Are you sure you want to " + verb + " this listing?")) return; try { await updateDoc(doc(db2, "listings", id), { status: nextStatus, updatedAt: serverTimestamp() }); var idx = listingsLoaded.findIndex(function (l) { return l.id === id; }); if (idx > -1) listingsLoaded[idx].status = nextStatus; renderListingsList(); loadCountsImpl(); showToast(nextStatus === "published" ? "Listing published." : "Listing unpublished."); } catch (error) { showToast("Could not update listing: " + error.message); } }; window.handleAdminDeleteListing = async function (id) { if (!await showConfirm("Delete this listing? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "listings", id)); listingsLoaded = listingsLoaded.filter(function (l) { return l.id !== id; }); renderListingsList(); loadCountsImpl(); showToast("Listing deleted."); } catch (error) { showToast("Could not delete listing: " + error.message); } }; document.addEventListener("change", function (e) {
   var sel = e.target.closest && e.target.closest(".admin-role-select");
   if (!sel) return;
   window.handleAdminRoleChange(sel.getAttribute("data-uid"), sel.value);
@@ -1853,7 +1853,7 @@ document.addEventListener("click", function (e) {
   if (action === "suspend") {
     window.handleAdminSuspendToggle(uid, btn.getAttribute("data-suspended") !== "true");
   } else if (action === "delete-user") {
-    window.handleAdminDeleteUser(uid);
+    window.handleAdminDeleteUser(uid); } else if (action === "toggle-listing") { window.handleAdminToggleListingStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-listing") { window.handleAdminDeleteListing(btn.getAttribute("data-id"));
   }
 });
 </script>
