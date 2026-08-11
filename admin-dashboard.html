@@ -1639,7 +1639,7 @@ function requestCardHtml(request) {
   var customer = safe2(request.customerName || request.plannerName, "Customer");
   var status = safe2(request.requestStatus || request.status, "pending");
   var created = fmtTime2(request.createdAt);
-  var id = encodeURIComponent(request.id || "");
+  var rawId = request.id || ""; var id = encodeURIComponent(rawId); var isWithdrawn = status === "withdrawn";
   var plannerBadge = request.plannerId ? '<span class="pill purple">Planner Request</span>' : "";
 
   return '<article class="item-card">' +
@@ -1656,7 +1656,7 @@ function requestCardHtml(request) {
     plannerBadge +
     "</div>" +
     '<div class="card-actions">' +
-    '<a class="btn" href="booking-requests.html?id=' + id + '">View Request</a>' +
+    '<a class="btn" href="booking-requests.html?id=' + id + '">View Request</a>' + "</div>" + '<div class="card-actions">' + '<button class="btn-secondary" type="button" data-action="toggle-request" data-status="' + esc2(status) + '" data-id="' + esc2(rawId) + '">' + (isWithdrawn ? "Reopen" : "Cancel Request") + "</button>" + '<button class="btn" type="button" data-action="delete-request" data-id="' + esc2(rawId) + '" style="background:linear-gradient(135deg,#ff8a7a,#c74f4d 70%);">Delete</button>' +
     "</div>" +
     "</article>";
 }
@@ -1839,7 +1839,7 @@ window.handleAdminDeleteUser = async function (uid) {
   }
 };
 
-window.handleAdminToggleListingStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "published" ? "draft" : "published"; var verb = nextStatus === "published" ? "publish" : "unpublish"; if (!await showConfirm("Are you sure you want to " + verb + " this listing?")) return; try { await updateDoc(doc(db2, "listings", id), { status: nextStatus, updatedAt: serverTimestamp() }); var idx = listingsLoaded.findIndex(function (l) { return l.id === id; }); if (idx > -1) listingsLoaded[idx].status = nextStatus; renderListingsList(); loadCountsImpl(); showToast(nextStatus === "published" ? "Listing published." : "Listing unpublished."); } catch (error) { showToast("Could not update listing: " + error.message); } }; window.handleAdminDeleteListing = async function (id) { if (!await showConfirm("Delete this listing? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "listings", id)); listingsLoaded = listingsLoaded.filter(function (l) { return l.id !== id; }); renderListingsList(); loadCountsImpl(); showToast("Listing deleted."); } catch (error) { showToast("Could not delete listing: " + error.message); } }; document.addEventListener("change", function (e) {
+window.handleAdminToggleListingStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "published" ? "draft" : "published"; var verb = nextStatus === "published" ? "publish" : "unpublish"; if (!await showConfirm("Are you sure you want to " + verb + " this listing?")) return; try { await updateDoc(doc(db2, "listings", id), { status: nextStatus, updatedAt: serverTimestamp() }); var idx = listingsLoaded.findIndex(function (l) { return l.id === id; }); if (idx > -1) listingsLoaded[idx].status = nextStatus; renderListingsList(); loadCountsImpl(); showToast(nextStatus === "published" ? "Listing published." : "Listing unpublished."); } catch (error) { showToast("Could not update listing: " + error.message); } }; window.handleAdminDeleteListing = async function (id) { if (!await showConfirm("Delete this listing? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "listings", id)); listingsLoaded = listingsLoaded.filter(function (l) { return l.id !== id; }); renderListingsList(); loadCountsImpl(); showToast("Listing deleted."); } catch (error) { showToast("Could not delete listing: " + error.message); } }; window.handleAdminToggleRequestStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "withdrawn" ? "pending" : "withdrawn"; var verb = nextStatus === "withdrawn" ? "cancel" : "reopen"; if (!await showConfirm("Are you sure you want to " + verb + " this request?")) return; try { var updates = { requestStatus: nextStatus, updatedAt: serverTimestamp() }; if (nextStatus === "withdrawn") { updates.withdrawReason = "Cancelled by admin"; } await updateDoc(doc(db2, "bookingRequests", id), updates); var idx = requestsLoaded.findIndex(function (r) { return r.id === id; }); if (idx > -1) Object.assign(requestsLoaded[idx], updates); renderRequestsList(); loadCountsImpl(); showToast(nextStatus === "withdrawn" ? "Request cancelled." : "Request reopened."); } catch (error) { showToast("Could not update request: " + error.message); } }; window.handleAdminDeleteRequest = async function (id) { if (!await showConfirm("Delete this booking request? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "bookingRequests", id)); requestsLoaded = requestsLoaded.filter(function (r) { return r.id !== id; }); renderRequestsList(); loadCountsImpl(); showToast("Request deleted."); } catch (error) { showToast("Could not delete request: " + error.message); } }; document.addEventListener("change", function (e) {
   var sel = e.target.closest && e.target.closest(".admin-role-select");
   if (!sel) return;
   window.handleAdminRoleChange(sel.getAttribute("data-uid"), sel.value);
@@ -1853,7 +1853,7 @@ document.addEventListener("click", function (e) {
   if (action === "suspend") {
     window.handleAdminSuspendToggle(uid, btn.getAttribute("data-suspended") !== "true");
   } else if (action === "delete-user") {
-    window.handleAdminDeleteUser(uid); } else if (action === "toggle-listing") { window.handleAdminToggleListingStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-listing") { window.handleAdminDeleteListing(btn.getAttribute("data-id"));
+    window.handleAdminDeleteUser(uid); } else if (action === "toggle-listing") { window.handleAdminToggleListingStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-listing") { window.handleAdminDeleteListing(btn.getAttribute("data-id")); } else if (action === "toggle-request") { window.handleAdminToggleRequestStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-request") { window.handleAdminDeleteRequest(btn.getAttribute("data-id"));
   }
 });
 </script>
