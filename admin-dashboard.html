@@ -654,7 +654,7 @@
           <a class="hero-btn" href="#usersSection">Users</a>
           <a class="hero-btn-secondary" href="#listingsSection">Listings</a>
           <a class="hero-btn-secondary" href="#requestsSection">Requests</a>
-          <a class="hero-btn-secondary" href="#launchSection">Launch Checklist</a>
+          <a class="hero-btn-secondary" href="#launchSection">Launch Checklist</a><a class="hero-btn-secondary" href="#waitlistSection">Waitlist</a>
         </div>
       </div>
     </section>
@@ -823,7 +823,7 @@
     </div>
 
     </section>
-  </main>
+  <section class="section" id="waitlistSection"><div class="section-header"><h2 class="section-title">Waitlist</h2><button class="section-link" type="button" onclick="loadAllData()">Refresh</button></div><div class="list" id="waitlistList"><div class="empty-card"><div class="empty-icon">…</div><h3>Loading waitlist</h3><p>Pulling early access signups now.</p></div></div><div class="load-more-wrap" id="waitlistLoadMoreWrap" style="display:none;margin-top:14px;"><button class="btn-secondary" type="button" style="width:100%;" onclick="window.loadWaitlistPage(false)">Load more waitlist entries</button></div></section></main>
 
   <nav class="bottom-nav" aria-label="Admin navigation">
     <a class="nav-item active" href="admin-dashboard.html">
@@ -840,7 +840,7 @@
     </a>
     <a class="nav-item" href="#requestsSection">
       <svg viewBox="0 0 24 24" fill="none"><path d="M5 5H19V19H5V5Z" stroke="currentColor" stroke-width="2"></path><path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
-      <span>Requests</span>
+      <span>Requests</span></a><a class="nav-item" href="#waitlistSection"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3L4 8V21H20V8L12 3Z" stroke="currentColor" stroke-width="2"></path></svg><span>Waitlist</span>
     </a>
   </nav>
 
@@ -1434,7 +1434,7 @@ var listingsHasMore = true;
 
 var requestsLoaded = [];
 var requestsLastDoc = null;
-var requestsHasMore = true;
+var requestsHasMore = true; var waitlistLoaded = []; var waitlistLastDoc = null; var waitlistHasMore = true;
 
 function esc2(value) {
   if (value === null || value === undefined) return "";
@@ -1668,7 +1668,7 @@ function renderRequestsList() {
   }
   document.getElementById("requestsList").innerHTML = requestsLoaded.map(requestCardHtml).join("");
 }
-async function loadUsersPageImpl(reset) {
+function waitlistCardHtml(w) { var name = safe2(w.fullName, "Unnamed"); var email = safe2(w.email, "No email"); var phone = safe2(w.phone, ""); var city = safe2(w.city, ""); var roles = Array.isArray(w.selectedRoles) ? w.selectedRoles : []; var created = fmtTime2(w.submittedAt || w.createdAt); var rawId = w.id || ""; var pills = roles.map(function (r) { var label = r === "client" ? "Client" : (r === "vendor" ? "Vendor" : (r === "planner" ? "Planner" : r)); var cls = r === "vendor" ? "blue" : (r === "planner" ? "purple" : "safe"); return '<span class="pill ' + cls + '">' + esc2(label) + '</span>'; }).join(""); var extra = ""; if (w.vendorDetails && w.vendorDetails.businessName) { extra = safe2(w.vendorDetails.businessName, ""); } else if (w.plannerDetails && w.plannerDetails.plannerBusinessName) { extra = safe2(w.plannerDetails.plannerBusinessName, ""); } else if (w.clientDetails && w.clientDetails.eventType) { extra = safe2(w.clientDetails.eventType, ""); } var subtitleTail = city ? (" \u00b7 " + city) : ""; var extraTail = extra ? (" \u00b7 " + extra) : ""; var contactBtn = phone ? ('<a class="btn-secondary" href="tel:' + esc2(phone) + '">Call</a>') : ('<a class="btn-secondary" href="mailto:' + esc2(email) + '">Email</a>'); return '<article class="item-card"><div class="item-top"><div><h3 class="item-title">' + esc2(name) + '</h3><p class="item-subtitle">' + esc2(email) + subtitleTail + extraTail + '</p></div><div class="price">' + esc2(created) + '</div></div><div class="pill-row">' + pills + '</div><div class="card-actions">' + contactBtn + '<button class="btn" type="button" data-action="delete-waitlist" data-id="' + esc2(rawId) + '" style="background:linear-gradient(135deg,#ff8a7a,#c74f4d 70%);">Delete</button></div></article>'; } function renderWaitlistList() { if (!waitlistLoaded.length) { renderEmpty2("waitlistList", "No waitlist signups yet", "Early access signups will appear here."); return; } document.getElementById("waitlistList").innerHTML = waitlistLoaded.map(waitlistCardHtml).join(""); } async function loadUsersPageImpl(reset) {
   if (reset) { usersLoaded = []; usersLastDoc = null; usersHasMore = true; }
   if (!usersHasMore) return;
   var q = usersLastDoc
@@ -1714,7 +1714,7 @@ async function loadRequestsPageImpl(reset) {
   if (wrap) wrap.style.display = requestsHasMore ? "block" : "none";
 }
 
-async function loadCountsImpl() {
+async function loadWaitlistPageImpl(reset) { if (reset) { waitlistLoaded = []; waitlistLastDoc = null; waitlistHasMore = true; } if (!waitlistHasMore) return; var q = waitlistLastDoc ? query(collection(db2, "waitlist"), orderBy("submittedAt", "desc"), startAfter(waitlistLastDoc), limit(PAGE_SIZE)) : query(collection(db2, "waitlist"), orderBy("submittedAt", "desc"), limit(PAGE_SIZE)); var snap; try { snap = await getDocs(q); } catch (error) { renderEmpty2("waitlistList", "Waitlist unavailable", "Could not load waitlist signups: " + error.message); waitlistHasMore = false; return; } snap.forEach(function (d) { waitlistLoaded.push(Object.assign({ id: d.id }, d.data())); }); if (snap.docs.length) waitlistLastDoc = snap.docs[snap.docs.length - 1]; waitlistHasMore = snap.docs.length === PAGE_SIZE; renderWaitlistList(); var wrap = document.getElementById("waitlistLoadMoreWrap"); if (wrap) wrap.style.display = waitlistHasMore ? "block" : "none"; } async function loadCountsImpl() {
   try {
     var vendorQ = query(collection(db2, "users"), or(
       where("vendorAccount", "==", true),
@@ -1761,7 +1761,7 @@ async function loadCountsImpl() {
 }
 window.loadUsersPage = function (reset) { loadUsersPageImpl(reset !== false); };
 window.loadListingsPage = function (reset) { loadListingsPageImpl(reset !== false); };
-window.loadRequestsPage = function (reset) { loadRequestsPageImpl(reset !== false); };
+window.loadRequestsPage = function (reset) { loadRequestsPageImpl(reset !== false); }; window.loadWaitlistPage = function (reset) { loadWaitlistPageImpl(reset !== false); };
 
 window.loadAllData = async function () {
   try {
@@ -1769,7 +1769,7 @@ window.loadAllData = async function () {
       loadCountsImpl(),
       loadUsersPageImpl(true),
       loadListingsPageImpl(true),
-      loadRequestsPageImpl(true)
+      loadRequestsPageImpl(true), loadWaitlistPageImpl(true)
     ]);
   } catch (error) {
     var warn = document.getElementById("adminWarning");
@@ -1839,7 +1839,7 @@ window.handleAdminDeleteUser = async function (uid) {
   }
 };
 
-window.handleAdminToggleListingStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "published" ? "draft" : "published"; var verb = nextStatus === "published" ? "publish" : "unpublish"; if (!await showConfirm("Are you sure you want to " + verb + " this listing?")) return; try { await updateDoc(doc(db2, "listings", id), { status: nextStatus, updatedAt: serverTimestamp() }); var idx = listingsLoaded.findIndex(function (l) { return l.id === id; }); if (idx > -1) listingsLoaded[idx].status = nextStatus; renderListingsList(); loadCountsImpl(); showToast(nextStatus === "published" ? "Listing published." : "Listing unpublished."); } catch (error) { showToast("Could not update listing: " + error.message); } }; window.handleAdminDeleteListing = async function (id) { if (!await showConfirm("Delete this listing? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "listings", id)); listingsLoaded = listingsLoaded.filter(function (l) { return l.id !== id; }); renderListingsList(); loadCountsImpl(); showToast("Listing deleted."); } catch (error) { showToast("Could not delete listing: " + error.message); } }; window.handleAdminToggleRequestStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "withdrawn" ? "pending" : "withdrawn"; var verb = nextStatus === "withdrawn" ? "cancel" : "reopen"; if (!await showConfirm("Are you sure you want to " + verb + " this request?")) return; try { var updates = { requestStatus: nextStatus, updatedAt: serverTimestamp() }; if (nextStatus === "withdrawn") { updates.withdrawReason = "Cancelled by admin"; } await updateDoc(doc(db2, "bookingRequests", id), updates); var idx = requestsLoaded.findIndex(function (r) { return r.id === id; }); if (idx > -1) Object.assign(requestsLoaded[idx], updates); renderRequestsList(); loadCountsImpl(); showToast(nextStatus === "withdrawn" ? "Request cancelled." : "Request reopened."); } catch (error) { showToast("Could not update request: " + error.message); } }; window.handleAdminDeleteRequest = async function (id) { if (!await showConfirm("Delete this booking request? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "bookingRequests", id)); requestsLoaded = requestsLoaded.filter(function (r) { return r.id !== id; }); renderRequestsList(); loadCountsImpl(); showToast("Request deleted."); } catch (error) { showToast("Could not delete request: " + error.message); } }; document.addEventListener("change", function (e) {
+window.handleAdminToggleListingStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "published" ? "draft" : "published"; var verb = nextStatus === "published" ? "publish" : "unpublish"; if (!await showConfirm("Are you sure you want to " + verb + " this listing?")) return; try { await updateDoc(doc(db2, "listings", id), { status: nextStatus, updatedAt: serverTimestamp() }); var idx = listingsLoaded.findIndex(function (l) { return l.id === id; }); if (idx > -1) listingsLoaded[idx].status = nextStatus; renderListingsList(); loadCountsImpl(); showToast(nextStatus === "published" ? "Listing published." : "Listing unpublished."); } catch (error) { showToast("Could not update listing: " + error.message); } }; window.handleAdminDeleteListing = async function (id) { if (!await showConfirm("Delete this listing? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "listings", id)); listingsLoaded = listingsLoaded.filter(function (l) { return l.id !== id; }); renderListingsList(); loadCountsImpl(); showToast("Listing deleted."); } catch (error) { showToast("Could not delete listing: " + error.message); } }; window.handleAdminToggleRequestStatus = async function (id, currentStatus) { var nextStatus = currentStatus === "withdrawn" ? "pending" : "withdrawn"; var verb = nextStatus === "withdrawn" ? "cancel" : "reopen"; if (!await showConfirm("Are you sure you want to " + verb + " this request?")) return; try { var updates = { requestStatus: nextStatus, updatedAt: serverTimestamp() }; if (nextStatus === "withdrawn") { updates.withdrawReason = "Cancelled by admin"; } await updateDoc(doc(db2, "bookingRequests", id), updates); var idx = requestsLoaded.findIndex(function (r) { return r.id === id; }); if (idx > -1) Object.assign(requestsLoaded[idx], updates); renderRequestsList(); loadCountsImpl(); showToast(nextStatus === "withdrawn" ? "Request cancelled." : "Request reopened."); } catch (error) { showToast("Could not update request: " + error.message); } }; window.handleAdminDeleteRequest = async function (id) { if (!await showConfirm("Delete this booking request? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "bookingRequests", id)); requestsLoaded = requestsLoaded.filter(function (r) { return r.id !== id; }); renderRequestsList(); loadCountsImpl(); showToast("Request deleted."); } catch (error) { showToast("Could not delete request: " + error.message); } }; window.handleAdminDeleteWaitlist = async function (id) { if (!await showConfirm("Delete this waitlist entry? This cannot be undone.")) return; try { await deleteDoc(doc(db2, "waitlist", id)); waitlistLoaded = waitlistLoaded.filter(function (w) { return w.id !== id; }); renderWaitlistList(); loadCountsImpl(); showToast("Waitlist entry deleted."); } catch (error) { showToast("Could not delete entry: " + error.message); } }; document.addEventListener("change", function (e) {
   var sel = e.target.closest && e.target.closest(".admin-role-select");
   if (!sel) return;
   window.handleAdminRoleChange(sel.getAttribute("data-uid"), sel.value);
@@ -1853,7 +1853,7 @@ document.addEventListener("click", function (e) {
   if (action === "suspend") {
     window.handleAdminSuspendToggle(uid, btn.getAttribute("data-suspended") !== "true");
   } else if (action === "delete-user") {
-    window.handleAdminDeleteUser(uid); } else if (action === "toggle-listing") { window.handleAdminToggleListingStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-listing") { window.handleAdminDeleteListing(btn.getAttribute("data-id")); } else if (action === "toggle-request") { window.handleAdminToggleRequestStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-request") { window.handleAdminDeleteRequest(btn.getAttribute("data-id"));
+    window.handleAdminDeleteUser(uid); } else if (action === "toggle-listing") { window.handleAdminToggleListingStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-listing") { window.handleAdminDeleteListing(btn.getAttribute("data-id")); } else if (action === "toggle-request") { window.handleAdminToggleRequestStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-request") { window.handleAdminDeleteRequest(btn.getAttribute("data-id")); } else if (action === "delete-waitlist") { window.handleAdminDeleteWaitlist(btn.getAttribute("data-id"));
   }
 });
 </script>
