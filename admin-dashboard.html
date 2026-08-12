@@ -1823,14 +1823,14 @@ window.handleAdminSuspendToggle = async function (uid, nextSuspended) {
   }
 };
 
-window.handleAdminDeleteUser = async function (uid) {
+async function callDeleteUserFallback(uid) { var idToken = await auth2.currentUser.getIdToken(); var resp = await fetch('https://deleteuseraccount-840686040363.us-central1.run.app', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken }, body: JSON.stringify({ uid: uid }) }); var data = await resp.json().catch(function () { return {}; }); if (!resp.ok) { throw new Error(data.error || ('Request failed with status ' + resp.status)); } return data; } window.handleAdminDeleteUser = async function (uid) {
   if (auth2.currentUser && uid === auth2.currentUser.uid) {
     showToast("You cannot delete your own account.");
     return;
   }
-  if (!await showConfirm("Delete this profile data? This removes app access and profile info but does not delete sign-in credentials. This cannot be undone.")) return;
+  if (!await showConfirm("Permanently delete this account? This removes their sign-in access and all profile data. This cannot be undone.")) return;
   try {
-    await deleteDoc(doc(db2, "users", uid));
+    await callDeleteUserFallback(uid);
     usersLoaded = usersLoaded.filter(function (u) { return u.id !== uid; });
     renderUsersList();
     loadCountsImpl();
