@@ -1145,8 +1145,7 @@ async function repairConversationFromBookingRequest() {
 
     if (vendorResponse?.note) {
       try {
-        await addDoc(collection(db, "conversations", conversationId, "messages"), {
-          text: messageText,
+              await setDoc(doc(db, "conversations", conversationId, "messages", `booking-response-${request.id}`), {          text: messageText,
           senderId: vendorId,
           senderName: vendorName,
           senderRole: "vendor",
