@@ -1971,7 +1971,7 @@ async function createConversationForVendor(requestId, payload, vendor) {
 
   await setDoc(doc(db, "conversations", conversationId), conversationPayload, { merge: true });
 
-  await addDoc(collection(db, "conversations", conversationId, "messages"), {
+  await setDoc(doc(db, "conversations", conversationId, "messages", "booking_intro"), {
     text: firstMessage,
     senderId: ownerId,
     senderName: ownerName,
@@ -2231,9 +2231,7 @@ async function submitBookingRequest() {
       throw new Error("This request cannot submit yet because the selected vendor is missing a vendorId. Confirm the listing and event board item both have the vendor UID attached.");
     }
 
-    const bookingRef = await addDoc(collection(db, "bookingRequests"), payload);
-    lastBookingRequestId = bookingRef.id;
-
+      const bookingRequestId = makeSafeId(`${payload.eventId}__${payload.requestOwnerId}__${(payload.vendorIds || []).slice().sort().join("-")}`); await setDoc(doc(db, "bookingRequests", bookingRequestId), payload, { merge: true }); const bookingRef = { id: bookingRequestId }; lastBookingRequestId = bookingRef.id;
     const conversationMap = await createConversationsForBookingRequest(bookingRef.id, payload);
 
     await Promise.all([
