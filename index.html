@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Listings | RentEvent</title>
+  <title>RentEvent — Book event vendors near you</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -626,6 +626,25 @@
       .listing-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .bottom-nav { max-width: 520px; }
     }
+  
+    /* --- Guest (signed-out) browsing --- */
+    .guest-only { display: none !important; }
+    body.guest-mode .guest-only { display: inline-flex !important; }
+    body.guest-mode .auth-only { display: none !important; }
+    .guest-login-btn {
+      align-items: center; justify-content: center;
+      min-height: 40px; padding: 0 18px; border-radius: 999px;
+      background: linear-gradient(135deg,#ff9a73,#ff7a63 52%,#ff5f67);
+      color: #fff; font-weight: 700; font-size: .88rem;
+      text-decoration: none; white-space: nowrap;
+    }
+    .guest-cta {
+      display: none; margin: 18px 0 0; padding: 18px;
+      border-radius: 20px; background: #fff;
+      box-shadow: 0 8px 24px rgba(0,0,0,.06); text-align: center;
+    }
+    body.guest-mode .guest-cta { display: block; }
+    .guest-cta p { margin: 0 0 12px; color: #6a625a; font-size: .92rem; line-height: 1.5; }
   </style>
 </head>
 
@@ -642,14 +661,15 @@
 
   <main class="page">
     <header class="topbar">
-      <a href="dashboard.html" class="back-link" id="backLink" aria-label="Go back">←</a>
+      <a href="dashboard.html" class="back-link auth-only" id="backLink" aria-label="Go back">←</a>
 
       <div class="topbar-center">
         <div class="eyebrow">Marketplace</div>
         <h1 class="page-title">Listings</h1>
       </div>
 
-      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+      <a href="login.html" class="guest-login-btn guest-only">Log In</a>
+      <a href="notifications.html" class="icon-btn auth-only" aria-label="Notifications">
         <span class="notification-badge" id="topNotificationBadge">0</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -904,9 +924,13 @@
         </div>
       </div>
     </section>
+    <div class="guest-cta">
+      <p>Create a free account to save vendors, message them, and book your event.</p>
+      <a href="create-account.html" class="guest-login-btn" style="display:inline-flex">Sign Up Free</a>
+    </div>
   </main>
 
-      <nav class="bottom-nav" aria-label="Bottom navigation" id="bottomNav">
+      <nav class="bottom-nav auth-only" aria-label="Bottom navigation" id="bottomNav">
     <a class="nav-item" href="dashboard.html">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor">
@@ -1803,10 +1827,16 @@ async function initPage() {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "index.html";
+    // Guests may browse published listings (Airbnb-style front door).
+    // Booking, messaging, saving and dashboards still require an account.
+    currentUser = null;
+    currentUserData = null;
+    document.body.classList.add("guest-mode");
+    await initPage();
     return;
   }
 
+  document.body.classList.remove("guest-mode");
   currentUser = user;
 
   try {
@@ -1814,7 +1844,7 @@ onAuthStateChanged(auth, async (user) => {
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      window.location.href = "index.html";
+      window.location.href = "login.html";
       return;
     }
 
