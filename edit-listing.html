@@ -1468,8 +1468,6 @@ window.saveListing = async function(status) {
       travelAvailableValue,
       virtualService,
       nationalShipping,
-
-      vendorEmail: currentUserData.email || currentUser.email || "",
       listingVisibility: currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion" ? "hidden" : "visible",
       updatedByRole: getActiveRole(currentUserData),
       updatedAt: serverTimestamp(),
