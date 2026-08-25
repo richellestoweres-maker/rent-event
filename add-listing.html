@@ -1637,7 +1637,6 @@ window.saveListing = async function(status) {
 
       vendorId: currentUser.uid,
       vendorName,
-      vendorEmail: currentUserData.email || currentUser.email || "",
 
       listingVisibility: currentUserData.accountStatus === "deactivated" || currentUserData.accountStatus === "pending_deletion" ? "hidden" : "visible",
       createdByRole: getActiveRole(currentUserData),
