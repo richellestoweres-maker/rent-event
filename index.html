@@ -273,6 +273,20 @@
       padding-bottom: 4px;
       margin-bottom: 22px;
       scrollbar-width: none;
+      /* Fade the trailing edge so it reads as swipeable rather than cut off. */
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent 100%);
+      mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent 100%);
+    }
+
+    /* On wider screens there is room to show every category at once. */
+    @media (min-width: 760px) {
+      .filters {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        row-gap: 10px;
+        -webkit-mask-image: none;
+        mask-image: none;
+      }
     }
 
     .filters::-webkit-scrollbar { display: none; }
