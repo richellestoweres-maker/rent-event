@@ -504,7 +504,6 @@
     .action-btn-secondary { background: var(--soft-2); color: #4a433d; }
     .action-btn:disabled, .action-btn-secondary:disabled { opacity: 0.65; cursor: not-allowed; }
 
-
     .admin-preview-bar {
       display: none;
       position: sticky;
@@ -635,6 +634,18 @@
       }
     }
   </style>
+
+  <!-- PWA:start (managed) -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ff5f67" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="RentEvent" />
+  <!-- PWA:end -->
 </head>
 
 <body>
@@ -823,7 +834,6 @@ function formatPrice(value) {
 
   return `$${Math.round(number).toLocaleString()}`;
 }
-
 
 function normalize(value) {
   return safeText(value, "").toLowerCase().trim();
@@ -1350,7 +1360,6 @@ async function findExistingConversation(actorId, vendorId, listingId, eventId = 
   };
 }
 
-
 async function notifyVendorOfMessage(conversationId, vendorId, customerName, listingTitle, messageText) {
   if (!conversationId || !vendorId) return;
 
@@ -1557,9 +1566,6 @@ async function startConversation() {
   }
 }
 
-
-
-
 function userCanSeeConversation(data, userId) {
   const participantIds = Array.isArray(data.participantIds) ? data.participantIds : [];
 
@@ -1682,5 +1688,17 @@ onAuthStateChanged(auth, async (user) => {
 </script>
 
 <script type="module" src="suspension-check.js"></script>
+
+<!-- PWA-SW:start (managed) -->
+<script>
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function (e) {
+        console.warn("SW registration failed:", e);
+      });
+    });
+  }
+</script>
+<!-- PWA-SW:end -->
 </body>
 </html>

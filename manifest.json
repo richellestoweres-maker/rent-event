@@ -1,0 +1,26 @@
+{
+  "name": "RentEvent — Book event vendors near you",
+  "short_name": "RentEvent",
+  "description": "Plan, book, and manage events with vendors, listings, and rentals near you.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f2e9",
+  "theme_color": "#ff5f67",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["lifestyle", "shopping", "business"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Browse listings", "short_name": "Browse", "url": "/listings.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "My events", "short_name": "Events", "url": "/event-builder.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Messages", "short_name": "Messages", "url": "/messages.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

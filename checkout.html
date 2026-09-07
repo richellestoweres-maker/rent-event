@@ -565,7 +565,6 @@
       letter-spacing: -0.02em;
     }
 
-
     .stripe-checkout-card {
       display: none;
       margin-top: 16px;
@@ -812,6 +811,18 @@
       .bottom-bar { max-width: 520px; }
     }
   </style>
+
+  <!-- PWA:start (managed) -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ff5f67" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="RentEvent" />
+  <!-- PWA:end -->
 </head>
 
 <body>
@@ -2072,7 +2083,6 @@ async function createRequesterConfirmationNotification(requestId, payload) {
   }
 }
 
-
 function validateStripeSetup() {
   if (!STRIPE_ENABLED) return;
 
@@ -2150,7 +2160,6 @@ async function startStripeEmbeddedCheckout(bookingRequestId, payload) {
     block: "start"
   });
 }
-
 
 async function createConversationsForBookingRequest(requestId, payload) {
   const vendors = Array.isArray(payload.vendors) ? payload.vendors : [];
@@ -2356,5 +2365,17 @@ onAuthStateChanged(auth, async (user) => {
 </script>
 
 <script type="module" src="suspension-check.js"></script>
+
+<!-- PWA-SW:start (managed) -->
+<script>
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function (e) {
+        console.warn("SW registration failed:", e);
+      });
+    });
+  }
+</script>
+<!-- PWA-SW:end -->
 </body>
 </html>
