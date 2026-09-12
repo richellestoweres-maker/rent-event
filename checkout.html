@@ -1013,7 +1013,7 @@
     <button class="bottom-btn" id="continuePaymentBtn" type="button">Continue to Payment</button>
   </div>
 
-<script src="https://js.stripe.com/v3/"></script>
+<script src="https://js.stripe.com/dahlia/stripe.js"></script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -2147,9 +2147,13 @@ async function startStripeEmbeddedCheckout(bookingRequestId, payload) {
 
   const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
 
-  const checkout = await stripe.initEmbeddedCheckout({
-    clientSecret: data.clientSecret
-  });
+  const embeddedOptions = {
+    fetchClientSecret: async () => data.clientSecret
+  };
+
+  const checkout = typeof stripe.createEmbeddedCheckoutPage === "function"
+    ? await stripe.createEmbeddedCheckoutPage(embeddedOptions)
+    : await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
 
   await checkout.mount("#stripeEmbeddedCheckout");
 
