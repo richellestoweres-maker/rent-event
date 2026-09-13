@@ -729,9 +729,71 @@
 
     .event-actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 54px;
       gap: 12px;
       margin-top: 16px;
+    }
+
+    .btn-trash {
+      min-height: 54px;
+      width: 54px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #9a8f82;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .btn-trash svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn-trash:hover {
+      color: var(--red-text);
+      border-color: #f3c9c2;
+      background: var(--red-soft);
+    }
+
+    .event-confirm {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 24px;
+      background: var(--red-soft);
+    }
+
+    .event-confirm-text {
+      margin: 0 0 14px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: #8d4340;
+      font-weight: 600;
+    }
+
+    .event-confirm-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .event-confirm .btn-secondary {
+      background: #fff;
+    }
+
+    .event-note {
+      margin: 14px 0 0;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: var(--blue-soft);
+      color: var(--blue-text);
+      font-size: 0.92rem;
+      line-height: 1.45;
+      font-weight: 600;
     }
 
     .btn,
@@ -1446,6 +1508,7 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -1468,6 +1531,10 @@ let currentUserData = null;
 let customerEvents = [];
 let eventBoardCounts = {};
 let requestCounts = {};
+// Every booking request this user can see, grouped by event. Loaded once with
+// the counts, and reused when deleting an event so we can tell whether any of
+// its bookings were actually paid for.
+let requestsByEvent = {};
 let isCreatingEvent = false;
 let dashboardNotifications = [];
 let notificationFilter = "all";
@@ -2467,13 +2534,170 @@ function renderEvents() {
           </div>
         </div>
 
-        <div class="event-actions">
+        <div class="event-actions" data-actions-for="${escapeHtml(eventData.id || "")}">
           <a class="btn" href="event-builder.html?eventId=${eventId}">Open Event</a>
           <a class="btn-secondary" href="my-requests.html?eventId=${eventId}">Requests</a>
+          <button class="btn-trash" type="button" data-ask-delete="${escapeHtml(eventData.id || "")}" aria-label="Delete ${escapeHtml(eventName)}" title="Delete this event">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M9 7V5.5C9 4.67 9.67 4 10.5 4H13.5C14.33 4 15 4.67 15 5.5V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M6.5 7L7.2 19C7.25 19.85 7.95 20.5 8.8 20.5H15.2C16.05 20.5 16.75 19.85 16.8 19L17.5 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+            </svg>
+          </button>
         </div>
+
+        <div class="event-confirm" data-confirm-for="${escapeHtml(eventData.id || "")}" hidden>
+          <p class="event-confirm-text">Delete &ldquo;${escapeHtml(eventName)}&rdquo;? This removes the event and everything saved to its board. It cannot be undone.</p>
+          <div class="event-confirm-actions">
+            <button class="btn-secondary" type="button" data-cancel-delete="${escapeHtml(eventData.id || "")}">Keep it</button>
+            <button class="btn-danger" type="button" data-confirm-delete="${escapeHtml(eventData.id || "")}">Delete</button>
+          </div>
+        </div>
+
+        <p class="event-note" data-note-for="${escapeHtml(eventData.id || "")}" hidden></p>
       </article>
     `;
   }).join("");
+}
+
+/* ------------------------------------------------------------------ */
+/* Deleting an event                                                    */
+/* ------------------------------------------------------------------ */
+
+function eventPart(eventId, attr) {
+  return document.querySelector('[' + attr + '="' + (window.CSS && CSS.escape ? CSS.escape(eventId) : eventId) + '"]');
+}
+
+function showEventNote(eventId, message) {
+  const note = eventPart(eventId, "data-note-for");
+  if (!note) return;
+
+  note.textContent = message;
+  note.hidden = !message;
+}
+
+function toggleEventConfirm(eventId, show) {
+  const actions = eventPart(eventId, "data-actions-for");
+  const confirmBox = eventPart(eventId, "data-confirm-for");
+
+  if (actions) actions.hidden = show;
+  if (confirmBox) confirmBox.hidden = !show;
+}
+
+/** A booking that was actually paid for must not be deleted from a browser. */
+function eventHasPaidBooking(eventId) {
+  const requests = requestsByEvent[eventId] || [];
+
+  return requests.some((entry) => {
+    const data = entry.data || {};
+    return data.paymentStatus === "paid" ||
+           data.paymentStatus === "refunded" ||
+           data.paymentStatus === "partially_refunded" ||
+           data.payoutStatus === "paid_out";
+  });
+}
+
+async function deleteEventEverywhere(eventId) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Please sign in again.");
+
+  // The board items saved to this event.
+  try {
+    const boardSnap = await getDocs(query(
+      collection(db, "eventBoardItems"),
+      where("userId", "==", user.uid)
+    ));
+
+    const doomed = [];
+    boardSnap.forEach((docSnap) => {
+      if (safeText((docSnap.data() || {}).eventId, "") === eventId) {
+        doomed.push(docSnap.ref);
+      }
+    });
+
+    for (const ref of doomed) {
+      await deleteDoc(ref);
+    }
+  } catch (error) {
+    console.warn("Could not clear board items:", error.message);
+  }
+
+  // Unpaid booking requests are marked cancelled rather than deleted, so the
+  // vendor's copy does not simply vanish on them.
+  const requests = requestsByEvent[eventId] || [];
+
+  for (const entry of requests) {
+    try {
+      await updateDoc(doc(db, "bookingRequests", entry.id), {
+        status: "cancelled",
+        cancelledReason: "event_deleted",
+        hiddenForCustomer: true,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.warn("Could not cancel request", entry.id, error.message);
+    }
+  }
+
+  await deleteDoc(doc(db, "customerEvents", eventId));
+}
+
+async function handleConfirmDelete(eventId, button) {
+  const original = button.textContent;
+
+  button.disabled = true;
+  button.textContent = "Deleting";
+
+  try {
+    await deleteEventEverywhere(eventId);
+
+    customerEvents = customerEvents.filter((item) => item.id !== eventId);
+    delete requestCounts[eventId];
+    delete eventBoardCounts[eventId];
+    delete requestsByEvent[eventId];
+
+    renderEvents();
+  } catch (error) {
+    console.error("Delete event failed:", error);
+    button.disabled = false;
+    button.textContent = original;
+    toggleEventConfirm(eventId, false);
+    showEventNote(eventId, "We could not delete that event. " + (error.message || "Please try again."));
+  }
+}
+
+function wireEventListActions() {
+  const eventList = document.getElementById("eventList");
+  if (!eventList || eventList.dataset.deleteWired === "1") return;
+
+  eventList.dataset.deleteWired = "1";
+
+  eventList.addEventListener("click", (e) => {
+    const ask = e.target.closest("[data-ask-delete]");
+    if (ask) {
+      const eventId = ask.getAttribute("data-ask-delete");
+
+      if (eventHasPaidBooking(eventId)) {
+        showEventNote(eventId, "This event has a booking that was paid for, so it cannot be deleted here. Message me and I will sort it out properly.");
+        return;
+      }
+
+      showEventNote(eventId, "");
+      toggleEventConfirm(eventId, true);
+      return;
+    }
+
+    const cancel = e.target.closest("[data-cancel-delete]");
+    if (cancel) {
+      toggleEventConfirm(cancel.getAttribute("data-cancel-delete"), false);
+      return;
+    }
+
+    const confirmBtn = e.target.closest("[data-confirm-delete]");
+    if (confirmBtn) {
+      handleConfirmDelete(confirmBtn.getAttribute("data-confirm-delete"), confirmBtn);
+    }
+  });
 }
 
 async function loadEventBoardCounts(user) {
@@ -2502,6 +2726,7 @@ async function loadEventBoardCounts(user) {
 
 async function loadRequestCounts(user) {
   requestCounts = {};
+  requestsByEvent = {};
 
   try {
     const requestQueries = [
@@ -2523,10 +2748,14 @@ async function loadRequestCounts(user) {
       }
     }
 
-    map.forEach((request) => {
+    map.forEach((request, requestId) => {
       const eventId = safeText(request.eventId, "");
+      if (!eventId) return;
 
-      if (eventId && !request.hiddenForCustomer) {
+      if (!requestsByEvent[eventId]) requestsByEvent[eventId] = [];
+      requestsByEvent[eventId].push({ id: requestId, data: request });
+
+      if (!request.hiddenForCustomer) {
         requestCounts[eventId] = (requestCounts[eventId] || 0) + 1;
       }
     });
@@ -2581,6 +2810,7 @@ async function loadCustomerEvents(user) {
 
     customerEvents = events;
     renderEvents();
+    wireEventListActions();
   } catch (error) {
     document.getElementById("eventList").innerHTML = `
       <div class="empty-card">
