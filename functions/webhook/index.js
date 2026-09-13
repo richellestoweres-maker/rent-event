@@ -10,7 +10,7 @@
  * it, because every request carries a signature made with a secret only Stripe
  * and this function know.
  *
- * Deployed as its own Cloud Run function with entry point: stripeWebhook
+ * Entry point: stripeWebhook
  * Secrets it needs: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
  */
 
@@ -189,8 +189,7 @@ async function markRefunded(charge) {
  * have Connect events turned on or it will never be sent.
  */
 async function syncConnectedAccount(account) {
-  const uid =
-    (account.metadata && account.metadata.rentEventUserId) || "";
+  const uid = (account.metadata && account.metadata.rentEventUserId) || "";
 
   let userRef = null;
 
@@ -212,7 +211,6 @@ async function syncConnectedAccount(account) {
   }
 
   const requirements = account.requirements || {};
-
   const payoutsEnabled = account.payouts_enabled === true;
 
   await userRef.set({
