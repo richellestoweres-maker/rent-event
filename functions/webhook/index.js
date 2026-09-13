@@ -63,7 +63,7 @@ async function claimEvent(event) {
   }
 }
 
-async function markPaid(session, event) {
+async function markPaid(session, event, stripe) {
   const bookingRequestId = bookingIdFromSession(session);
   if (!bookingRequestId) {
     console.error("No bookingRequestId on session", session.id);
@@ -120,6 +120,25 @@ async function markPaid(session, event) {
       ? session.payment_intent
       : (session.payment_intent && session.payment_intent.id) || "";
 
+  // Vendor transfers are drawn from this specific charge, which is what lets
+  // them be created later without waiting for the money to clear into the
+  // platform balance. Without a charge id there is nothing to pay out from.
+  let chargeId = "";
+
+  if (paymentIntentId && stripe) {
+    try {
+      const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      chargeId =
+        typeof intent.latest_charge === "string"
+          ? intent.latest_charge
+          : (intent.latest_charge && intent.latest_charge.id) || "";
+    } catch (err) {
+      console.error("Could not read payment intent", paymentIntentId, err.message);
+    }
+  }
+
+  const hasPayoutPlan = Array.isArray(booking.payoutPlan) && booking.payoutPlan.length > 0;
+
   await ref.set({
     paymentStatus: "paid",
     status: "confirmed",
@@ -134,6 +153,10 @@ async function markPaid(session, event) {
     stripeLivemode: event.livemode === true,
     paymentConfirmedBy: "stripe_webhook",
     paymentNeedsReview: false,
+    stripeChargeId: chargeId,
+    // "scheduled" is what the payout job looks for. No charge id means no
+    // payout is possible, so flag it for a human rather than silently skipping.
+    payoutStatus: hasPayoutPlan && chargeId ? "scheduled" : "needs_review",
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   }, { merge: true });
 
@@ -170,12 +193,26 @@ async function markRefunded(charge) {
 
   const fullyRefunded = charge.amount_refunded >= charge.amount;
 
-  await ref.set({
+  const booking = snap.data() || {};
+  const alreadyPaidOut = booking.payoutStatus === "paid_out";
+
+  const update = {
     paymentStatus: fullyRefunded ? "refunded" : "partially_refunded",
     stripeAmountRefundedCents: charge.amount_refunded,
     refundedAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  }, { merge: true });
+  };
+
+  // Stop a scheduled payout before it happens. If the vendor has already been
+  // paid, that money has to be reversed deliberately, so flag it instead.
+  if (fullyRefunded && !alreadyPaidOut) {
+    update.payoutStatus = "cancelled_refunded";
+  } else if (alreadyPaidOut) {
+    update.payoutNeedsReview = true;
+    update.payoutReviewReason = "refund_after_payout";
+  }
+
+  await ref.set(update, { merge: true });
 
   console.log("Booking refunded:", bookingRequestId);
 }
@@ -284,14 +321,14 @@ exports.stripeWebhook = onRequest(
           // Card payments arrive here already paid. Slower methods arrive
           // unpaid and settle later via async_payment_succeeded.
           if (session.payment_status === "paid") {
-            await markPaid(session, event);
+            await markPaid(session, event, stripe);
           } else {
             await markNotPaid(session, "awaiting_payment");
           }
           break;
         }
         case "checkout.session.async_payment_succeeded":
-          await markPaid(event.data.object, event);
+          await markPaid(event.data.object, event, stripe);
           break;
         case "checkout.session.async_payment_failed":
           await markNotPaid(event.data.object, "payment_failed");
