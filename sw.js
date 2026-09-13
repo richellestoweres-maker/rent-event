@@ -5,7 +5,7 @@
      - Everything live (Firebase, Stripe, Cloud Functions): never touched
    Bump CACHE_VERSION on every deploy so old shells are dropped. */
 
-const CACHE_VERSION = "rentevent-v1";
+const CACHE_VERSION = "rentevent-v2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -64,7 +64,11 @@ self.addEventListener("fetch", (event) => {
 
   if (isHTML) {
     event.respondWith(
-      fetch(req)
+      // "no-cache" makes the browser revalidate with the server instead of
+      // handing back a page out of its own HTTP cache. Without this, a new
+      // deploy could take up to ten minutes to show up even though this
+      // worker asks the network first.
+      fetch(req, { cache: "no-cache" })
         .then((res) => {
           // Only cache real successes. Caching a 404/500 would pin an error
           // page in place of a working one on the next offline load.
