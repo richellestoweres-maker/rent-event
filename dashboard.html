@@ -2789,15 +2789,23 @@ async function loadCustomerEvents(user) {
       }
     }
 
-    const legacyRef = doc(db, "customerEvents", user.uid);
-    const legacySnap = await getDoc(legacyRef);
+    // Very old accounts kept a single event at customerEvents/{uid}. Most
+    // accounts have no such document, and the security rules deny a read of a
+    // document that does not exist, so this throws for almost everybody. It
+    // used to take the whole event list down with it.
+    try {
+      const legacyRef = doc(db, "customerEvents", user.uid);
+      const legacySnap = await getDoc(legacyRef);
 
-    if (legacySnap.exists()) {
-      eventMap.set(legacySnap.id, {
-        id: legacySnap.id,
-        legacy: true,
-        ...legacySnap.data()
-      });
+      if (legacySnap.exists()) {
+        eventMap.set(legacySnap.id, {
+          id: legacySnap.id,
+          legacy: true,
+          ...legacySnap.data()
+        });
+      }
+    } catch (error) {
+      console.warn("Legacy event read skipped:", error.message);
     }
 
     eventMap.forEach((eventData) => events.push(eventData));
