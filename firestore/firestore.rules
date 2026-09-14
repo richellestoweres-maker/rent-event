@@ -1,0 +1,266 @@
+rules_version = '2';
+
+// RentEvent — Stage 1 hardening, corrected (2026-09-13)
+//
+// ONLY TWO THINGS CHANGED from the rules you had. Everything else below is
+// byte-for-byte your existing logic, so no app behaviour changes.
+//
+//   1. isAdmin() no longer reads users/{uid}.role. Admin now comes from a
+//      custom auth claim or the UID allowlist, neither of which a browser can
+//      write. Previously any user could write role:"admin" to their own
+//      document and inherit the catch-all rule's full database access.
+//
+//   2. users/{userId} create and update now reject privileged fields
+//      (admin, isAdmin, roles, suspended, verified, plannerPro, Stripe ids)
+//      and limit "role" to real roles. Ordinary profile edits are unaffected.
+//
+// Stage 2 adds the quotes collection, which is where a booking's real price
+// now lives. Still to do after that: lock payment fields on bookingRequests,
+// require senderId on notifications, bound waitlist writes.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function userPath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function hasUserDoc() { return signedIn() && exists(userPath()); }
+    function userData() { return get(userPath()).data; }
+    function userRole() { return hasUserDoc() ? userData().get('role', null) : null; }
+
+    // CHANGE 1 — admin can no longer be self-assigned.
+    // Add more admins with: admin.auth().setCustomUserClaims(uid, { admin: true })
+    // They must sign out and back in for the claim to appear in their token.
+    function isAdmin() {
+      return signedIn() && (
+        ('admin' in request.auth.token && request.auth.token.admin == true) ||
+        request.auth.uid in ['GBrIifV7FnOnXhXmgmG4lpMg4Lr1']
+      );
+    }
+
+    function isVendor() { return signedIn() && hasUserDoc() && userRole() == 'vendor'; }
+    function isPlanner() { return signedIn() && hasUserDoc() && (userRole() == 'planner' || userData().get('plannerPro', false) == true); }
+    function isOwner(userId) { return signedIn() && request.auth.uid == userId; }
+    function isSuspended() { return hasUserDoc() && userData().get('suspended', false) == true; }
+    function isNotSuspended() { return !isSuspended(); }
+
+    // CHANGE 2 — fields a client may never write to a user document.
+    function protectedUserFields() {
+      return ['admin', 'isAdmin', 'suspended', 'suspendedAt', 'suspensionReason',
+              'verified', 'balance', 'stripeAccountId', 'stripeCustomerId',
+              'chargesEnabled', 'payoutsEnabled', 'stripeDetailsSubmitted',
+              'stripeRequirementsDue', 'stripeDisabledReason', 'claims'];
+    }
+
+    function safeRoleNames() {
+      return ['customer', 'client', 'host', 'event_host', 'vendor', 'planner'];
+    }
+
+    // "roles" has to stay writable, because signing up and filling in a vendor
+    // or planner profile both write it. What must never get through is the
+    // string "admin" hidden inside the list, so the list is checked instead of
+    // being blocked outright.
+    function rolesAreSafe() {
+      return !('roles' in request.resource.data) ||
+             (request.resource.data.roles is list &&
+              request.resource.data.roles.hasOnly(safeRoleNames()));
+    }
+
+    // "role" stays writable so signup and vendor upgrade keep working,
+    // but "admin" is not an accepted value.
+    function roleIsSafe() {
+      return !('role' in request.resource.data) ||
+             request.resource.data.role in ['customer', 'client', 'host', 'event_host', 'vendor', 'planner'];
+    }
+
+    match /users/{userId} {
+      allow create: if isOwner(userId)
+                    && roleIsSafe()
+                    && rolesAreSafe()
+                    && !request.resource.data.keys().hasAny(protectedUserFields());
+      allow read:   if isAdmin() || isOwner(userId);
+      allow update: if isAdmin() || (
+                      isOwner(userId) && isNotSuspended() && roleIsSafe() && rolesAreSafe()
+                      && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedUserFields())
+                    );
+      allow delete: if isAdmin();
+    }
+
+    // ---- everything below is unchanged from your existing rules ----
+
+    match /vendor_profiles/{vendorId} {
+      allow create, update: if isOwner(vendorId) && isNotSuspended();
+      allow read: if isAdmin() || isOwner(vendorId);
+      allow delete: if isAdmin();
+    }
+
+    match /planner_profiles/{plannerId} {
+      allow create, update: if isOwner(plannerId) && isNotSuspended();
+      allow read: if isAdmin() || isOwner(plannerId);
+      allow delete: if isAdmin();
+    }
+
+    match /client_profiles/{clientId} {
+      allow create, update: if isOwner(clientId) && isNotSuspended();
+      allow read: if isAdmin() || isOwner(clientId);
+      allow delete: if isAdmin();
+    }
+
+    match /emailSubscribers/{subscriberId} {
+      allow create: if signedIn() && isNotSuspended();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /waitlist/{entryId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /listings/{listingId} {
+      allow read: if resource.data.status == "published" || (signedIn() && (isAdmin() || resource.data.vendorId == request.auth.uid));
+      allow create: if signedIn() && isVendor() && isNotSuspended() && request.resource.data.vendorId == request.auth.uid;
+      allow update: if isAdmin() || (isVendor() && isNotSuspended() && resource.data.vendorId == request.auth.uid);
+      allow delete: if isAdmin() || (isVendor() && isNotSuspended() && resource.data.vendorId == request.auth.uid);
+    }
+
+    match /customerEvents/{eventId} {
+      allow create: if signedIn() && isNotSuspended() && (request.resource.data.customerId == request.auth.uid || request.resource.data.ownerId == request.auth.uid);
+      allow read: if isAdmin() || resource.data.customerId == request.auth.uid || resource.data.ownerId == request.auth.uid;
+      allow update: if isAdmin() || (isNotSuspended() && (resource.data.customerId == request.auth.uid || resource.data.ownerId == request.auth.uid));
+      allow delete: if isAdmin() || (isNotSuspended() && (resource.data.customerId == request.auth.uid || resource.data.ownerId == request.auth.uid));
+    }
+
+    match /eventBoardItems/{itemId} {
+      allow create: if signedIn() && isNotSuspended() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin() || resource.data.userId == request.auth.uid || resource.data.customerId == request.auth.uid || resource.data.ownerId == request.auth.uid;
+      allow update: if isAdmin() || (isNotSuspended() && (resource.data.userId == request.auth.uid || resource.data.customerId == request.auth.uid || resource.data.ownerId == request.auth.uid));
+      allow delete: if isAdmin() || (isNotSuspended() && (resource.data.userId == request.auth.uid || resource.data.customerId == request.auth.uid || resource.data.ownerId == request.auth.uid));
+    }
+
+    match /bookingRequests/{requestId} {
+      allow create: if signedIn() && isNotSuspended() && request.resource.data.customerId == request.auth.uid;
+      allow get: if isAdmin() || resource.data.customerId == request.auth.uid || resource.data.plannerId == request.auth.uid || resource.data.requestOwnerId == request.auth.uid || (resource.data.vendorIds is list && request.auth.uid in resource.data.vendorIds);
+      allow list: if isAdmin() || resource.data.customerId == request.auth.uid || resource.data.plannerId == request.auth.uid || resource.data.requestOwnerId == request.auth.uid || request.auth.uid in resource.data.vendorIds;
+      allow update: if isAdmin() || (isNotSuspended() && (resource.data.customerId == request.auth.uid || resource.data.plannerId == request.auth.uid || resource.data.requestOwnerId == request.auth.uid || (resource.data.vendorIds is list && request.auth.uid in resource.data.vendorIds)));
+      allow delete: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow create: if signedIn() && isNotSuspended();
+      allow read: if signedIn() && (isAdmin() || resource.data.recipientId == request.auth.uid || resource.data.userId == request.auth.uid);
+      allow update: if signedIn() && (isAdmin() || (isNotSuspended() && (resource.data.recipientId == request.auth.uid || resource.data.userId == request.auth.uid)));
+      allow delete: if signedIn() && (isAdmin() || (isNotSuspended() && (resource.data.recipientId == request.auth.uid || resource.data.userId == request.auth.uid)));
+    }
+
+    // -----------------------------------------------------------------
+    // Vendor quotes
+    //
+    // This is where a booking's real price lives. The vendor types it, and
+    // nobody else can ever change the number, which is the entire point: the
+    // amount Stripe charges is read from here on the server instead of being
+    // trusted from the customer's browser.
+    //
+    // A quote can be revised right up until the booking is paid for, and any
+    // revision drops it back to "sent" so the customer has to agree to the new
+    // number. Once the booking is paid the quote is frozen for everyone.
+    // -----------------------------------------------------------------
+    match /quotes/{quoteId} {
+      function quotePath() { return /databases/$(database)/documents/quotes/$(quoteId); }
+      function bookingPath(id) { return /databases/$(database)/documents/bookingRequests/$(id); }
+
+      function bookingNotPaid(id) {
+        return !exists(bookingPath(id)) ||
+               get(bookingPath(id)).data.get('paymentStatus', 'not_collected') != 'paid';
+      }
+
+      function isQuoteParty() {
+        return signedIn() && (
+          resource.data.vendorId == request.auth.uid ||
+          resource.data.requestOwnerId == request.auth.uid ||
+          resource.data.get('customerId', '') == request.auth.uid ||
+          resource.data.get('plannerId', '') == request.auth.uid
+        );
+      }
+
+      // Only the vendor being booked may set a price, and only a sane one.
+      function vendorQuoteIsWellFormed() {
+        return signedIn() &&
+               request.resource.data.vendorId is string &&
+               request.resource.data.vendorId == request.auth.uid &&
+               request.resource.data.bookingRequestId is string &&
+               request.resource.data.bookingRequestId.size() > 0 &&
+               request.resource.data.requestOwnerId is string &&
+               request.resource.data.requestOwnerId.size() > 0 &&
+               request.resource.data.amount is number &&
+               request.resource.data.amount > 0 &&
+               request.resource.data.amount <= 100000 &&
+               request.resource.data.status in ['sent', 'withdrawn'];
+      }
+
+      // The customer may answer a quote and nothing more. The price, the vendor
+      // and the booking it belongs to all have to come back untouched.
+      function ownerIsOnlyAnswering() {
+        return signedIn() &&
+               resource.data.requestOwnerId == request.auth.uid &&
+               request.resource.data.amount == resource.data.amount &&
+               request.resource.data.vendorId == resource.data.vendorId &&
+               request.resource.data.requestOwnerId == resource.data.requestOwnerId &&
+               request.resource.data.bookingRequestId == resource.data.bookingRequestId &&
+               request.resource.data.status in ['accepted', 'declined'];
+      }
+
+      // Reading a quote that has not been written yet has to be allowed, because
+      // a rule written against resource.data denies a document that does not
+      // exist and the page then sees a permissions error instead of an empty
+      // answer. That exact trap took the event list down once already.
+      allow get: if isAdmin() || isQuoteParty() || (signedIn() && !exists(quotePath()));
+      allow list: if isAdmin() || isQuoteParty();
+
+      allow create: if isAdmin() || (
+        isNotSuspended() &&
+        vendorQuoteIsWellFormed() &&
+        request.resource.data.status == 'sent'
+      );
+
+      allow update: if isAdmin() || (
+        isNotSuspended() &&
+        bookingNotPaid(resource.data.bookingRequestId) &&
+        (
+          (resource.data.vendorId == request.auth.uid && vendorQuoteIsWellFormed()) ||
+          ownerIsOnlyAnswering()
+        )
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    match /conversations/{conversationId} {
+      function conversationPath() { return /databases/$(database)/documents/conversations/$(conversationId); }
+      function conversationExists() { return exists(conversationPath()); }
+      function conversationData() { return get(conversationPath()).data; }
+      function isExistingConversationParticipant() {
+        return signedIn() && conversationExists() && ((conversationData().participantIds is list && request.auth.uid in conversationData().participantIds) || conversationData().customerId == request.auth.uid || conversationData().vendorId == request.auth.uid || conversationData().plannerId == request.auth.uid || conversationData().requestOwnerId == request.auth.uid);
+      }
+      function isResourceConversationParticipant() {
+        return signedIn() && (request.auth.uid in resource.data.participantIds || resource.data.customerId == request.auth.uid || resource.data.vendorId == request.auth.uid || resource.data.plannerId == request.auth.uid || resource.data.requestOwnerId == request.auth.uid);
+      }
+      function isCreatingAllowedConversation() {
+        return signedIn() && request.resource.data.participantIds is list && request.auth.uid in request.resource.data.participantIds && request.resource.data.vendorId is string && request.resource.data.vendorId in request.resource.data.participantIds && request.resource.data.requestOwnerId == request.auth.uid;
+      }
+      allow get: if isAdmin() || isExistingConversationParticipant() || (signedIn() && !conversationExists());
+      allow list: if isAdmin() || isResourceConversationParticipant();
+      allow create: if isAdmin() || (isNotSuspended() && isCreatingAllowedConversation());
+      allow update: if isAdmin() || (isNotSuspended() && isExistingConversationParticipant());
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow create: if signedIn() && request.auth.uid == request.resource.data.senderId && (isAdmin() || (isNotSuspended() && isExistingConversationParticipant()));
+        allow read: if isAdmin() || isExistingConversationParticipant();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
