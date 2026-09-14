@@ -638,6 +638,41 @@
       letter-spacing:.08em
     }
 
+    [hidden]{display:none!important}
+
+    .quote-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 16px;
+      margin-top:12px;
+      background:var(--soft)
+    }
+
+    .quote-box h4{
+      margin:0 0 4px;
+      font-size:.95rem
+    }
+
+    .quote-box p{
+      margin:0;
+      font-size:.86rem;
+      color:var(--muted)
+    }
+
+    .quote-amount{
+      font-size:1.3rem;
+      font-weight:800;
+      color:var(--text)
+    }
+
+    .modal-hint{
+      margin:-6px 0 14px;
+      font-size:.8rem;
+      color:var(--muted);
+      line-height:1.5
+    }
+
+    .modal-field input,
     .modal-field select,
     .modal-field textarea{
       width:100%;
@@ -806,14 +841,25 @@
       <div class="modal-field">
         <label for="responseStatusSelect">Response</label>
         <select id="responseStatusSelect">
-          <option value="available">Available</option>
+          <option value="available">Available, send a price</option>
           <option value="needs_info">Need More Information</option>
           <option value="declined">Not Available</option>
         </select>
       </div>
 
+      <div class="modal-field" id="quoteAmountField" hidden>
+        <label for="quoteAmountInput">Your price for this booking</label>
+        <input id="quoteAmountInput" type="number" min="1" step="1" inputmode="decimal" placeholder="250" />
+      </div>
+
+      <p class="modal-hint" id="quoteAmountHint" hidden>
+        This is the amount the customer pays for your services. RentEvent adds its
+        service fee on top, so you receive the full price you enter here. You can
+        change it any time before the customer pays.
+      </p>
+
       <div class="modal-field">
-        <label for="responseNote">Optional note</label>
+        <label for="responseNote" id="responseNoteLabel">Optional note</label>
         <textarea id="responseNote" placeholder="Add a short response..."></textarea>
       </div>
 
@@ -1167,6 +1213,82 @@ function getStatusPillClass(status) {
   return "pending";
 }
 
+/* ------------------------------------------------------------------ */
+/* Quotes                                                              */
+/*                                                                     */
+/* A quote is the real price of a booking. The vendor types it here and */
+/* nobody else can change the number, which is what lets the server     */
+/* charge it without trusting anything the customer's browser sent.     */
+/* ------------------------------------------------------------------ */
+
+let quotesByRequestId = {};
+
+function makeQuoteId(requestId, vendorId) {
+  return [requestId, vendorId]
+    .map((part) => safeText(part, "").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 200))
+    .join("__");
+}
+
+function getQuoteForRequest(request) {
+  return quotesByRequestId[safeText(request?.id, "")] || null;
+}
+
+function getQuoteStatusLabel(status) {
+  if (status === "accepted") return "Quote Accepted";
+  if (status === "declined") return "Quote Declined";
+  if (status === "withdrawn") return "Quote Withdrawn";
+  if (status === "sent") return "Quote Sent";
+  return "No Quote Yet";
+}
+
+function getQuoteStatusPillClass(status) {
+  if (status === "accepted") return "safe";
+  if (status === "declined") return "danger";
+  if (status === "sent") return "info";
+  return "warn";
+}
+
+/** Reads this vendor's quote for every request on screen. */
+async function loadQuotesForRequests() {
+  const map = {};
+
+  for (const request of bookingRequests) {
+    const requestId = safeText(request.id, "");
+    const vendorId = isAdminPreview()
+      ? safeText(getVendorItemsForCurrentVendor(request)[0]?.vendorId, "")
+      : currentUser.uid;
+
+    if (!requestId || !vendorId) continue;
+
+    try {
+      const quoteSnap = await getDoc(doc(db, "quotes", makeQuoteId(requestId, vendorId)));
+      if (quoteSnap.exists()) map[requestId] = { id: quoteSnap.id, ...quoteSnap.data() };
+    } catch (error) {
+      console.warn("Quote could not be read for", requestId, error.message);
+    }
+  }
+
+  quotesByRequestId = map;
+}
+
+/** The number to put in the box before the vendor types anything. */
+function suggestedQuoteAmount(request) {
+  const existing = getQuoteForRequest(request);
+  if (existing && Number(existing.amount) > 0) return Number(existing.amount);
+
+  const items = getVendorItemsForCurrentVendor(request);
+
+  for (const item of items) {
+    const fromNumber = Number(item.priceNumber || 0);
+    if (fromNumber > 0) return fromNumber;
+
+    const fromText = Number(safeText(item.startingPrice, "").replace(/[^0-9.]/g, ""));
+    if (fromText > 0) return fromText;
+  }
+
+  return "";
+}
+
 function getVendorResponse(request, vendorId = currentUser?.uid) {
   if (!vendorId) return null;
   return (request.vendorResponses || {})[vendorId] || null;
@@ -1362,6 +1484,31 @@ function renderRequests() {
     const plannerBadge = ownerRole === "planner" || request.plannerId ? `<span class="pill ai">Planner Request</span>` : "";
     const conversationId = response?.conversationId || getConversationIdForRequest(request);
     const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
+    const quote = getQuoteForRequest(request);
+    const quoteStatus = safeText(quote?.status, "");
+    const quoteNote = safeText(quote?.note, "");
+
+    const quoteBox = quote
+      ? `
+        <div class="quote-box">
+          <h4>Your Quote</h4>
+          <p><span class="quote-amount">${escapeHtml(formatMoney(quote.amount))}</span></p>
+          ${quoteNote ? `<p>${escapeHtml(quoteNote)}</p>` : ""}
+          <p>${escapeHtml(
+            quoteStatus === "accepted"
+              ? "The customer accepted this price. You are paid two days after the event."
+              : quoteStatus === "declined"
+                ? "The customer declined this price. You can send a new one."
+                : "Waiting for the customer to accept. You can change this price until they pay."
+          )}</p>
+        </div>
+      `
+      : `
+        <div class="quote-box">
+          <h4>No Price Sent Yet</h4>
+          <p>The customer cannot book you until you send a price. Message them first if you need details, then choose Available and enter your price.</p>
+        </div>
+      `;
 
     const vendorBox = vendorItems.length
       ? vendorItems.map((vendor) => {
@@ -1373,7 +1520,7 @@ function renderRequests() {
           return `
             <div class="vendor-box">
               <h4>${escapeHtml(title)}</h4>
-              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · listed from ${escapeHtml(price)}</p>
             </div>
           `;
         }).join("")
@@ -1397,6 +1544,7 @@ function renderRequests() {
         <div class="pill-row">
           <span class="pill ${getStatusPillClass(status)}">${escapeHtml(getStatusLabel(status))}</span>
           <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+          <span class="pill ${getQuoteStatusPillClass(quoteStatus)}">${escapeHtml(getQuoteStatusLabel(quoteStatus))}</span>
           <span class="pill info">${escapeHtml(safeText(request.paymentStatus,"not_collected").replaceAll("_"," "))}</span>
           <span class="pill type">${escapeHtml(eventType)}</span>
           ${plannerBadge}
@@ -1419,6 +1567,8 @@ function renderRequests() {
         </div>
 
         ${vendorBox}
+
+        ${isWithdrawn ? "" : quoteBox}
 
         ${response ? `
           <div class="response-box">
@@ -1447,7 +1597,7 @@ function renderRequests() {
           </div>
         ` : `
           <div class="request-actions">
-            <button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">Available</button>
+            <button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">${quote ? "Update Price" : "Send Price"}</button>
             <button class="btn-warning" type="button" data-respond-request="${requestId}" data-response-status="needs_info">Need Info</button>
             <button class="btn-danger" type="button" data-respond-request="${requestId}" data-response-status="declined">Decline</button>
             ${conversationId ? `<button class="btn-secondary" type="button" data-message-request="${requestId}">Message ${escapeHtml(ownerLabel)}</button>` : ""}
@@ -1477,10 +1627,36 @@ function openResponseModal(requestId, status) {
   }
 
   pendingResponseRequestId = decodeURIComponent(requestId);
-  document.getElementById("responseStatusSelect").value = status || "available";
-  document.getElementById("responseNote").value = "";
+
+  const request = bookingRequests.find((item) => item.id === pendingResponseRequestId);
+  const existingQuote = request ? getQuoteForRequest(request) : null;
+
+  const statusSelect = document.getElementById("responseStatusSelect");
+  statusSelect.value = status || "available";
+
+  document.getElementById("responseNote").value = safeText(existingQuote?.note, "");
+  document.getElementById("quoteAmountInput").value = request ? suggestedQuoteAmount(request) : "";
+
+  syncQuoteFieldVisibility();
+
   document.getElementById("responseModal").classList.add("show");
   document.getElementById("responseModal").setAttribute("aria-hidden", "false");
+}
+
+/** The price box only makes sense when the vendor is saying yes. */
+function syncQuoteFieldVisibility() {
+  const isAvailable = document.getElementById("responseStatusSelect").value === "available";
+
+  document.getElementById("quoteAmountField").hidden = !isAvailable;
+  document.getElementById("quoteAmountHint").hidden = !isAvailable;
+
+  document.getElementById("responseNoteLabel").textContent = isAvailable
+    ? "What this price includes"
+    : "Optional note";
+
+  document.getElementById("responseNote").placeholder = isAvailable
+    ? "For example: 4 hours of coverage, travel within 30 miles, two artists on site."
+    : "Add a short response...";
 }
 
 function closeResponseModal() {
@@ -1489,7 +1665,7 @@ function closeResponseModal() {
   document.getElementById("responseModal").setAttribute("aria-hidden", "true");
 }
 
-async function ensureOwnerConversation(request, responseStatus = "", responseNote = "") {
+async function ensureOwnerConversation(request, responseStatus = "", responseNote = "", quoteAmount = 0) {
   const ownerId = getRequestOwnerId(request);
   const ownerName = getRequestOwnerName(request);
   const ownerRole = getRequestOwnerRole(request);
@@ -1509,10 +1685,15 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
   }
 
   const responseLabel = responseStatus ? getResponseLabel(responseStatus) : "";
+
+  // When there is a price, lead the message with it. That number is the thing
+  // the customer has to decide about, so it should not be buried in a note.
+  const headline = Number(quoteAmount) > 0
+    ? `Quote: ${formatMoney(quoteAmount)}`
+    : `${responseLabel}.`;
+
   const messageText = responseStatus
-    ? responseNote
-      ? `${responseLabel}: ${responseNote}`
-      : `${responseLabel}.`
+    ? [headline, responseNote].filter(Boolean).join(" ")
     : "";
 
   const conversationPayload = {
@@ -1571,11 +1752,12 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
       senderId: vendorId,
       senderName: vendorName,
       senderRole: "vendor",
-      messageType: "vendor_response",
+      messageType: Number(quoteAmount) > 0 ? "vendor_quote" : "vendor_response",
       bookingRequestId: requestId,
       eventId,
       listingId,
       responseStatus,
+      quoteAmount: Number(quoteAmount) > 0 ? Number(quoteAmount) : null,
       readBy: {
         [vendorId]: true
       },
@@ -1586,7 +1768,7 @@ async function ensureOwnerConversation(request, responseStatus = "", responseNot
   return conversationId;
 }
 
-async function createOwnerResponseNotification(request, responseStatus, responseNote, conversationId) {
+async function createOwnerResponseNotification(request, responseStatus, responseNote, conversationId, quoteAmount = 0) {
   try {
     const eventName = safeText(request.eventDetails?.eventName || request.eventName, "your event request");
     const vendorName = getVendorName();
@@ -1596,18 +1778,24 @@ async function createOwnerResponseNotification(request, responseStatus, response
 
     if (!recipientId) return;
 
+    // A price is the thing they have to act on, so it goes first.
+    const summary = Number(quoteAmount) > 0
+      ? `${vendorName} sent a price: ${formatMoney(quoteAmount)}${responseNote ? `. ${responseNote}` : ""}`
+      : `${vendorName} responded: ${responseLabel}${responseNote ? `. ${responseNote}` : ""}`;
+
     await addDoc(collection(db, "notifications"), {
       recipientId,
       userId: recipientId,
       recipientRole,
 
-      type: "vendor_response",
-      typeLabel: "Vendor Response",
+      type: Number(quoteAmount) > 0 ? "vendor_quote" : "vendor_response",
+      typeLabel: Number(quoteAmount) > 0 ? "Vendor Quote" : "Vendor Response",
       category: "Booking Request",
 
-      title: "Vendor responded to your request",
-      body: `${vendorName} responded: ${responseLabel}${responseNote ? `. ${responseNote}` : ""}`,
-      message: `${vendorName} responded: ${responseLabel}${responseNote ? `. ${responseNote}` : ""}`,
+      title: Number(quoteAmount) > 0 ? "A vendor sent you a price" : "Vendor responded to your request",
+      body: summary,
+      message: summary,
+      quoteAmount: Number(quoteAmount) > 0 ? Number(quoteAmount) : null,
 
       sourceId: conversationId,
       sourceCollection: "conversations",
@@ -1704,6 +1892,50 @@ async function openMessageThreadForRequest(encodedRequestId) {
   }
 }
 
+/**
+ * Saves this vendor's price for a booking.
+ *
+ * Every write puts the quote back to "sent", so a vendor who changes their
+ * number cannot have an old acceptance carried over onto the new one. The
+ * customer has to agree to whatever is showing now.
+ */
+async function saveQuote(request, amount, note, conversationId) {
+  const requestId = safeText(request.id, "");
+  const vendorId = currentUser.uid;
+  const quoteId = makeQuoteId(requestId, vendorId);
+  const item = getVendorItemsForCurrentVendor(request)[0] || {};
+
+  const payload = {
+    quoteKey: quoteId,
+    bookingRequestId: requestId,
+    vendorId,
+    vendorName: getVendorName(),
+    requestOwnerId: getRequestOwnerId(request),
+    customerId: safeText(request.customerId, ""),
+    plannerId: safeText(request.plannerId, ""),
+    eventId: safeText(request.eventId || request.eventDetails?.id, ""),
+    eventName: safeText(request.eventDetails?.eventName || request.eventName, "Event"),
+    listingId: safeText(item.listingId, ""),
+    listingTitle: safeText(item.listingTitle || item.title, "Event Service"),
+    conversationId: safeText(conversationId, ""),
+    amount: Number(amount),
+    currency: "usd",
+    note: safeText(note, ""),
+    status: "sent",
+    updatedAt: serverTimestamp()
+  };
+
+  const existing = getQuoteForRequest(request);
+
+  if (!existing) {
+    payload.createdAt = serverTimestamp();
+  }
+
+  await setDoc(doc(db, "quotes", quoteId), payload, { merge: true });
+
+  quotesByRequestId[requestId] = { id: quoteId, ...payload };
+}
+
 async function confirmResponse() {
   if (isBusy || !pendingResponseRequestId) return;
 
@@ -1724,6 +1956,21 @@ async function confirmResponse() {
   const responseStatus = document.getElementById("responseStatusSelect").value;
   const responseNote = safeText(document.getElementById("responseNote").value, "");
   const responseLabel = getResponseLabel(responseStatus);
+  const quoteAmount = Number(document.getElementById("quoteAmountInput").value || 0);
+
+  // Saying you are available without saying what you charge leaves the customer
+  // with nothing to accept, so the price is required on that answer.
+  if (responseStatus === "available") {
+    if (!(quoteAmount > 0)) {
+      showStatus("Enter the price you are charging for this booking.", "error");
+      return;
+    }
+
+    if (quoteAmount > 100000) {
+      showStatus("That price is higher than RentEvent can take in one booking. Please contact support.", "error");
+      return;
+    }
+  }
 
   try {
     isBusy = true;
@@ -1737,8 +1984,12 @@ async function confirmResponse() {
       respondedAt: new Date().toISOString()
     };
 
-    const conversationId = await ensureOwnerConversation(request, responseStatus, responseNote);
+    const conversationId = await ensureOwnerConversation(request, responseStatus, responseNote, responseStatus === "available" ? quoteAmount : 0);
     const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+
+    if (responseStatus === "available") {
+      await saveQuote(request, quoteAmount, responseNote, conversationId);
+    }
 
     const updatedResponses = {
       ...(request.vendorResponses || {}),
@@ -1778,11 +2029,17 @@ async function confirmResponse() {
     request.vendorConversationIds = updatedConversationIds;
     request.vendors = updatedVendors;
 
-    await createOwnerResponseNotification(request, responseStatus, responseNote, conversationId);
+    await createOwnerResponseNotification(request, responseStatus, responseNote, conversationId, responseStatus === "available" ? quoteAmount : 0);
 
     closeResponseModal();
     renderRequests();
-    showStatus(`${responseLabel} response saved. Opening message thread...`, "success");
+
+    showStatus(
+      responseStatus === "available"
+        ? `Quote for ${formatMoney(quoteAmount)} sent. Opening message thread...`
+        : `${responseLabel} response saved. Opening message thread...`,
+      "success"
+    );
 
     const eventId = safeText(request.eventId || request.eventDetails?.id, "");
     const eventPart = eventId ? `&eventId=${encodeURIComponent(eventId)}` : "";
@@ -2002,11 +2259,17 @@ async function loadBookingRequests() {
   bookingRequests = requests;
   renderRequests();
 
+  // Prices live in their own collection, so they are fetched separately and the
+  // list is drawn again once they arrive.
+  await loadQuotesForRequests();
+  renderRequests();
+
   if (!bookingRequests.length) {
     showStatus("No connected booking requests found yet. When a customer submits a request with your listing, it will appear here.", "info");
   }
 }
 
+document.getElementById("responseStatusSelect").addEventListener("change", syncQuoteFieldVisibility);
 document.getElementById("cancelResponseBtn").addEventListener("click", closeResponseModal);
 document.getElementById("confirmResponseBtn").addEventListener("click", confirmResponse);
 
