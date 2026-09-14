@@ -1438,7 +1438,7 @@ async function startConversation() {
   const vendorId = safeText(currentListing.vendorId, "");
 
   if (!vendorId) {
-    showStatus("This listing is missing vendor information, so messaging cannot start yet.", "error");
+    showStatus("We cannot start a message for this listing right now. Try another vendor, or contact support.", "error");
     return;
   }
 
@@ -1558,7 +1558,7 @@ async function startConversation() {
   } catch (error) {
     const rawMessage = safeText(error.message, "Could not open this vendor message thread.");
     const friendlyMessage = rawMessage.includes("Missing or insufficient permissions")
-      ? "Messaging is protected, but Firebase rules are still blocking this general inquiry. We may need to update the Firestore rule for conversations."
+      ? "We could not open a message with this vendor right now. Please try again, or contact support if it keeps happening."
       : rawMessage;
 
     showStatus(friendlyMessage, "error");

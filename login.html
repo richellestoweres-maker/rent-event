@@ -470,6 +470,30 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+/**
+ * Firebase error codes are not written for people. A mistyped password should
+ * not show a customer "Firebase: Error (auth/invalid-credential)", which is
+ * both confusing and tells them which backend we run on.
+ */
+function friendlyAuthError(error) {
+  const code = (error && error.code) || "";
+
+  const map = {
+    "auth/invalid-credential": "That email and password do not match. Try again, or reset your password.",
+    "auth/wrong-password": "That email and password do not match. Try again, or reset your password.",
+    "auth/user-not-found": "We could not find an account with that email.",
+    "auth/invalid-email": "That does not look like a valid email address.",
+    "auth/email-already-in-use": "There is already an account with this email. Try signing in instead.",
+    "auth/weak-password": "Please choose a password with at least 6 characters.",
+    "auth/too-many-requests": "Too many tries. Please wait a minute and try again.",
+    "auth/network-request-failed": "We could not reach RentEvent. Check your connection and try again.",
+    "auth/user-disabled": "This account has been disabled. Contact support and we will help."
+  };
+
+  return map[code] || "Something went wrong on our end. Please try again.";
+}
+
 const db = getFirestore(app);
 
 function showMessage(text, type = "") {
@@ -589,7 +613,7 @@ window.login = async function () {
     await routeUser(userCredential.user);
 
   } catch (error) {
-    showMessage(error.message, "error");
+    showMessage(friendlyAuthError(error), "error");
   } finally {
     loginBtn.disabled = false;
     loginBtn.textContent = "Sign In";
@@ -631,7 +655,7 @@ async function sendResetLink() {
 
     showResetStatus("Password reset email sent. Check your inbox and spam folder.", "success");
   } catch (error) {
-    showResetStatus(error.message, "error");
+    showResetStatus(friendlyAuthError(error), "error");
   } finally {
     sendBtn.disabled = false;
     sendBtn.textContent = "Send Link";

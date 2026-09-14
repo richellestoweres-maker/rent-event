@@ -815,7 +815,7 @@
       </div>
     </section>
 
-    <a class="promo-card" href="vendor-onboarding.html" id="rolePromoCard">
+    <a class="promo-card" href="vendor-profile.html" id="rolePromoCard">
       <div>
         <h3 id="rolePromoTitle">Become a vendor</h3>
         <p id="rolePromoText">List your event services and connect with customers planning real events.</p>
@@ -839,7 +839,7 @@
             <span class="menu-arrow">›</span>
           </a>
 
-          <a class="menu-item" href="profile-public.html">
+          <a class="menu-item" href="account-settings.html">
             <span class="menu-icon">P</span>
             <span class="menu-copy">
               <span>View profile</span>
@@ -1193,14 +1193,14 @@ function renderRoleCards(userData, activeRole) {
       role: "vendor",
       title: "Vendor Profile",
       description: "Manage your business profile, listings, service areas, and booking opportunities.",
-      href: allowedRoles.includes("vendor") ? "vendor-profile.html" : "vendor-onboarding.html",
+      href: allowedRoles.includes("vendor") ? "vendor-profile.html" : "vendor-profile.html",
       icon: "V"
     },
     {
       role: "planner",
       title: "Planner Profile",
       description: "Manage client events, preferred vendors, planning tools, and planner details.",
-      href: allowedRoles.includes("planner") ? "planner-profile.html" : "planner-onboarding.html",
+      href: allowedRoles.includes("planner") ? "planner-profile.html" : "planner-profile.html",
       icon: "P"
     }
   ];
@@ -1533,7 +1533,7 @@ function applyRoleLayout(userData, activeRole) {
     promoText.textContent = "Switch to vendor mode or update your vendor profile anytime.";
     promoIcon.textContent = "V";
   } else {
-    promoCard.href = "vendor-onboarding.html";
+    promoCard.href = "vendor-profile.html";
     promoTitle.textContent = "Become a vendor";
     promoText.textContent = "List your event services and connect with customers planning real events.";
     promoIcon.textContent = "V";

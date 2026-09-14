@@ -825,7 +825,7 @@
             <label for="image-url">Main Photo URL</label>
             <input id="image-url" class="input" type="url" placeholder="Paste a public image link here" />
             <p class="helper-text">
-              For now, paste a public image link. Later, this will become a real upload button when storage is added.
+              Paste a link to a photo of your work. Good photos are the single biggest thing that gets you booked.
             </p>
 
             <div class="image-preview-wrap" id="imagePreviewWrap">
@@ -1508,7 +1508,7 @@ onAuthStateChanged(auth, async (user) => {
 
   if (activeRole === "admin") {
     document.getElementById("backLink").href = "admin-dashboard.html";
-    showStatus("Admin preview is allowed, but publishing should be tested with a real vendor account.", "info");
+    showStatus("You are viewing this as an admin. Switch to a vendor account to publish a listing.", "info");
   }
 
   if (userData.accountStatus === "deactivated" || userData.accountStatus === "pending_deletion") {

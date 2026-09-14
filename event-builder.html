@@ -2474,7 +2474,7 @@ async function openMessageForListing(listingId) {
   const vendorId = safeText(vendor.vendorId, "");
 
   if (!vendorId) {
-    showStatus("This vendor listing is missing vendor information.", "error");
+    showStatus("We cannot open a message for this vendor right now. Try another vendor, or contact support.", "error");
     return;
   }
 

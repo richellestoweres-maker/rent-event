@@ -770,7 +770,7 @@
                 <div>
                   <label for="emailInput">Email</label>
                   <input id="emailInput" class="input" type="email" placeholder="you@email.com" />
-                  <p class="helper-text">This updates your RentEvent profile record. Changing login email can be added later with Firebase Auth email verification.</p>
+                  <p class="helper-text">This is the email we use to reach you about bookings and requests. To change the email you sign in with, contact support and we will help you switch it safely.</p>
                 </div>
 
                 <div>
@@ -837,7 +837,7 @@
             <div class="toggle-card">
               <div>
                 <h3>SMS updates</h3>
-                <p>Allow RentEvent to send text updates when SMS features are connected.</p>
+                <p>Allow RentEvent to send text updates about your bookings. We are rolling this out soon.</p>
               </div>
 
               <label class="switch">
@@ -1594,7 +1594,7 @@ async function requestPermanentDeletion() {
   if (!currentUser || !currentUserData) return;
 
   const confirmed = confirm(
-    "Request permanent deletion? This will mark your account for deletion review and hide or pause account activity. This should also cancel paid subscriptions when billing is connected."
+    "Request permanent deletion? This will mark your account for deletion review and hide or pause account activity. If you have a paid plan, please cancel it first so you are not billed again."
   );
 
   if (!confirmed) return;
@@ -1648,7 +1648,7 @@ async function requestPermanentDeletion() {
 function openBillingPortalPlaceholder() {
   showStatus(
     "billingStatus",
-    "Stripe billing portal is not connected yet. When Stripe is added, this button will open billing management for upgrades, downgrades, cancellations, cards, and invoices.",
+    "Billing is not open on your account yet. When paid plans launch, you will manage your card, invoices and cancellations right here.",
     ""
   );
 }
@@ -1656,7 +1656,7 @@ function openBillingPortalPlaceholder() {
 function openPlansPlaceholder() {
   showStatus(
     "billingStatus",
-    "Plan selection is not connected yet. Later this can route to billing.html, pricing.html, or open a Stripe checkout flow.",
+    "Paid plans are not available yet. We will let you know the moment they open, and nothing changes on your account until then.",
     ""
   );
 }
