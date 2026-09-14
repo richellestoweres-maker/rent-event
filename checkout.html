@@ -1149,11 +1149,16 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+/**
+ * Money on this page is what somebody's card gets charged, so it shows cents.
+ * Rounding to whole dollars here is what made a $1 booking read "Total $1"
+ * while Stripe actually took $1.43.
+ */
 function formatMoney(value) {
   const number = Number(value || 0);
   return `$${number.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   })}`;
 }
 
@@ -1593,13 +1598,20 @@ function updateTotals() {
   setText("heroVendorCount", `${vendorCount} Vendor${vendorCount === 1 ? "" : "s"}`);
   setText("heroTotal", `${formatMoney(totals.totalDue)} Total`);
 
-  if (vendorsAwaitingQuote.length && !isAdminPreview() && !lastBookingRequestId) {
+  if (isAdminPreview() || lastBookingRequestId) {
+    // Leave whatever the page is already saying about the request it just sent.
+  } else if (vendorsAwaitingQuote.length) {
     const names = vendorsAwaitingQuote.join(", ");
 
     setCheckoutStatus(
       vendorsAwaitingQuote.length === 1
         ? `Send your request first and ${names} will reply with a price. Nothing is charged until you accept it.`
         : `Send your request first and each vendor will reply with a price. Nothing is charged until you accept them. Waiting on: ${names}.`,
+      "info"
+    );
+  } else if (vendorCount > 0) {
+    setCheckoutStatus(
+      `You have agreed ${formatMoney(totals.vendorSubtotal)} with your vendors. Continuing charges ${formatMoney(totals.totalDue)} today, and they are paid two days after your event.`,
       "info"
     );
   }
