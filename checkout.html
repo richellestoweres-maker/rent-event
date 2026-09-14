@@ -994,8 +994,8 @@
         <div class="checkout-card">
           <div class="price-row">
             <div class="price-copy">
-              <p class="price-label">Vendor Subtotal</p>
-              <p class="price-note">Total of selected vendor starting prices.</p>
+              <p class="price-label" id="subtotalLabel">Vendor Subtotal</p>
+              <p class="price-note" id="subtotalNote">What your vendors are charging.</p>
             </div>
             <div class="price-value" id="vendorSubtotal">$0</div>
           </div>
@@ -1003,29 +1003,29 @@
           <div class="price-row">
             <div class="price-copy">
               <p class="price-label">RentEvent Service Fee</p>
-              <p class="price-note">Estimated 10% customer service fee for marketplace support.</p>
+              <p class="price-note">10% service fee for booking, payment protection, and support.</p>
             </div>
             <div class="price-value" id="serviceFee">$0</div>
           </div>
 
           <div class="price-row">
             <div class="price-copy">
-              <p class="price-label">Processing Estimate</p>
-              <p class="price-note">Card processing fee. This is the amount you will be charged, it does not change at checkout.</p>
+              <p class="price-label">Card Processing</p>
+              <p class="price-note">What the card network charges. It does not change at checkout.</p>
             </div>
             <div class="price-value" id="processingFee">$0</div>
           </div>
 
           <div class="total-row">
             <div>
-              <p class="total-label">Estimated Total</p>
-              <p class="total-note">Payment is securely processed through Stripe and connected to your RentEvent request.</p>
+              <p class="total-label" id="totalLabel">Total</p>
+              <p class="total-note">Paid securely through Stripe. Your vendors are paid two days after your event.</p>
             </div>
             <div class="total-value" id="totalDue">$0</div>
           </div>
 
           <div class="status-message info" id="checkoutStatus">
-            When you continue, we send your request to each vendor, open a conversation with them, and take you to secure payment.
+            Send your request and each vendor replies with a price. Nothing is charged until you accept one.
           </div>
         </div>
       </section>
@@ -1532,14 +1532,32 @@ function getCategoryLine(source) {
 }
 
 function calculateTotals() {
+  // Each vendor is counted once, at the price they quoted, not at whatever
+  // starting price their listing advertises.
+  const counted = new Set();
+
   const vendorSubtotal = selectedVendors.reduce((total, vendor) => {
+    const vendorId = safeText(vendor.vendorId, "");
+    const quote = vendorId ? acceptedQuotes[vendorId] : null;
+
+    if (quote) {
+      if (counted.has(vendorId)) return total;
+      counted.add(vendorId);
+      return total + Number(quote.amount || 0);
+    }
+
     return total + Number(vendor.priceNumber || 0);
   }, 0);
 
   const serviceFee = vendorSubtotal * SERVICE_FEE_PERCENT;
   const baseBeforeProcessing = vendorSubtotal + serviceFee;
+
+  // Stripe takes its cut out of the final amount charged, not out of the
+  // subtotal, so this solves for the total that still leaves the full service
+  // fee behind. It is the same sum the server runs, which is what makes the
+  // number on screen match the number on the card.
   const processingFee = baseBeforeProcessing > 0
-    ? (baseBeforeProcessing * PROCESSING_PERCENT) + PROCESSING_FIXED
+    ? ((baseBeforeProcessing + PROCESSING_FIXED) / (1 - PROCESSING_PERCENT)) - baseBeforeProcessing
     : 0;
 
   const totalDue = baseBeforeProcessing + processingFee;
@@ -1562,8 +1580,29 @@ function updateTotals() {
   setText("processingFee", formatMoney(totals.processingFee));
   setText("totalDue", formatMoney(totals.totalDue));
   setText("bottomTotal", formatMoney(totals.totalDue));
+  // Before a vendor quotes, these numbers are only the listing starting prices,
+  // so say so rather than showing a total that looks settled.
+  const awaitingPrices = vendorsAwaitingQuote.length > 0;
+
+  setText("subtotalLabel", awaitingPrices ? "Estimated Vendor Subtotal" : "Vendor Subtotal");
+  setText("subtotalNote", awaitingPrices
+    ? "Based on listed starting prices. Your vendors will send their real price."
+    : "What your vendors are charging.");
+  setText("totalLabel", awaitingPrices ? "Estimated Total" : "Total");
+
   setText("heroVendorCount", `${vendorCount} Vendor${vendorCount === 1 ? "" : "s"}`);
   setText("heroTotal", `${formatMoney(totals.totalDue)} Total`);
+
+  if (vendorsAwaitingQuote.length && !isAdminPreview() && !lastBookingRequestId) {
+    const names = vendorsAwaitingQuote.join(", ");
+
+    setCheckoutStatus(
+      vendorsAwaitingQuote.length === 1
+        ? `Send your request first and ${names} will reply with a price. Nothing is charged until you accept it.`
+        : `Send your request first and each vendor will reply with a price. Nothing is charged until you accept them. Waiting on: ${names}.`,
+      "info"
+    );
+  }
 
   if (isAdminPreview()) {
     continueBtn.disabled = true;
@@ -1576,7 +1615,13 @@ function updateTotals() {
     continueBtn.textContent = "Add Vendor";
   } else if (lastBookingRequestId) {
     continueBtn.disabled = true;
-    continueBtn.textContent = STRIPE_ENABLED ? "Checkout Open" : "Request Submitted";
+    continueBtn.textContent = vendorsAwaitingQuote.length
+      ? "Request Sent"
+      : STRIPE_ENABLED ? "Checkout Open" : "Request Submitted";
+  } else if (vendorsAwaitingQuote.length) {
+    // Nothing to pay for yet, but the vendors still need to hear from them.
+    continueBtn.disabled = false;
+    continueBtn.textContent = "Send Request";
   } else if (currentUserData?.accountStatus === "deactivated" || currentUserData?.accountStatus === "pending_deletion") {
     continueBtn.disabled = true;
     continueBtn.textContent = "Account Inactive";
@@ -1940,6 +1985,76 @@ function buildBookingRequestPayload() {
   return payload;
 }
 
+/* ------------------------------------------------------------------ */
+/* Quotes                                                              */
+/*                                                                     */
+/* Nothing can be paid for until every vendor has sent a price and the  */
+/* customer has accepted it. The server checks this too and refuses the */
+/* charge otherwise, so this is here to explain the situation rather    */
+/* than to enforce it.                                                 */
+/* ------------------------------------------------------------------ */
+
+let acceptedQuotes = {};
+let vendorsAwaitingQuote = [];
+
+function makeQuoteId(requestId, vendorId) {
+  return [requestId, vendorId]
+    .map((part) => safeText(part, "").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 200))
+    .join("__");
+}
+
+/**
+ * The booking request id is worked out from the event and the vendors rather
+ * than handed out by Firestore, so the same selection always lands on the same
+ * booking. That is what lets this page find the quotes before anything is
+ * submitted.
+ */
+function predictedBookingRequestId() {
+  if (!activeEventId || !currentUser) return "";
+
+  const ownerId = isPlannerView()
+    ? safeText(currentEventData?.plannerId || currentUser.uid, "")
+    : safeText(currentEventData?.customerId || currentUser.uid, "");
+
+  const vendorIds = Array.from(new Set(
+    selectedVendors.map((vendor) => safeText(vendor.vendorId || vendor.ownerId || vendor.userId, "")).filter(Boolean)
+  )).sort();
+
+  if (!ownerId || !vendorIds.length) return "";
+
+  return makeSafeId(`${activeEventId}__${ownerId}__${vendorIds.join("-")}`);
+}
+
+async function loadAcceptedQuotes() {
+  acceptedQuotes = {};
+  vendorsAwaitingQuote = [];
+
+  const requestId = predictedBookingRequestId();
+
+  if (!requestId) return;
+
+  for (const vendor of selectedVendors) {
+    const vendorId = safeText(vendor.vendorId || vendor.ownerId || vendor.userId, "");
+    if (!vendorId || acceptedQuotes[vendorId]) continue;
+
+    const vendorName = safeText(vendor.vendorName || vendor.listingTitle, "This vendor");
+
+    try {
+      const snap = await getDoc(doc(db, "quotes", makeQuoteId(requestId, vendorId)));
+      const quote = snap.exists() ? snap.data() : null;
+
+      if (quote && quote.status === "accepted" && Number(quote.amount) > 0) {
+        acceptedQuotes[vendorId] = quote;
+      } else {
+        vendorsAwaitingQuote.push(vendorName);
+      }
+    } catch (error) {
+      console.warn("Quote could not be read for", vendorId, error.message);
+      vendorsAwaitingQuote.push(vendorName);
+    }
+  }
+}
+
 function makeSafeId(value) {
   return safeText(value, "item")
     .replace(/[^a-zA-Z0-9_-]/g, "_")
@@ -2052,20 +2167,45 @@ async function createConversationForVendor(requestId, payload, vendor) {
     updatedAt: serverTimestamp()
   };
 
-  await setDoc(doc(db, "conversations", conversationId), conversationPayload, { merge: true });
+  const conversationRef = doc(db, "conversations", conversationId);
 
-  await setDoc(doc(db, "conversations", conversationId, "messages", "booking_intro"), {
-    text: firstMessage,
-    senderId: ownerId,
-    senderName: ownerName,
-    senderRole: ownerRole,
-    systemGenerated: true,
-    messageType: "booking_request",
-    bookingRequestId: requestId,
-    eventId: payload.eventId,
-    listingId: vendor.listingId || "",
-    createdAt: serverTimestamp()
-  });
+  // Booking request ids are worked out from the event and the vendors now, so
+  // submitting the same request a second time lands on this exact same
+  // conversation. The intro message always had the id "booking_intro", and
+  // rewriting an existing message counts as an update, which only an admin is
+  // allowed to do. That threw a permissions error on every repeat submission
+  // and the vendor silently lost their message thread. Write the intro only
+  // when the thread is genuinely new.
+  let threadAlreadyExists = false;
+
+  try {
+    const existing = await getDoc(conversationRef);
+    threadAlreadyExists = existing.exists();
+  } catch (error) {
+    console.warn("Could not check for an existing thread:", error.message);
+  }
+
+  if (threadAlreadyExists) {
+    // Keep the original start date instead of resetting it every time.
+    delete conversationPayload.createdAt;
+  }
+
+  await setDoc(conversationRef, conversationPayload, { merge: true });
+
+  if (!threadAlreadyExists) {
+    await setDoc(doc(db, "conversations", conversationId, "messages", "booking_intro"), {
+      text: firstMessage,
+      senderId: ownerId,
+      senderName: ownerName,
+      senderRole: ownerRole,
+      systemGenerated: true,
+      messageType: "booking_request",
+      bookingRequestId: requestId,
+      eventId: payload.eventId,
+      listingId: vendor.listingId || "",
+      createdAt: serverTimestamp()
+    });
+  }
 
   return conversationId;
 }
@@ -2239,8 +2379,22 @@ async function startStripeEmbeddedCheckout(bookingRequestId, payload) {
 
 async function createConversationsForBookingRequest(requestId, payload) {
   const vendors = Array.isArray(payload.vendors) ? payload.vendors : [];
-  const conversationMap = {};
   const updatedVendors = [];
+
+  // Start from the ids this booking already has. If one vendor's thread fails,
+  // the others keep theirs instead of the whole list being replaced by nothing.
+  let conversationMap = {};
+
+  try {
+    const existingSnap = await getDoc(doc(db, "bookingRequests", requestId));
+    const existingIds = existingSnap.exists() ? existingSnap.data().vendorConversationIds : null;
+
+    if (existingIds && typeof existingIds === "object") {
+      conversationMap = { ...existingIds };
+    }
+  } catch (error) {
+    console.warn("Could not read existing conversation ids:", error.message);
+  }
 
   for (const vendor of vendors) {
     const vendorId = safeText(vendor.vendorId, "");
@@ -2324,11 +2478,30 @@ async function submitBookingRequest() {
       createRequesterConfirmationNotification(bookingRef.id, payload)
     ]);
 
-    if (STRIPE_ENABLED) {
+    // Re-read the prices in case a vendor answered while this page was open.
+    await loadAcceptedQuotes();
+
+    if (STRIPE_ENABLED && !vendorsAwaitingQuote.length) {
       button.textContent = "Opening Checkout...";
       await startStripeEmbeddedCheckout(bookingRef.id, payload);
       button.disabled = true;
       button.textContent = "Checkout Open";
+      updateTotals();
+      return;
+    }
+
+    if (vendorsAwaitingQuote.length) {
+      document.getElementById("successSection").style.display = "block";
+      document.getElementById("successMessage").textContent =
+        "Your request is on its way. Each vendor will send you a price, and you can talk through the details with them in Messages first. Once you accept a price, come back to pay.";
+
+      setCheckoutStatus("Request sent. You will find a conversation with each vendor in Messages, and their prices will appear in My Requests.", "success");
+
+      document.getElementById("successSection").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
       updateTotals();
       return;
     }
@@ -2389,6 +2562,11 @@ async function loadPage() {
   }
 
   await loadSelectedVendors();
+
+  // Prices come from the vendors, so they are read here and the totals redrawn
+  // once they are in hand.
+  await loadAcceptedQuotes();
+  updateTotals();
 
   if (currentUserData?.accountStatus === "deactivated" || currentUserData?.accountStatus === "pending_deletion") {
     setCheckoutStatus("This account is not currently active. Checkout actions are disabled.", "error");
