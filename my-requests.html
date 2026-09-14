@@ -1164,9 +1164,15 @@ async function answerQuote(requestId, vendorId, answer) {
   }
 }
 
+/** Whole dollars read fine for a price, but never hide cents that exist. */
 function formatMoney(value) {
   const number = Number(value || 0);
-  return `$${Math.round(number).toLocaleString()}`;
+  const hasCents = Math.abs(number - Math.round(number)) > 0.004;
+
+  return `$${number.toLocaleString(undefined, {
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: 2
+  })}`;
 }
 
 function formatTime(value) {
@@ -1688,7 +1694,7 @@ function renderQuoteForVendor(request, vendorId) {
       <span class="quote-amount">${escapeHtml(amount)}</span>
       <span class="quote-caption">${escapeHtml(caption)}</span>
     </div>
-    ${note ? `<p class="response-note">${escapeHtml(note)}</p>` : ""}
+    ${note && note !== safeText(getVendorResponse(request, vendorId)?.note, "") ? `<p class="response-note">${escapeHtml(note)}</p>` : ""}
     ${quote.status === "accepted" && !paid ? `<p class="response-note">Accepted. Pay whenever you are ready and this vendor is paid two days after your event.</p>` : ""}
     ${actions}
   `;
