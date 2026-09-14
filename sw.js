@@ -5,7 +5,7 @@
      - Everything live (Firebase, Stripe, Cloud Functions): never touched
    Bump CACHE_VERSION on every deploy so old shells are dropped. */
 
-const CACHE_VERSION = "rentevent-v3";
+const CACHE_VERSION = "rentevent-v4";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
