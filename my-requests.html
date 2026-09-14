@@ -344,6 +344,34 @@
     .pill.declined,
     .pill.withdrawn { background: var(--red-soft); color: var(--red-text); }
 
+    .quote-line {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 10px 0 2px;
+    }
+
+    .quote-amount {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .quote-caption {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .quote-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
     .request-grid {
       display: grid;
       gap: 10px;
@@ -995,6 +1023,147 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+/* ------------------------------------------------------------------ */
+/* Quotes                                                              */
+/*                                                                     */
+/* The vendor sets the price, and this is where the customer agrees to  */
+/* it. Accepting is the only thing a customer can change about a quote, */
+/* which is what makes the price safe to charge.                       */
+/* ------------------------------------------------------------------ */
+
+let quotesByKey = {};
+
+function makeQuoteId(requestId, vendorId) {
+  return [requestId, vendorId]
+    .map((part) => safeText(part, "").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 200))
+    .join("__");
+}
+
+function getQuote(requestId, vendorId) {
+  return quotesByKey[makeQuoteId(requestId, vendorId)] || null;
+}
+
+/** True when every vendor on this request has a price the customer accepted. */
+function allQuotesAccepted(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const withIds = vendors.filter((vendor) => safeText(vendor.vendorId, ""));
+
+  if (!withIds.length) return false;
+
+  return withIds.every((vendor) => {
+    const quote = getQuote(request.id, vendor.vendorId);
+    return quote && quote.status === "accepted";
+  });
+}
+
+function acceptedQuoteTotal(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+
+  return vendors.reduce((total, vendor) => {
+    const quote = getQuote(request.id, safeText(vendor.vendorId, ""));
+    return total + (quote && quote.status === "accepted" ? Number(quote.amount || 0) : 0);
+  }, 0);
+}
+
+async function loadQuotesForRequests() {
+  const map = {};
+
+  for (const request of bookingRequests) {
+    const requestId = safeText(request.id, "");
+    const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+
+    for (const vendor of vendors) {
+      const vendorId = safeText(vendor.vendorId, "");
+      if (!requestId || !vendorId) continue;
+
+      const quoteId = makeQuoteId(requestId, vendorId);
+
+      try {
+        const snap = await getDoc(doc(db, "quotes", quoteId));
+        if (snap.exists()) map[quoteId] = { id: snap.id, ...snap.data() };
+      } catch (error) {
+        console.warn("Quote could not be read:", quoteId, error.message);
+      }
+    }
+  }
+
+  quotesByKey = map;
+}
+
+/** Tells the vendor what the customer decided, so they are not left guessing. */
+async function notifyVendorAboutQuoteAnswer(requestId, vendorId, quote, answer) {
+  const request = bookingRequests.find((item) => item.id === requestId) || {};
+  const eventName = safeText(request.eventDetails?.eventName || request.eventName || quote.eventName, "an event");
+
+  try {
+    await addDoc(collection(db, "notifications"), {
+      recipientId: vendorId,
+      recipientRole: "vendor",
+      type: answer === "accepted" ? "quote_accepted" : "quote_declined",
+      typeLabel: answer === "accepted" ? "Quote Accepted" : "Quote Declined",
+      category: "Booking Request",
+      title: answer === "accepted" ? "Your price was accepted" : "Your price was declined",
+      body: answer === "accepted"
+        ? `Your ${formatMoney(quote.amount)} price for ${eventName} was accepted. You are paid two days after the event.`
+        : `Your ${formatMoney(quote.amount)} price for ${eventName} was declined. You can send a new one.`,
+      sourceId: requestId,
+      sourceCollection: "bookingRequests",
+      sourceLabel: eventName,
+      eventId: getRequestEventId(request),
+      bookingRequestId: requestId,
+      customerId: safeText(request.customerId, ""),
+      plannerId: safeText(request.plannerId, ""),
+      vendorId,
+      read: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Quote answer notification failed:", error.message);
+  }
+}
+
+/** Accepting or declining. The price itself is never touched here. */
+async function answerQuote(requestId, vendorId, answer) {
+  if (isAdminPreview()) {
+    showStatus("Admin preview mode is view-only.", "error");
+    return;
+  }
+
+  const quoteId = makeQuoteId(requestId, vendorId);
+  const quote = quotesByKey[quoteId];
+
+  if (!quote) {
+    showStatus("That quote could not be found. Refresh and try again.", "error");
+    return;
+  }
+
+  try {
+    showStatus(answer === "accepted" ? "Accepting this price..." : "Declining this price...", "info");
+
+    await updateDoc(doc(db, "quotes", quoteId), {
+      status: answer,
+      answeredAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    quotesByKey[quoteId] = { ...quote, status: answer };
+
+    await notifyVendorAboutQuoteAnswer(requestId, vendorId, quote, answer);
+
+    renderRequests();
+
+    showStatus(
+      answer === "accepted"
+        ? "Price accepted. You can pay whenever you are ready."
+        : "Price declined. Message the vendor if you want a different quote.",
+      "success"
+    );
+  } catch (error) {
+    showStatus(`Could not save your answer: ${error.message}`, "error");
+  }
+}
+
 function formatMoney(value) {
   const number = Number(value || 0);
   return `$${Math.round(number).toLocaleString()}`;
@@ -1476,6 +1645,55 @@ function renderEmptyRequests() {
   `;
 }
 
+/**
+ * The price block a customer sees under each vendor.
+ *
+ * Until a vendor sends a price there is nothing to accept, so this says so
+ * plainly instead of showing a booking button that cannot work yet.
+ */
+function renderQuoteForVendor(request, vendorId) {
+  if (!vendorId) return "";
+
+  const requestId = safeText(request.id, "");
+  const quote = getQuote(requestId, vendorId);
+  const paid = safeText(request.paymentStatus, "not_collected") === "paid";
+
+  if (!quote || quote.status === "withdrawn") {
+    return `
+      <div class="quote-line"><span class="quote-caption">Waiting on a price</span></div>
+      <p class="response-note">This vendor has not sent a price yet. Message them with your details so they can quote you.</p>
+    `;
+  }
+
+  const note = safeText(quote.note, "");
+  const amount = formatMoney(quote.amount);
+
+  const caption = quote.status === "accepted"
+    ? "Accepted price"
+    : quote.status === "declined"
+      ? "Declined price"
+      : "Their price";
+
+  const actions = quote.status === "sent" && !paid && !isAdminPreview()
+    ? `
+      <div class="quote-actions">
+        <button class="btn" type="button" data-accept-quote="${escapeHtml(requestId)}" data-quote-vendor="${escapeHtml(vendorId)}">Accept ${escapeHtml(amount)}</button>
+        <button class="btn-danger" type="button" data-decline-quote="${escapeHtml(requestId)}" data-quote-vendor="${escapeHtml(vendorId)}">Decline</button>
+      </div>
+    `
+    : "";
+
+  return `
+    <div class="quote-line">
+      <span class="quote-amount">${escapeHtml(amount)}</span>
+      <span class="quote-caption">${escapeHtml(caption)}</span>
+    </div>
+    ${note ? `<p class="response-note">${escapeHtml(note)}</p>` : ""}
+    ${quote.status === "accepted" && !paid ? `<p class="response-note">Accepted. Pay whenever you are ready and this vendor is paid two days after your event.</p>` : ""}
+    ${actions}
+  `;
+}
+
 function renderRequests() {
   const container = document.getElementById("requestList");
 
@@ -1520,6 +1738,9 @@ function renderRequests() {
     const responseSummary = getVendorResponseSummary(request);
     const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "No reason provided.");
     const plannerBadge = request.plannerId ? `<span class="pill ai">Planner Request</span>` : "";
+    const isPaid = paymentStatus === "paid";
+    const readyToPay = !isPaid && allQuotesAccepted(request);
+    const quotedTotal = acceptedQuoteTotal(request);
 
     const vendorBox = vendors.length
       ? vendors.map((vendor) => {
@@ -1535,7 +1756,7 @@ function renderRequests() {
           return `
             <div class="vendor-box">
               <h4>${escapeHtml(title)}</h4>
-              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · ${escapeHtml(price)} estimated starting price</p>
+              <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · listed from ${escapeHtml(price)}</p>
               <div class="pill-row">
                 <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
               </div>
@@ -1582,6 +1803,7 @@ function renderRequests() {
                 </div>
 
                 ${responseNote ? `<p class="response-note">${escapeHtml(responseNote)}</p>` : ""}
+                ${renderQuoteForVendor(request, vendorId)}
                 ${vendorId ? `<div style="margin-top:12px;"><button class="btn-secondary" type="button" data-message-vendor="${escapeHtml(vendorId)}" data-message-request="${escapeHtml(request.id)}">Message Vendor</button></div>` : ""}
               </div>
             `;
@@ -1607,6 +1829,7 @@ function renderRequests() {
           <span class="pill type">${escapeHtml(eventType)}</span>
           ${plannerBadge}
           ${responseSummary.available > 0 ? `<span class="pill safe">${responseSummary.available} Available</span>` : ""}
+          ${readyToPay ? `<span class="pill safe">Ready To Pay</span>` : ""}
           ${aiSummary ? `<span class="pill ai">Concierge Planned</span>` : ""}
         </div>
 
@@ -1666,7 +1889,8 @@ function renderRequests() {
           </div>
         ` : `
           <div class="request-actions">
-            <button class="btn" type="button" data-message-request-main="${requestId}">Message Vendor</button>
+            ${readyToPay ? `<a class="btn" href="${escapeHtml(withEventParam("checkout.html", getRequestEventId(request)))}">Pay ${escapeHtml(formatMoney(quotedTotal))} plus fees</a>` : ""}
+            <button class="${readyToPay ? "btn-secondary" : "btn"}" type="button" data-message-request-main="${requestId}">Message Vendor</button>
             <a class="btn-secondary" href="${escapeHtml(withEventParam("event-builder.html", getRequestEventId(request)))}">Edit Event</a>
             <button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>
           </div>
@@ -1684,6 +1908,18 @@ function renderRequests() {
   document.querySelectorAll("[data-message-vendor]").forEach((button) => {
     button.addEventListener("click", () => {
       messageVendorForRequest(button.dataset.messageRequest, button.dataset.messageVendor);
+    });
+  });
+
+  document.querySelectorAll("[data-accept-quote]").forEach((button) => {
+    button.addEventListener("click", () => {
+      answerQuote(button.dataset.acceptQuote, button.dataset.quoteVendor, "accepted");
+    });
+  });
+
+  document.querySelectorAll("[data-decline-quote]").forEach((button) => {
+    button.addEventListener("click", () => {
+      answerQuote(button.dataset.declineQuote, button.dataset.quoteVendor, "declined");
     });
   });
 
@@ -2173,6 +2409,11 @@ async function loadBookingRequests() {
     });
 
     bookingRequests = requests;
+    renderRequests();
+
+    // Prices live in their own collection, so they arrive a moment later and
+    // the list is drawn again once they do.
+    await loadQuotesForRequests();
     renderRequests();
 
   } catch (error) {
