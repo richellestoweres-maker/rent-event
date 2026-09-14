@@ -460,6 +460,73 @@
     .pill.pending { background: #fff4df; color: #aa6f12; }
     .pill.info { background: #f6efe4; color: #6a625a; }
     .pill.safe { background: var(--green-soft); color: var(--green-text); }
+
+    /* Shown when a customer comes back from Stripe having paid. */
+    .paid-panel {
+      background: linear-gradient(160deg, #34b27b 0%, #22996a 55%, #148055 100%);
+      color: #fff;
+      border-radius: 30px;
+      padding: 24px 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 18px 32px rgba(28, 128, 90, 0.22);
+    }
+
+    .paid-panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.9rem;
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .paid-panel p {
+      margin: 0 0 14px;
+      font-size: 0.98rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.96);
+    }
+
+    .paid-panel p:last-child { margin-bottom: 0; }
+
+    .paid-amount {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      font-weight: 800;
+      font-size: 0.92rem;
+      margin-bottom: 12px;
+    }
+
+    .paid-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .paid-actions a {
+      min-height: 50px;
+      padding: 0 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      background: #fff;
+      color: #148055;
+    }
+
+    .paid-actions a.ghost {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      color: #fff;
+    }
     .pill.type { background: var(--blue-soft); color: var(--blue-text); }
     .pill.ai { background: var(--purple-soft); color: var(--purple-text); }
 
@@ -2329,6 +2396,92 @@ document.getElementById("roleSelect").addEventListener("change", (event) => {
   switchDashboardRole(event.target.value);
 });
 
+/**
+ * Stripe sends a customer back here after paying, but until now nothing on this
+ * page read that, so a person who had just been charged landed on the ordinary
+ * checkout screen with no confirmation at all. This shows them what happened.
+ *
+ * The booking is flipped to paid by the webhook, server side, which usually
+ * lands within a second or two but is not instant, so this waits for it rather
+ * than declaring failure on the first look.
+ */
+function renderPaidPanel(booking, bookingRequestId) {
+  const main = document.querySelector("main.page");
+  if (!main || document.getElementById("paidPanel")) return;
+
+  const cents = Number(booking.stripeAmountCollectedCents || booking.stripeAmountCents || 0);
+  const amount = cents ? "$" + (cents / 100).toFixed(2) : "";
+  const eventId = safeText(booking.eventId, "");
+
+  const panel = document.createElement("section");
+  panel.className = "paid-panel";
+  panel.id = "paidPanel";
+
+  const amountPill = amount
+    ? '<div class="paid-amount">' + escapeHtml(amount) + " paid</div>"
+    : "";
+
+  panel.innerHTML =
+    amountPill +
+    "<h2>Payment received</h2>" +
+    "<p>Your booking is confirmed and your vendors have been notified. A receipt is on its way to your email from Stripe.</p>" +
+    "<p>Your vendors are paid automatically after your event, so there is nothing else for you to send.</p>" +
+    '<div class="paid-actions">' +
+      '<a href="my-requests.html' + (eventId ? "?eventId=" + encodeURIComponent(eventId) : "") + '">View my request</a>' +
+      '<a class="ghost" href="dashboard.html">Back to my events</a>' +
+    "</div>";
+
+  main.insertBefore(panel, main.firstChild);
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderPendingPaymentPanel() {
+  const main = document.querySelector("main.page");
+  if (!main || document.getElementById("paidPanel")) return;
+
+  const panel = document.createElement("section");
+  panel.className = "paid-panel";
+  panel.id = "paidPanel";
+  panel.style.background = "linear-gradient(160deg, #ff9a73 0%, #ff7a63 52%, #ff5f67 100%)";
+  panel.innerHTML =
+    "<h2>Still confirming</h2>" +
+    "<p>Stripe has your payment, but we have not had the confirmation back yet. This usually takes a few seconds. Refresh this page in a moment, or check My Requests.</p>" +
+    '<div class="paid-actions"><a href="my-requests.html">View my requests</a></div>';
+
+  main.insertBefore(panel, main.firstChild);
+}
+
+async function showPaymentConfirmationIfReturning() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("stripe_return") !== "true") return;
+
+  const bookingRequestId = safeText(params.get("bookingRequestId"), "");
+  if (!bookingRequestId) return;
+
+  const ref = doc(db, "bookingRequests", bookingRequestId);
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    try {
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const booking = snap.data() || {};
+
+        if (booking.paymentStatus === "paid") {
+          renderPaidPanel(booking, bookingRequestId);
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn("Could not read booking for confirmation:", error.message);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+
+  renderPendingPaymentPanel();
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -2365,6 +2518,8 @@ onAuthStateChanged(auth, async (user) => {
     loadUnreadNotifications(),
     loadPage()
   ]);
+
+  await showPaymentConfirmationIfReturning();
 });
 </script>
 
