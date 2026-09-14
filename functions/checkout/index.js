@@ -104,10 +104,78 @@ function getRequestUserId(reqBody = {}) {
   );
 }
 
-function calculateTotalsFromBookingRequest(bookingRequest = {}) {
+function makeQuoteId(requestId, vendorId) {
+  return [requestId, vendorId]
+    .map((part) => cleanText(part, "").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 200))
+    .join("__");
+}
+
+/**
+ * Reads the price each vendor set for this booking.
+ *
+ * This is the whole reason quotes exist. The amount charged used to come from
+ * vendors[].priceNumber, which the customer's own browser wrote, so a person
+ * who knew how to open developer tools could have booked a $2,000 photographer
+ * for a dollar. A quote can only be written by the vendor being booked, and the
+ * customer can only accept or decline it, so reading the price from here means
+ * the browser no longer gets a say in what anything costs.
+ */
+async function loadAcceptedQuotes(bookingRequest = {}) {
+  const requestId = cleanText(bookingRequest.id, "");
   const vendors = Array.isArray(bookingRequest.vendors) ? bookingRequest.vendors : [];
 
+  const amounts = new Map();
+  const missing = [];
+
+  const seen = new Set();
+
+  for (const vendor of vendors) {
+    const vendorId = cleanText(vendor.vendorId, "");
+    if (!vendorId || seen.has(vendorId)) continue;
+    seen.add(vendorId);
+
+    const vendorName = cleanText(vendor.vendorName || vendor.listingTitle, "This vendor");
+
+    let snap;
+
+    try {
+      snap = await db.collection("quotes").doc(makeQuoteId(requestId, vendorId)).get();
+    } catch (error) {
+      console.error("Quote read failed", requestId, vendorId, error.message);
+      missing.push(vendorName);
+      continue;
+    }
+
+    const quote = snap.exists ? snap.data() || {} : {};
+    const amount = toNumber(quote.amount, 0);
+
+    if (!snap.exists || quote.status !== "accepted" || !(amount > 0)) {
+      missing.push(vendorName);
+      continue;
+    }
+
+    amounts.set(vendorId, amount);
+  }
+
+  return { amounts, missing };
+}
+
+function calculateTotalsFromBookingRequest(bookingRequest = {}, quoteAmounts = null) {
+  const vendors = Array.isArray(bookingRequest.vendors) ? bookingRequest.vendors : [];
+
+  // One entry per vendor, because a quote covers the whole vendor rather than
+  // each line they appear on.
+  const counted = new Set();
+
   const vendorSubtotal = vendors.reduce((total, vendor) => {
+    const vendorId = cleanText(vendor.vendorId, "");
+
+    if (quoteAmounts && vendorId) {
+      if (counted.has(vendorId)) return total;
+      counted.add(vendorId);
+      return total + toNumber(quoteAmounts.get(vendorId), 0);
+    }
+
     return total + toNumber(vendor.priceNumber, 0);
   }, 0);
 
@@ -169,7 +237,7 @@ function payoutReleaseInfo(bookingRequest = {}) {
  * the booking cannot receive money yet. Taking a payment that has nowhere to go
  * is worse than making the customer wait.
  */
-async function buildPayoutPlan(bookingRequest = {}) {
+async function buildPayoutPlan(bookingRequest = {}, quoteAmounts = null) {
   const vendors = Array.isArray(bookingRequest.vendors) ? bookingRequest.vendors : [];
   const owed = new Map();
   const names = new Map();
@@ -178,9 +246,18 @@ async function buildPayoutPlan(bookingRequest = {}) {
     const vendorId = cleanText(vendor.vendorId, "");
     if (!vendorId) return;
 
+    names.set(vendorId, cleanText(vendor.vendorName || vendor.listingTitle, "This vendor"));
+
+    // A vendor is paid what they quoted, once, no matter how many lines of the
+    // event they appear on.
+    if (quoteAmounts) {
+      if (owed.has(vendorId)) return;
+      owed.set(vendorId, roundCentsFromDollars(toNumber(quoteAmounts.get(vendorId), 0)));
+      return;
+    }
+
     const cents = roundCentsFromDollars(toNumber(vendor.priceNumber, 0));
     owed.set(vendorId, (owed.get(vendorId) || 0) + cents);
-    names.set(vendorId, cleanText(vendor.vendorName || vendor.listingTitle, "This vendor"));
   });
 
   if (!owed.size) {
@@ -489,7 +566,28 @@ exports.createStripeCheckoutSession = onRequest(
         return;
       }
 
-      const totals = calculateTotalsFromBookingRequest(bookingRequest);
+      // The price comes from the vendors, not from whatever the browser sent.
+      const quotes = await loadAcceptedQuotes(bookingRequest);
+
+      if (quotes.missing.length === 1) {
+        res.status(409).json({
+          success: false,
+          error: quotes.missing[0] + " has not sent a price you have accepted yet. Open the request, agree on a price in Messages, then accept it to pay.",
+          vendorsAwaitingQuote: quotes.missing
+        });
+        return;
+      }
+
+      if (quotes.missing.length > 1) {
+        res.status(409).json({
+          success: false,
+          error: "These vendors still need an accepted price before you can pay: " + quotes.missing.join(", ") + ". Agree on a price with each of them in Messages, then accept it.",
+          vendorsAwaitingQuote: quotes.missing
+        });
+        return;
+      }
+
+      const totals = calculateTotalsFromBookingRequest(bookingRequest, quotes.amounts);
 
       if (!totals.amountCents || totals.amountCents < 50) {
         res.status(400).json({
@@ -500,7 +598,7 @@ exports.createStripeCheckoutSession = onRequest(
       }
 
       // Nobody pays for a booking whose vendors cannot be paid out.
-      const payoutPlan = await buildPayoutPlan(bookingRequest);
+      const payoutPlan = await buildPayoutPlan(bookingRequest, quotes.amounts);
 
       if (payoutPlan.noVendors) {
         res.status(400).json({
@@ -584,6 +682,16 @@ exports.createStripeCheckoutSession = onRequest(
         stripeClientReferenceId: bookingRequestId,
         stripeAmountCents: totals.amountCents,
         stripeCurrency: "usd",
+
+        // The agreed prices, written down at the moment of checkout, so the
+        // booking record shows what was actually charged and why.
+        quotedVendorAmounts: Object.fromEntries(quotes.amounts),
+        quotedVendorSubtotal: totals.vendorSubtotal,
+        quotedServiceFee: totals.serviceFee,
+        quotedProcessingFee: totals.processingFee,
+        quotedTotalDue: totals.totalDue,
+        pricedFromQuotes: true,
+
         stripeLivemode: session.livemode === true,
         stripeCheckoutStartedAt: admin.firestore.FieldValue.serverTimestamp(),
         stripeTransferGroup: transferGroup,
