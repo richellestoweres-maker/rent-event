@@ -962,8 +962,15 @@ function escapeHtml(value) {
     .replaceAll("'","&#039;");
 }
 
+/** Whole dollars read fine for a price, but never hide cents that exist. */
 function formatMoney(value) {
-  return `$${Math.round(Number(value || 0)).toLocaleString()}`;
+  const number = Number(value || 0);
+  const hasCents = Math.abs(number - Math.round(number)) > 0.004;
+
+  return `$${number.toLocaleString(undefined, {
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: 2
+  })}`;
 }
 
 function formatTime(value) {
