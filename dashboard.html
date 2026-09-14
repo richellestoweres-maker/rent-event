@@ -2629,7 +2629,13 @@ async function deleteEventEverywhere(eventId) {
   for (const entry of requests) {
     try {
       await updateDoc(doc(db, "bookingRequests", entry.id), {
-        status: "cancelled",
+        // The vendor's list reads requestStatus first, so setting only "status"
+        // left them looking at a Pending request for an event that no longer
+        // exists. Both fields are set so the request reads as withdrawn on
+        // their side and they know not to hold the date.
+        requestStatus: "withdrawn",
+        status: "withdrawn",
+        withdrawReason: "The customer deleted this event.",
         cancelledReason: "event_deleted",
         hiddenForCustomer: true,
         updatedAt: serverTimestamp()
