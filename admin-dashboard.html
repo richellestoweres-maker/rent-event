@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <meta name="description" content="RentEvent administration." />
   <title>Admin Dashboard | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -620,6 +621,60 @@
         max-width: 560px;
       }
     }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .success-icon svg { width: 30px; height: 30px; }
+    .verify-icon svg { width: 16px; height: 16px; }
   </style>
 
   <!-- PWA:start (managed) -->
@@ -666,7 +721,7 @@
           <a class="hero-btn" href="#usersSection">Users</a>
           <a class="hero-btn-secondary" href="#listingsSection">Listings</a>
           <a class="hero-btn-secondary" href="#requestsSection">Requests</a>
-          <a class="hero-btn-secondary" href="#launchSection">Launch Checklist</a><a class="hero-btn-secondary" href="#waitlistSection">Waitlist</a>
+          <a class="hero-btn-secondary" href="#launchSection">Views</a><a class="hero-btn-secondary" href="#waitlistSection">Waitlist</a>
         </div>
       </div>
     </section>
@@ -741,39 +796,39 @@
 
     <section class="section" id="launchSection">
       <div class="section-header">
-        <h2 class="section-title">Launch Command Center</h2>
+        <h2 class="section-title">Jump To A View</h2>
       </div>
 
       <div class="quick-grid">
         <a class="quick-card" href="dashboard.html">
-          <div class="quick-icon">C</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 20c.9-3.6 3.9-5.6 7.5-5.6s6.6 2 7.5 5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>Customer View</h3>
-            <p>Check the customer dashboard and multi-event flow.</p>
+            <p>Open the customer dashboard.</p>
           </div>
         </a>
 
         <a class="quick-card" href="planner-dashboard.html">
-          <div class="quick-icon">P</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><rect x="3.8" y="5.5" width="16.4" height="14.5" rx="2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.8 10h16.4M8.5 3.5v3.6M15.5 3.5v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>Planner View</h3>
-            <p>Review Planner Pro client event management.</p>
+            <p>Open Planner Pro client events.</p>
           </div>
         </a>
 
         <a class="quick-card" href="vendor-dashboard.html">
-          <div class="quick-icon">V</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><path d="M4.5 9.5h15V19a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 9.5 5.8 4.5h12.4L20 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 20.5v-5h4v5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>Vendor View</h3>
-            <p>Check listings, requests, and vendor flow.</p>
+            <p>Open the vendor portal.</p>
           </div>
         </a>
 
         <a class="quick-card" href="listings.html">
-          <div class="quick-icon">◎</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><circle cx="11" cy="11" r="6.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m15.6 15.6 3.9 3.9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>Marketplace</h3>
-            <p>Review categories, search, and listing display.</p>
+            <p>Open the marketplace.</p>
           </div>
         </a>
       </div>
@@ -787,7 +842,7 @@
 
       <div class="list" id="usersList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
           <h3>Loading users</h3>
           <p>We’re pulling account data now.</p>
         </div>
@@ -806,7 +861,7 @@
 
       <div class="list" id="listingsList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
           <h3>Loading listings</h3>
           <p>We’re pulling vendor listings now.</p>
         </div>
@@ -825,7 +880,7 @@
 
       <div class="list" id="requestsList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
           <h3>Loading requests</h3>
           <p>We’re pulling booking requests now.</p>
         </div>
@@ -835,7 +890,37 @@
     </div>
 
     </section>
-  <section class="section" id="waitlistSection"><div class="section-header"><h2 class="section-title">Waitlist</h2><button class="section-link" type="button" onclick="loadAllData()">Refresh</button></div><div class="list" id="waitlistList"><div class="empty-card"><div class="empty-icon">…</div><h3>Loading waitlist</h3><p>Pulling early access signups now.</p></div></div><div class="load-more-wrap" id="waitlistLoadMoreWrap" style="display:none;margin-top:14px;"><button class="btn-secondary" type="button" style="width:100%;" onclick="window.loadWaitlistPage(false)">Load more waitlist entries</button></div></section></main>
+  <section class="section" id="inboxSection">
+    <div class="section-header">
+      <h2 class="section-title">Support &amp; Reports</h2>
+      <button class="section-link" type="button" onclick="loadInbox()">Refresh</button>
+    </div>
+    <div class="list" id="inboxList">
+      <div class="empty-card">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
+        <h3>Loading</h3>
+        <p>Checking for new support messages and reports.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="waitlistSection"><div class="section-header"><h2 class="section-title">Waitlist</h2><button class="section-link" type="button" onclick="loadAllData()">Refresh</button></div><div class="list" id="waitlistList"><div class="empty-card"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div><h3>Loading waitlist</h3><p>Pulling early access signups now.</p></div></div><div class="load-more-wrap" id="waitlistLoadMoreWrap" style="display:none;margin-top:14px;"><button class="btn-secondary" type="button" style="width:100%;" onclick="window.loadWaitlistPage(false)">Load more waitlist entries</button></div></section></main>
+
+  
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
 
   <nav class="bottom-nav" aria-label="Admin navigation">
     <a class="nav-item active" href="admin-dashboard.html">
@@ -1046,7 +1131,7 @@ async function switchDashboardRole(nextRole) {
   const allowedRoles = getAllowedRoles(currentUserData);
 
   if (!allowedRoles.includes(normalizedRole)) {
-    alert("This dashboard is not enabled on your account yet.");
+    showAppNotice("That view is not set up on your account yet. You can add a vendor or planner profile from your profile page.");
     renderRoleSwitcher(currentUserData);
     return;
   }
@@ -1085,7 +1170,7 @@ function getUserPrimaryLabel(user) {
 function renderEmpty(id, title, text) {
   document.getElementById(id).innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">✓</div>
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.4 12.2 2.6 2.6 4.6-5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>${escapeHtml(title)}</h3>
       <p>${escapeHtml(text)}</p>
     </div>
@@ -1546,7 +1631,7 @@ function renderEmpty2(id, title, text) {
   if (!el) return;
   el.innerHTML =
     '<div class="empty-card">' +
-    '<div class="empty-icon">\u2713</div>' +
+    '<div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m8.4 12.2 2.6 2.6 4.6-5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
     "<h3>" + esc2(title) + "</h3>" +
     "<p>" + esc2(text) + "</p>" +
     "</div>";
@@ -1680,7 +1765,7 @@ function renderRequestsList() {
   }
   document.getElementById("requestsList").innerHTML = requestsLoaded.map(requestCardHtml).join("");
 }
-function waitlistCardHtml(w) { var name = safe2(w.fullName, "Unnamed"); var email = safe2(w.email, "No email"); var phone = safe2(w.phone, ""); var city = safe2(w.city, ""); var roles = Array.isArray(w.selectedRoles) ? w.selectedRoles : []; var created = fmtTime2(w.submittedAt || w.createdAt); var rawId = w.id || ""; var pills = roles.map(function (r) { var label = r === "client" ? "Client" : (r === "vendor" ? "Vendor" : (r === "planner" ? "Planner" : r)); var cls = r === "vendor" ? "blue" : (r === "planner" ? "purple" : "safe"); return '<span class="pill ' + cls + '">' + esc2(label) + '</span>'; }).join(""); var extra = ""; if (w.vendorDetails && w.vendorDetails.businessName) { extra = safe2(w.vendorDetails.businessName, ""); } else if (w.plannerDetails && w.plannerDetails.plannerBusinessName) { extra = safe2(w.plannerDetails.plannerBusinessName, ""); } else if (w.clientDetails && w.clientDetails.eventType) { extra = safe2(w.clientDetails.eventType, ""); } var subtitleTail = city ? (" \u00b7 " + city) : ""; var extraTail = extra ? (" \u00b7 " + extra) : ""; var contactBtn = phone ? ('<a class="btn-secondary" href="tel:' + esc2(phone) + '">Call</a>') : ('<a class="btn-secondary" href="mailto:' + esc2(email) + '">Email</a>'); return '<article class="item-card"><div class="item-top"><div><h3 class="item-title">' + esc2(name) + '</h3><p class="item-subtitle">' + esc2(email) + subtitleTail + extraTail + '</p></div><div class="price">' + esc2(created) + '</div></div><div class="pill-row">' + pills + '</div><div class="card-actions">' + contactBtn + '<button class="btn" type="button" data-action="delete-waitlist" data-id="' + esc2(rawId) + '" style="background:linear-gradient(135deg,#ff8a7a,#c74f4d 70%);">Delete</button></div></article>'; } function renderWaitlistList() { if (!waitlistLoaded.length) { renderEmpty2("waitlistList", "No waitlist signups yet", "Early access signups will appear here."); return; } document.getElementById("waitlistList").innerHTML = waitlistLoaded.map(waitlistCardHtml).join(""); } async function loadUsersPageImpl(reset) {
+function waitlistCardHtml(w) { var name = safe2(w.fullName, "Unnamed"); var email = safe2(w.email, "No email"); var phone = safe2(w.phone, ""); var city = safe2(w.city, ""); var roles = Array.isArray(w.selectedRoles) ? w.selectedRoles : []; var created = fmtTime2(w.submittedAt || w.createdAt); var rawId = w.id || ""; var pills = roles.map(function (r) { var label = r === "client" ? "Client" : (r === "vendor" ? "Vendor" : (r === "planner" ? "Planner" : r)); var cls = r === "vendor" ? "blue" : (r === "planner" ? "purple" : "safe"); return '<span class="pill ' + cls + '">' + esc2(label) + '</span>'; }).join(""); var extra = ""; if (w.vendorDetails && w.vendorDetails.businessName) { extra = safe2(w.vendorDetails.businessName, ""); } else if (w.plannerDetails && w.plannerDetails.plannerBusinessName) { extra = safe2(w.plannerDetails.plannerBusinessName, ""); } else if (w.clientDetails && w.clientDetails.eventType) { extra = safe2(w.clientDetails.eventType, ""); } var subtitleTail = city ? (" \u00b7 " + city) : ""; var extraTail = extra ? (" \u00b7 " + extra) : ""; var contactBtn = phone ? ('<a class="btn-secondary" href="tel:' + esc2(phone) + '">Call</a>') : ('<a class="btn-secondary" href="mailto:' + esc2(email) + '">Email</a>'); return '<article class="item-card"><div class="item-top"><div><h3 class="item-title">' + esc2(name) + '</h3><p class="item-subtitle">' + esc2(email) + subtitleTail + extraTail + '</p></div><div class="price">' + esc2(created) + '</div></div><div class="pill-row">' + pills + '</div><div class="card-actions">' + contactBtn + '<button class="btn" type="button" data-action="delete-waitlist" data-id="' + esc2(rawId) + '" style="background:linear-gradient(135deg,#ff8a7a,#c74f4d 70%);">Delete</button></div></article>'; } function renderWaitlistList() { if (!waitlistLoaded.length) { renderEmpty2("waitlistList", "No waitlist signups yet", "Signups will appear here."); return; } document.getElementById("waitlistList").innerHTML = waitlistLoaded.map(waitlistCardHtml).join(""); } async function loadUsersPageImpl(reset) {
   if (reset) { usersLoaded = []; usersLastDoc = null; usersHasMore = true; }
   if (!usersHasMore) return;
   var q = usersLastDoc
@@ -1775,13 +1860,76 @@ window.loadUsersPage = function (reset) { loadUsersPageImpl(reset !== false); };
 window.loadListingsPage = function (reset) { loadListingsPageImpl(reset !== false); };
 window.loadRequestsPage = function (reset) { loadRequestsPageImpl(reset !== false); }; window.loadWaitlistPage = function (reset) { loadWaitlistPageImpl(reset !== false); };
 
+/**
+ * Everything people send from the Support and Report a Concern pages.
+ *
+ * Those pages used to build a mailto link, which did nothing at all on a phone
+ * with no email app set up while still telling the person it had been sent.
+ * They now write into RentEvent, and this is where those messages land.
+ */
+window.loadInbox = async function () {
+  var list = document.getElementById("inboxList");
+  if (!list) return;
+
+  var items = [];
+
+  var sources = [["reports", "Report"], ["supportRequests", "Support"]];
+
+  for (var i = 0; i < sources.length; i++) {
+    try {
+      var snap = await getDocs(collection(db2, sources[i][0]));
+      snap.forEach(function (d) {
+        items.push(Object.assign({ id: d.id, kind: sources[i][1] }, d.data()));
+      });
+    } catch (error) {
+      console.warn("Could not load", sources[i][0], error.message);
+    }
+  }
+
+  if (!items.length) {
+    renderEmpty2("inboxList", "Nothing waiting", "Support messages and safety reports will appear here.");
+    return;
+  }
+
+  items.sort(function (a, b) {
+    return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
+  });
+
+  list.innerHTML = items.map(function (item) {
+    var who = esc2(item.name || item.reporterName || item.accountEmail || item.reporterAccountEmail || "Someone");
+    var reply = esc2(item.email || item.reporterEmail || item.accountEmail || item.reporterAccountEmail || "");
+    var subject = esc2(item.topic || item.reportType || "No subject");
+    var urgency = esc2(item.urgency || "");
+    var body = esc2(String(item.message || "").slice(0, 600));
+    var when = fmtTime2(item.createdAt);
+    var related = esc2(item.relatedReference || "");
+    var reported = esc2(item.reportedParty || "");
+
+    return '<article class="item-card">'
+      + '<div class="item-top"><div>'
+      + '<h3 class="item-title">' + subject + '</h3>'
+      + '<p class="item-subtitle">' + who + (reply ? " &middot; " + reply : "") + '</p>'
+      + '</div><div class="price">' + esc2(when) + '</div></div>'
+      + '<div class="pill-row">'
+      + '<span class="pill ' + (item.kind === "Report" ? "red" : "blue") + '">' + esc2(item.kind) + '</span>'
+      + (urgency ? '<span class="pill">' + urgency + '</span>' : "")
+      + '<span class="pill">' + esc2(item.status || "new") + '</span>'
+      + '</div>'
+      + (reported ? '<p class="item-subtitle">About: ' + reported + '</p>' : "")
+      + (related ? '<p class="item-subtitle">Reference: ' + related + '</p>' : "")
+      + '<p style="margin:10px 0 0;white-space:pre-wrap;line-height:1.55;">' + body + '</p>'
+      + (reply ? '<div class="card-actions"><a class="btn-secondary" href="mailto:' + reply + '">Reply by email</a></div>' : "")
+      + '</article>';
+  }).join("");
+};
+
 window.loadAllData = async function () {
   try {
     await Promise.all([
       loadCountsImpl(),
       loadUsersPageImpl(true),
       loadListingsPageImpl(true),
-      loadRequestsPageImpl(true), loadWaitlistPageImpl(true)
+      loadRequestsPageImpl(true), loadWaitlistPageImpl(true), window.loadInbox()
     ]);
   } catch (error) {
     var warn = document.getElementById("adminWarning");
@@ -1880,6 +2028,43 @@ document.addEventListener("click", function (e) {
       });
     });
   }
+
+/**
+ * A small message that slides in at the bottom of the screen.
+ *
+ * This replaces window.alert, which stops the whole page, looks like a browser
+ * error, and on a phone reads as though something has gone wrong with the app.
+ */
+function showAppNotice(text, tone = "info") {
+  const existing = document.getElementById("appNotice");
+  if (existing) existing.remove();
+
+  const notice = document.createElement("div");
+  notice.id = "appNotice";
+  notice.setAttribute("role", "status");
+  notice.textContent = text;
+  notice.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "bottom:96px",
+    "transform:translateX(-50%)",
+    "max-width:min(92vw,430px)",
+    "padding:14px 20px",
+    "border-radius:18px",
+    "font-family:inherit",
+    "font-size:.88rem",
+    "font-weight:600",
+    "line-height:1.45",
+    "text-align:center",
+    "z-index:9999",
+    "box-shadow:0 14px 34px rgba(0,0,0,.2)",
+    tone === "error" ? "background:#fdecea;color:#8c2f22" : "background:#2b2622;color:#fff"
+  ].join(";");
+
+  document.body.appendChild(notice);
+  window.setTimeout(() => notice.remove(), 6000);
+}
+
 </script>
 <!-- PWA-SW:end -->
 </body>
