@@ -152,6 +152,35 @@ service cloud.firestore {
     }
 
     // -----------------------------------------------------------------
+    // Support requests and safety reports
+    //
+    // These are written straight from the support and report pages, so a
+    // person can always reach RentEvent from inside the app. Anyone can file
+    // one, signed in or not, because somebody who cannot sign in is exactly
+    // the person who most needs to reach support.
+    //
+    // Nobody can read them back except an admin. A reporter should never be
+    // able to see what anybody else has reported.
+    // -----------------------------------------------------------------
+    function inboundMessageIsSane() {
+      return request.resource.data.message is string &&
+             request.resource.data.message.size() > 0 &&
+             request.resource.data.message.size() <= 4000 &&
+             request.resource.data.status == 'new' &&
+             request.resource.data.keys().size() <= 20;
+    }
+
+    match /supportRequests/{requestId} {
+      allow create: if inboundMessageIsSane();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /reports/{reportId} {
+      allow create: if inboundMessageIsSane();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // -----------------------------------------------------------------
     // Vendor quotes
     //
     // This is where a booking's real price lives. The vendor types it, and
