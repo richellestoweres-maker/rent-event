@@ -19,7 +19,7 @@
     { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Browse listings", "short_name": "Browse", "url": "/listings.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Browse listings", "short_name": "Browse", "url": "/index.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
     { "name": "My events", "short_name": "Events", "url": "/event-builder.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
     { "name": "Messages", "short_name": "Messages", "url": "/messages.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
   ]
