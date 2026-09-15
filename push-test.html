@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Push Test | RentEvent</title>
+  <meta name="description" content="Check that RentEvent can send notifications to this device." />
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --coral-1: #ff9a7b;
+      --coral-3: #e8674f;
+      --ink: #2e2822;
+      --muted: #6b6259;
+      --line: #eee3d6;
+      --cream: #fdf8f3;
+      --good: #1f7a4d;
+      --bad: #b5382f;
+      --warn: #8a6516;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      padding: 24px 16px 60px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 6px; }
+    .lede { margin: 0 0 22px; color: var(--muted); font-size: 0.95rem; }
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .card h2 { font-size: 1rem; margin: 0 0 12px; }
+    .check {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.9rem;
+    }
+    .check:last-child { border-bottom: 0; }
+    .check .mark { flex: 0 0 20px; font-weight: 800; line-height: 1.5; }
+    .ok .mark { color: var(--good); }
+    .no .mark { color: var(--bad); }
+    .maybe .mark { color: var(--warn); }
+    .check .label { flex: 1; }
+    .check .note { display: block; color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+    .btn {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 15px 18px;
+      font: inherit;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-3) 70%);
+      cursor: pointer;
+    }
+    .btn[disabled] { opacity: 0.5; cursor: default; }
+    .btn-secondary {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 13px 18px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      display: none;
+      white-space: pre-wrap;
+    }
+    .status.show { display: block; }
+    .status.good { background: #e8f5ee; color: var(--good); }
+    .status.bad { background: #fdeceb; color: var(--bad); }
+    .status.info { background: #fff6e8; color: var(--warn); }
+    .token {
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      word-break: break-all;
+      background: #f6f1ea;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 10px;
+      color: var(--muted);
+    }
+    .steps { margin: 0; padding-left: 20px; font-size: 0.9rem; color: var(--muted); }
+    .steps li { margin-bottom: 7px; }
+    a { color: var(--coral-3); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Notification test</h1>
+    <p class="lede">This page checks whether RentEvent can send a notification to this exact device, and tells you plainly what is missing if it cannot.</p>
+
+    <div class="card">
+      <h2>This device</h2>
+      <div id="checks"></div>
+    </div>
+
+    <div class="card">
+      <h2>Turn notifications on</h2>
+      <button class="btn" id="enableBtn" type="button">Enable Notifications</button>
+      <button class="btn-secondary" id="localBtn" type="button">Send myself a test right now</button>
+      <div class="status" id="status"></div>
+      <div class="token" id="token" style="display:none;"></div>
+    </div>
+
+    <div class="card" id="iosHelp" style="display:none;">
+      <h2>On an iPhone, read this first</h2>
+      <ol class="steps">
+        <li>Apple only allows notifications from a website if it has been added to the Home Screen. Opening this page in Safari will not work, no matter how many times you tap Enable.</li>
+        <li>In Safari, tap the Share button, then <strong>Add to Home Screen</strong>.</li>
+        <li>Close Safari. Open RentEvent from the new Home Screen icon.</li>
+        <li>Come back to this page from inside that app and tap Enable Notifications.</li>
+      </ol>
+    </div>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+  authDomain: "rent-event-f7abd.firebaseapp.com",
+  projectId: "rent-event-f7abd",
+  storageBucket: "rent-event-f7abd.firebasestorage.app",
+  messagingSenderId: "840686040363",
+  appId: "1:840686040363:web:3103c8c5b624deecee416e"
+};
+
+// The public half of the Web Push key pair from the Firebase console. This one
+// is meant to live in public code, it is what the browser uses to identify the
+// sender. The private half never leaves Firebase.
+const VAPID_PUBLIC_KEY = "BIY_UKhuOSQa_t_MA4NG5DoPI6B_1liR6CsP_esIZJWKhdrSpgL9eTRs0M6S6w8FULnoKhdj9epQMf5fNSkXbY8";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let signedInUser = null;
+
+/** True when the page is running from a Home Screen icon rather than a browser tab. */
+function isStandalone() {
+  return window.navigator.standalone === true ||
+         window.matchMedia("(display-mode: standalone)").matches;
+}
+
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+/** iOS reports itself as "Version/16.4" in the user agent string. */
+function iosVersion() {
+  const m = navigator.userAgent.match(/OS (\d+)_(\d+)/);
+  return m ? Number(m[1]) + Number(m[2]) / 10 : null;
+}
+
+function renderChecks() {
+  const ios = isIOS();
+  const ver = iosVersion();
+  const standalone = isStandalone();
+
+  const rows = [
+    {
+      state: "Notification" in window ? "ok" : "no",
+      label: "This browser knows what a notification is",
+      note: "Notification" in window ? "" : "This browser cannot show notifications at all."
+    },
+    {
+      state: "serviceWorker" in navigator ? "ok" : "no",
+      label: "Service workers are available",
+      note: "serviceWorker" in navigator ? "" : "Push needs a service worker. Private browsing often blocks these."
+    },
+    {
+      state: window.isSecureContext ? "ok" : "no",
+      label: "Served over a secure connection",
+      note: window.isSecureContext ? "" : "Push only works over https."
+    }
+  ];
+
+  if (ios) {
+    rows.push({
+      state: ver === null ? "maybe" : (ver >= 16.4 ? "ok" : "no"),
+      label: "iOS version supports web push",
+      note: ver === null
+        ? "Could not read the iOS version from this browser."
+        : (ver >= 16.4 ? "iOS " + ver.toFixed(1) + ", which is new enough." : "iOS " + ver.toFixed(1) + ". Apple added this in 16.4, so this device needs an update.")
+    });
+    rows.push({
+      state: standalone ? "ok" : "no",
+      label: "Opened from the Home Screen",
+      note: standalone
+        ? "Running as an installed app, which is what Apple requires."
+        : "Running in a browser tab. On iPhone, notifications will not work this way. See the steps below."
+    });
+  }
+
+  rows.push({
+    state: Notification.permission === "granted" ? "ok"
+         : (Notification.permission === "denied" ? "no" : "maybe"),
+    label: "Notification permission",
+    note: Notification.permission === "granted" ? "Already allowed."
+        : (Notification.permission === "denied"
+            ? "Blocked. iPhone: Settings, Notifications, RentEvent. You may need to delete the Home Screen icon and add it again."
+            : "Not asked yet. Tap the button below.")
+  });
+
+  document.getElementById("checks").innerHTML = rows.map(r => `
+    <div class="check ${r.state}">
+      <span class="mark">${r.state === "ok" ? "&#10003;" : (r.state === "no" ? "&#10007;" : "!")}</span>
+      <span class="label">${r.label}${r.note ? `<span class="note">${r.note}</span>` : ""}</span>
+    </div>`).join("");
+
+  if (ios && !standalone) document.getElementById("iosHelp").style.display = "block";
+}
+
+function say(message, kind) {
+  const el = document.getElementById("status");
+  el.textContent = message;
+  el.className = "status show " + (kind || "info");
+}
+
+onAuthStateChanged(auth, (user) => { signedInUser = user || null; });
+
+document.getElementById("enableBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("enableBtn");
+
+  if (isIOS() && !isStandalone()) {
+    say("This is an iPhone in a browser tab. Apple will not allow notifications here. Add RentEvent to your Home Screen and open this page from that icon instead.", "bad");
+    return;
+  }
+
+  if (VAPID_PUBLIC_KEY.indexOf("__VAPID") === 0) {
+    say("The web push key has not been added to this page yet, so there is nothing to register with.", "bad");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Asking...";
+
+  try {
+    if (!(await isSupported())) {
+      say("This browser does not support Firebase messaging.", "bad");
+      btn.disabled = false; btn.textContent = "Enable Notifications";
+      return;
+    }
+
+    // Apple requires this to be called straight from a tap, which is why it
+    // lives in the click handler and not in page setup.
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      say("Permission was not granted. It came back as: " + permission, "bad");
+      btn.disabled = false; btn.textContent = "Enable Notifications";
+      renderChecks();
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    await navigator.serviceWorker.ready;
+
+    const messaging = getMessaging(app);
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_PUBLIC_KEY,
+      serviceWorkerRegistration: registration
+    });
+
+    if (!token) {
+      say("Permission was granted but no token came back. That usually means the web push key is wrong.", "bad");
+      btn.disabled = false; btn.textContent = "Enable Notifications";
+      return;
+    }
+
+    // Saved under the token itself so the same phone re-registering does not
+    // pile up duplicate rows and get notified twice.
+    try {
+      await setDoc(doc(db, "pushTokens", token), {
+        token,
+        userId: signedInUser ? signedInUser.uid : "",
+        userEmail: signedInUser ? (signedInUser.email || "") : "",
+        platform: isIOS() ? "ios" : "other",
+        standalone: isStandalone(),
+        userAgent: navigator.userAgent.slice(0, 300),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (error) {
+      console.warn("Token saved locally but not to Firestore:", error.message);
+      say("Notifications are on, but saving this device to RentEvent failed: " + error.message + "\n\nThe token below still works for a manual test.", "info");
+    }
+
+    document.getElementById("token").style.display = "block";
+    document.getElementById("token").textContent = token;
+
+    btn.textContent = "Notifications Are On";
+    say("This device is registered. The long code below identifies this phone. Send a test to it from the Firebase console, or tap the button above to fire a local one.", "good");
+    renderChecks();
+  } catch (error) {
+    console.error(error);
+    say("Could not turn notifications on.\n\n" + error.message, "bad");
+    btn.disabled = false;
+    btn.textContent = "Enable Notifications";
+  }
+});
+
+/**
+ * Fires a notification from the page itself. This does NOT prove push works, it
+ * only proves the phone will display a notification once permission is granted.
+ * Worth separating, because a local one succeeding while a real push fails is
+ * the single most common way to be misled here.
+ */
+document.getElementById("localBtn").addEventListener("click", async () => {
+  if (Notification.permission !== "granted") {
+    say("Turn notifications on first.", "bad");
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    await reg.showNotification("RentEvent test", {
+      body: "If you can see this, your phone will display RentEvent notifications.",
+      icon: "/icon-192.png",
+      badge: "/icon-192.png"
+    });
+    say("Sent. Note this came from the page itself, not from RentEvent's servers, so it proves the phone can display notifications but not yet that we can reach it.", "info");
+  } catch (error) {
+    say("Could not show it: " + error.message, "bad");
+  }
+});
+
+// A push that arrives while this page is open in the foreground.
+(async () => {
+  try {
+    if (await isSupported()) {
+      onMessage(getMessaging(app), (payload) => {
+        const n = payload.notification || payload.data || {};
+        say("A push just arrived while this page was open:\n\n" + (n.title || "") + "\n" + (n.body || ""), "good");
+      });
+    }
+  } catch (e) { /* messaging not available, the checks above already say so */ }
+})();
+
+renderChecks();
+</script>
+</body>
+</html>
