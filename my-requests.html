@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <meta name="description" content="Track the vendor requests you have sent, review the prices vendors quote you, and pay when you are ready." />
   <title>My Requests | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -800,6 +801,60 @@
 
       .bottom-nav { max-width: 520px; }
     }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .success-icon svg { width: 30px; height: 30px; }
+    .verify-icon svg { width: 16px; height: 16px; }
   </style>
 
   <!-- PWA:start (managed) -->
@@ -874,7 +929,7 @@
 
       <div class="request-list" id="requestList">
         <div class="empty-card">
-          <div class="empty-icon">...</div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
           <h3>Loading requests</h3>
           <p>We’re checking your submitted event requests now.</p>
         </div>
@@ -915,7 +970,23 @@
     </div>
   </div>
 
-    <nav class="bottom-nav" aria-label="Bottom navigation" id="bottomNav">
+    
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
+
+  <nav class="bottom-nav" aria-label="Bottom navigation" id="bottomNav">
     <a class="nav-item" href="dashboard.html" id="bottomHomeLink">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 10.5L12 3L21 10.5V20A1 1 0 0 1 20 21H14V14H10V21H4A1 1 0 0 1 3 20V10.5Z" fill="currentColor">
@@ -1352,7 +1423,7 @@ async function switchDashboardRole(nextRole) {
   const allowedRoles = getAllowedRoles(currentUserData);
 
   if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
-    alert("This dashboard is not enabled on your account yet.");
+    showAppNotice("That view is not set up on your account yet. You can add a vendor or planner profile from your profile page.");
     renderRoleSwitcher(currentUserData);
     return;
   }
@@ -1643,7 +1714,7 @@ function renderEmptyRequests() {
 
   document.getElementById("requestList").innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">+</div>
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 5.5v13M5.5 12h13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>No requests yet</h3>
       <p>When you submit an event request from checkout, it will appear here.</p>
       <a class="btn" href="${escapeHtml(actionHref)}">${escapeHtml(actionLabel)}</a>
@@ -1999,7 +2070,7 @@ async function createWithdrawNotifications(request, requestId, finalReason) {
 
 async function confirmWithdrawRequest() {
   if (isAdminPreview()) {
-    showStatus("Admin preview mode is view-only. Use a customer or planner test account to withdraw requests.", "error");
+    showStatus("You are viewing this as an admin, so requests cannot be withdrawn here.", "error");
     closeWithdrawModal();
     return;
   }
@@ -2066,7 +2137,7 @@ async function confirmWithdrawRequest() {
 
 function withdrawRequest(requestId) {
   if (isAdminPreview()) {
-    showStatus("Admin preview mode is view-only. Use a customer or planner test account to withdraw requests.", "error");
+    showStatus("You are viewing this as an admin, so requests cannot be withdrawn here.", "error");
     return;
   }
 
@@ -2075,7 +2146,7 @@ function withdrawRequest(requestId) {
 
 async function clearRequestFromCustomerView(requestId) {
   if (isAdminPreview()) {
-    showStatus("Admin preview mode is view-only. Use a customer or planner test account to clear requests.", "error");
+    showStatus("You are viewing this as an admin, so requests cannot be cleared here.", "error");
     return;
   }
 
@@ -2122,7 +2193,7 @@ async function clearRequestFromCustomerView(requestId) {
 
 async function messageVendorForRequest(requestId, vendorId) {
   if (isAdminPreview()) {
-    showStatus("Messaging is disabled in admin preview mode. Use a customer or planner test account to test messages.", "error");
+    showStatus("Messaging is turned off while viewing as an admin.", "error");
     return;
   }
 
@@ -2275,7 +2346,7 @@ async function messageVendorForRequest(requestId, vendorId) {
 
 async function messageFirstVendorForRequest(requestId) {
   if (isAdminPreview()) {
-    showStatus("Messaging is disabled in admin preview mode. Use a customer or planner test account to test messages.", "error");
+    showStatus("Messaging is turned off while viewing as an admin.", "error");
     return;
   }
 
@@ -2425,7 +2496,7 @@ async function loadBookingRequests() {
   } catch (error) {
     document.getElementById("requestList").innerHTML = `
       <div class="empty-card">
-        <div class="empty-icon">!</div>
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 4.6 21 19.4H3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 10.4v3.6M12 16.6h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>Could not load requests</h3>
         <p>Refresh the page and try again. If it keeps happening, let us know at support@rentevent-app.com.</p>
         <a class="btn" href="${isAdminPreview() ? "admin-dashboard.html" : isPlannerView() ? "planner-dashboard.html" : "dashboard.html"}">Go Back</a>
@@ -2507,6 +2578,43 @@ onAuthStateChanged(auth, async (user) => {
       });
     });
   }
+
+/**
+ * A small message that slides in at the bottom of the screen.
+ *
+ * This replaces window.alert, which stops the whole page, looks like a browser
+ * error, and on a phone reads as though something has gone wrong with the app.
+ */
+function showAppNotice(text, tone = "info") {
+  const existing = document.getElementById("appNotice");
+  if (existing) existing.remove();
+
+  const notice = document.createElement("div");
+  notice.id = "appNotice";
+  notice.setAttribute("role", "status");
+  notice.textContent = text;
+  notice.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "bottom:96px",
+    "transform:translateX(-50%)",
+    "max-width:min(92vw,430px)",
+    "padding:14px 20px",
+    "border-radius:18px",
+    "font-family:inherit",
+    "font-size:.88rem",
+    "font-weight:600",
+    "line-height:1.45",
+    "text-align:center",
+    "z-index:9999",
+    "box-shadow:0 14px 34px rgba(0,0,0,.2)",
+    tone === "error" ? "background:#fdecea;color:#8c2f22" : "background:#2b2622;color:#fff"
+  ].join(";");
+
+  document.body.appendChild(notice);
+  window.setTimeout(() => notice.remove(), 6000);
+}
+
 </script>
 <!-- PWA-SW:end -->
 </body>
