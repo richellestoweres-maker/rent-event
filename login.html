@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RentEvent Login</title>
+<meta name="description" content="Sign in to RentEvent to plan events, message vendors, and manage your bookings." />
+  <title>Sign In | RentEvent</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -379,7 +380,43 @@ h1 {
     overflow-y: auto;
   }
 }
-</style>
+
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  </style>
 
   <!-- PWA:start (managed) -->
   <link rel="manifest" href="/manifest.json" />
@@ -700,5 +737,21 @@ document.addEventListener("keydown", (event) => {
   }
 </script>
 <!-- PWA-SW:end -->
-</body>
+
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
+
+  </body>
 </html>
