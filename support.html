@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <meta name="description" content="Get help with a RentEvent booking, payment, listing or account." />
   <title>Support | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -464,6 +465,59 @@
         padding: 24px;
       }
     }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    [hidden]{display:none!important}
   </style>
 
   <!-- PWA:start (managed) -->
@@ -501,7 +555,7 @@
       <div class="hero-content">
         <h2 class="hero-title">How can we help?</h2>
         <p class="hero-subtitle">
-          Get help with accounts, booking requests, vendor listings, messages, safety concerns, payments, or launch questions.
+          Get help with accounts, booking requests, vendor listings, messages, safety concerns, payments, or anything else.
         </p>
 
         <div class="hero-actions">
@@ -523,7 +577,7 @@
 
       <div class="support-grid">
         <button class="support-card" type="button" data-topic="Account / Login Help">
-          <div class="support-icon">ACC</div>
+          <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 20c.9-3.6 3.9-5.6 7.5-5.6s6.6 2 7.5 5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="support-copy">
             <h3>Account or Login</h3>
             <p>Help with signing in, role access, profiles, account settings, or deactivation.</p>
@@ -531,7 +585,7 @@
         </button>
 
         <button class="support-card" type="button" data-topic="Booking Request Help">
-          <div class="support-icon">REQ</div>
+          <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><rect x="5.5" y="5" width="13" height="15" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 5V3.8h5V5M9 11h6M9 14.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="support-copy">
             <h3>Booking Requests</h3>
             <p>Help with request status, vendor responses, customer details, or missing request threads.</p>
@@ -539,7 +593,7 @@
         </button>
 
         <button class="support-card" type="button" data-topic="Messages / Notifications Help">
-          <div class="support-icon">MSG</div>
+          <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><path d="M20 12.2c0 3.8-3.6 6.9-8 6.9a9.4 9.4 0 0 1-2.6-.4L4.5 20l1.1-3.3A6.5 6.5 0 0 1 4 12.2c0-3.8 3.6-6.9 8-6.9s8 3.1 8 6.9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="support-copy">
             <h3>Messages or Alerts</h3>
             <p>Help with chat threads, unread badges, notifications, or missing conversations.</p>
@@ -547,7 +601,7 @@
         </button>
 
         <button class="support-card" type="button" data-topic="Vendor Listing Help">
-          <div class="support-icon">VEN</div>
+          <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><path d="M4.5 9.5h15V19a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 9.5 5.8 4.5h12.4L20 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 20.5v-5h4v5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="support-copy">
             <h3>Vendor Listings</h3>
             <p>Help creating, editing, publishing, or correcting a vendor listing or profile.</p>
@@ -555,7 +609,7 @@
         </button>
 
         <button class="support-card" type="button" data-topic="Safety / Trust Concern">
-          <div class="support-icon">SAFE</div>
+          <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><path d="M12 3.2 5.5 5.8v5.4c0 4.2 2.7 7.6 6.5 9.1 3.8-1.5 6.5-4.9 6.5-9.1V5.8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.3 12.2l1.9 1.9 3.6-3.9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="support-copy">
             <h3>Safety or Trust</h3>
             <p>For concerning listings, suspicious users, unsafe behavior, or platform policy concerns.</p>
@@ -563,7 +617,7 @@
         </button>
 
         <button class="support-card" type="button" data-topic="Billing / Subscription Help">
-          <div class="support-icon">BILL</div>
+          <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><rect x="3.5" y="6" width="17" height="12" rx="2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 10h17M7 14.3h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="support-copy">
             <h3>Billing or Plans</h3>
             <p>Help with vendor plans, planner plans, customer fees, subscriptions, or payment questions.</p>
@@ -575,7 +629,7 @@
     <section class="section" id="supportFormSection">
       <h2 class="section-title">Contact Support</h2>
 
-      <div class="form-card">
+      <div class="form-card" id="supportFormCard">
         <div class="form-grid">
           <div>
             <label for="nameInput">Name</label>
@@ -628,13 +682,11 @@
         </div>
 
         <div class="button-row">
-          <button class="btn" type="button" id="sendSupportBtn">Send Support Email</button>
+          <button class="btn" type="button" id="sendSupportBtn">Send Message</button>
           <a class="btn-secondary" href="report.html">Report Concern</a>
         </div>
 
-        <div class="status-message" id="supportStatus">
-          Your email app should open with your support request filled in.
-        </div>
+        <div class="status-message" id="supportStatus" style="display:none;"></div>
       </div>
     </section>
 
@@ -659,7 +711,7 @@
         <div class="faq-item">
           <h3>Why are messages or notifications missing?</h3>
           <p>
-            During launch, message threads are tied to booking requests and conversations. Include the request ID, listing name, vendor name, and account email when contacting support.
+            Message threads are tied to your booking requests, so everything about an event stays in one place. Include the request ID, listing name, vendor name, and account email when contacting support.
           </p>
         </div>
 
@@ -673,8 +725,27 @@
     </section>
   </main>
 
-  <script>
-    const SUPPORT_EMAIL = "support@rentevent-app.com";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+      authDomain: "rent-event-f7abd.firebaseapp.com",
+      projectId: "rent-event-f7abd",
+      storageBucket: "rent-event-f7abd.firebasestorage.app",
+      messagingSenderId: "840686040363",
+      appId: "1:840686040363:web:3103c8c5b624deecee416e",
+      measurementId: "G-600Z95K9GX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let signedInUser = null;
+    onAuthStateChanged(auth, (user) => { signedInUser = user || null; });
 
     function safeText(value, fallback = "") {
       return value && String(value).trim() ? String(value).trim() : fallback;
@@ -686,39 +757,56 @@
       document.getElementById("supportFormSection").scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    function sendSupportEmail() {
-      const name = safeText(document.getElementById("nameInput").value, "Not provided");
-      const email = safeText(document.getElementById("emailInput").value, "Not provided");
-      const role = safeText(document.getElementById("roleInput").value, "Not provided");
+    async function submitSupportRequest() {
+      const name = safeText(document.getElementById("nameInput").value, "");
+      const email = safeText(document.getElementById("emailInput").value, "");
+      const role = safeText(document.getElementById("roleInput").value, "");
       const topic = safeText(document.getElementById("topicInput").value, "Support Request");
-      const related = safeText(document.getElementById("relatedInput").value, "Not provided");
+      const related = safeText(document.getElementById("relatedInput").value, "");
       const message = safeText(document.getElementById("messageInput").value, "");
 
       if (!message) {
-        alert("Please add a message before sending.");
+        showAppNotice("Please add a message before sending.", "error");
         return;
       }
 
-      const subject = `RentEvent Support: ${topic}`;
-      const body = [
-        "RentEvent Support Request",
-        "",
-        `Name: ${name}`,
-        `Email: ${email}`,
-        `Role: ${role}`,
-        `Topic: ${topic}`,
-        `Related ID / Page: ${related}`,
-        "",
-        "Message:",
-        message,
-        "",
-        "Page: support.html"
-      ].join("\n");
+      const button = document.getElementById("sendSupportBtn");
+      const status = document.getElementById("supportStatus");
 
-      const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      button.disabled = true;
+      button.textContent = "Sending...";
 
-      document.getElementById("supportStatus").style.display = "block";
-      window.location.href = mailto;
+      try {
+        // Sent straight into RentEvent rather than through a mailto link, which
+        // silently did nothing on any phone without an email app set up.
+        await addDoc(collection(db, "supportRequests"), {
+          name,
+          email,
+          role,
+          topic,
+          relatedReference: related,
+          message: message.slice(0, 4000),
+          userId: signedInUser ? signedInUser.uid : "",
+          accountEmail: signedInUser ? (signedInUser.email || "") : "",
+          status: "new",
+          source: "support.html",
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById("supportFormCard").hidden = true;
+
+        status.style.display = "block";
+        status.textContent = "Your message is with the RentEvent team. We usually reply within one business day, by email if you left one.";
+
+        status.scrollIntoView({ behavior: "smooth", block: "center" });
+      } catch (error) {
+        console.error("Support request failed:", error);
+
+        button.disabled = false;
+        button.textContent = "Send Message";
+
+        showAppNotice("Your message did not go through. Check your connection and try again, or email support@rentevent-app.com.", "error");
+      }
     }
 
     document.querySelectorAll("[data-topic]").forEach((button) => {
@@ -727,7 +815,7 @@
       });
     });
 
-    document.getElementById("sendSupportBtn").addEventListener("click", sendSupportEmail);
+    document.getElementById("sendSupportBtn").addEventListener("click", submitSupportRequest);
   </script>
 
 <!-- PWA-SW:start (managed) -->
@@ -739,7 +827,79 @@
       });
     });
   }
+
+/**
+ * A small message that slides in at the bottom of the screen.
+ *
+ * This replaces window.alert, which stops the whole page, looks like a browser
+ * error, and on a phone reads as though something has gone wrong with the app.
+ */
+function showAppNotice(text, tone = "info") {
+  const existing = document.getElementById("appNotice");
+  if (existing) existing.remove();
+
+  const notice = document.createElement("div");
+  notice.id = "appNotice";
+  notice.setAttribute("role", "status");
+  notice.textContent = text;
+  notice.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "bottom:96px",
+    "transform:translateX(-50%)",
+    "max-width:min(92vw,430px)",
+    "padding:14px 20px",
+    "border-radius:18px",
+    "font-family:inherit",
+    "font-size:.88rem",
+    "font-weight:600",
+    "line-height:1.45",
+    "text-align:center",
+    "z-index:9999",
+    "box-shadow:0 14px 34px rgba(0,0,0,.2)",
+    tone === "error" ? "background:#fdecea;color:#8c2f22" : "background:#2b2622;color:#fff"
+  ].join(";");
+
+  document.body.appendChild(notice);
+  window.setTimeout(() => notice.remove(), 6000);
+}
+
+/** Turns a raw error into something a person can act on. */
+function friendlyProblem(error) {
+  const raw = String((error && error.message) || error || "").toLowerCase();
+
+  if (raw.includes("permission") || raw.includes("insufficient")) {
+    return "You do not have access to that. Try signing out and back in.";
+  }
+
+  if (raw.includes("network") || raw.includes("offline") || raw.includes("unavailable")) {
+    return "That did not go through. Check your connection and try again.";
+  }
+
+  if (raw.includes("not-found") || raw.includes("no document")) {
+    return "That item is no longer there. Refresh the page.";
+  }
+
+  return "That did not go through. Please try again.";
+}
+
 </script>
 <!-- PWA-SW:end -->
-</body>
+
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
+
+  </body>
 </html>
