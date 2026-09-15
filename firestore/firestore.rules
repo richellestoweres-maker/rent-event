@@ -180,6 +180,17 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Devices that have agreed to receive push notifications.
+    //
+    // The document id IS the push token, so a phone that re-registers updates
+    // its own row instead of creating a second one and getting notified twice.
+    // Only an admin can read the list back, because a push token is effectively
+    // a private address for somebody's phone.
+    match /pushTokens/{token} {
+      allow create, update: if signedIn();
+      allow read, delete: if isAdmin();
+    }
+
     // -----------------------------------------------------------------
     // Vendor quotes
     //
