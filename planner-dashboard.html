@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <meta name="description" content="Planner Pro on RentEvent. Manage client events, vendor requests and bookings from one place." />
   <title>Planner Dashboard | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -773,6 +774,60 @@
         max-width: 520px;
       }
     }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .success-icon svg { width: 30px; height: 30px; }
+    .verify-icon svg { width: 16px; height: 16px; }
   </style>
 
   <!-- PWA:start (managed) -->
@@ -817,7 +872,7 @@
           🔔
         </a>
 
-        <a class="icon-btn" href="profile.html" aria-label="Profile">☺</a>
+        <a class="icon-btn" href="profile.html" aria-label="Profile"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 20c.9-3.6 3.9-5.6 7.5-5.6s6.6 2 7.5 5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 
         <button class="logout-btn" onclick="logout()">Log Out</button>
       </div>
@@ -873,7 +928,7 @@
 
       <div class="quick-grid">
         <button class="quick-card" type="button" id="openCreateEventQuickBtn">
-          <div class="quick-icon">+</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><path d="M12 5.5v13M5.5 12h13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>New Client Event</h3>
             <p>Create a board with client name, event status, and planning details.</p>
@@ -881,7 +936,7 @@
         </button>
 
         <a class="quick-card" href="listings.html">
-          <div class="quick-icon">◎</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><circle cx="11" cy="11" r="6.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m15.6 15.6 3.9 3.9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>Vendor Search</h3>
             <p>Source DJs, singers, glam, venues, rentals, food, and more.</p>
@@ -889,7 +944,7 @@
         </a>
 
         <a class="quick-card" href="my-requests.html">
-          <div class="quick-icon">✉</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m4.5 7.5 7.5 5.5 7.5-5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>Requests</h3>
             <p>Track vendor responses across all client projects.</p>
@@ -898,7 +953,7 @@
 
         <a class="quick-card" href="messages.html">
           <span class="badge" id="messageQuickBadge">0</span>
-          <div class="quick-icon">☰</div>
+          <div class="quick-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><path d="M9 6.5h11M9 12h11M9 17.5h11M4.4 6.5h.01M4.4 12h.01M4.4 17.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div>
             <h3>Messages</h3>
             <p>Keep vendor conversations organized by event.</p>
@@ -915,7 +970,7 @@
 
       <div class="event-list" id="eventList">
         <div class="empty-card">
-          <div class="empty-icon">…</div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
           <h3>Loading events</h3>
           <p>We’re pulling your client event projects now.</p>
         </div>
@@ -1021,6 +1076,22 @@
       </div>
     </div>
   </div>
+
+  
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
 
   <nav class="bottom-nav" aria-label="Planner navigation">
       <a class="nav-item active" href="planner-dashboard.html">
@@ -1235,7 +1306,7 @@ async function switchDashboardRole(nextRole) {
   const allowedRoles = getAllowedRoles(currentUserData);
 
   if (!allowedRoles.includes(normalizedRole)) {
-    alert("This dashboard is not enabled on your account yet.");
+    showAppNotice("That view is not set up on your account yet. You can add a vendor or planner profile from your profile page.");
     renderRoleSwitcher(currentUserData, getActiveRole(currentUserData));
     return;
   }
@@ -1378,7 +1449,7 @@ async function loadUnreadCounts(user) {
 function renderEmptyEvents() {
   document.getElementById("eventList").innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">+</div>
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 5.5v13M5.5 12h13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>No client events yet</h3>
       <p>Create your first client project so vendors, messages, notes, and requests stay organized by event.</p>
       <button class="btn" type="button" onclick="openPlannerEventModalFromWindow()">Create Client Event</button>
@@ -1432,8 +1503,8 @@ function renderEvents() {
           </div>
 
           <div class="stat-box">
-            <span class="stat-number">Concierge</span>
-            <span class="stat-label">Planner</span>
+            <span class="stat-number">AI</span>
+            <span class="stat-label">Concierge</span>
           </div>
         </div>
 
@@ -1568,7 +1639,7 @@ async function loadClientEvents(user) {
   } catch (error) {
     document.getElementById("eventList").innerHTML = `
       <div class="empty-card">
-        <div class="empty-icon">!</div>
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 4.6 21 19.4H3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 10.4v3.6M12 16.6h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>Could not load client events</h3>
         <p>Refresh the page and try again. If it keeps happening, let us know at support@rentevent-app.com.</p>
         <button class="btn" type="button" onclick="openPlannerEventModalFromWindow()">Create Client Event</button>
@@ -1747,6 +1818,43 @@ window.logout = async function () {
       });
     });
   }
+
+/**
+ * A small message that slides in at the bottom of the screen.
+ *
+ * This replaces window.alert, which stops the whole page, looks like a browser
+ * error, and on a phone reads as though something has gone wrong with the app.
+ */
+function showAppNotice(text, tone = "info") {
+  const existing = document.getElementById("appNotice");
+  if (existing) existing.remove();
+
+  const notice = document.createElement("div");
+  notice.id = "appNotice";
+  notice.setAttribute("role", "status");
+  notice.textContent = text;
+  notice.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "bottom:96px",
+    "transform:translateX(-50%)",
+    "max-width:min(92vw,430px)",
+    "padding:14px 20px",
+    "border-radius:18px",
+    "font-family:inherit",
+    "font-size:.88rem",
+    "font-weight:600",
+    "line-height:1.45",
+    "text-align:center",
+    "z-index:9999",
+    "box-shadow:0 14px 34px rgba(0,0,0,.2)",
+    tone === "error" ? "background:#fdecea;color:#8c2f22" : "background:#2b2622;color:#fff"
+  ].join(";");
+
+  document.body.appendChild(notice);
+  window.setTimeout(() => notice.remove(), 6000);
+}
+
 </script>
 <!-- PWA-SW:end -->
 </body>
