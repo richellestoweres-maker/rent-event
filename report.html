@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <meta name="description" content="Report a safety concern, a listing, or a message on RentEvent." />
   <title>Report a Concern | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -416,6 +417,59 @@
         align-items: start;
       }
     }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    [hidden]{display:none!important}
   </style>
 
   <!-- PWA:start (managed) -->
@@ -469,7 +523,7 @@
       <section class="section" style="margin-top:0;">
         <h2 class="section-title">Report Details</h2>
 
-        <div class="form-card">
+        <div class="form-card" id="reportFormCard">
           <div class="form-grid">
             <div>
               <label for="reportTypeInput">What are you reporting?</label>
@@ -553,13 +607,11 @@
           </div>
 
           <div class="button-row">
-            <button class="btn" type="button" id="sendReportBtn">Send Report Email</button>
+            <button class="btn" type="button" id="sendReportBtn">Send Report</button>
             <a class="btn-secondary" href="support.html">Contact Support</a>
           </div>
 
-          <div class="status-message" id="reportStatus">
-            Your email app should open with your report filled in.
-          </div>
+          <div class="status-message" id="reportStatus" style="display:none;"></div>
         </div>
       </section>
 
@@ -602,14 +654,33 @@
     </div>
   </main>
 
-  <script>
-    const REPORT_EMAIL = "support@rentevent-app.com";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
+      authDomain: "rent-event-f7abd.firebaseapp.com",
+      projectId: "rent-event-f7abd",
+      storageBucket: "rent-event-f7abd.firebasestorage.app",
+      messagingSenderId: "840686040363",
+      appId: "1:840686040363:web:3103c8c5b624deecee416e",
+      measurementId: "G-600Z95K9GX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let signedInUser = null;
+    onAuthStateChanged(auth, (user) => { signedInUser = user || null; });
 
     function safeText(value, fallback = "") {
       return value && String(value).trim() ? String(value).trim() : fallback;
     }
 
-    function sendReportEmail() {
+    async function submitReport() {
       const reportType = safeText(document.getElementById("reportTypeInput").value, "");
       const urgency = safeText(document.getElementById("urgencyInput").value, "");
       const role = safeText(document.getElementById("yourRoleInput").value, "");
@@ -622,59 +693,76 @@
       const emergencyChecked = document.getElementById("emergencyInput").checked;
 
       if (!reportType) {
-        alert("Please select what you are reporting.");
+        showAppNotice("Please choose what you are reporting.", "error");
         return;
       }
 
       if (!urgency) {
-        alert("Please select an urgency level.");
+        showAppNotice("Please choose how urgent this is.", "error");
         return;
       }
 
       if (!message) {
-        alert("Please describe what happened before sending.");
+        showAppNotice("Please describe what happened before sending.", "error");
         return;
       }
 
       if (!truthChecked) {
-        alert("Please confirm the report is accurate to the best of your knowledge.");
+        showAppNotice("Please confirm the report is accurate to the best of your knowledge.", "error");
         return;
       }
 
       if (!emergencyChecked) {
-        alert("Please confirm you understand RentEvent is not an emergency service.");
+        showAppNotice("Please confirm you understand RentEvent is not an emergency service.", "error");
         return;
       }
 
-      const subject = `RentEvent Report: ${reportType}`;
-      const body = [
-        "RentEvent Report",
-        "",
-        `Report Type: ${reportType}`,
-        `Urgency: ${urgency}`,
-        `Reporter Role: ${role || "Not provided"}`,
-        `Reporter Name: ${name}`,
-        `Reporter Email: ${email}`,
-        `Reported User / Listing / Business: ${reportedUser}`,
-        `Related ID / Page / Link: ${related}`,
-        "",
-        "What happened:",
-        message,
-        "",
-        "Confirmations:",
-        `Accurate to best knowledge: ${truthChecked ? "Yes" : "No"}`,
-        `Understands RentEvent is not emergency service: ${emergencyChecked ? "Yes" : "No"}`,
-        "",
-        "Page: report.html"
-      ].join("\n");
+      const button = document.getElementById("sendReportBtn");
+      const status = document.getElementById("reportStatus");
 
-      const mailto = `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      button.disabled = true;
+      button.textContent = "Sending...";
 
-      document.getElementById("reportStatus").style.display = "block";
-      window.location.href = mailto;
+      try {
+        // The report is written straight into RentEvent, so it arrives whether
+        // or not this phone has an email app set up. It used to open a mailto
+        // link, which on an iPhone with no mail account did nothing at all
+        // while still telling the person their report had been sent.
+        await addDoc(collection(db, "reports"), {
+          reportType,
+          urgency,
+          reporterRole: role,
+          reporterName: name,
+          reporterEmail: email,
+          reportedParty: reportedUser,
+          relatedReference: related,
+          message: message.slice(0, 4000),
+          confirmedAccurate: truthChecked === true,
+          confirmedNotEmergency: emergencyChecked === true,
+          reporterUserId: signedInUser ? signedInUser.uid : "",
+          reporterAccountEmail: signedInUser ? (signedInUser.email || "") : "",
+          status: "new",
+          source: "report.html",
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById("reportFormCard").hidden = true;
+
+        status.style.display = "block";
+        status.textContent = "Your report has been sent to the RentEvent team. We review every report and will follow up by email if we need more from you.";
+
+        status.scrollIntoView({ behavior: "smooth", block: "center" });
+      } catch (error) {
+        console.error("Report submission failed:", error);
+
+        button.disabled = false;
+        button.textContent = "Send Report";
+
+        showAppNotice("Your report did not go through. Check your connection and try again, or email support@rentevent-app.com.", "error");
+      }
     }
 
-    document.getElementById("sendReportBtn").addEventListener("click", sendReportEmail);
+    document.getElementById("sendReportBtn").addEventListener("click", submitReport);
   </script>
 
 <!-- PWA-SW:start (managed) -->
@@ -686,7 +774,79 @@
       });
     });
   }
+
+/**
+ * A small message that slides in at the bottom of the screen.
+ *
+ * This replaces window.alert, which stops the whole page, looks like a browser
+ * error, and on a phone reads as though something has gone wrong with the app.
+ */
+function showAppNotice(text, tone = "info") {
+  const existing = document.getElementById("appNotice");
+  if (existing) existing.remove();
+
+  const notice = document.createElement("div");
+  notice.id = "appNotice";
+  notice.setAttribute("role", "status");
+  notice.textContent = text;
+  notice.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "bottom:96px",
+    "transform:translateX(-50%)",
+    "max-width:min(92vw,430px)",
+    "padding:14px 20px",
+    "border-radius:18px",
+    "font-family:inherit",
+    "font-size:.88rem",
+    "font-weight:600",
+    "line-height:1.45",
+    "text-align:center",
+    "z-index:9999",
+    "box-shadow:0 14px 34px rgba(0,0,0,.2)",
+    tone === "error" ? "background:#fdecea;color:#8c2f22" : "background:#2b2622;color:#fff"
+  ].join(";");
+
+  document.body.appendChild(notice);
+  window.setTimeout(() => notice.remove(), 6000);
+}
+
+/** Turns a raw error into something a person can act on. */
+function friendlyProblem(error) {
+  const raw = String((error && error.message) || error || "").toLowerCase();
+
+  if (raw.includes("permission") || raw.includes("insufficient")) {
+    return "You do not have access to that. Try signing out and back in.";
+  }
+
+  if (raw.includes("network") || raw.includes("offline") || raw.includes("unavailable")) {
+    return "That did not go through. Check your connection and try again.";
+  }
+
+  if (raw.includes("not-found") || raw.includes("no document")) {
+    return "That item is no longer there. Refresh the page.";
+  }
+
+  return "That did not go through. Please try again.";
+}
+
 </script>
 <!-- PWA-SW:end -->
-</body>
+
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
+
+  </body>
 </html>
