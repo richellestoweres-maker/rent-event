@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="See photos, pricing, service area and availability for this event vendor, then message them and request a booking through RentEvent." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="RentEvent" />
+  <meta property="og:title" content="Listing Details | RentEvent" />
+  <meta property="og:description" content="See photos, pricing, service area and availability for this event vendor, then message them and request a booking through RentEvent." />
+  <meta property="og:image" content="https://www.rentevent-app.com/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Listing Details | RentEvent" />
+  <meta name="twitter:description" content="See photos, pricing, service area and availability for this event vendor, then message them and request a booking through RentEvent." />
   <title>Listing Details | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -633,6 +642,62 @@
         max-width: 780px;
       }
     }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .success-icon svg { width: 30px; height: 30px; }
+    .verify-icon svg { width: 16px; height: 16px; }
+  
+    .feature-icon svg { width: 20px; height: 20px; }
   </style>
 
   <!-- PWA:start (managed) -->
@@ -713,10 +778,10 @@
         <h2 class="section-title">What’s Included</h2>
         <div class="card">
           <div class="feature-list">
-            <div class="feature-item"><div class="feature-icon">✓</div><div class="feature-copy"><h3>Included Details</h3><p id="includedText">Loading included details...</p></div></div>
-            <div class="feature-item"><div class="feature-icon">★</div><div class="feature-copy"><h3>Best For</h3><p id="eventTypeText">Loading event types...</p></div></div>
-            <div class="feature-item"><div class="feature-icon">⌂</div><div class="feature-copy"><h3>Service Area</h3><p id="serviceAreaText">Loading service area...</p></div></div>
-            <div class="feature-item"><div class="feature-icon">↗</div><div class="feature-copy"><h3>Travel / National Service</h3><p id="travelText">Loading travel details...</p></div></div>
+            <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="m5.5 12.6 4.2 4.2 8.8-9.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-copy"><h3>Included Details</h3><p id="includedText">Checking what is included...</p></div></div>
+            <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 4.2 13.9 9.4 19.3 11 13.9 12.6 12 17.8 10.1 12.6 4.7 11l5.4-1.6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-copy"><h3>Best For</h3><p id="eventTypeText">Checking which events this suits...</p></div></div>
+            <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 21s6.2-5.3 6.2-10A6.2 6.2 0 0 0 5.8 11c0 4.7 6.2 10 6.2 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10.8" r="2.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-copy"><h3>Service Area</h3><p id="serviceAreaText">Checking the service area...</p></div></div>
+            <div class="feature-item"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M4 13.2 20 5l-5.2 15.3-2.7-6.2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m12.1 14.1 3.4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="feature-copy"><h3>Travel / National Service</h3><p id="travelText">Checking travel options...</p></div></div>
           </div>
         </div>
       </section>
@@ -747,14 +812,14 @@
         <h2 class="section-title">Details</h2>
         <div class="card">
           <div class="detail-grid">
-            <div class="detail-row"><div class="detail-label">Main Category</div><div class="detail-value" id="mainCategoryValue">Loading</div></div>
-            <div class="detail-row"><div class="detail-label">Service</div><div class="detail-value" id="categoryValue">Loading</div></div>
-            <div class="detail-row"><div class="detail-label">Best For</div><div class="detail-value" id="eventTypeValue">Loading</div></div>
-            <div class="detail-row"><div class="detail-label">Starting Price</div><div class="detail-value" id="priceValue">Loading</div></div>
-            <div class="detail-row"><div class="detail-label">Base Location</div><div class="detail-value" id="locationValue">Loading</div></div>
-            <div class="detail-row"><div class="detail-label">Service Area</div><div class="detail-value" id="serviceAreaValue">Loading</div></div>
-            <div class="detail-row"><div class="detail-label">ZIP</div><div class="detail-value" id="zipValue">Loading</div></div>
-            <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value" id="statusValue">Loading</div></div>
+            <div class="detail-row"><div class="detail-label">Main Category</div><div class="detail-value" id="mainCategoryValue">Checking...</div></div>
+            <div class="detail-row"><div class="detail-label">Service</div><div class="detail-value" id="categoryValue">Checking...</div></div>
+            <div class="detail-row"><div class="detail-label">Best For</div><div class="detail-value" id="eventTypeValue">Checking...</div></div>
+            <div class="detail-row"><div class="detail-label">Starting Price</div><div class="detail-value" id="priceValue">Checking...</div></div>
+            <div class="detail-row"><div class="detail-label">Base Location</div><div class="detail-value" id="locationValue">Checking...</div></div>
+            <div class="detail-row"><div class="detail-label">Service Area</div><div class="detail-value" id="serviceAreaValue">Checking...</div></div>
+            <div class="detail-row"><div class="detail-label">ZIP</div><div class="detail-value" id="zipValue">Checking...</div></div>
+            <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value" id="statusValue">Checking...</div></div>
           </div>
         </div>
       </section>
@@ -1181,7 +1246,7 @@ function renderMissingListing(message) {
   page.innerHTML = `
     <section class="content" style="margin-top: 0; padding-top: 20px;">
       <div class="empty-card">
-        <div class="empty-icon">!</div>
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 4.6 21 19.4H3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 10.4v3.6M12 16.6h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h2>Listing not found</h2>
         <p>${escapeHtml(message)}</p>
         <a class="action-btn" href="${escapeHtml(backUrl)}">Back to Listings</a>
@@ -1426,7 +1491,7 @@ async function startConversation() {
   }
 
   if (isAdminPreview()) {
-    showStatus("Admin preview mode is view-only. Use a customer or planner test account to test messaging.", "error");
+    showStatus("You are viewing this as an admin, so messaging is turned off here.", "error");
     return;
   }
 
@@ -1700,5 +1765,21 @@ onAuthStateChanged(auth, async (user) => {
   }
 </script>
 <!-- PWA-SW:end -->
-</body>
+
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
+
+  </body>
 </html>
