@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Your RentEvent vendor portal. Manage listings, respond to booking requests, and get paid automatically." />
   <title>Vendor Dashboard | RentEvent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -904,6 +905,60 @@
         max-width: 520px;
       }
     }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .success-icon svg { width: 30px; height: 30px; }
+    .verify-icon svg { width: 16px; height: 16px; }
   </style>
 
   <!-- PWA:start (managed) -->
@@ -1108,7 +1163,7 @@
 
       <div class="request-list" id="recentRequestList">
         <div class="empty-card">
-          <div class="empty-icon">...</div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
           <h3>Loading requests</h3>
           <p>We’re checking for incoming booking requests.</p>
         </div>
@@ -1123,13 +1178,29 @@
 
       <div class="listing-list" id="recentListingList">
         <div class="empty-card">
-          <div class="empty-icon">...</div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
           <h3>Loading listings</h3>
           <p>We’re pulling your vendor listings now.</p>
         </div>
       </div>
     </section>
   </main>
+
+  
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
 
   <nav class="bottom-nav" aria-label="Vendor navigation">
   <a class="nav-item active" href="vendor-dashboard.html" id="bottomHomeLink">
@@ -1369,7 +1440,7 @@ async function switchDashboardRole(nextRole) {
   const allowedRoles = getAllowedRoles(currentUserData);
 
   if (!normalizedRole || !allowedRoles.includes(normalizedRole)) {
-    alert("This dashboard is not enabled on your account yet.");
+    showAppNotice("That view is not set up on your account yet. You can add a vendor or planner profile from your profile page.");
     renderRoleSwitcher(currentUserData, getActiveRole(currentUserData));
     return;
   }
@@ -2024,7 +2095,7 @@ async function loadUnreadCounts(user) {
 function renderEmptyListings() {
   document.getElementById("recentListingList").innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">+</div>
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><path d="M12 5.5v13M5.5 12h13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>No listings yet</h3>
       <p>Add your first service so customers can find and request your business.</p>
       <a class="btn" href="add-listing.html">Add Listing</a>
@@ -2077,7 +2148,7 @@ function renderListings(listings) {
 function renderEmptyRequests() {
   document.getElementById("recentRequestList").innerHTML = `
     <div class="empty-card">
-      <div class="empty-icon">IN</div>
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><rect x="3.6" y="5" width="16.8" height="14" rx="2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.6 13.5H8a1 1 0 0 1 1 1 1 1 0 0 0 1 1h4a1 1 0 0 0 1-1 1 1 0 0 1 1-1h4.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>No booking requests yet</h3>
       <p>When customers or planners submit requests that include your listings, they’ll show here.</p>
       <a class="btn" href="booking-requests.html">Open Requests</a>
@@ -2382,18 +2453,18 @@ onAuthStateChanged(auth, async (user) => {
 
     document.getElementById("recentRequestList").innerHTML = `
       <div class="empty-card">
-        <div class="empty-icon">A</div>
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>Admin preview mode</h3>
-        <p>Vendor-specific requests only appear when logged in as an actual vendor. Use this page to review layout and navigation.</p>
+        <p>Requests appear here when you are signed in as the vendor they were sent to.</p>
         <a class="btn" href="booking-requests.html">Open Requests Page</a>
       </div>
     `;
 
     document.getElementById("recentListingList").innerHTML = `
       <div class="empty-card">
-        <div class="empty-icon">A</div>
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" width="22" height="22" aria-hidden="true" focusable="false" style="display:block"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>Admin preview mode</h3>
-        <p>Vendor-specific listings only appear when logged in as an actual vendor. Use this page to review layout and navigation.</p>
+        <p>Listings appear here when you are signed in as the vendor who owns them.</p>
         <a class="btn" href="my-listings.html">Open Listings Page</a>
       </div>
     `;
@@ -2421,6 +2492,43 @@ onAuthStateChanged(auth, async (user) => {
       });
     });
   }
+
+/**
+ * A small message that slides in at the bottom of the screen.
+ *
+ * This replaces window.alert, which stops the whole page, looks like a browser
+ * error, and on a phone reads as though something has gone wrong with the app.
+ */
+function showAppNotice(text, tone = "info") {
+  const existing = document.getElementById("appNotice");
+  if (existing) existing.remove();
+
+  const notice = document.createElement("div");
+  notice.id = "appNotice";
+  notice.setAttribute("role", "status");
+  notice.textContent = text;
+  notice.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "bottom:96px",
+    "transform:translateX(-50%)",
+    "max-width:min(92vw,430px)",
+    "padding:14px 20px",
+    "border-radius:18px",
+    "font-family:inherit",
+    "font-size:.88rem",
+    "font-weight:600",
+    "line-height:1.45",
+    "text-align:center",
+    "z-index:9999",
+    "box-shadow:0 14px 34px rgba(0,0,0,.2)",
+    tone === "error" ? "background:#fdecea;color:#8c2f22" : "background:#2b2622;color:#fff"
+  ].join(";");
+
+  document.body.appendChild(notice);
+  window.setTimeout(() => notice.remove(), 6000);
+}
+
 </script>
 <!-- PWA-SW:end -->
 </body>
