@@ -34,7 +34,10 @@ messaging.onBackgroundMessage(function (payload) {
 
   var title = note.title || data.title || "RentEvent";
   var body = note.body || data.body || "Someone needs help.";
-  var link = data.link || "/admin-dashboard.html";
+  // Defaults to the notifications list, not the admin dashboard. Most people
+  // receiving these are customers and vendors, and sending them somewhere they
+  // are not allowed to go is worse than sending them somewhere plain.
+  var link = data.link || "/notifications.html";
 
   return self.registration.showNotification(title, {
     body: body,
@@ -55,7 +58,7 @@ messaging.onBackgroundMessage(function (payload) {
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
-  var link = (event.notification.data && event.notification.data.link) || "/admin-dashboard.html";
+  var link = (event.notification.data && event.notification.data.link) || "/notifications.html";
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
