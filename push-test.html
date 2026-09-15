@@ -125,6 +125,11 @@
       <div class="token" id="token" style="display:none;"></div>
     </div>
 
+    <div class="card">
+      <h2>Under the hood</h2>
+      <div class="token" id="workerState" style="display:block;">Checking...</div>
+    </div>
+
     <div class="card" id="iosHelp" style="display:none;">
       <h2>On an iPhone, read this first</h2>
       <ol class="steps">
@@ -229,6 +234,10 @@ function renderChecks() {
             : "Not asked yet. Tap the button below.")
   });
 
+  // Rendered synchronously first, then the service worker facts are filled in
+  // once the browser answers, because those answers are async.
+  renderLiveWorkerState();
+
   document.getElementById("checks").innerHTML = rows.map(r => `
     <div class="check ${r.state}">
       <span class="mark">${r.state === "ok" ? "&#10003;" : (r.state === "no" ? "&#10007;" : "!")}</span>
@@ -236,6 +245,66 @@ function renderChecks() {
     </div>`).join("");
 
   if (ios && !standalone) document.getElementById("iosHelp").style.display = "block";
+}
+
+/**
+ * The question that actually mattered and that nothing was reporting: does a
+ * live push subscription exist right now?
+ *
+ * A token can be handed out and then quietly orphaned when another service
+ * worker takes over its scope. From then on every send succeeds and nothing
+ * arrives, which is indistinguishable from Apple being difficult unless you
+ * look here.
+ */
+async function renderLiveWorkerState() {
+  const box = document.getElementById("workerState");
+  if (!box) return;
+
+  if (!("serviceWorker" in navigator)) {
+    box.textContent = "Service workers are not available in this browser.";
+    return;
+  }
+
+  try {
+    const regs = await navigator.serviceWorker.getRegistrations();
+
+    const lines = [];
+
+    for (const reg of regs) {
+      const script = (reg.active && reg.active.scriptURL) ||
+                     (reg.installing && reg.installing.scriptURL) ||
+                     (reg.waiting && reg.waiting.scriptURL) || "unknown";
+      const name = script.split("/").pop();
+      let sub = null;
+      try { sub = await reg.pushManager.getSubscription(); } catch (e) { /* not supported here */ }
+      lines.push(
+        name + "\n   scope " + reg.scope.replace(location.origin, "") +
+        "\n   push subscription: " + (sub ? "yes" : "no")
+      );
+    }
+
+    const pushReg = regs.find(r => {
+      const u = (r.active && r.active.scriptURL) || "";
+      return u.indexOf("firebase-messaging-sw.js") !== -1;
+    });
+
+    let verdict;
+    if (!regs.length) {
+      verdict = "No service workers registered yet. Tap Enable below.";
+    } else if (!pushReg) {
+      verdict = "The push worker is not registered yet. Tap Enable below.";
+    } else {
+      let sub = null;
+      try { sub = await pushReg.pushManager.getSubscription(); } catch (e) {}
+      verdict = sub
+        ? "A live push subscription exists. Notifications sent from RentEvent should reach this device."
+        : "The push worker is registered but has NO subscription, so nothing sent from RentEvent can arrive. Tap Enable below to rebuild it.";
+    }
+
+    box.textContent = verdict + "\n\n" + lines.join("\n\n");
+  } catch (error) {
+    box.textContent = "Could not read service worker state: " + error.message;
+  }
 }
 
 function say(message, kind) {
@@ -280,8 +349,37 @@ document.getElementById("enableBtn").addEventListener("click", async () => {
       return;
     }
 
-    const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-    await navigator.serviceWorker.ready;
+    // The scope here is the whole reason this works.
+    //
+    // Every page in RentEvent registers sw.js at the root scope "/". A service
+    // worker registration is keyed by its scope, so registering this one at "/"
+    // too meant the two replaced each other. The push subscription belongs to
+    // the registration, so the moment sw.js won the scope back the subscription
+    // was destroyed, leaving a token in the database pointing at a mailbox that
+    // no longer existed. Firebase would happily accept a send and nothing would
+    // ever arrive.
+    //
+    // Giving this one its own scope lets the two live side by side.
+    const registration = await navigator.serviceWorker.register(
+      "/firebase-messaging-sw.js",
+      { scope: "/firebase-cloud-messaging-push-scope" }
+    );
+
+    // Wait for THIS registration to be active, not whichever worker happens to
+    // control the page. navigator.serviceWorker.ready resolves for the page's
+    // controller, which is sw.js, so it was never the right thing to wait on.
+    if (!registration.active) {
+      await new Promise((resolve) => {
+        const worker = registration.installing || registration.waiting;
+        if (!worker) return resolve();
+        worker.addEventListener("statechange", function handler() {
+          if (worker.state === "activated") {
+            worker.removeEventListener("statechange", handler);
+            resolve();
+          }
+        });
+      });
+    }
 
     const messaging = getMessaging(app);
     const token = await getToken(messaging, {
