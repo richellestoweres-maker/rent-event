@@ -358,6 +358,47 @@ h1 {
       line-height: 1.55;
       color: var(--muted, #6b6259);
     }
+  
+    /* Login and Create Account centre their card with a flex body. The shared
+       footer became a second item in that row and sat BESIDE the card instead
+       of underneath it, which is what looked wrong on a wide screen. Stacking
+       the direction puts it back, and the auto margins keep the card centred
+       while the footer settles at the bottom.
+
+       The shared footer colours were written for the cream pages. On the coral
+       gradient they were close to unreadable, so they lighten here. */
+    body {
+      flex-direction: column;
+      align-items: center;
+    }
+    body > .container {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    .site-footer {
+      width: 100%;
+      max-width: 780px;
+      margin-top: 0;
+      padding: 26px 16px 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.32);
+    }
+    .footer-links a { color: #ffffff; }
+    .footer-legal,
+    .footer-contact { color: rgba(255, 255, 255, 0.88); }
+    .footer-contact a { color: #ffffff; }
+
+    @media (max-height: 760px) {
+      body {
+        justify-content: flex-start;
+        align-items: center;
+        overflow-y: auto;
+      }
+      body > .container {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      .site-footer { padding-bottom: 20px; }
+    }
   </style>
 
   <!-- PWA:start (managed) -->
