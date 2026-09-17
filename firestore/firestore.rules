@@ -191,6 +191,30 @@ service cloud.firestore {
       allow read, delete: if isAdmin();
     }
 
+    // A vendor pulling out of a booking the customer already paid for.
+    //
+    // The document id is fixed as cancel_<booking>_<vendor> and the rule pins
+    // the vendorId to whoever is signed in, so a vendor can only ever cancel
+    // themselves off a booking, never somebody else.
+    //
+    // Nobody can edit one of these afterwards except an admin. The server reads
+    // this document to decide how much money to send back, so letting it be
+    // rewritten after the fact would be handing out a blank cheque.
+    match /vendorCancellations/{cancellationId} {
+      allow create: if signedIn() &&
+                       request.resource.data.vendorId == request.auth.uid &&
+                       request.resource.data.bookingRequestId is string &&
+                       request.resource.data.status == 'pending' &&
+                       request.resource.data.note is string &&
+                       request.resource.data.note.size() >= 10 &&
+                       request.resource.data.note.size() <= 2000;
+
+      allow get: if isAdmin() ||
+                    (signedIn() && resource.data.vendorId == request.auth.uid);
+      allow list: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
     // -----------------------------------------------------------------
     // Vendor quotes
     //
