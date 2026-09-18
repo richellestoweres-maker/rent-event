@@ -925,6 +925,47 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="cancelBookingModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="cancelBookingTitle">
+      <div class="modal-label">Cancel a Paid Booking</div>
+      <h2 class="modal-title" id="cancelBookingTitle">Cancel this booking</h2>
+
+      <p class="modal-text" id="cancelBookingWarning">
+        This customer has already paid and is counting on you.
+      </p>
+
+      <div class="modal-field">
+        <label for="cancelReasonSelect">Why are you cancelling?</label>
+        <select id="cancelReasonSelect">
+          <option value="">Choose a reason</option>
+          <option value="double_booked">I am double booked</option>
+          <option value="illness">Illness or emergency</option>
+          <option value="cannot_deliver">I cannot deliver what was agreed</option>
+          <option value="customer_asked">The customer asked me to</option>
+          <option value="other">Something else</option>
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label for="cancelReasonNote">Tell the customer what happened</label>
+        <textarea id="cancelReasonNote" placeholder="They will read this, so be straight with them."></textarea>
+      </div>
+
+      <p class="modal-hint">
+        The customer is refunded in full for your part of their event, you will not
+        be paid for it, and this cancellation is recorded on your account. Repeated
+        cancellations affect whether you keep receiving requests.
+      </p>
+
+      <div class="status-message" id="cancelBookingStatus" style="display:none;"></div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="cancelBookingBack">Never Mind</button>
+        <button class="btn-danger" type="button" id="confirmCancelBookingBtn">Cancel The Booking</button>
+      </div>
+    </div>
+  </div>
+
   
   <footer class="site-footer">
     <nav class="footer-links" aria-label="Policies and support">
@@ -1566,6 +1607,14 @@ function renderRequests() {
     const quoteStatus = safeText(quote?.status, "");
     const quoteNote = safeText(quote?.note, "");
 
+    // A booking the customer has already paid for is a different thing from a
+    // request. The vendor cannot re-price it or decline it, and the only way out
+    // is a cancellation that refunds the customer.
+    const isPaid = safeText(request.paymentStatus, "") === "paid";
+    const cancelledIds = Array.isArray(request.cancelledVendorIds) ? request.cancelledVendorIds : [];
+    const alreadyCancelled = cancelledIds.indexOf(currentUser?.uid || "") !== -1;
+    const daysToEvent = daysUntilEvent(eventDetails, request);
+
     const quoteBox = quote
       ? `
         <div class="quote-box">
@@ -1673,6 +1722,19 @@ function renderRequests() {
             <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
             ${conversationId ? `<button class="btn" type="button" data-message-request="${requestId}">Message ${escapeHtml(ownerLabel)}</button>` : ""}
           </div>
+        ` : alreadyCancelled ? `
+          <div class="withdrawn-box">
+            <h4>You cancelled this booking</h4>
+            <p>The customer has been refunded for your part of their event and you will not be paid for it.</p>
+          </div>
+          <div class="request-actions">
+            <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
+          </div>
+        ` : isPaid ? `
+          <div class="request-actions">
+            ${conversationId ? `<button class="btn" type="button" data-message-request="${requestId}">Message ${escapeHtml(ownerLabel)}</button>` : ""}
+            <button class="btn-danger" type="button" data-cancel-booking="${requestId}">Cancel This Booking</button>
+          </div>
         ` : `
           <div class="request-actions">
             <button class="btn-safe" type="button" data-respond-request="${requestId}" data-response-status="available">${quote ? "Update Price" : "Send Price"}</button>
@@ -1685,6 +1747,10 @@ function renderRequests() {
     `;
   }).join("");
 
+  document.querySelectorAll("[data-cancel-booking]").forEach((button) => {
+    button.addEventListener("click", () => openCancelBookingModal(button.dataset.cancelBooking));
+  });
+
   document.querySelectorAll("[data-respond-request]").forEach((button) => {
     button.addEventListener("click", () => {
       openResponseModal(button.dataset.respondRequest, button.dataset.responseStatus);
@@ -1696,6 +1762,144 @@ function renderRequests() {
       openMessageThreadForRequest(button.dataset.messageRequest);
     });
   });
+}
+
+/**
+ * How many days until the event, or null when the date cannot be read.
+ *
+ * Used to tell a cancelling vendor exactly how close they are cutting it. A
+ * vendor pulling out six days before a wedding should have to see the number.
+ */
+function daysUntilEvent(eventDetails, request) {
+  const raw = eventDetails?.eventDate || request?.eventDate || "";
+  if (!raw) return null;
+
+  const when = new Date(raw);
+  if (Number.isNaN(when.getTime())) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  when.setHours(0, 0, 0, 0);
+
+  return Math.round((when - today) / 86400000);
+}
+
+let cancellingRequestId = "";
+
+function openCancelBookingModal(requestId) {
+  if (isAdminPreview()) {
+    showStatus("You are viewing this as an admin, so cancelling is turned off here.", "error");
+    return;
+  }
+
+  // The id arrives url-encoded from the data attribute, the same way the
+  // response modal receives it.
+  const decodedId = decodeURIComponent(requestId);
+  const request = bookingRequests.find((item) => item.id === decodedId);
+  if (!request) return;
+
+  cancellingRequestId = decodedId;
+
+  const eventDetails = request.eventDetails || {};
+  const eventName = safeText(eventDetails.eventName || request.eventName, "this event");
+  const days = daysUntilEvent(eventDetails, request);
+
+  // Saying the number out loud is the friction. It is easy to cancel something
+  // abstract and much harder to cancel "a wedding in six days".
+  let warning = "This customer has already paid for " + eventName + " and is counting on you.";
+  if (days !== null && days >= 0) {
+    warning = days === 0
+      ? "This event is TODAY. " + eventName + " is happening now and the customer has already paid."
+      : "This event is in " + days + (days === 1 ? " day" : " days") +
+        ". The customer has already paid for " + eventName + " and is counting on you.";
+  }
+
+  document.getElementById("cancelBookingWarning").textContent = warning;
+  document.getElementById("cancelReasonSelect").value = "";
+  document.getElementById("cancelReasonNote").value = "";
+
+  const status = document.getElementById("cancelBookingStatus");
+  status.style.display = "none";
+  status.textContent = "";
+
+  const confirm = document.getElementById("confirmCancelBookingBtn");
+  confirm.disabled = false;
+  confirm.textContent = "Cancel The Booking";
+
+  document.getElementById("cancelBookingModal").classList.add("show");
+  document.getElementById("cancelBookingModal").setAttribute("aria-hidden", "false");
+}
+
+function closeCancelBookingModal() {
+  cancellingRequestId = "";
+  document.getElementById("cancelBookingModal").classList.remove("show");
+  document.getElementById("cancelBookingModal").setAttribute("aria-hidden", "true");
+}
+
+/**
+ * Records the cancellation and lets the server do the rest.
+ *
+ * This deliberately does not touch the booking, the payout plan, or the refund.
+ * All of that needs the Stripe key and has to be right to the cent, so the page
+ * writes down what happened and a Cloud Function picks it up.
+ */
+async function submitBookingCancellation() {
+  const requestId = cancellingRequestId;
+  const request = bookingRequests.find((item) => item.id === requestId);
+  if (!request || !currentUser) return;
+
+  const reasonCode = document.getElementById("cancelReasonSelect").value;
+  const note = safeText(document.getElementById("cancelReasonNote").value, "");
+  const status = document.getElementById("cancelBookingStatus");
+
+  if (!reasonCode) {
+    status.style.display = "block";
+    status.textContent = "Please choose a reason before cancelling.";
+    return;
+  }
+
+  if (note.length < 10) {
+    status.style.display = "block";
+    status.textContent = "Please tell the customer what happened. They will read this.";
+    return;
+  }
+
+  const confirm = document.getElementById("confirmCancelBookingBtn");
+  confirm.disabled = true;
+  confirm.textContent = "Cancelling...";
+
+  try {
+    // Keyed on the booking and the vendor, so a double tap or a retry lands on
+    // the same document instead of refunding the customer twice.
+    const cancellationId = "cancel_" + requestId + "_" + currentUser.uid;
+
+    await setDoc(doc(db, "vendorCancellations", cancellationId), {
+      bookingRequestId: requestId,
+      vendorId: currentUser.uid,
+      vendorName: getVendorName(),
+      reasonCode,
+      reason: reasonCode + ": " + note,
+      note,
+      daysToEvent: daysUntilEvent(request.eventDetails || {}, request),
+      status: "pending",
+      createdAt: serverTimestamp()
+    }, { merge: true });
+
+    status.style.display = "block";
+    status.textContent = "Done. The customer is being refunded and has been told. This is recorded on your account.";
+    confirm.textContent = "Cancelled";
+
+    setTimeout(() => {
+      closeCancelBookingModal();
+      loadRequests();
+    }, 2600);
+  } catch (error) {
+    console.error("Cancellation failed:", error);
+    status.style.display = "block";
+    status.textContent = "That did not go through: " + error.message + ". Nothing has changed, please try again.";
+    confirm.disabled = false;
+    confirm.textContent = "Cancel The Booking";
+  }
 }
 
 function openResponseModal(requestId, status) {
@@ -2349,6 +2553,8 @@ async function loadBookingRequests() {
 
 document.getElementById("responseStatusSelect").addEventListener("change", syncQuoteFieldVisibility);
 document.getElementById("cancelResponseBtn").addEventListener("click", closeResponseModal);
+document.getElementById("cancelBookingBack").addEventListener("click", closeCancelBookingModal);
+document.getElementById("confirmCancelBookingBtn").addEventListener("click", submitBookingCancellation);
 document.getElementById("confirmResponseBtn").addEventListener("click", confirmResponse);
 
 document.getElementById("responseModal").addEventListener("click", (event) => {
