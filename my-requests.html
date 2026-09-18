@@ -1819,6 +1819,13 @@ function renderRequests() {
     const readyToPay = !isPaid && allQuotesAccepted(request);
     const quotedTotal = acceptedQuoteTotal(request);
 
+    // Vendors who pulled out after being paid. The customer needs to see this
+    // first, above everything else on the card, because it is the thing that
+    // breaks their event.
+    const cancelledIds = Array.isArray(request.cancelledVendorIds) ? request.cancelledVendorIds : [];
+    const cancelledVendors = vendors.filter((vendor) =>
+      cancelledIds.indexOf(safeText(vendor.vendorId, "")) !== -1);
+
     const vendorBox = vendors.length
       ? vendors.map((vendor) => {
           const title = safeText(vendor.listingTitle || vendor.title, "Requested Listing");
@@ -1829,13 +1836,16 @@ function renderRequests() {
           const responseStatus = safeText(response?.status, "");
           const responseLabel = getResponseLabel(responseStatus);
           const responsePillClass = getResponsePillClass(responseStatus);
+          const hasCancelled = cancelledIds.indexOf(safeText(vendor.vendorId, "")) !== -1;
 
           return `
             <div class="vendor-box">
               <h4>${escapeHtml(title)}</h4>
               <p>${escapeHtml(vendorName)} · ${escapeHtml(category)} · listed from ${escapeHtml(price)}</p>
               <div class="pill-row">
-                <span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>
+                ${hasCancelled
+                  ? `<span class="pill withdrawn">Cancelled by vendor</span>`
+                  : `<span class="pill ${responsePillClass}">${escapeHtml(responseLabel)}</span>`}
               </div>
             </div>
           `;
@@ -1914,6 +1924,34 @@ function renderRequests() {
           <div class="withdrawn-box">
             <h4>Request Withdrawn</h4>
             <p>You withdrew this request. Reason: ${escapeHtml(withdrawnReason)}</p>
+          </div>
+        ` : ""}
+
+        ${cancelledVendors.length ? `
+          <div class="withdrawn-box">
+            <h4>${cancelledVendors.length === 1 ? "A vendor cancelled" : cancelledVendors.length + " vendors cancelled"}</h4>
+            <p>
+              ${escapeHtml(cancelledVendors.map((v) => safeText(v.vendorName, "A vendor")).join(", "))}
+              ${cancelledVendors.length === 1 ? "has" : "have"} pulled out of this event.
+              You have been refunded for their part of it, which usually reaches your
+              card within five to ten days. You have not been charged anything for
+              the vendors who cancelled.
+            </p>
+            <div class="request-actions" style="margin-top:12px;">
+              ${cancelledVendors.map((vendor) => {
+                // Straight to other vendors in the same category, on the same
+                // event, so replacing somebody is one tap rather than starting
+                // the whole search again.
+                const cat = safeText(vendor.category || vendor.mainCategory, "");
+                const parts = [];
+                const thisEventId = getRequestEventId(request);
+                if (thisEventId) parts.push("eventId=" + encodeURIComponent(thisEventId));
+                if (cat) parts.push("category=" + encodeURIComponent(cat));
+                const href = "index.html" + (parts.length ? "?" + parts.join("&") : "");
+                const label = cat ? "Find another " + normalizeProfessionalLabel(cat) : "Find a replacement";
+                return `<a class="btn" href="${escapeHtml(href)}">${escapeHtml(label)}</a>`;
+              }).join("")}
+            </div>
           </div>
         ` : ""}
 
