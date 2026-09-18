@@ -890,6 +890,20 @@
     </div>
 
     </section>
+  <section class="section" id="cancellationsSection">
+    <div class="section-header">
+      <h2 class="section-title">Vendor Cancellations</h2>
+      <button class="section-link" type="button" onclick="loadCancellations()">Refresh</button>
+    </div>
+    <div class="list" id="cancellationsList">
+      <div class="empty-card">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
+        <h3>Loading</h3>
+        <p>Checking whether any vendors have pulled out of paid bookings.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="inboxSection">
     <div class="section-header">
       <h2 class="section-title">Support &amp; Reports</h2>
@@ -1867,6 +1881,81 @@ window.loadRequestsPage = function (reset) { loadRequestsPageImpl(reset !== fals
  * with no email app set up while still telling the person it had been sent.
  * They now write into RentEvent, and this is where those messages land.
  */
+/**
+ * Vendors who pulled out of bookings people had already paid for.
+ *
+ * Two things matter here and they are different. The first is the queue: any
+ * refund over the automatic limit stops and waits, and somebody has to notice.
+ * The second is the pattern: one cancellation is life, four is a vendor who
+ * should not be taking bookings, and that only shows up if the count is visible.
+ */
+window.loadCancellations = async function () {
+  var list = document.getElementById("cancellationsList");
+  if (!list) return;
+
+  var rows = [];
+  try {
+    var snap = await getDocs(collection(db2, "vendorCancellations"));
+    snap.forEach(function (d) { rows.push(Object.assign({ id: d.id }, d.data())); });
+  } catch (error) {
+    renderEmpty2("cancellationsList", "Could not load cancellations", error.message);
+    return;
+  }
+
+  if (!rows.length) {
+    renderEmpty2("cancellationsList", "No cancellations", "No vendor has pulled out of a paid booking.");
+    return;
+  }
+
+  rows.sort(function (a, b) {
+    return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
+  });
+
+  // How many times each vendor has done this, worked out from the
+  // cancellations themselves rather than trusting a counter that could drift.
+  var countByVendor = {};
+  rows.forEach(function (r) {
+    var v = safe2(r.vendorId, "");
+    if (v) countByVendor[v] = (countByVendor[v] || 0) + 1;
+  });
+
+  list.innerHTML = rows.map(function (r) {
+    var vendor = safe2(r.vendorName, "A vendor");
+    var status = safe2(r.status, "pending");
+    var refund = Number(r.refundCents || 0);
+    var days = r.daysToEvent;
+    var repeat = countByVendor[safe2(r.vendorId, "")] || 1;
+
+    // The one state that needs a human. Everything else is just history.
+    var needsYou = status === "awaiting_approval" || status === "refund_failed" || status === "missing_charge";
+
+    var statusPill = status === "refunded" ? "safe"
+      : (needsYou ? "red" : "blue");
+
+    var daysLine = (days === null || days === undefined)
+      ? ""
+      : (Number(days) < 0
+          ? "after the event"
+          : (Number(days) === 0 ? "on the day of the event" : Number(days) + " days before the event"));
+
+    return '<article class="item-card">'
+      + '<div class="item-top"><div>'
+      + '<h3 class="item-title">' + esc2(vendor) + '</h3>'
+      + '<p class="item-subtitle">' + esc2(fmtTime2(r.createdAt)) + (daysLine ? " &middot; cancelled " + esc2(daysLine) : "") + '</p>'
+      + '</div><div class="price">' + esc2(refund ? "$" + (refund / 100).toFixed(2) : "no refund") + '</div></div>'
+      + '<div class="pill-row">'
+      + '<span class="pill ' + statusPill + '">' + esc2(status.replace(/_/g, " ")) + '</span>'
+      + (repeat > 1 ? '<span class="pill red">' + repeat + ' cancellations</span>' : "")
+      + (needsYou ? '<span class="pill red">Needs you</span>' : "")
+      + '</div>'
+      + '<p style="margin:10px 0 0;white-space:pre-wrap;line-height:1.55;">' + esc2(safe2(r.note, "No note given")) + '</p>'
+      + (needsYou
+          ? '<p class="item-subtitle" style="margin-top:10px;">This refund was not sent automatically. The vendor is already off the payout plan, so the money is still held and nothing is lost by taking your time. Issue the refund in Stripe when you are ready.</p>'
+          : "")
+      + '</article>';
+  }).join("");
+};
+
 window.loadInbox = async function () {
   var list = document.getElementById("inboxList");
   if (!list) return;
@@ -1929,7 +2018,7 @@ window.loadAllData = async function () {
       loadCountsImpl(),
       loadUsersPageImpl(true),
       loadListingsPageImpl(true),
-      loadRequestsPageImpl(true), loadWaitlistPageImpl(true), window.loadInbox()
+      loadRequestsPageImpl(true), loadWaitlistPageImpl(true), window.loadInbox(), window.loadCancellations()
     ]);
   } catch (error) {
     var warn = document.getElementById("adminWarning");
