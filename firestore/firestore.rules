@@ -193,24 +193,53 @@ service cloud.firestore {
 
     // A vendor pulling out of a booking the customer already paid for.
     //
-    // The document id is fixed as cancel_<booking>_<vendor> and the rule pins
-    // the vendorId to whoever is signed in, so a vendor can only ever cancel
-    // themselves off a booking, never somebody else.
+    // There are two ways to get here and they are checked differently. A
+    // vendor writes cancel_<booking>_<vendor> and the rule pins the vendorId
+    // to whoever is signed in, so a vendor can only ever take themselves off a
+    // booking. A customer writes custcancel_<booking>_<vendor>, and there the
+    // booking itself is read to confirm the event is actually theirs.
     //
     // Nobody can edit one of these afterwards except an admin. The server reads
     // this document to decide how much money to send back, so letting it be
     // rewritten after the fact would be handing out a blank cheque.
+    function cancellationNoteIsSane() {
+      return request.resource.data.bookingRequestId is string &&
+             request.resource.data.vendorId is string &&
+             request.resource.data.status == 'pending' &&
+             request.resource.data.note is string &&
+             request.resource.data.note.size() >= 10 &&
+             request.resource.data.note.size() <= 2000;
+    }
+
+    // Whether the person signed in owns the booking being cancelled. Reading
+    // the booking here is what stops somebody cancelling a vendor off an event
+    // that is not theirs. get() with a default never errors on a missing field.
+    function ownsBooking(bookingId) {
+      return signedIn() &&
+             (get(/databases/$(database)/documents/bookingRequests/$(bookingId)).data.get('customerId', '') == request.auth.uid ||
+              get(/databases/$(database)/documents/bookingRequests/$(bookingId)).data.get('plannerId', '') == request.auth.uid ||
+              get(/databases/$(database)/documents/bookingRequests/$(bookingId)).data.get('requestOwnerId', '') == request.auth.uid);
+    }
+
     match /vendorCancellations/{cancellationId} {
+      // A vendor taking themselves off a booking.
       allow create: if signedIn() &&
+                       request.resource.data.get('initiatedBy', 'vendor') != 'customer' &&
                        request.resource.data.vendorId == request.auth.uid &&
-                       request.resource.data.bookingRequestId is string &&
-                       request.resource.data.status == 'pending' &&
-                       request.resource.data.note is string &&
-                       request.resource.data.note.size() >= 10 &&
-                       request.resource.data.note.size() <= 2000;
+                       cancellationNoteIsSane();
+
+      // A customer or their planner cancelling a vendor off their own booking.
+      // The server decides the refund from the published tiers, so the only
+      // thing that matters here is that this event really belongs to them.
+      allow create: if signedIn() &&
+                       request.resource.data.get('initiatedBy', '') == 'customer' &&
+                       request.resource.data.get('cancelledBy', '') == request.auth.uid &&
+                       cancellationNoteIsSane() &&
+                       ownsBooking(request.resource.data.bookingRequestId);
 
       allow get: if isAdmin() ||
-                    (signedIn() && resource.data.vendorId == request.auth.uid);
+                    (signedIn() && resource.data.vendorId == request.auth.uid) ||
+                    (signedIn() && resource.data.get('cancelledBy', '') == request.auth.uid);
       allow list: if isAdmin();
       allow update, delete: if isAdmin();
     }
