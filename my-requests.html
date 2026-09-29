@@ -692,6 +692,102 @@
       min-width: 0;
     }
 
+    .modal-card.wide {
+      max-width: 430px;
+      max-height: 86vh;
+      overflow-y: auto;
+    }
+
+    .modal-hint {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .refund-list {
+      margin: 4px 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .refund-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--soft-2);
+    }
+
+    .refund-row:last-child {
+      border-bottom: none;
+    }
+
+    .refund-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      flex: none;
+      accent-color: var(--coral-3);
+    }
+
+    .refund-row-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .refund-row-name {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .refund-row-note {
+      margin: 3px 0 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .refund-row-amount {
+      flex: none;
+      text-align: right;
+      font-size: 0.92rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .refund-row-amount small {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .refund-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin: 0 0 6px;
+      padding: 13px 15px;
+      border-radius: 20px;
+      background: var(--green-soft);
+      color: var(--green-text);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .refund-total.none {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
     .admin-preview-bar {
       display: none;
       position: sticky;
@@ -966,6 +1062,54 @@
       <div class="modal-actions">
         <button class="btn-secondary" type="button" id="keepRequestBtn">Keep Request</button>
         <button class="btn-danger" type="button" id="confirmWithdrawBtn">Withdraw Request</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="cancelBookingModal" aria-hidden="true">
+    <div class="modal-card wide" role="dialog" aria-modal="true" aria-labelledby="cancelBookingTitle">
+      <div class="modal-label">Cancel a Paid Booking</div>
+      <h2 class="modal-title" id="cancelBookingTitle">Cancel this booking</h2>
+
+      <p class="modal-text" id="cancelBookingWarning">
+        This booking is already paid for.
+      </p>
+
+      <div class="modal-field">
+        <label>Who are you cancelling?</label>
+        <div class="refund-list" id="cancelVendorList"></div>
+      </div>
+
+      <div class="refund-total" id="cancelRefundTotal">
+        <span>Coming back to you</span>
+        <span id="cancelRefundTotalAmount">$0</span>
+      </div>
+
+      <p class="modal-hint" id="cancelRefundExplainer"></p>
+
+      <div class="modal-field" style="margin-top:14px;">
+        <label for="cancelReasonSelect">Why are you cancelling?</label>
+        <select id="cancelReasonSelect">
+          <option value="">Choose a reason</option>
+          <option value="Event was called off">The event is not happening</option>
+          <option value="Event date changed">The date changed</option>
+          <option value="Budget changed">Our budget changed</option>
+          <option value="Going another way">We are going another way</option>
+          <option value="Problem with the vendor">There was a problem with the vendor</option>
+          <option value="Something else">Something else</option>
+        </select>
+      </div>
+
+      <div class="modal-field">
+        <label for="cancelReasonNote">Tell them what happened</label>
+        <textarea id="cancelReasonNote" placeholder="They held this date for you, so a short note goes a long way."></textarea>
+      </div>
+
+      <div class="status-message" id="cancelBookingStatus" style="display:none;"></div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" id="cancelBookingBack">Never Mind</button>
+        <button class="btn-danger" type="button" id="confirmCancelBookingBtn">Cancel Booking</button>
       </div>
     </div>
   </div>
@@ -1823,8 +1967,19 @@ function renderRequests() {
     // first, above everything else on the card, because it is the thing that
     // breaks their event.
     const cancelledIds = Array.isArray(request.cancelledVendorIds) ? request.cancelledVendorIds : [];
-    const cancelledVendors = vendors.filter((vendor) =>
-      cancelledIds.indexOf(safeText(vendor.vendorId, "")) !== -1);
+    const byCustomerIds = Array.isArray(request.customerCancelledVendorIds)
+      ? request.customerCancelledVendorIds : [];
+
+    // Two different stories. A vendor pulling out breaks the event and needs a
+    // replacement. A cancellation the customer made themselves is just a
+    // receipt, and offering to find them a replacement would be strange.
+    const cancelledVendors = vendors.filter((vendor) => {
+      const vendorId = safeText(vendor.vendorId, "");
+      return cancelledIds.indexOf(vendorId) !== -1 && byCustomerIds.indexOf(vendorId) === -1;
+    });
+
+    const selfCancelledVendors = vendors.filter((vendor) =>
+      byCustomerIds.indexOf(safeText(vendor.vendorId, "")) !== -1);
 
     const vendorBox = vendors.length
       ? vendors.map((vendor) => {
@@ -1955,6 +2110,18 @@ function renderRequests() {
           </div>
         ` : ""}
 
+        ${selfCancelledVendors.length ? `
+          <div class="withdrawn-box">
+            <h4>You cancelled ${selfCancelledVendors.length === 1 ? "a vendor" : selfCancelledVendors.length + " vendors"}</h4>
+            <p>
+              You cancelled ${escapeHtml(selfCancelledVendors.map((v) => safeText(v.vendorName, "a vendor")).join(", "))}
+              on this event. Any refund due under the cancellation policy is on its way
+              back to your card, usually within five to ten days. The RentEvent service
+              fee and the card processing fee are not refunded.
+            </p>
+          </div>
+        ` : ""}
+
         <div class="request-grid">
           <div class="info-row">
             <span class="info-label">Date</span>
@@ -2007,7 +2174,14 @@ function renderRequests() {
             ${readyToPay ? `<a class="btn" href="${escapeHtml(withEventParam("checkout.html", getRequestEventId(request)))}">Pay ${escapeHtml(formatMoney(quotedTotal))} plus fees</a>` : ""}
             <button class="${readyToPay ? "btn-secondary" : "btn"}" type="button" data-message-request-main="${requestId}">Message Vendor</button>
             <a class="btn-secondary" href="${escapeHtml(withEventParam("event-builder.html", getRequestEventId(request)))}">Edit Event</a>
-            <button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>
+            ${isPaid
+              // Withdrawing is for a request nobody has paid for. Once money
+              // has moved, cancelling means a refund and a vendor who has to
+              // be told, so it is a different button doing a different thing.
+              ? (activeVendorsFor(request).length
+                  ? `<button class="btn-danger" type="button" data-cancel-booking="${requestId}">Cancel Booking</button>`
+                  : "")
+              : `<button class="btn-danger" type="button" data-withdraw-request="${requestId}">Withdraw Request</button>`}
           </div>
         `}
       </article>
@@ -2044,11 +2218,401 @@ function renderRequests() {
     });
   });
 
+  document.querySelectorAll("[data-cancel-booking]").forEach((button) => {
+    button.addEventListener("click", () => {
+      cancelBooking(button.dataset.cancelBooking);
+    });
+  });
+
   document.querySelectorAll("[data-clear-request]").forEach((button) => {
     button.addEventListener("click", () => {
       clearRequestFromCustomerView(button.dataset.clearRequest);
     });
   });
+}
+
+/* ------------------------------------------------------------------
+ * Cancelling a booking that has already been paid for
+ *
+ * Withdrawing and cancelling are not the same thing. A request nobody has
+ * paid for can be withdrawn and nothing has moved. Once money has changed
+ * hands, cancelling means a refund, a vendor who has to be told, and a
+ * payout that has to be corrected, so it runs through the server.
+ *
+ * This page never touches the money. It works out what the refund will be
+ * so the customer can see it before they decide, writes down what they
+ * chose, and lets the Cloud Function do the rest with the Stripe key.
+ * ------------------------------------------------------------------ */
+
+/** The published tiers, in days before the event. Also in the Terms. */
+const FULL_REFUND_DAYS = 30;
+const HALF_REFUND_DAYS = 14;
+
+/**
+ * Days are counted on this clock here and on the server both.
+ *
+ * It has to be one fixed zone or the two disagree. Somebody in California at
+ * eleven at night is already on tomorrow's date in UTC, and at a tier
+ * boundary that one day is real money. Whatever number this page shows in
+ * the modal is the number the refund is worked out from.
+ */
+const POLICY_TIME_ZONE = "America/New_York";
+
+let cancellingRequestId = "";
+
+function todayOnPolicyClock() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: POLICY_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+
+  return parts.split("-").map(Number);
+}
+
+/**
+ * Whole calendar days between today and the event.
+ *
+ * Date.UTC on both sides turns two calendar dates into a clean difference
+ * with no clock and no daylight saving in the way. Returns null when there
+ * is no usable date, which is deliberately not the same as zero.
+ */
+function daysUntilEventFor(request) {
+  const details = request.eventDetails || {};
+  const raw = safeText(details.eventDate || request.eventDate, "");
+  if (!raw) return null;
+
+  const plain = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let y;
+  let m;
+  let d;
+
+  if (plain) {
+    y = Number(plain[1]);
+    m = Number(plain[2]);
+    d = Number(plain[3]);
+  } else {
+    const parsed = new Date(raw);
+    if (Number.isNaN(parsed.getTime())) return null;
+    y = parsed.getUTCFullYear();
+    m = parsed.getUTCMonth() + 1;
+    d = parsed.getUTCDate();
+  }
+
+  const [ty, tm, td] = todayOnPolicyClock();
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(ty, tm - 1, td)) / 86400000);
+}
+
+/** What this vendor was actually charged for, in dollars. */
+function vendorQuotedAmount(request, vendorId) {
+  const amounts = request.quotedVendorAmounts || {};
+  const paid = Number(amounts[vendorId]);
+
+  // Written down at checkout, so this is the number that was really charged.
+  if (Number.isFinite(paid) && paid > 0) return paid;
+
+  const quote = getQuote(request.id, vendorId);
+  return quote && quote.status === "accepted" ? Number(quote.amount || 0) : 0;
+}
+
+/**
+ * The refund for one vendor under the published tiers.
+ *
+ * Based on the vendor's price, not the total, because the service fee and
+ * the processing fee are not coming back. Halves are rounded down so this
+ * page never promises a cent the server will not send.
+ */
+function refundPreviewFor(request, vendorId, days) {
+  const base = Math.round(vendorQuotedAmount(request, vendorId) * 100);
+
+  if (base <= 0) return { cents: 0, tier: "unknown", label: "We will check this one" };
+  if (days === null) return { cents: 0, tier: "unknown", label: "We will check this one" };
+
+  // Whatever has not already gone back. The server caps the same way, and this
+  // page must never show a number larger than the one that actually arrives.
+  const collected = Math.round(Number(
+    request.stripeAmountCollectedCents || request.stripeAmountCents || 0));
+  const spokenFor = Math.round(Number(request.refundedCents || 0)) +
+                    Math.round(Number(request.refundReservedCents || 0));
+  const remaining = collected > 0 ? Math.max(0, collected - spokenFor) : base;
+
+  if (days >= FULL_REFUND_DAYS) {
+    return {
+      cents: Math.min(base, remaining),
+      tier: "full",
+      label: "Full refund, 30 or more days out"
+    };
+  }
+
+  if (days >= HALF_REFUND_DAYS) {
+    return {
+      cents: Math.min(Math.floor(base / 2), remaining),
+      tier: "half",
+      label: "Half refund, 14 to 29 days out"
+    };
+  }
+
+  return { cents: 0, tier: "none", label: "No refund, under 14 days" };
+}
+
+/** Vendors on this booking who have not already been cancelled. */
+function activeVendorsFor(request) {
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const cancelled = Array.isArray(request.cancelledVendorIds) ? request.cancelledVendorIds : [];
+  const seen = new Set();
+
+  return vendors.filter((vendor) => {
+    const vendorId = safeText(vendor.vendorId, "");
+    if (!vendorId || seen.has(vendorId)) return false;
+    if (cancelled.indexOf(vendorId) !== -1) return false;
+    seen.add(vendorId);
+    return true;
+  });
+}
+
+function openCancelBookingModal(requestId) {
+  if (isAdminPreview()) {
+    showStatus("You are viewing this as an admin, so cancelling is turned off here.", "error");
+    return;
+  }
+
+  const decodedId = decodeURIComponent(requestId);
+  const request = bookingRequests.find((item) => item.id === decodedId);
+  if (!request) return;
+
+  const vendors = activeVendorsFor(request);
+
+  if (!vendors.length) {
+    showStatus("Every vendor on this booking has already been cancelled.", "info");
+    return;
+  }
+
+  cancellingRequestId = decodedId;
+
+  const details = request.eventDetails || {};
+  const eventName = safeText(details.eventName || request.eventName, "this event");
+  const days = daysUntilEventFor(request);
+
+  // Saying the number out loud is the friction. It is easy to cancel
+  // something abstract and much harder to cancel "a wedding in nine days"
+  // once you have read what it costs.
+  let warning = "You have already paid for " + eventName + ".";
+
+  if (days !== null && days >= 0) {
+    warning = days === 0
+      ? eventName + " is TODAY, and it has been paid for."
+      : eventName + " is in " + days + (days === 1 ? " day" : " days") + ", and it has been paid for.";
+  } else if (days !== null) {
+    warning = eventName + " has already passed.";
+  }
+
+  document.getElementById("cancelBookingWarning").textContent = warning;
+
+  document.getElementById("cancelVendorList").innerHTML = vendors.map((vendor) => {
+    const vendorId = safeText(vendor.vendorId, "");
+    const vendorName = safeText(vendor.vendorName, "Vendor");
+    const category = normalizeProfessionalLabel(safeText(vendor.category || vendor.mainCategory, "Event Service"));
+    const paid = vendorQuotedAmount(request, vendorId);
+    const preview = refundPreviewFor(request, vendorId, days);
+
+    return `
+      <label class="refund-row">
+        <input type="checkbox" data-cancel-vendor="${escapeHtml(vendorId)}" checked>
+        <span class="refund-row-body">
+          <span class="refund-row-name">${escapeHtml(vendorName)}</span>
+          <span class="refund-row-note">
+            ${escapeHtml(category)} · you paid ${escapeHtml(formatMoney(paid))}<br>
+            ${escapeHtml(preview.label)}
+          </span>
+        </span>
+        <span class="refund-row-amount">
+          ${escapeHtml(formatMoney(preview.cents / 100))}
+          <small>back</small>
+        </span>
+      </label>
+    `;
+  }).join("");
+
+  document.getElementById("cancelReasonSelect").value = "";
+  document.getElementById("cancelReasonNote").value = "";
+
+  const status = document.getElementById("cancelBookingStatus");
+  status.style.display = "none";
+  status.textContent = "";
+  status.className = "status-message";
+
+  const confirm = document.getElementById("confirmCancelBookingBtn");
+  confirm.disabled = false;
+  confirm.textContent = "Cancel Booking";
+
+  document.querySelectorAll("[data-cancel-vendor]").forEach((box) => {
+    box.addEventListener("change", updateCancelRefundTotal);
+  });
+
+  updateCancelRefundTotal();
+
+  document.getElementById("cancelBookingModal").classList.add("show");
+  document.getElementById("cancelBookingModal").setAttribute("aria-hidden", "false");
+}
+
+/** Which vendors are ticked right now. */
+function selectedCancelVendorIds() {
+  return Array.from(document.querySelectorAll("[data-cancel-vendor]"))
+    .filter((box) => box.checked)
+    .map((box) => box.dataset.cancelVendor)
+    .filter(Boolean);
+}
+
+function updateCancelRefundTotal() {
+  const request = bookingRequests.find((item) => item.id === cancellingRequestId);
+  if (!request) return;
+
+  const days = daysUntilEventFor(request);
+  const chosen = selectedCancelVendorIds();
+
+  const totalCents = chosen.reduce((sum, vendorId) =>
+    sum + refundPreviewFor(request, vendorId, days).cents, 0);
+
+  const box = document.getElementById("cancelRefundTotal");
+  box.classList.toggle("none", totalCents <= 0);
+  document.getElementById("cancelRefundTotalAmount").textContent = formatMoney(totalCents / 100);
+
+  const anyUnknown = chosen.some((vendorId) => refundPreviewFor(request, vendorId, days).tier === "unknown");
+
+  let explainer = "The RentEvent service fee and the card processing fee are not refunded. Refunds usually reach your card in five to ten days.";
+
+  if (!chosen.length) {
+    explainer = "Tick at least one vendor to cancel.";
+  } else if (anyUnknown) {
+    explainer = "We could not read the date on part of this booking, so a person will check it and be in touch. Nothing is refunded automatically.";
+  } else if (totalCents <= 0) {
+    explainer = "This is under 14 days before the event, so under the cancellation policy there is no refund. The vendors have already turned down other work to hold your date. You can read the policy in our Terms.";
+  }
+
+  document.getElementById("cancelRefundExplainer").textContent = explainer;
+}
+
+function closeCancelBookingModal() {
+  cancellingRequestId = "";
+  document.getElementById("cancelBookingModal").classList.remove("show");
+  document.getElementById("cancelBookingModal").setAttribute("aria-hidden", "true");
+}
+
+/**
+ * Records the cancellation and lets the server do the rest.
+ *
+ * One document per vendor, because the tiers apply to each vendor on their
+ * own. This deliberately does not touch the booking, the payout plan or the
+ * refund. All of that needs the Stripe key and has to be right to the cent.
+ */
+async function submitCustomerCancellation() {
+  const requestId = cancellingRequestId;
+  const request = bookingRequests.find((item) => item.id === requestId);
+  if (!request || !currentUser) return;
+
+  const status = document.getElementById("cancelBookingStatus");
+  const chosen = selectedCancelVendorIds();
+
+  function say(message, kind) {
+    status.className = "status-message " + kind;
+    status.style.display = "block";
+    status.textContent = message;
+  }
+
+  if (!chosen.length) {
+    say("Tick at least one vendor to cancel.", "error");
+    return;
+  }
+
+  const reasonCode = document.getElementById("cancelReasonSelect").value;
+  const note = safeText(document.getElementById("cancelReasonNote").value, "");
+
+  if (!reasonCode) {
+    say("Please choose a reason before cancelling.", "error");
+    return;
+  }
+
+  if (note.length < 10) {
+    say("Please add a short note. The vendor will read this.", "error");
+    return;
+  }
+
+  const confirm = document.getElementById("confirmCancelBookingBtn");
+  confirm.disabled = true;
+  confirm.textContent = "Cancelling...";
+
+  const days = daysUntilEventFor(request);
+  const vendors = Array.isArray(request.vendors) ? request.vendors : [];
+  const failed = [];
+
+  for (const vendorId of chosen) {
+    const vendor = vendors.find((item) => safeText(item.vendorId, "") === vendorId) || {};
+    const preview = refundPreviewFor(request, vendorId, days);
+
+    try {
+      // Keyed on the booking and the vendor, so a double tap or a retry lands
+      // on the same document instead of refunding twice.
+      await setDoc(doc(db, "vendorCancellations", "custcancel_" + requestId + "_" + vendorId), {
+        bookingRequestId: requestId,
+        vendorId,
+        vendorName: safeText(vendor.vendorName, "Vendor"),
+        initiatedBy: "customer",
+        cancelledBy: currentUser.uid,
+        cancelledByRole: isPlannerView() ? "planner" : "customer",
+        cancelledByName: getRequestOwnerName(request),
+        reasonCode,
+        reason: reasonCode + ": " + note,
+        note,
+        daysToEvent: days,
+        // What this page showed the customer before they tapped confirm. The
+        // server works the refund out again on its own; these two sitting
+        // side by side are how a disagreement gets noticed.
+        previewRefundCents: preview.cents,
+        previewTier: preview.tier,
+        status: "pending",
+        createdAt: serverTimestamp()
+      }, { merge: true });
+    } catch (error) {
+      console.error("Cancellation failed for", vendorId, error);
+      failed.push(safeText(vendor.vendorName, "a vendor"));
+    }
+  }
+
+  if (failed.length === chosen.length) {
+    say("That did not go through. Nothing has changed, please try again.", "error");
+    confirm.disabled = false;
+    confirm.textContent = "Cancel Booking";
+    return;
+  }
+
+  if (failed.length) {
+    say("Some of that went through, but we could not cancel " + failed.join(", ") +
+        ". Please try those again or contact support.", "error");
+  } else {
+    const totalCents = chosen.reduce((sum, vendorId) =>
+      sum + refundPreviewFor(request, vendorId, days).cents, 0);
+
+    say(totalCents > 0
+      ? "Done. " + formatMoney(totalCents / 100) + " is being refunded to your card and the vendors have been told."
+      : "Done. The vendors have been told. There is no refund this close to the event.", "success");
+  }
+
+  confirm.textContent = "Cancelled";
+
+  setTimeout(async () => {
+    closeCancelBookingModal();
+    await loadBookingRequests();
+  }, 2800);
+}
+
+function cancelBooking(requestId) {
+  if (isAdminPreview()) {
+    showStatus("You are viewing this as an admin, so cancelling is turned off here.", "error");
+    return;
+  }
+
+  openCancelBookingModal(requestId);
 }
 
 function openWithdrawModal(requestId) {
@@ -2545,6 +3109,14 @@ async function loadBookingRequests() {
 
 document.getElementById("keepRequestBtn").addEventListener("click", closeWithdrawModal);
 document.getElementById("confirmWithdrawBtn").addEventListener("click", confirmWithdrawRequest);
+document.getElementById("cancelBookingBack").addEventListener("click", closeCancelBookingModal);
+document.getElementById("confirmCancelBookingBtn").addEventListener("click", submitCustomerCancellation);
+
+document.getElementById("cancelBookingModal").addEventListener("click", (event) => {
+  if (event.target.id === "cancelBookingModal") {
+    closeCancelBookingModal();
+  }
+});
 
 document.getElementById("withdrawModal").addEventListener("click", (event) => {
   if (event.target.id === "withdrawModal") {

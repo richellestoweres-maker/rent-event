@@ -1615,6 +1615,19 @@ function renderRequests() {
     const alreadyCancelled = cancelledIds.indexOf(currentUser?.uid || "") !== -1;
     const daysToEvent = daysUntilEvent(eventDetails, request);
 
+    // Being cancelled ON is not the same as cancelling, and the vendor must
+    // never be told they walked away from a booking the customer called off.
+    const customerCancelledIds = Array.isArray(request.customerCancelledVendorIds)
+      ? request.customerCancelledVendorIds : [];
+    const cancelledByCustomer = customerCancelledIds.indexOf(currentUser?.uid || "") !== -1;
+
+    // What is still owed, read from the payout plan the server corrected. Under
+    // the policy a vendor often keeps something, and guessing at that number
+    // would be worse than not showing one.
+    const payoutLine = (Array.isArray(request.payoutPlan) ? request.payoutPlan : [])
+      .find((line) => safeText(line.vendorId, "") === (currentUser?.uid || ""));
+    const stillOwedCents = Math.max(0, Math.round(Number(payoutLine?.amountCents || 0)));
+
     const quoteBox = quote
       ? `
         <div class="quote-box">
@@ -1721,6 +1734,18 @@ function renderRequests() {
           <div class="request-actions">
             <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
             ${conversationId ? `<button class="btn" type="button" data-message-request="${requestId}">Message ${escapeHtml(ownerLabel)}</button>` : ""}
+          </div>
+        ` : cancelledByCustomer ? `
+          <div class="withdrawn-box">
+            <h4>The customer cancelled this booking</h4>
+            <p>
+              ${stillOwedCents > 0
+                ? `You keep ${escapeHtml(formatMoney(stillOwedCents / 100))} for holding the date, paid out on the usual schedule. Your calendar is free again.`
+                : `This was cancelled more than 30 days out, so it is refunded in full under the cancellation policy and will not be paid out. Your calendar is free again.`}
+            </p>
+          </div>
+          <div class="request-actions">
+            <a class="btn-secondary" href="vendor-dashboard.html">Back to Dashboard</a>
           </div>
         ` : alreadyCancelled ? `
           <div class="withdrawn-box">

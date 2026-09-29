@@ -899,7 +899,7 @@
       <div class="empty-card">
         <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
         <h3>Loading</h3>
-        <p>Checking whether any vendors have pulled out of paid bookings.</p>
+        <p>Checking whether anybody has cancelled a paid booking.</p>
       </div>
     </div>
   </section>
@@ -1903,7 +1903,7 @@ window.loadCancellations = async function () {
   }
 
   if (!rows.length) {
-    renderEmpty2("cancellationsList", "No cancellations", "No vendor has pulled out of a paid booking.");
+    renderEmpty2("cancellationsList", "No cancellations", "Nobody has cancelled a paid booking.");
     return;
   }
 
@@ -1911,12 +1911,18 @@ window.loadCancellations = async function () {
     return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
   });
 
-  // How many times each vendor has done this, worked out from the
+  // How many times each person has done this, worked out from the
   // cancellations themselves rather than trusting a counter that could drift.
-  var countByVendor = {};
+  //
+  // Counted against whoever actually cancelled. A vendor should never pick up
+  // a strike because a customer cancelled on them, and this number is the one
+  // that decides whether an account gets frozen.
+  var countByPerson = {};
   rows.forEach(function (r) {
-    var v = safe2(r.vendorId, "");
-    if (v) countByVendor[v] = (countByVendor[v] || 0) + 1;
+    var who = safe2(r.initiatedBy, "vendor") === "customer"
+      ? safe2(r.cancelledBy, "")
+      : safe2(r.vendorId, "");
+    if (who) countByPerson[who] = (countByPerson[who] || 0) + 1;
   });
 
   list.innerHTML = rows.map(function (r) {
@@ -1924,12 +1930,13 @@ window.loadCancellations = async function () {
     var status = safe2(r.status, "pending");
     var refund = Number(r.refundCents || 0);
     var days = r.daysToEvent;
-    var repeat = countByVendor[safe2(r.vendorId, "")] || 1;
+    var byCustomer = safe2(r.initiatedBy, "vendor") === "customer";
+    var repeat = countByPerson[byCustomer ? safe2(r.cancelledBy, "") : safe2(r.vendorId, "")] || 1;
 
-    // The one state that needs a human. Everything else is just history.
+    // The one set of states that needs a human. Everything else is history.
     var needsYou = status === "awaiting_approval" || status === "refund_failed" || status === "missing_charge";
 
-    var statusPill = status === "refunded" ? "safe"
+    var statusPill = (status === "refunded" || status === "no_refund_under_policy") ? "safe"
       : (needsYou ? "red" : "blue");
 
     var daysLine = (days === null || days === undefined)
@@ -1938,19 +1945,32 @@ window.loadCancellations = async function () {
           ? "after the event"
           : (Number(days) === 0 ? "on the day of the event" : Number(days) + " days before the event"));
 
+    var title = byCustomer
+      ? safe2(r.cancelledByName, "A customer") + " cancelled " + vendor
+      : vendor + " pulled out";
+
+    var tier = safe2(r.tier, "");
+    var tierLine = byCustomer && tier
+      ? (tier === "full" ? "full refund tier"
+          : (tier === "half" ? "half refund tier"
+              : (tier === "none" ? "no refund tier" : tier)))
+      : "";
+
     return '<article class="item-card">'
       + '<div class="item-top"><div>'
-      + '<h3 class="item-title">' + esc2(vendor) + '</h3>'
+      + '<h3 class="item-title">' + esc2(title) + '</h3>'
       + '<p class="item-subtitle">' + esc2(fmtTime2(r.createdAt)) + (daysLine ? " &middot; cancelled " + esc2(daysLine) : "") + '</p>'
       + '</div><div class="price">' + esc2(refund ? "$" + (refund / 100).toFixed(2) : "no refund") + '</div></div>'
       + '<div class="pill-row">'
+      + '<span class="pill ' + (byCustomer ? "blue" : "red") + '">' + (byCustomer ? "Customer cancelled" : "Vendor cancelled") + '</span>'
       + '<span class="pill ' + statusPill + '">' + esc2(status.replace(/_/g, " ")) + '</span>'
-      + (repeat > 1 ? '<span class="pill red">' + repeat + ' cancellations</span>' : "")
+      + (tierLine ? '<span class="pill blue">' + esc2(tierLine) + '</span>' : "")
+      + (repeat > 1 ? '<span class="pill red">' + repeat + (byCustomer ? ' customer cancellations' : ' vendor cancellations') + '</span>' : "")
       + (needsYou ? '<span class="pill red">Needs you</span>' : "")
       + '</div>'
       + '<p style="margin:10px 0 0;white-space:pre-wrap;line-height:1.55;">' + esc2(safe2(r.note, "No note given")) + '</p>'
       + (needsYou
-          ? '<p class="item-subtitle" style="margin-top:10px;">This refund was not sent automatically. The vendor is already off the payout plan, so the money is still held and nothing is lost by taking your time. Issue the refund in Stripe when you are ready.</p>'
+          ? '<p class="item-subtitle" style="margin-top:10px;">This refund was not sent automatically. The payout plan has already been corrected, so the money is still held and nothing is lost by taking your time. Issue the refund in Stripe when you are ready.</p>'
           : "")
       + '</article>';
   }).join("");
