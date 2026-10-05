@@ -2655,6 +2655,41 @@ document.getElementById("roleSelect").addEventListener("change", (event) => {
  * lands within a second or two but is not instant, so this waits for it rather
  * than declaring failure on the first look.
  */
+/**
+ * Turns the checkout screen into a receipt.
+ *
+ * Showing "Payment received" at the top while the rest of the page still reads
+ * "Submit your event request" and a Continue to Payment button floats over the
+ * bottom of the screen is the worst of both worlds. The person has paid, and
+ * the most obvious control on the page still invites them to pay again. The
+ * server refuses a second checkout on a paid booking, so no money was ever at
+ * risk, but nobody should have to find that out by tapping it.
+ */
+function lockCheckoutAsPaid() {
+  const bar = document.querySelector(".bottom-bar");
+  if (bar) bar.style.display = "none";
+
+  const eyebrow = document.getElementById("pageEyebrow");
+  if (eyebrow) eyebrow.textContent = "Booking Confirmed";
+
+  const heroLabel = document.getElementById("heroLabel");
+  if (heroLabel) heroLabel.textContent = "Paid";
+
+  const heroTitle = document.querySelector(".hero-title");
+  if (heroTitle) heroTitle.textContent = "This booking is paid for.";
+
+  const heroSubtitle = document.querySelector(".hero-subtitle");
+  if (heroSubtitle) {
+    heroSubtitle.textContent =
+      "Everything below is what you paid for, kept here as your record of the booking.";
+  }
+
+  // Back now means back to the booking, not back to editing an event that has
+  // already been paid for.
+  const back = document.getElementById("backToEventLink");
+  if (back) back.setAttribute("href", "my-requests.html");
+}
+
 function renderPaidPanel(booking, bookingRequestId) {
   const main = document.querySelector("main.page");
   if (!main || document.getElementById("paidPanel")) return;
@@ -2682,6 +2717,7 @@ function renderPaidPanel(booking, bookingRequestId) {
     "</div>";
 
   main.insertBefore(panel, main.firstChild);
+  lockCheckoutAsPaid();
   panel.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -2699,6 +2735,46 @@ function renderPendingPaymentPanel() {
     '<div class="paid-actions"><a href="my-requests.html">View my requests</a></div>';
 
   main.insertBefore(panel, main.firstChild);
+
+  // Stripe already has the money. Whatever is still catching up, a second
+  // payment is never the answer, so the button goes quiet rather than tempting.
+  const button = document.getElementById("continuePaymentBtn");
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Payment sent";
+  }
+
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/**
+ * The same lock, for arriving here any other way.
+ *
+ * Coming back from Stripe is not the only route to this page. A bookmark, the
+ * back button, or a link from somewhere else can all land on the checkout for
+ * a booking that is already paid, and without this it would offer to charge
+ * for it a second time.
+ */
+async function lockIfAlreadyPaid() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("stripe_return") === "true") return;
+
+  const bookingRequestId = predictedBookingRequestId();
+  if (!bookingRequestId) return;
+
+  try {
+    const snap = await getDoc(doc(db, "bookingRequests", bookingRequestId));
+    if (!snap.exists()) return;
+
+    const booking = snap.data() || {};
+    if (safeText(booking.paymentStatus, "") !== "paid") return;
+
+    renderPaidPanel(booking, bookingRequestId);
+  } catch (error) {
+    // Not being able to check is not a reason to break the page. The server
+    // refuses a second checkout on a paid booking either way.
+    console.warn("Could not check whether this booking is already paid:", error.message);
+  }
 }
 
 async function showPaymentConfirmationIfReturning() {
@@ -2770,6 +2846,7 @@ onAuthStateChanged(auth, async (user) => {
   ]);
 
   await showPaymentConfirmationIfReturning();
+  await lockIfAlreadyPaid();
 });
 </script>
 
