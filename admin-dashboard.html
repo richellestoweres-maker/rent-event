@@ -904,6 +904,20 @@
     </div>
   </section>
 
+  <section class="section" id="supportChatSection">
+    <div class="section-header">
+      <h2 class="section-title">Live Chat</h2>
+      <button class="section-link" type="button" onclick="loadSupportChats()">Refresh</button>
+    </div>
+    <div class="list" id="supportChatList">
+      <div class="empty-card">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
+        <h3>Loading</h3>
+        <p>Checking whether anybody is waiting to talk to you.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="inboxSection">
     <div class="section-header">
       <h2 class="section-title">Support &amp; Reports</h2>
@@ -1451,6 +1465,9 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-aut
 import {
   getFirestore,
   doc,
+  getDoc,
+  setDoc,
+  addDoc,
   updateDoc,
   deleteDoc,
   collection,
@@ -1976,6 +1993,172 @@ window.loadCancellations = async function () {
   }).join("");
 };
 
+/* ------------------------------------------------------------------
+ * Live chat
+ *
+ * People who could not find what they needed from the help bubble end up
+ * here. Unanswered threads are pinned to the top, because the whole point of
+ * this is that somebody is sitting there waiting.
+ * ------------------------------------------------------------------ */
+
+var openChatId = "";
+
+window.loadSupportChats = async function () {
+  var list = document.getElementById("supportChatList");
+  if (!list) return;
+
+  var rows = [];
+  try {
+    var snap = await getDocs(collection(db2, "supportChats"));
+    snap.forEach(function (d) { rows.push(Object.assign({ id: d.id }, d.data())); });
+  } catch (error) {
+    renderEmpty2("supportChatList", "Could not load chats", error.message);
+    return;
+  }
+
+  if (!rows.length) {
+    renderEmpty2("supportChatList", "No chats", "Nobody has asked to talk to a person yet.");
+    return;
+  }
+
+  // Waiting first, then most recent. Somebody who asked an hour ago and has
+  // had no reply matters more than a thread that is already handled.
+  rows.sort(function (a, b) {
+    var aWaiting = a.unreadForAdmin ? 1 : 0;
+    var bWaiting = b.unreadForAdmin ? 1 : 0;
+    if (aWaiting !== bWaiting) return bWaiting - aWaiting;
+    return ((b.lastMessageAt && b.lastMessageAt.seconds) || 0) - ((a.lastMessageAt && a.lastMessageAt.seconds) || 0);
+  });
+
+  list.innerHTML = rows.map(function (r) {
+    var name = safe2(r.name, "Someone");
+    var waiting = !!r.unreadForAdmin;
+    var status = safe2(r.status, "open");
+
+    return '<article class="item-card" id="chat-' + esc2(r.id) + '">'
+      + '<div class="item-top"><div>'
+      + '<h3 class="item-title">' + esc2(name) + '</h3>'
+      + '<p class="item-subtitle">' + esc2(safe2(r.email, "no email")) + ' &middot; ' + esc2(fmtTime2(r.lastMessageAt)) + '</p>'
+      + '</div></div>'
+      + '<div class="pill-row">'
+      + (waiting ? '<span class="pill red">Waiting on you</span>' : '<span class="pill safe">Answered</span>')
+      + '<span class="pill blue">' + esc2(safe2(r.role, "customer")) + '</span>'
+      + (status === "closed" ? '<span class="pill blue">closed</span>' : "")
+      + '</div>'
+      + '<p style="margin:10px 0 0;line-height:1.55;">' + esc2(safe2(r.lastMessage, "No messages yet")) + '</p>'
+      + '<div class="item-actions" style="margin-top:12px;">'
+      + '<button class="btn-secondary" type="button" onclick="openSupportChat(\'' + esc2(r.id) + '\')">Open conversation</button>'
+      + '</div>'
+      + '<div id="thread-' + esc2(r.id) + '"></div>'
+      + '</article>';
+  }).join("");
+};
+
+window.openSupportChat = async function (chatId) {
+  var holder = document.getElementById("thread-" + chatId);
+  if (!holder) return;
+
+  if (openChatId === chatId && holder.innerHTML) {
+    holder.innerHTML = "";
+    openChatId = "";
+    return;
+  }
+
+  openChatId = chatId;
+  holder.innerHTML = '<p class="item-subtitle" style="margin-top:12px;">Loading the conversation...</p>';
+
+  var messages = [];
+  try {
+    var snap = await getDocs(query(collection(db2, "supportChats", chatId, "messages"), orderBy("createdAt", "asc"), limit(200)));
+    snap.forEach(function (d) { messages.push(d.data()); });
+  } catch (error) {
+    holder.innerHTML = '<p class="item-subtitle" style="margin-top:12px;">Could not load it: ' + esc2(error.message) + '</p>';
+    return;
+  }
+
+  holder.innerHTML =
+    '<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px;">'
+    + messages.map(function (m) {
+        var mine = safe2(m.from, "user") === "admin";
+        return '<div style="margin-bottom:10px;padding:10px 13px;border-radius:16px;line-height:1.5;white-space:pre-wrap;'
+          + (mine ? 'background:var(--blue);margin-left:28px;' : 'background:var(--soft);margin-right:28px;') + '">'
+          + '<span style="display:block;font-size:0.68rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">'
+          + (mine ? "You" : "Them") + '</span>'
+          + esc2(safe2(m.text, "")) + '</div>';
+      }).join("")
+    + '<div style="display:flex;gap:8px;margin-top:12px;">'
+    + '<input id="reply-' + esc2(chatId) + '" type="text" placeholder="Write a reply" '
+    + 'style="flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:11px 15px;font-family:inherit;font-size:0.9rem;background:var(--soft);color:var(--text);outline:none;">'
+    + '<button class="btn" type="button" onclick="sendSupportReply(\'' + esc2(chatId) + '\')">Send</button>'
+    + '</div>'
+    + '<p class="item-subtitle" style="margin-top:10px;">They see this in the help bubble wherever they are on the site, and get a notification.</p>'
+    + '</div>';
+
+  // Opening it is the same as reading it, so the Waiting pill clears.
+  try {
+    await setDoc(doc(db2, "supportChats", chatId), {
+      unreadForAdmin: false,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.warn("Could not mark the chat read:", error.message);
+  }
+};
+
+window.sendSupportReply = async function (chatId) {
+  var field = document.getElementById("reply-" + chatId);
+  if (!field) return;
+
+  var text = String(field.value || "").trim();
+  if (!text) return;
+
+  field.disabled = true;
+
+  try {
+    await addDoc(collection(db2, "supportChats", chatId, "messages"), {
+      from: "admin",
+      senderId: (auth2.currentUser && auth2.currentUser.uid) || "admin",
+      text: text.slice(0, 4000),
+      createdAt: serverTimestamp()
+    });
+
+    await setDoc(doc(db2, "supportChats", chatId), {
+      lastMessage: text.slice(0, 140),
+      lastFrom: "admin",
+      lastMessageAt: serverTimestamp(),
+      unreadForAdmin: false,
+      status: "open",
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    // Their phone buzzes, the same way every other notification on the site
+    // works, so a reply does not sit unread because they closed the tab.
+    await addDoc(collection(db2, "notifications"), {
+      recipientId: chatId,
+      userId: chatId,
+      recipientRole: "customer",
+      type: "support_reply",
+      typeLabel: "Support",
+      category: "Support",
+      title: "RentEvent replied",
+      body: text.slice(0, 140),
+      message: "RentEvent replied to your question.",
+      link: "/notifications.html",
+      read: false,
+      isRead: false,
+      createdAt: serverTimestamp()
+    });
+
+    field.value = "";
+    field.disabled = false;
+    openChatId = "";
+    await window.openSupportChat(chatId);
+  } catch (error) {
+    field.disabled = false;
+    alert("That reply did not send: " + error.message);
+  }
+};
+
 window.loadInbox = async function () {
   var list = document.getElementById("inboxList");
   if (!list) return;
@@ -2038,7 +2221,8 @@ window.loadAllData = async function () {
       loadCountsImpl(),
       loadUsersPageImpl(true),
       loadListingsPageImpl(true),
-      loadRequestsPageImpl(true), loadWaitlistPageImpl(true), window.loadInbox(), window.loadCancellations()
+      loadRequestsPageImpl(true), loadWaitlistPageImpl(true), window.loadInbox(), window.loadCancellations(),
+      window.loadSupportChats()
     ]);
   } catch (error) {
     var warn = document.getElementById("adminWarning");
