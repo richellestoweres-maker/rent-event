@@ -673,6 +673,17 @@
       line-height:1.5
     }
 
+
+    .note-count {
+      margin: 7px 2px 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .note-count.ready {
+      color: var(--greenText);
+    }
+
     .modal-field input,
     .modal-field select,
     .modal-field textarea{
@@ -948,7 +959,8 @@
 
       <div class="modal-field">
         <label for="cancelReasonNote">Tell the customer what happened</label>
-        <textarea id="cancelReasonNote" placeholder="They will read this, so be straight with them."></textarea>
+        <textarea id="cancelReasonNote" placeholder="They will read this, so be straight with them. A sentence is plenty."></textarea>
+        <p class="modal-hint note-count" id="cancelNoteCount">A sentence or so, at least 10 characters.</p>
       </div>
 
       <p class="modal-hint">
@@ -1809,6 +1821,15 @@ function daysUntilEvent(eventDetails, request) {
   return Math.round((when - today) / 86400000);
 }
 
+/**
+ * The shortest note the customer is worth.
+ *
+ * This number also lives in the Firestore rules, so a shorter note is refused
+ * by the server whatever this page does. Saying it out loud while somebody is
+ * typing is the only honest way to enforce it.
+ */
+const NOTE_MINIMUM = 10;
+
 let cancellingRequestId = "";
 
 function openCancelBookingModal(requestId) {
@@ -1842,6 +1863,11 @@ function openCancelBookingModal(requestId) {
   document.getElementById("cancelBookingWarning").textContent = warning;
   document.getElementById("cancelReasonSelect").value = "";
   document.getElementById("cancelReasonNote").value = "";
+  updateCancelNoteCount();
+
+  const noteField = document.getElementById("cancelReasonNote");
+  noteField.removeEventListener("input", updateCancelNoteCount);
+  noteField.addEventListener("input", updateCancelNoteCount);
 
   const status = document.getElementById("cancelBookingStatus");
   status.style.display = "none";
@@ -1853,6 +1879,31 @@ function openCancelBookingModal(requestId) {
 
   document.getElementById("cancelBookingModal").classList.add("show");
   document.getElementById("cancelBookingModal").setAttribute("aria-hidden", "false");
+}
+
+/**
+ * Counts the note as it is typed.
+ *
+ * Finding out a box is too short only after tapping the button is how somebody
+ * ends up typing the same four words three times.
+ */
+function updateCancelNoteCount() {
+  const field = document.getElementById("cancelReasonNote");
+  const label = document.getElementById("cancelNoteCount");
+  if (!field || !label) return;
+
+  const length = safeText(field.value, "").length;
+
+  if (length >= NOTE_MINIMUM) {
+    label.textContent = "That will do nicely.";
+    label.classList.add("ready");
+    return;
+  }
+
+  label.classList.remove("ready");
+  label.textContent = length === 0
+    ? "A sentence or so, at least " + NOTE_MINIMUM + " characters."
+    : length + " of " + NOTE_MINIMUM + " characters so far.";
 }
 
 function closeCancelBookingModal() {
@@ -1883,9 +1934,11 @@ async function submitBookingCancellation() {
     return;
   }
 
-  if (note.length < 10) {
+  if (note.length < NOTE_MINIMUM) {
     status.style.display = "block";
-    status.textContent = "Please tell the customer what happened. They will read this.";
+    status.textContent = "Your note needs at least " + NOTE_MINIMUM + " characters and has " +
+      note.length + ". A sentence is plenty, and the customer will read it.";
+    document.getElementById("cancelReasonNote").focus();
     return;
   }
 

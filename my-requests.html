@@ -788,6 +788,16 @@
       color: var(--red-text);
     }
 
+    .note-count {
+      margin: 7px 2px 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .note-count.ready {
+      color: var(--green-text);
+    }
+
     .admin-preview-bar {
       display: none;
       position: sticky;
@@ -1102,7 +1112,8 @@
 
       <div class="modal-field">
         <label for="cancelReasonNote">Tell them what happened</label>
-        <textarea id="cancelReasonNote" placeholder="They held this date for you, so a short note goes a long way."></textarea>
+        <textarea id="cancelReasonNote" placeholder="They held this date for you. A sentence is plenty, such as: our date moved and we had to cancel."></textarea>
+        <p class="modal-hint note-count" id="cancelNoteCount">A sentence or so, at least 10 characters.</p>
       </div>
 
       <div class="status-message" id="cancelBookingStatus" style="display:none;"></div>
@@ -2249,6 +2260,15 @@ const FULL_REFUND_DAYS = 30;
 const HALF_REFUND_DAYS = 14;
 
 /**
+ * The shortest note the vendor is worth.
+ *
+ * This number also lives in the Firestore rules, so a shorter note is refused
+ * by the server whatever this page does. Saying it out loud while somebody is
+ * typing is the only honest way to enforce it.
+ */
+const NOTE_MINIMUM = 10;
+
+/**
  * Days are counted on this clock here and on the server both.
  *
  * It has to be one fixed zone or the two disagree. Somebody in California at
@@ -2436,6 +2456,7 @@ function openCancelBookingModal(requestId) {
 
   document.getElementById("cancelReasonSelect").value = "";
   document.getElementById("cancelReasonNote").value = "";
+  updateCancelNoteCount();
 
   const status = document.getElementById("cancelBookingStatus");
   status.style.display = "none";
@@ -2450,10 +2471,40 @@ function openCancelBookingModal(requestId) {
     box.addEventListener("change", updateCancelRefundTotal);
   });
 
+  const noteField = document.getElementById("cancelReasonNote");
+  noteField.removeEventListener("input", updateCancelNoteCount);
+  noteField.addEventListener("input", updateCancelNoteCount);
+
   updateCancelRefundTotal();
 
   document.getElementById("cancelBookingModal").classList.add("show");
   document.getElementById("cancelBookingModal").setAttribute("aria-hidden", "false");
+}
+
+/**
+ * Counts the note as it is typed.
+ *
+ * Finding out a box is too short only after tapping the button, from a message
+ * that asks for a short note while refusing one, is how somebody ends up
+ * typing the same four words three times.
+ */
+function updateCancelNoteCount() {
+  const field = document.getElementById("cancelReasonNote");
+  const label = document.getElementById("cancelNoteCount");
+  if (!field || !label) return;
+
+  const length = safeText(field.value, "").length;
+
+  if (length >= NOTE_MINIMUM) {
+    label.textContent = "That will do nicely.";
+    label.classList.add("ready");
+    return;
+  }
+
+  label.classList.remove("ready");
+  label.textContent = length === 0
+    ? "A sentence or so, at least " + NOTE_MINIMUM + " characters."
+    : length + " of " + NOTE_MINIMUM + " characters so far.";
 }
 
 /** Which vendors are ticked right now. */
@@ -2533,8 +2584,10 @@ async function submitCustomerCancellation() {
     return;
   }
 
-  if (note.length < 10) {
-    say("Please add a short note. The vendor will read this.", "error");
+  if (note.length < NOTE_MINIMUM) {
+    say("Your note needs at least " + NOTE_MINIMUM + " characters and has " + note.length +
+        ". A sentence is plenty, such as: our date moved and we had to cancel.", "error");
+    document.getElementById("cancelReasonNote").focus();
     return;
   }
 
