@@ -31,6 +31,14 @@ const db = admin.firestore();
 /** How many bookings to settle in one run. */
 const BATCH_SIZE = 50;
 
+/**
+ * Payment states a booking can still owe vendors money in.
+ *
+ * "partially_refunded" is here because a cancellation that refunds one vendor
+ * out of several leaves the rest perfectly payable.
+ */
+const PAYABLE_STATUSES = ["paid", "partially_refunded"];
+
 function cleanText(value, fallback = "") {
   if (value === null || value === undefined) return fallback;
   const text = String(value).trim();
@@ -68,7 +76,15 @@ async function settleBooking(stripe, doc, nowMs) {
   const ref = doc.ref;
   const booking = doc.data() || {};
 
-  if (booking.paymentStatus !== "paid") {
+  // A booking can be partly refunded and still owe money.
+  //
+  // One vendor cancelling off a five vendor event refunds that vendor's share
+  // and leaves the other four to be paid, and Stripe's webhook marks the
+  // booking "partially_refunded" the moment that refund lands. Treating that
+  // as unpayable would quietly strand four vendors who did the work, with
+  // nothing flagged for anyone to notice. Only a booking that was never paid,
+  // or was refunded in full, is genuinely not payable.
+  if (!PAYABLE_STATUSES.includes(cleanText(booking.paymentStatus, ""))) {
     return { skipped: "not_paid" };
   }
 
@@ -97,15 +113,22 @@ async function settleBooking(stripe, doc, nowMs) {
     return { skipped: "empty_payout_plan" };
   }
 
-  // Never pay out more than was actually collected. If these disagree, the
-  // booking was edited after payment and a person should look at it.
+  // Never pay out more than is actually still on the charge. Money that has
+  // been refunded to the customer is gone, so the ceiling is what was collected
+  // minus what went back, not what was collected. If the plan wants more than
+  // that, the booking was edited after payment and a person should look at it.
   const planTotal = plan.reduce((sum, item) => sum + Number(item.amountCents || 0), 0);
   const collected = Number(booking.stripeAmountCollectedCents || booking.stripeAmountCents || 0);
+  const refunded = Math.round(Number(
+    booking.stripeAmountRefundedCents || booking.refundedCents || 0));
+  const available = collected ? Math.max(0, collected - refunded) : 0;
 
-  if (!planTotal || (collected && planTotal > collected)) {
+  if (!planTotal || (collected && planTotal > available)) {
     await flagForReview(ref, "payout_exceeds_collected", {
       payoutPlannedCents: planTotal,
-      stripeAmountCollectedCents: collected
+      stripeAmountCollectedCents: collected,
+      stripeAmountRefundedCents: refunded,
+      payoutAvailableCents: available
     });
     return { skipped: "payout_exceeds_collected" };
   }
