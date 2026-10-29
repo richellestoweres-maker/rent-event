@@ -226,6 +226,7 @@ service cloud.firestore {
       return ['vendorId', 'vendorEmail', 'legalName', 'regNumber', 'regState',
               'insurer', 'policyNumber', 'insuranceExpiry',
               'licenceType', 'licenceNumber', 'licenceExpiry',
+              'certificatePath', 'certificateName',
               'status', 'submittedAt', 'updatedAt'];
     }
 

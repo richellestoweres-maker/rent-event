@@ -1,0 +1,50 @@
+rules_version = '2';
+
+// RentEvent file storage.
+//
+// There is exactly one thing in this bucket: insurance certificates and
+// business documents that vendors send in to be verified. They contain policy
+// numbers, tax numbers and addresses, so the default below is a flat refusal
+// and the only opening is a vendor's own folder.
+//
+// Nothing here is public. A verification document is never served to a
+// customer, and the badge a customer sees is a separate Firestore document
+// with none of this in it.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // The same admin allowlist as the Firestore rules. Add an admin in both
+    // places or they will be able to approve a vendor without being able to
+    // open the document they are approving.
+    function isAdmin() {
+      return signedIn() && (
+        ('admin' in request.auth.token && request.auth.token.admin == true) ||
+        request.auth.uid in ['GBrIifV7FnOnXhXmgmG4lpMg4Lr1']
+      );
+    }
+
+    match /verification/{vendorId}/{fileName} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == vendorId);
+
+      // A certificate is a photo or a PDF. Capping the size and the type stops
+      // the folder being used as free hosting for something else entirely.
+      allow write: if signedIn() &&
+                      request.auth.uid == vendorId &&
+                      request.resource.size < 10 * 1024 * 1024 &&
+                      (request.resource.contentType.matches('image/.*') ||
+                       request.resource.contentType == 'application/pdf');
+
+      allow delete: if isAdmin() || (signedIn() && request.auth.uid == vendorId);
+    }
+
+    // Everything else, including anything uploaded before this file existed.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
