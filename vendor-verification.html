@@ -1330,6 +1330,12 @@
             <input id="insuranceExpiry" type="date">
           </div>
 
+          <div class="field">
+            <label for="certificateFile">Certificate of insurance</label>
+            <input id="certificateFile" type="file" accept="image/*,application/pdf">
+            <p class="step-body" style="margin:7px 0 0;">A photo or PDF, up to 10MB. Only you and RentEvent can open it.</p>
+          </div>
+
           <h3 class="step-title" style="margin-top:22px;">Trade licence</h3>
           <p class="step-body" style="margin-top:0;">Only if your work needs one, such as alcohol service, food handling, transport or security.</p>
 
@@ -1426,6 +1432,11 @@ import {
   collection,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBj6kPKcJUGQtfe-WYA9Q5sWRhbXHYo9NU",
@@ -1440,16 +1451,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 /**
  * Where the certificate goes.
  *
- * Documents are not uploaded into the app. They are emailed, read by a person,
- * and then thrown away. Storing somebody's insurance certificate and EIN means
- * securing them, backing them up and deleting them on request, and none of
- * that is worth doing until there is enough volume to justify it.
+ * Into the vendor's own folder in Firebase Storage, which the storage rules
+ * open to exactly two people: that vendor and an admin. It is never served to
+ * a customer. What a customer sees is a separate public document holding a
+ * name and an expiry date and nothing else.
  */
-const DOCUMENTS_EMAIL = "support@rentevent-app.com";
+const CERTIFICATE_FOLDER = "verification";
 
 /** Admins who get told when somebody applies. Matches the Firestore rules. */
 const ADMIN_USER_IDS = ["GBrIifV7FnOnXhXmgmG4lpMg4Lr1"];
@@ -1550,7 +1562,7 @@ function renderStatus() {
     pill.textContent = "In review";
     setText("heroTitle", "We are checking your details");
     setText("heroSubtitle",
-      "Usually within two business days. Make sure your certificate has reached " + DOCUMENTS_EMAIL + ".");
+      "Usually within two business days. We have everything we need from you.");
     primary.textContent = "Change what I sent";
     primary.onclick = openForm;
     return;
@@ -1598,9 +1610,10 @@ function openForm() {
   document.getElementById("licenceNumber").value = safeText(record.licenceNumber, "");
   document.getElementById("licenceExpiry").value = safeText(record.licenceExpiry, "");
 
-  document.getElementById("emailHint").textContent =
-    "Email your certificate of liability insurance to " + DOCUMENTS_EMAIL +
-    " from the address on your account. We read it, check it, and do not keep it.";
+  const existing = safeText(record.certificateName, "");
+  document.getElementById("emailHint").textContent = existing
+    ? "We already have " + existing + " on file. Choose a new file only if your policy has changed."
+    : "";
 
   form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -1641,12 +1654,53 @@ async function submit() {
     return;
   }
 
+  const fileInput = document.getElementById("certificateFile");
+  const file = fileInput.files && fileInput.files[0];
+  const alreadyHaveOne = !!safeText((currentRecord || {}).certificatePath, "");
+
+  if (!file && !alreadyHaveOne) {
+    say("Please attach your certificate of insurance. It is the part we actually check.", "error");
+    return;
+  }
+
+  if (file && file.size > 10 * 1024 * 1024) {
+    say("That file is over 10MB. A photo or a PDF of the certificate is all we need.", "error");
+    return;
+  }
+
   const button = document.getElementById("submitBtn");
   button.disabled = true;
   button.textContent = "Sending...";
 
+  let certificatePath = safeText((currentRecord || {}).certificatePath, "");
+  let certificateName = safeText((currentRecord || {}).certificateName, "");
+
+  if (file) {
+    try {
+      button.textContent = "Uploading...";
+
+      // Named with the time so a renewal never silently overwrites the
+      // certificate that an earlier approval was based on.
+      const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60);
+      certificatePath = CERTIFICATE_FOLDER + "/" + currentUser.uid + "/" + Date.now() + "_" + cleanName;
+      certificateName = file.name;
+
+      await uploadBytes(storageRef(storage, certificatePath), file, {
+        contentType: file.type || "application/octet-stream"
+      });
+    } catch (error) {
+      say("That file did not upload: " + error.message, "error");
+      button.disabled = false;
+      button.textContent = "Submit for review";
+      return;
+    }
+  }
+
+  button.textContent = "Sending...";
+
   try {
     await setDoc(doc(db, "vendorVerifications", currentUser.uid), {
+      certificatePath, certificateName,
       vendorId: currentUser.uid,
       vendorEmail: safeText(currentUser.email, ""),
       legalName, regNumber, regState,
@@ -1666,7 +1720,7 @@ async function submit() {
         typeLabel: "Verification",
         category: "Vendors",
         title: legalName + " applied to be verified",
-        body: "Insured with " + insurer + " until " + insuranceExpiry + ". Waiting for their certificate.",
+        body: "Insured with " + insurer + " until " + insuranceExpiry + ". Certificate attached.",
         message: legalName + " applied to be verified.",
         link: "/admin-dashboard.html#verificationSection",
         vendorId: currentUser.uid,
@@ -1676,7 +1730,7 @@ async function submit() {
       }).catch(() => {});
     }
 
-    say("Sent. Now email your certificate to " + DOCUMENTS_EMAIL + " and we will take it from there.", "success");
+    say("Sent, certificate and all. We will check it and let you know, usually within two business days.", "success");
     button.textContent = "Sent";
 
     const snap = await getDoc(doc(db, "vendorVerifications", currentUser.uid));

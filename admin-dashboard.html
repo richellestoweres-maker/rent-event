@@ -1476,6 +1476,7 @@ window.logout = async function () {
 <script type="module">
 import { getApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getStorage, ref as storageRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
 import {
   getFirestore,
   doc,
@@ -1499,6 +1500,7 @@ import {
 var app2 = getApp();
 var auth2 = getAuth(app2);
 var db2 = getFirestore(app2);
+var storage2 = getStorage(app2);
 
 function showConfirm(message) {
   return new Promise(function (resolve) {
@@ -2077,7 +2079,10 @@ window.loadVerifications = async function () {
       + (safe2(r.licenceType, "")
           ? row2("Licence", safe2(r.licenceType, "") + " " + safe2(r.licenceNumber, "") + ", expires " + safe2(r.licenceExpiry, "?"))
           : "")
-      + row2("Email", safe2(r.vendorEmail, "not given"));
+      + row2("Email", safe2(r.vendorEmail, "not given"))
+      + (safe2(r.certificatePath, "")
+          ? row2("Certificate", safe2(r.certificateName, "attached"))
+          : '<p style="margin:0 0 4px;font-size:0.88rem;color:var(--redText);">No certificate attached</p>');
 
     return '<article class="item-card">'
       + '<div class="item-top"><div>'
@@ -2092,6 +2097,9 @@ window.loadVerifications = async function () {
       + (safe2(r.reviewNote, "")
           ? '<p class="item-subtitle" style="margin-top:10px;">Your note: ' + esc2(r.reviewNote) + '</p>' : "")
       + '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">'
+      + (safe2(r.certificatePath, "")
+          ? '<button class="btn-secondary" type="button" onclick="openCertificate(\'' + esc2(r.id) + '\')">View certificate</button>'
+          : "")
       + (state === "approved"
           ? '<button class="btn-secondary" type="button" onclick="revokeVerification(\'' + esc2(r.id) + '\')">Remove badge</button>'
           : '<button class="btn" type="button" onclick="approveVerification(\'' + esc2(r.id) + '\')">Approve</button>'
@@ -2105,6 +2113,27 @@ function row2(label, value) {
   return '<p style="margin:0 0 4px;font-size:0.88rem;line-height:1.5;">'
     + '<span style="color:var(--muted);">' + esc2(label) + ': </span>' + esc2(value) + '</p>';
 }
+
+
+/**
+ * Opens a vendor's certificate.
+ *
+ * The file itself is never copied anywhere. This asks Firebase Storage for a
+ * short lived link, which it only hands over because the storage rules
+ * recognise this account as an admin.
+ */
+window.openCertificate = async function (vendorId) {
+  try {
+    var snap = await getDoc(doc(db2, "vendorVerifications", vendorId));
+    var path = snap.exists() ? safe2((snap.data() || {}).certificatePath, "") : "";
+    if (!path) { alert("There is no certificate on this application."); return; }
+
+    var url = await getDownloadURL(storageRef(storage2, path));
+    window.open(url, "_blank", "noopener");
+  } catch (error) {
+    alert("Could not open it: " + error.message);
+  }
+};
 
 window.approveVerification = async function (vendorId) {
   var snap = await getDoc(doc(db2, "vendorVerifications", vendorId));
