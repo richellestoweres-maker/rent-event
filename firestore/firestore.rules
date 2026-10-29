@@ -115,10 +115,18 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Fields a vendor must never write onto their own listing, because they
+    // are claims about the vendor that only RentEvent gets to make.
+    function badgeFields() {
+      return ['vendorVerified', 'vendorVerifiedUntil', 'verifiedLegalName', 'featured'];
+    }
+
     match /listings/{listingId} {
       allow read: if resource.data.status == "published" || (signedIn() && (isAdmin() || resource.data.vendorId == request.auth.uid));
-      allow create: if signedIn() && isVendor() && isNotSuspended() && request.resource.data.vendorId == request.auth.uid;
-      allow update: if isAdmin() || (isVendor() && isNotSuspended() && resource.data.vendorId == request.auth.uid);
+      allow create: if signedIn() && isVendor() && isNotSuspended() && request.resource.data.vendorId == request.auth.uid
+                    && !request.resource.data.keys().hasAny(badgeFields());
+      allow update: if isAdmin() || (isVendor() && isNotSuspended() && resource.data.vendorId == request.auth.uid
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(badgeFields()));
       allow delete: if isAdmin() || (isVendor() && isNotSuspended() && resource.data.vendorId == request.auth.uid);
     }
 
@@ -199,6 +207,55 @@ service cloud.firestore {
       return request.resource.data.text is string &&
              request.resource.data.text.size() > 0 &&
              request.resource.data.text.size() <= 4000;
+    }
+
+    // -----------------------------------------------------------------
+    // Vendor verification
+    //
+    // Two collections, deliberately split by who may read them.
+    //
+    // vendorVerifications holds the application: legal name, tax number,
+    // policy number. That is the vendor's private business and only they and
+    // an admin can see it. They may submit and resubmit it, but they can only
+    // ever set it to 'pending'. Nobody awards themselves a badge.
+    //
+    // verifiedVendors holds the result, and is world readable because its
+    // entire job is to be a public trust signal. Only an admin writes it.
+    // -----------------------------------------------------------------
+    function applicationFields() {
+      return ['vendorId', 'vendorEmail', 'legalName', 'regNumber', 'regState',
+              'insurer', 'policyNumber', 'insuranceExpiry',
+              'licenceType', 'licenceNumber', 'licenceExpiry',
+              'status', 'submittedAt', 'updatedAt'];
+    }
+
+    match /vendorVerifications/{vendorId} {
+      allow create: if isAdmin() || (
+                       signedIn() && isNotSuspended() &&
+                       vendorId == request.auth.uid &&
+                       request.resource.data.vendorId == request.auth.uid &&
+                       request.resource.data.status == 'pending' &&
+                       request.resource.data.keys().hasOnly(applicationFields())
+                     );
+
+      // Reapplying is allowed, and sets it straight back to pending. The diff
+      // check means a vendor can never reach in and change the verdict or the
+      // date their badge runs out.
+      allow update: if isAdmin() || (
+                       signedIn() && isNotSuspended() &&
+                       vendorId == request.auth.uid &&
+                       request.resource.data.status == 'pending' &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(applicationFields())
+                     );
+
+      allow get: if isAdmin() || (signedIn() && vendorId == request.auth.uid);
+      allow list: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /verifiedVendors/{vendorId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /supportChats/{chatId} {
