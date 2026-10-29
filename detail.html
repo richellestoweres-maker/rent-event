@@ -793,6 +793,7 @@
             <div class="vendor-avatar"><span id="vendorInitials">RE</span></div>
             <div class="vendor-info">
               <h3 id="vendorName">Vendor</h3>
+              <div id="vendorVerifiedRow" hidden></div>
               <p id="vendorText">This vendor offers event services through RentEvent.</p>
               <div class="vendor-rating" id="vendorRating">★ New vendor listing</div>
             </div>
@@ -1289,6 +1290,48 @@ function renderEventTypePills(eventTypes) {
   `;
 }
 
+/**
+ * The Verified badge on a listing page.
+ *
+ * Read from verifiedVendors, the public half of verification. The expiry is
+ * checked here rather than trusted, so a lapsed policy stops showing a badge
+ * the day it lapses.
+ */
+function badgeStillGood(until) {
+  const match = String(until || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+
+  const now = new Date();
+  return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) >=
+         Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+async function showVerifiedBadge(vendorId) {
+  const row = document.getElementById("vendorVerifiedRow");
+  if (!row || !vendorId) return;
+
+  let record = null;
+  try {
+    const snap = await getDoc(doc(db, "verifiedVendors", vendorId));
+    record = snap.exists() ? snap.data() || {} : null;
+  } catch (error) {
+    return;
+  }
+
+  if (!record || !badgeStillGood(record.verifiedUntil)) return;
+
+  row.hidden = false;
+  row.innerHTML =
+    '<span style="display:inline-flex;align-items:center;gap:4px;margin:4px 0 2px;padding:3px 10px;' +
+    'border-radius:999px;background:#e9f2ff;color:#2558a8;font-size:0.76rem;font-weight:800;">' +
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="12" height="12">' +
+    '<path d="m4.5 12.5 5 5 10-11" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+    "</svg>Verified</span>" +
+    '<p style="margin:5px 0 0;font-size:0.8rem;line-height:1.45;color:var(--muted);">' +
+    "Business registration and liability insurance checked by RentEvent. " +
+    '<a href="verification-standard.html">What this means</a></p>';
+}
+
 function renderListing(listing) {
   const title = safeText(listing.title, "Untitled Listing");
   const rawMainCategory = safeText(listing.mainCategory, "Event Services");
@@ -1332,6 +1375,7 @@ function renderListing(listing) {
   setText("travelText", travelText);
   setText("vendorInitials", initialsFromName(vendorName));
   setText("vendorName", vendorName);
+  showVerifiedBadge(safeText(listing.vendorId, ""));
   setText("vendorText", `${vendorName} offers ${typeLine} for ${eventTypesText} and other event needs through RentEvent.`);
   setText("vendorRating", rating === "★ New" ? "★ New vendor listing" : `${rating} average rating`);
   setText("mainCategoryValue", mainCategory);

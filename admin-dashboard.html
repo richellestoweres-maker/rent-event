@@ -904,6 +904,20 @@
     </div>
   </section>
 
+  <section class="section" id="verificationSection">
+    <div class="section-header">
+      <h2 class="section-title">Verification</h2>
+      <button class="section-link" type="button" onclick="loadVerifications()">Refresh</button>
+    </div>
+    <div class="list" id="verificationList">
+      <div class="empty-card">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" style="display:block"><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18" cy="12" r="1.7" fill="currentColor"/></svg></div>
+        <h3>Loading</h3>
+        <p>Checking whether any vendors are waiting to be verified.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="supportChatSection">
     <div class="section-header">
       <h2 class="section-title">Live Chat</h2>
@@ -1994,6 +2008,216 @@ window.loadCancellations = async function () {
 };
 
 /* ------------------------------------------------------------------
+ * Verification
+ *
+ * Approving writes two things. The private application is stamped with the
+ * verdict, and a small public document is created that says this vendor is
+ * verified until a date. Customers read only the public one, which is why
+ * nobody browsing can see somebody's policy number or tax ID.
+ * ------------------------------------------------------------------ */
+
+/** The badge runs out when the FIRST of their documents does. */
+function badgeExpiryFor(r) {
+  var days = [safe2(r.insuranceExpiry, ""), safe2(r.licenceExpiry, "")]
+    .filter(function (d) { return /^\d{4}-\d{2}-\d{2}$/.test(d); })
+    .sort();
+  return days.length ? days[0] : "";
+}
+
+function dayPassed(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return false;
+  var p = String(value).split("-");
+  var n = new Date();
+  return Date.UTC(+p[0], +p[1] - 1, +p[2]) < Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+}
+
+function liveState(r) {
+  var status = safe2(r.status, "none");
+  if (status !== "approved") return status;
+  return dayPassed(r.verifiedUntil) ? "expired" : "approved";
+}
+
+window.loadVerifications = async function () {
+  var list = document.getElementById("verificationList");
+  if (!list) return;
+
+  var rows = [];
+  try {
+    var snap = await getDocs(collection(db2, "vendorVerifications"));
+    snap.forEach(function (d) { rows.push(Object.assign({ id: d.id }, d.data())); });
+  } catch (error) {
+    renderEmpty2("verificationList", "Could not load applications", error.message);
+    return;
+  }
+
+  if (!rows.length) {
+    renderEmpty2("verificationList", "No applications", "No vendor has applied to be verified yet.");
+    return;
+  }
+
+  // Waiting on you first. Everything else is just history.
+  rows.sort(function (a, b) {
+    var aw = liveState(a) === "pending" ? 1 : 0;
+    var bw = liveState(b) === "pending" ? 1 : 0;
+    if (aw !== bw) return bw - aw;
+    return ((b.submittedAt && b.submittedAt.seconds) || 0) - ((a.submittedAt && a.submittedAt.seconds) || 0);
+  });
+
+  list.innerHTML = rows.map(function (r) {
+    var state = liveState(r);
+    var expiry = badgeExpiryFor(r);
+    var pill = state === "approved" ? "safe" : (state === "pending" ? "red" : "blue");
+
+    var detail = ""
+      + row2("Legal name", safe2(r.legalName, "not given"))
+      + row2("Registration", safe2(r.regNumber, "not given") + " (" + safe2(r.regState, "no state") + ")")
+      + row2("Insurer", safe2(r.insurer, "not given"))
+      + row2("Policy", safe2(r.policyNumber, "not given"))
+      + row2("Insurance expires", safe2(r.insuranceExpiry, "not given"))
+      + (safe2(r.licenceType, "")
+          ? row2("Licence", safe2(r.licenceType, "") + " " + safe2(r.licenceNumber, "") + ", expires " + safe2(r.licenceExpiry, "?"))
+          : "")
+      + row2("Email", safe2(r.vendorEmail, "not given"));
+
+    return '<article class="item-card">'
+      + '<div class="item-top"><div>'
+      + '<h3 class="item-title">' + esc2(safe2(r.legalName, "A vendor")) + '</h3>'
+      + '<p class="item-subtitle">Applied ' + esc2(fmtTime2(r.submittedAt)) + '</p>'
+      + '</div></div>'
+      + '<div class="pill-row">'
+      + '<span class="pill ' + pill + '">' + esc2(state === "pending" ? "waiting on you" : state) + '</span>'
+      + (expiry ? '<span class="pill blue">badge runs to ' + esc2(expiry) + '</span>' : '<span class="pill red">no expiry date</span>')
+      + '</div>'
+      + '<div style="margin-top:10px;">' + detail + '</div>'
+      + (safe2(r.reviewNote, "")
+          ? '<p class="item-subtitle" style="margin-top:10px;">Your note: ' + esc2(r.reviewNote) + '</p>' : "")
+      + '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">'
+      + (state === "approved"
+          ? '<button class="btn-secondary" type="button" onclick="revokeVerification(\'' + esc2(r.id) + '\')">Remove badge</button>'
+          : '<button class="btn" type="button" onclick="approveVerification(\'' + esc2(r.id) + '\')">Approve</button>'
+            + '<button class="btn-secondary" type="button" onclick="rejectVerification(\'' + esc2(r.id) + '\')">Reject</button>')
+      + '</div>'
+      + '</article>';
+  }).join("");
+};
+
+function row2(label, value) {
+  return '<p style="margin:0 0 4px;font-size:0.88rem;line-height:1.5;">'
+    + '<span style="color:var(--muted);">' + esc2(label) + ': </span>' + esc2(value) + '</p>';
+}
+
+window.approveVerification = async function (vendorId) {
+  var snap = await getDoc(doc(db2, "vendorVerifications", vendorId));
+  if (!snap.exists()) { alert("That application has gone."); return; }
+
+  var r = snap.data() || {};
+  var expiry = badgeExpiryFor(r);
+
+  if (!expiry) {
+    alert("There is no expiry date on this application, so the badge would never come off. Ask them for their policy dates first.");
+    return;
+  }
+
+  if (dayPassed(expiry)) {
+    alert("That policy expired on " + expiry + ". Ask for the current certificate before approving.");
+    return;
+  }
+
+  try {
+    await setDoc(doc(db2, "vendorVerifications", vendorId), {
+      status: "approved",
+      verifiedUntil: expiry,
+      reviewNote: "",
+      reviewedAt: serverTimestamp(),
+      reviewedBy: (auth2.currentUser && auth2.currentUser.uid) || "admin"
+    }, { merge: true });
+
+    // The public half. This is the only part a customer can read.
+    await setDoc(doc(db2, "verifiedVendors", vendorId), {
+      vendorId: vendorId,
+      legalName: safe2(r.legalName, ""),
+      verifiedUntil: expiry,
+      approvedAt: serverTimestamp()
+    });
+
+    await notifyVendor(vendorId, "You are verified",
+      "Your badge is live on your listings until " + expiry + ", when your insurance runs out.");
+
+    await window.loadVerifications();
+  } catch (error) {
+    alert("Could not approve: " + error.message);
+  }
+};
+
+window.rejectVerification = async function (vendorId) {
+  var reason = prompt("What should they fix? They will read this.");
+  if (reason === null) return;
+
+  reason = String(reason).trim();
+  if (reason.length < 5) { alert("Give them something to act on."); return; }
+
+  try {
+    await setDoc(doc(db2, "vendorVerifications", vendorId), {
+      status: "rejected",
+      reviewNote: reason,
+      reviewedAt: serverTimestamp(),
+      reviewedBy: (auth2.currentUser && auth2.currentUser.uid) || "admin"
+    }, { merge: true });
+
+    await deleteDoc(doc(db2, "verifiedVendors", vendorId)).catch(function () {});
+    await notifyVendor(vendorId, "We could not verify you yet", reason);
+    await window.loadVerifications();
+  } catch (error) {
+    alert("Could not reject: " + error.message);
+  }
+};
+
+window.revokeVerification = async function (vendorId) {
+  var reason = prompt("Why is the badge coming off? They will read this.");
+  if (reason === null) return;
+
+  reason = String(reason).trim();
+  if (reason.length < 5) { alert("Give them a reason."); return; }
+
+  try {
+    await setDoc(doc(db2, "vendorVerifications", vendorId), {
+      status: "rejected",
+      reviewNote: reason,
+      reviewedAt: serverTimestamp(),
+      reviewedBy: (auth2.currentUser && auth2.currentUser.uid) || "admin"
+    }, { merge: true });
+
+    await deleteDoc(doc(db2, "verifiedVendors", vendorId));
+    await notifyVendor(vendorId, "Your verified badge was removed", reason);
+    await window.loadVerifications();
+  } catch (error) {
+    alert("Could not remove it: " + error.message);
+  }
+};
+
+async function notifyVendor(vendorId, title, body) {
+  try {
+    await addDoc(collection(db2, "notifications"), {
+      recipientId: vendorId,
+      userId: vendorId,
+      recipientRole: "vendor",
+      type: "verification",
+      typeLabel: "Verification",
+      category: "Vendors",
+      title: title,
+      body: body,
+      message: title,
+      link: "/vendor-verification.html",
+      read: false,
+      isRead: false,
+      createdAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("Could not notify the vendor:", error.message);
+  }
+}
+
+/* ------------------------------------------------------------------
  * Live chat
  *
  * People who could not find what they needed from the help bubble end up
@@ -2222,7 +2446,7 @@ window.loadAllData = async function () {
       loadUsersPageImpl(true),
       loadListingsPageImpl(true),
       loadRequestsPageImpl(true), loadWaitlistPageImpl(true), window.loadInbox(), window.loadCancellations(),
-      window.loadSupportChats()
+      window.loadSupportChats(), window.loadVerifications()
     ]);
   } catch (error) {
     var warn = document.getElementById("adminWarning");

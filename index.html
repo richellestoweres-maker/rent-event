@@ -467,6 +467,11 @@
     .pill.location { background: #f6efe4; color: #6a625a; }
     .pill.type { background: var(--blue-soft); color: var(--blue-text); }
     .pill.available { background: var(--green-soft); color: var(--green-text); }
+    .pill.verified {
+      background: #e9f2ff;
+      color: #2558a8;
+      font-weight: 800;
+    }
     .pill.event { background: var(--purple-soft); color: var(--purple-text); }
 
     .listing-actions {
@@ -1614,6 +1619,57 @@ function renderEventTypePills(listing) {
   return `${pills}${morePill}`;
 }
 
+/* ------------------------------------------------------------------
+ * The Verified badge
+ *
+ * Read from verifiedVendors, which is the only public half of verification.
+ * The private application, with the vendor's tax number and policy number,
+ * is never readable here.
+ *
+ * Whether the badge shows is worked out from the expiry date on every page
+ * load, so a vendor whose insurance lapsed yesterday stops looking insured
+ * today, with no job needing to run overnight.
+ * ------------------------------------------------------------------ */
+
+const verifiedVendorCache = new Map();
+
+function badgeStillGood(until) {
+  const match = String(until || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+
+  const now = new Date();
+  return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) >=
+         Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+async function loadVerifiedVendors(listings) {
+  const ids = Array.from(new Set(
+    listings.map((l) => safeText(l.vendorId, "")).filter(Boolean)
+  )).filter((id) => !verifiedVendorCache.has(id));
+
+  await Promise.all(ids.map(async (id) => {
+    try {
+      const snap = await getDoc(doc(db, "verifiedVendors", id));
+      verifiedVendorCache.set(id, snap.exists() ? snap.data() || {} : null);
+    } catch (error) {
+      verifiedVendorCache.set(id, null);
+    }
+  }));
+}
+
+function isVendorVerified(vendorId) {
+  const record = verifiedVendorCache.get(safeText(vendorId, ""));
+  return !!record && badgeStillGood(record.verifiedUntil);
+}
+
+function verifiedPill(vendorId) {
+  if (!isVendorVerified(vendorId)) return "";
+  return '<span class="pill verified" title="Business and insurance checked by RentEvent">'
+    + '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="12" height="12" style="vertical-align:-1px;margin-right:3px;">'
+    + '<path d="m4.5 12.5 5 5 10-11" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>'
+    + "</svg>Verified</span>";
+}
+
 function renderListings(listings) {
   const listingList = document.getElementById("listingList");
   const sectionTitle = document.getElementById("sectionTitle");
@@ -1625,6 +1681,11 @@ function renderListings(listings) {
   }
 
   sectionTitle.textContent = `${listings.length} Matching Listing${listings.length === 1 ? "" : "s"}`;
+
+  // Verified vendors sit above unverified ones. That placement is most of
+  // what they are paying for, so it has to be real and not just a badge.
+  listings = listings.slice().sort((a, b) =>
+    (isVendorVerified(b.vendorId) ? 1 : 0) - (isVendorVerified(a.vendorId) ? 1 : 0));
 
   listingList.innerHTML = listings.map((listing, index) => {
     const title = safeText(listing.title, "Untitled Listing");
@@ -1686,6 +1747,7 @@ function renderListings(listings) {
         <p class="listing-description">${escapeHtml(description)}</p>
 
         <div class="listing-meta">
+          ${verifiedPill(listing.vendorId)}
           <span class="pill rating">${escapeHtml(rating)}</span>
           <span class="pill location">${escapeHtml(locationLine || "Location not listed")}</span>
           ${renderEventTypePills(listing)}
@@ -1926,6 +1988,12 @@ async function loadListings() {
     });
 
     allListings = listings;
+
+    // Badges are fetched once for the whole result set, before anything is
+    // drawn, so a card never appears unbadged and then changes under the
+    // reader's eye.
+    await loadVerifiedVendors(allListings);
+
     applySearchAndFilter();
 
   } catch (error) {

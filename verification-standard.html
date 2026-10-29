@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="What RentEvent checks before a vendor gets the Verified badge, and what the badge does not mean." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="RentEvent" />
+  <meta property="og:title" content="Safety Guidelines | RentEvent" />
+  <meta property="og:description" content="How RentEvent keeps events, vendors and customers safe, and what to do if something goes wrong." />
+  <meta property="og:image" content="https://www.rentevent-app.com/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Safety Guidelines | RentEvent" />
+  <meta name="twitter:description" content="How RentEvent keeps events, vendors and customers safe, and what to do if something goes wrong." />
+  <title>What Verified Means | RentEvent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f7f2e9;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #6a625a;
+      --line: #ece2d3;
+      --soft: #faf5ee;
+      --coral-1: #ff9a73;
+      --coral-2: #ff7a63;
+      --coral-3: #ff5f67;
+      --green-soft: #eaf7ef;
+      --green-text: #2d7a49;
+      --red-soft: #ffe7e2;
+      --red-text: #c74f4d;
+      --blue-soft: #edf4ff;
+      --blue-text: #4067b2;
+      --gold-soft: #fff4df;
+      --gold-text: #9b6511;
+      --purple-soft: #f0eaff;
+      --purple-text: #6f4ab8;
+      --shadow: 0 18px 40px rgba(123, 96, 58, 0.08);
+      --shadow-strong: 0 18px 32px rgba(255, 108, 98, 0.18);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 18px 92px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .back-link,
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: #222;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(140, 111, 75, 0.05);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7b7268;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 24px 22px;
+      background: linear-gradient(160deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      color: #fff;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      right: -60px;
+      top: -45px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.48;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .notice-card {
+      background: var(--gold-soft);
+      color: var(--gold-text);
+      border: 1px solid rgba(155, 101, 17, 0.18);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .notice-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .notice-card p {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .safety-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(236, 226, 211, 0.45);
+    }
+
+    .updated {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .section {
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 1.12rem;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .section h3 {
+      margin: 14px 0 8px;
+      font-size: 0.98rem;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .section p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section ul {
+      margin: 0 0 12px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.58;
+    }
+
+    .section li {
+      margin-bottom: 8px;
+    }
+
+    .safety-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .safety-box {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 13px;
+    }
+
+    .safety-box strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.86rem;
+      line-height: 1.25;
+    }
+
+    .safety-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .alert-box {
+      background: var(--red-soft);
+      color: var(--red-text);
+      border: 1px solid rgba(199, 79, 77, 0.2);
+      border-radius: 22px;
+      padding: 15px;
+      margin: 12px 0;
+    }
+
+    .alert-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    .alert-box p {
+      color: var(--red-text);
+      margin: 0;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+
+    .pill {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .pill.blue {
+      background: var(--blue-soft);
+      color: var(--blue-text);
+    }
+
+    .pill.green {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .pill.red {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    .pill.purple {
+      background: var(--purple-soft);
+      color: var(--purple-text);
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn,
+    .btn-secondary {
+      min-height: 48px;
+      border-radius: 999px;
+      padding: 0 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--coral-1), var(--coral-2), var(--coral-3));
+      box-shadow: 0 14px 28px rgba(255, 107, 97, 0.16);
+    }
+
+    .btn-secondary {
+      color: #4a433d;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 24px 0;
+      }
+
+      .page {
+        max-width: 880px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .hero-content {
+        max-width: 560px;
+      }
+
+      .safety-card {
+        padding: 28px;
+      }
+
+      .section h2 {
+        font-size: 1.25rem;
+      }
+
+      .safety-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  
+    /* Shared policy footer. Every page carries it so Terms, Privacy, Safety
+       and Support are always one tap away, wherever somebody has landed. */
+    .site-footer {
+      margin-top: 40px;
+      padding: 26px 16px 110px;
+      border-top: 1px solid var(--line, #eee3d6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+    }
+    .footer-links a {
+      color: #554c43;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { text-decoration: underline; }
+    .footer-contact { margin: 0; font-size: 0.86rem; color: var(--muted, #6b6259); }
+    .footer-contact a { color: var(--coral-3, #e8674f); font-weight: 600; }
+    .footer-legal {
+      margin: 0;
+      max-width: 60ch;
+      font-size: 0.76rem;
+      line-height: 1.55;
+      color: var(--muted, #6b6259);
+    }
+  
+    /* Icons are inline SVG so they take the colour of whatever holds them and
+       stay sharp on every screen. These sizes keep each one centred in its
+       existing tile rather than filling it edge to edge. */
+    .support-icon svg { width: 22px; height: 22px; }
+    .menu-icon svg { width: 19px; height: 19px; }
+    .quick-icon svg { width: 26px; height: 26px; }
+    .empty-icon svg { width: 30px; height: 30px; }
+    .upload-icon svg { width: 28px; height: 28px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+
+  <!-- PWA:start (managed) -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ff5f67" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="RentEvent" />
+  <!-- PWA:end -->
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a href="index.html" class="back-link" aria-label="Go back">←</a>
+
+      <div class="topbar-center">
+        <div class="eyebrow">Trust</div>
+        <h1 class="page-title">Verified</h1>
+      </div>
+
+      <a href="notifications.html" class="icon-btn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 7.5h18s-3-.5-3-7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-content">
+        <h2 class="hero-title">What Verified means</h2>
+        <p class="hero-subtitle">
+          Exactly what we check, and what we do not. Read it before you rely on it.
+        </p>
+      </div>
+    </section>
+
+    <section class="safety-card">
+      <div class="section">
+        <h2>What we check</h2>
+        <p>
+          Before a vendor gets the badge, a person at RentEvent checks three things.
+        </p>
+        <ul>
+          <li><strong>The business is real.</strong> We check the legal business name and its registration or EIN against the state it says it is registered in.</li>
+          <li><strong>They carry liability insurance.</strong> We read the certificate, check the policy is current, and record the date it expires.</li>
+          <li><strong>They hold any licence their work needs.</strong> For alcohol service, food handling, transport and security, we check the licence number and its expiry.</li>
+        </ul>
+        <p>
+          Every vendor who can take a booking on RentEvent, badge or not, has also been through identity checks with Stripe, our payment processor, before they are allowed to receive money.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>What it does not mean</h2>
+        <p>
+          The badge is about paperwork, not performance. It is not a review, a rating, or a promise about quality.
+        </p>
+        <ul>
+          <li>It does not mean RentEvent has seen their work or met them.</li>
+          <li>It does not mean they will do a good job, turn up on time, or be easy to deal with.</li>
+          <li>It does not make RentEvent responsible for their work. Vendors are independent businesses.</li>
+          <li>It does not replace your own judgement. Read their reviews and talk to them.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>It runs out</h2>
+        <p>
+          The badge expires on the day the vendor's insurance does, automatically, with nobody having to remember. If their policy lapses, the badge is gone that morning until they send us the new certificate.
+        </p>
+        <p>
+          We also remove it at any time if we find something is wrong, if a vendor stops meeting the standard, or if they repeatedly cancel confirmed bookings.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>Your documents</h2>
+        <p>
+          Insurance certificates are emailed to us, read by a person, and then deleted. We keep the policy number, the insurer, and the expiry date. We do not keep the certificate itself.
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>Something not right?</h2>
+        <p>
+          If a verified vendor is not what the badge says they are, tell us. We would rather take a badge off than leave a wrong one up.
+        </p>
+        <div class="footer-actions">
+          <a class="btn" href="report.html">Report a Concern</a>
+          <a class="btn-secondary" href="support.html">Contact Support</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<!-- PWA-SW:start (managed) -->
+<script>
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function (e) {
+        console.warn("SW registration failed:", e);
+      });
+    });
+  }
+</script>
+<!-- PWA-SW:end -->
+
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Policies and support">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="safety.html">Safety</a>
+      <a href="community-guidelines.html">Community Guidelines</a>
+      <a href="support.html">Support</a>
+      <a href="report.html">Report a Concern</a>
+    </nav>
+    <p class="footer-legal">
+      &copy; 2026 Johnnie &amp; Jane Boutique LLC, doing business as RentEvent.
+      Vendors listed on RentEvent are independent businesses responsible for the services they provide.
+    </p>
+  </footer>
+
+    <script type="module" src="support-chat.js"></script>
+</body>
+</html>
