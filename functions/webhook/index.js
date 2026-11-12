@@ -34,6 +34,9 @@ const HANDLED = new Set([
   "checkout.session.expired",
   "charge.refunded",
   "account.updated",
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
 ]);
 
 function bookingIdFromSession(session) {
@@ -272,6 +275,132 @@ async function syncConnectedAccount(account) {
   console.log("Connected account synced:", account.id, "payouts", payoutsEnabled);
 }
 
+/* ------------------------------------------------------------------ */
+/* Vendor verification subscription                                    */
+/*                                                                     */
+/* The badge needs two things at once: Richelle approved the documents, */
+/* and the $14.99 a month subscription is paid up. Approval alone does  */
+/* not show it, and paying alone does not show it.                      */
+/*                                                                     */
+/* Subscription details are stored on the vendor's vendorVerifications */
+/* document, which the vendor can read but never write those fields of, */
+/* because the Firestore rules only let them touch application fields. */
+/* ------------------------------------------------------------------ */
+
+const LIVE_SUBSCRIPTION_STATES = new Set(["active", "trialing"]);
+
+function dayFromUnix(seconds) {
+  if (!seconds) return "";
+  return new Date(Number(seconds) * 1000).toISOString().slice(0, 10);
+}
+
+/** Newer Stripe API versions keep the period end on the item, older ones on the subscription. */
+function subscriptionPeriodEnd(sub) {
+  if (sub.current_period_end) return sub.current_period_end;
+  const item = sub.items && sub.items.data && sub.items.data[0];
+  return (item && item.current_period_end) || 0;
+}
+
+function insuranceStillGood(verifiedUntil) {
+  const m = String(verifiedUntil || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return false;
+  const now = new Date();
+  return Date.UTC(+m[1], +m[2] - 1, +m[3]) >=
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+}
+
+/**
+ * Puts the public badge on or takes it off.
+ *
+ * Off whenever the subscription is not paid up. On when it is paid, the
+ * application is approved, and the insurance has not run out. While a paying
+ * vendor is being re-reviewed (status "pending") the badge is left as it is,
+ * the same way it worked before subscriptions existed.
+ */
+async function syncVerificationBadge(vendorId, application) {
+  const badgeRef = db.collection("verifiedVendors").doc(vendorId);
+  const paid = LIVE_SUBSCRIPTION_STATES.has(application.subscriptionStatus || "");
+
+  if (!paid) {
+    await badgeRef.delete().catch(() => {});
+    return false;
+  }
+
+  if (application.status === "approved" && insuranceStillGood(application.verifiedUntil)) {
+    const existing = await badgeRef.get();
+    const badge = {
+      vendorId,
+      legalName: application.legalName || "",
+      verifiedUntil: application.verifiedUntil
+    };
+    if (!existing.exists) badge.approvedAt = admin.firestore.FieldValue.serverTimestamp();
+    await badgeRef.set(badge, { merge: true });
+    return true;
+  }
+
+  return false;
+}
+
+/** Records a subscription's current state against the vendor and fixes the badge to match. */
+async function applyVerificationSubscription(sub) {
+  const vendorId = (sub.metadata && sub.metadata.rentEventVendorId) || "";
+  if (!vendorId) return null;
+
+  const appRef = db.collection("vendorVerifications").doc(vendorId);
+  const snap = await appRef.get();
+
+  if (!snap.exists) {
+    console.warn("Verification subscription for a vendor with no application", vendorId, sub.id);
+    return null;
+  }
+
+  const application = snap.data() || {};
+  const storedId = application.subscriptionId || "";
+
+  // An old subscription ending must never switch off a newer one that is paid.
+  if (storedId && storedId !== sub.id &&
+      LIVE_SUBSCRIPTION_STATES.has(application.subscriptionStatus || "") &&
+      !LIVE_SUBSCRIPTION_STATES.has(sub.status)) {
+    console.log("Ignoring stale subscription", sub.id, "for", vendorId);
+    return application;
+  }
+
+  const update = {
+    subscriptionId: sub.id,
+    subscriptionStatus: sub.status,
+    subscriptionPeriodEnd: dayFromUnix(subscriptionPeriodEnd(sub)),
+    subscriptionCancelAtPeriodEnd: sub.cancel_at_period_end === true,
+    subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  await appRef.set(update, { merge: true });
+
+  const merged = Object.assign({}, application, update);
+  await syncVerificationBadge(vendorId, merged);
+
+  console.log("Verification subscription", sub.id, "for", vendorId, "is", sub.status);
+  return merged;
+}
+
+/**
+ * Reads the subscription fresh from Stripe rather than trusting the event's
+ * copy, because Stripe does not promise events arrive in order.
+ */
+async function handleVerificationSubscription(subOrId, stripe) {
+  const id = typeof subOrId === "string" ? subOrId : subOrId.id;
+  let sub = typeof subOrId === "string" ? null : subOrId;
+
+  try {
+    sub = await stripe.subscriptions.retrieve(id);
+  } catch (err) {
+    console.error("Could not read subscription", id, err.message);
+    if (!sub) throw err;
+  }
+
+  if (!sub.metadata || sub.metadata.purpose !== "vendor_verification") return;
+  await applyVerificationSubscription(sub);
+}
+
 exports.stripeWebhook = onRequest(
   {
     region: "us-central1",
@@ -318,6 +447,13 @@ exports.stripeWebhook = onRequest(
       switch (event.type) {
         case "checkout.session.completed": {
           const session = event.data.object;
+          // A vendor verification subscription, not a booking.
+          if (session.mode === "subscription") {
+            if (session.subscription) {
+              await handleVerificationSubscription(session.subscription, stripe);
+            }
+            break;
+          }
           // Card payments arrive here already paid. Slower methods arrive
           // unpaid and settle later via async_payment_succeeded.
           if (session.payment_status === "paid") {
@@ -328,13 +464,21 @@ exports.stripeWebhook = onRequest(
           break;
         }
         case "checkout.session.async_payment_succeeded":
+          if (event.data.object.mode === "subscription") break;
           await markPaid(event.data.object, event, stripe);
           break;
         case "checkout.session.async_payment_failed":
+          if (event.data.object.mode === "subscription") break;
           await markNotPaid(event.data.object, "payment_failed");
           break;
         case "checkout.session.expired":
+          if (event.data.object.mode === "subscription") break;
           await markNotPaid(event.data.object, "checkout_expired");
+          break;
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+        case "customer.subscription.deleted":
+          await handleVerificationSubscription(event.data.object, stripe);
           break;
         case "charge.refunded":
           await markRefunded(event.data.object);
@@ -348,6 +492,9 @@ exports.stripeWebhook = onRequest(
     } catch (err) {
       // A non-200 tells Stripe to retry, which is what we want on a real fault.
       console.error("Webhook handler error:", err);
+      // Release the claim, or Stripe's retry would be skipped as a duplicate
+      // and the work would never happen.
+      await db.collection("stripeEvents").doc(event.id).delete().catch(() => {});
       res.status(500).send("Webhook handler failed");
     }
   }
