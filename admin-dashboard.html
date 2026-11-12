@@ -2033,6 +2033,43 @@ function dayPassed(value) {
   return Date.UTC(+p[0], +p[1] - 1, +p[2]) < Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
 }
 
+/** The server that runs Stripe for vendors, including verification billing. */
+var CONNECT_ENDPOINT2 = "https://stripeconnect-840686040363.us-central1.run.app";
+
+function isPaid2(r) {
+  return ["active", "trialing"].indexOf(safe2(r.subscriptionStatus, "")) !== -1;
+}
+
+function billingPill(r) {
+  var s = safe2(r.subscriptionStatus, "");
+  if (s === "active" || s === "trialing") {
+    return r.subscriptionCancelAtPeriodEnd
+      ? '<span class="pill blue">paying, ends ' + esc2(safe2(r.subscriptionPeriodEnd, "soon")) + '</span>'
+      : '<span class="pill safe">paying $14.99/mo</span>';
+  }
+  if (s === "past_due" || s === "unpaid") return '<span class="pill red">payment failed</span>';
+  if (s === "canceled") return '<span class="pill blue">subscription cancelled</span>';
+  return '<span class="pill blue">not subscribed</span>';
+}
+
+/**
+ * Stops a vendor being billed. Used when their badge comes off for a reason
+ * of ours, so nobody keeps paying for a badge they cannot have.
+ */
+async function cancelVerificationBilling(vendorId) {
+  var user = auth2.currentUser;
+  if (!user) throw new Error("Sign in again.");
+  var token = await user.getIdToken();
+  var response = await fetch(CONNECT_ENDPOINT2, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+    body: JSON.stringify({ action: "verifyAdminCancel", vendorId: vendorId })
+  });
+  var data = await response.json().catch(function () { return {}; });
+  if (!response.ok || !data.success) throw new Error(data.error || "Could not stop their billing.");
+  return data;
+}
+
 function liveState(r) {
   var status = safe2(r.status, "none");
   if (status !== "approved") return status;
@@ -2092,6 +2129,7 @@ window.loadVerifications = async function () {
       + '<div class="pill-row">'
       + '<span class="pill ' + pill + '">' + esc2(state === "pending" ? "waiting on you" : state) + '</span>'
       + (expiry ? '<span class="pill blue">badge runs to ' + esc2(expiry) + '</span>' : '<span class="pill red">no expiry date</span>')
+      + billingPill(r)
       + '</div>'
       + '<div style="margin-top:10px;">' + detail + '</div>'
       + (safe2(r.reviewNote, "")
@@ -2161,16 +2199,23 @@ window.approveVerification = async function (vendorId) {
       reviewedBy: (auth2.currentUser && auth2.currentUser.uid) || "admin"
     }, { merge: true });
 
-    // The public half. This is the only part a customer can read.
-    await setDoc(doc(db2, "verifiedVendors", vendorId), {
-      vendorId: vendorId,
-      legalName: safe2(r.legalName, ""),
-      verifiedUntil: expiry,
-      approvedAt: serverTimestamp()
-    });
+    if (isPaid2(r)) {
+      // Already paying, for example a renewal. The public half goes straight
+      // back on, and it is the only part a customer can read.
+      await setDoc(doc(db2, "verifiedVendors", vendorId), {
+        vendorId: vendorId,
+        legalName: safe2(r.legalName, ""),
+        verifiedUntil: expiry,
+        approvedAt: serverTimestamp()
+      });
 
-    await notifyVendor(vendorId, "You are verified",
-      "Your badge is live on your listings until " + expiry + ", when your insurance runs out.");
+      await notifyVendor(vendorId, "You're verified",
+        "Your badge is live on your listings until " + expiry + ", when your insurance runs out.");
+    } else {
+      // Not paying yet. The badge goes on when their subscription starts.
+      await notifyVendor(vendorId, "You're approved",
+        "Turn on your Verified badge for $14.99 a month on your verification page.");
+    }
 
     await window.loadVerifications();
   } catch (error) {
@@ -2185,6 +2230,12 @@ window.rejectVerification = async function (vendorId) {
   reason = String(reason).trim();
   if (reason.length < 5) { alert("Give them something to act on."); return; }
 
+  var r0 = {};
+  try {
+    var snap0 = await getDoc(doc(db2, "vendorVerifications", vendorId));
+    r0 = snap0.exists() ? (snap0.data() || {}) : {};
+  } catch (e) {}
+
   try {
     await setDoc(doc(db2, "vendorVerifications", vendorId), {
       status: "rejected",
@@ -2195,6 +2246,13 @@ window.rejectVerification = async function (vendorId) {
 
     await deleteDoc(doc(db2, "verifiedVendors", vendorId)).catch(function () {});
     await notifyVendor(vendorId, "We could not verify you yet", reason);
+    if (isPaid2(r0)) {
+      try {
+        await cancelVerificationBilling(vendorId);
+      } catch (billingError) {
+        alert("The badge is off, but their billing did not stop: " + billingError.message + ". Cancel it in Stripe.");
+      }
+    }
     await window.loadVerifications();
   } catch (error) {
     alert("Could not reject: " + error.message);
@@ -2208,6 +2266,12 @@ window.revokeVerification = async function (vendorId) {
   reason = String(reason).trim();
   if (reason.length < 5) { alert("Give them a reason."); return; }
 
+  var r0 = {};
+  try {
+    var snap0 = await getDoc(doc(db2, "vendorVerifications", vendorId));
+    r0 = snap0.exists() ? (snap0.data() || {}) : {};
+  } catch (e) {}
+
   try {
     await setDoc(doc(db2, "vendorVerifications", vendorId), {
       status: "rejected",
@@ -2218,6 +2282,13 @@ window.revokeVerification = async function (vendorId) {
 
     await deleteDoc(doc(db2, "verifiedVendors", vendorId));
     await notifyVendor(vendorId, "Your verified badge was removed", reason);
+    if (isPaid2(r0)) {
+      try {
+        await cancelVerificationBilling(vendorId);
+      } catch (billingError) {
+        alert("The badge is off, but their billing did not stop: " + billingError.message + ". Cancel it in Stripe.");
+      }
+    }
     await window.loadVerifications();
   } catch (error) {
     alert("Could not remove it: " + error.message);
