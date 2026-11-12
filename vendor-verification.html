@@ -1258,6 +1258,7 @@
           <ul class="todo-list" id="todoList" hidden></ul>
           <div class="hero-actions" id="heroActions" hidden>
             <button class="hero-btn" type="button" id="primaryBtn">Apply</button>
+            <button class="hero-btn-secondary" type="button" id="billingBtn" hidden>Manage billing</button>
             <a class="hero-btn-secondary" href="verification-standard.html">What we check</a>
           </div>
         </div>
@@ -1463,6 +1464,9 @@ const storage = getStorage(app);
  */
 const CERTIFICATE_FOLDER = "verification";
 
+/** The server that runs Stripe for vendors: payouts and the verification subscription. */
+const CONNECT_ENDPOINT = "https://stripeconnect-840686040363.us-central1.run.app";
+
 /** Admins who get told when somebody applies. Matches the Firestore rules. */
 const ADMIN_USER_IDS = ["GBrIifV7FnOnXhXmgmG4lpMg4Lr1"];
 
@@ -1534,6 +1538,46 @@ function currentState(record) {
   return until < todayUTC() ? "expired" : "approved";
 }
 
+function isPaid(record) {
+  return ["active", "trialing"].includes(safeText(record && record.subscriptionStatus, ""));
+}
+
+function paymentFailed(record) {
+  return ["past_due", "unpaid"].includes(safeText(record && record.subscriptionStatus, ""));
+}
+
+async function callBilling(action) {
+  const token = await currentUser.getIdToken();
+  const response = await fetch(CONNECT_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+    body: JSON.stringify({ action })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.success) throw new Error(data.error || "Something went wrong. Please try again.");
+  return data;
+}
+
+/** Sends the vendor to Stripe, either to subscribe or to manage billing. */
+async function goToStripe(action, button) {
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = "Opening...";
+
+  try {
+    const data = await callBilling(action);
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+  } catch (error) {
+    showAlert(error.message);
+  }
+
+  button.disabled = false;
+  button.textContent = label;
+}
+
 function renderStatus() {
   const state = currentState(currentRecord);
   const pill = document.getElementById("statusPillText");
@@ -1541,20 +1585,46 @@ function renderStatus() {
   const todo = document.getElementById("todoList");
   const form = document.getElementById("formSection");
   const primary = document.getElementById("primaryBtn");
+  const billing = document.getElementById("billingBtn");
 
   todo.hidden = true;
   todo.innerHTML = "";
   heroActions.hidden = false;
   form.hidden = true;
+  primary.disabled = false;
 
-  if (state === "approved") {
+  // Anyone who has ever subscribed can reach their receipts and card.
+  billing.hidden = !safeText((currentRecord || {}).subscriptionId, "");
+  billing.onclick = () => goToStripe("verifyManage", billing);
+
+  if (state === "approved" && isPaid(currentRecord)) {
     pill.textContent = "Verified";
-    setText("heroTitle", "You are verified");
-    setText("heroSubtitle",
-      "Your badge is on your listings. It stays until " +
-      (prettyDay(currentRecord.verifiedUntil) || "we remove it") + ", when your insurance runs out.");
+    setText("heroTitle", "You're verified");
+    setText("heroSubtitle", currentRecord.subscriptionCancelAtPeriodEnd
+      ? "Your subscription ends " + (prettyDay(currentRecord.subscriptionPeriodEnd) || "soon") + ", and your badge comes off then."
+      : "Your badge is on your listings until " +
+        (prettyDay(currentRecord.verifiedUntil) || "we remove it") + ", when your insurance runs out.");
     primary.textContent = "Update my details";
     primary.onclick = openForm;
+    return;
+  }
+
+  if (state === "approved" && paymentFailed(currentRecord)) {
+    pill.textContent = "Payment failed";
+    setText("heroTitle", "Your payment didn't go through");
+    setText("heroSubtitle", "Your badge is off until it's paid. Update your card to turn it back on.");
+    primary.textContent = "Update my card";
+    primary.onclick = () => goToStripe("verifyManage", primary);
+    billing.hidden = true;
+    return;
+  }
+
+  if (state === "approved") {
+    pill.textContent = "Approved";
+    setText("heroTitle", "Turn on your badge");
+    setText("heroSubtitle", "You're approved. The Verified badge is $14.99 a month. Cancel anytime.");
+    primary.textContent = "Turn on my badge";
+    primary.onclick = () => goToStripe("verifySubscribe", primary);
     return;
   }
 
@@ -1582,7 +1652,8 @@ function renderStatus() {
     setText("heroTitle", "Your insurance ran out");
     setText("heroSubtitle",
       "The badge came off on " + (prettyDay(currentRecord.verifiedUntil) || "its expiry date") +
-      ". Send your new certificate and it goes straight back.");
+      ". Send your new certificate and it goes straight back." +
+      (isPaid(currentRecord) ? " You're still subscribed, so cancel in billing if you're not renewing." : ""));
     primary.textContent = "Renew";
     primary.onclick = openForm;
     return;
@@ -1590,7 +1661,7 @@ function renderStatus() {
 
   pill.textContent = "Not verified";
   setText("heroTitle", "Get the Verified badge");
-  setText("heroSubtitle", "Show customers your business is real and insured.");
+  setText("heroSubtitle", "Show customers your business is real and insured. Applying is free. Once you're approved, the badge is $14.99 a month.");
   primary.textContent = "Apply";
   primary.onclick = openForm;
 }
@@ -1773,6 +1844,28 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   renderStatus();
+
+  // Check Stripe directly for anyone approved or subscribed, so the page is
+  // right the moment they come back from paying, without waiting on Stripe.
+  const params = new URLSearchParams(window.location.search);
+  const cameBack = params.has("subscribed") || params.has("billing");
+
+  if (currentRecord && (currentRecord.status === "approved" || currentRecord.subscriptionId || cameBack)) {
+    try {
+      await callBilling("verifyStatus");
+      const fresh = await getDoc(doc(db, "vendorVerifications", user.uid));
+      currentRecord = fresh.exists() ? fresh.data() : currentRecord;
+      renderStatus();
+    } catch (error) {
+      // The page already shows what we have on file.
+    }
+  }
+
+  if (params.has("subscribed") && isPaid(currentRecord)) {
+    showAlert("You're subscribed. Your Verified badge is live.");
+  }
+
+  if (cameBack) history.replaceState(null, "", window.location.pathname);
 });
 
 </script>
