@@ -861,6 +861,7 @@ async function notifyAdmins(name, text, chatId) {
   for (const adminId of ADMIN_USER_IDS) {
     try {
       await addDoc(collection(db, "notifications"), {
+        senderId: currentUser.uid,
         recipientId: adminId,
         userId: adminId,
         recipientRole: "admin",
