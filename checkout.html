@@ -2288,6 +2288,7 @@ async function createVendorBookingNotifications(requestId, payload, conversation
 
     try {
       await addDoc(collection(db, "notifications"), {
+        senderId: currentUser.uid,
         recipientId: vendorId,
         recipientRole: "vendor",
 
@@ -2331,6 +2332,7 @@ async function createRequesterConfirmationNotification(requestId, payload) {
 
   try {
     await addDoc(collection(db, "notifications"), {
+      senderId: currentUser.uid,
       recipientId: ownerId,
       recipientRole: payload.requestOwnerRole || payload.accountType || "customer",
 
