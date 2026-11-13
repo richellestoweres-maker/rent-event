@@ -2298,6 +2298,7 @@ window.revokeVerification = async function (vendorId) {
 async function notifyVendor(vendorId, title, body) {
   try {
     await addDoc(collection(db2, "notifications"), {
+      senderId: (auth2.currentUser && auth2.currentUser.uid) || "",
       recipientId: vendorId,
       userId: vendorId,
       recipientRole: "vendor",
@@ -2458,6 +2459,7 @@ window.sendSupportReply = async function (chatId) {
     // Their phone buzzes, the same way every other notification on the site
     // works, so a reply does not sit unread because they closed the tab.
     await addDoc(collection(db2, "notifications"), {
+      senderId: (auth2.currentUser && auth2.currentUser.uid) || "",
       recipientId: chatId,
       userId: chatId,
       recipientRole: "customer",
