@@ -1323,6 +1323,7 @@ async function notifyVendorAboutQuoteAnswer(requestId, vendorId, quote, answer) 
 
   try {
     await addDoc(collection(db, "notifications"), {
+      senderId: currentUser.uid,
       recipientId: vendorId,
       recipientRole: "vendor",
       type: answer === "accepted" ? "quote_accepted" : "quote_declined",
@@ -2698,6 +2699,7 @@ async function createWithdrawNotifications(request, requestId, finalReason) {
   for (const vendorId of uniqueVendorIds) {
     try {
       await addDoc(collection(db, "notifications"), {
+        senderId: currentUser.uid,
         recipientId: vendorId,
         recipientRole: "vendor",
         type: "request_withdrawn",
