@@ -2144,6 +2144,7 @@ async function createOwnerResponseNotification(request, responseStatus, response
       : `${vendorName} responded: ${responseLabel}${responseNote ? `. ${responseNote}` : ""}`;
 
     await addDoc(collection(db, "notifications"), {
+      senderId: currentUser.uid,
       recipientId,
       userId: recipientId,
       recipientRole,
