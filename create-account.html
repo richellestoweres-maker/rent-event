@@ -669,6 +669,7 @@ async function createWelcomeNotification(user, selectedRoles, activeRole) {
 
   try {
     await addDoc(collection(db, "notifications"), {
+      senderId: user.uid,
       recipientId: user.uid,
       type: "welcome",
       typeLabel: "Welcome",
