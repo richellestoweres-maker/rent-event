@@ -48,6 +48,9 @@ const db = admin.firestore();
  */
 const AUTO_REFUND_LIMIT_CENTS = 50000;
 
+/** Same admins as the Firestore rules. */
+const ADMIN_USER_IDS = ["GBrIifV7FnOnXhXmgmG4lpMg4Lr1"];
+
 /** The published tiers, in days before the event. */
 const FULL_REFUND_DAYS = 30;
 const HALF_REFUND_DAYS = 14;
@@ -161,6 +164,27 @@ function vendorPriceCents(booking, vendorId) {
   return Math.round(toNumber(amounts[vendorId], 0) * 100);
 }
 
+/** Whether the balance on a deposit booking has been collected yet. */
+function balanceCollected(booking) {
+  return booking.depositMode !== true || cleanText(booking.balanceStatus, "") === "paid";
+}
+
+/**
+ * What the customer has actually paid toward one vendor's price, in cents.
+ * Before a deposit booking's balance is collected, that is only the deposit.
+ */
+function paidTowardCents(booking, vendorId) {
+  if (balanceCollected(booking)) return vendorPriceCents(booking, vendorId);
+  const deposits = booking.vendorDepositCents || {};
+  return Math.round(toNumber(deposits[vendorId], 0));
+}
+
+/** Everything collected so far, across the deposit and the balance. */
+function collectedCents(booking) {
+  return Math.round(toNumber(booking.stripeAmountCollectedCents || booking.stripeAmountCents, 0)) +
+         Math.round(toNumber(booking.balanceCollectedCents, 0));
+}
+
 /** Money that is spoken for already: refunded, or earmarked and awaiting approval. */
 function spokenForCents(booking) {
   return Math.round(toNumber(booking.refundedCents, 0)) +
@@ -176,14 +200,16 @@ function spokenForCents(booking) {
  */
 function vendorCancelRefund(booking, vendorId) {
   const amounts = booking.quotedVendorAmounts || {};
-  const subtotal = Object.keys(amounts).reduce((sum, id) => sum + toNumber(amounts[id], 0), 0);
+
+  // Weighted by what was actually paid toward each vendor, which on a deposit
+  // booking whose balance is still to come is each vendor's deposit.
+  const subtotal = Object.keys(amounts).reduce((sum, id) => sum + paidTowardCents(booking, id), 0);
   if (subtotal <= 0) return { cents: 0, reason: "no_vendor_amounts", tier: "vendor_cancelled" };
 
-  const thisVendor = toNumber(amounts[vendorId], 0);
+  const thisVendor = paidTowardCents(booking, vendorId);
   if (thisVendor <= 0) return { cents: 0, reason: "vendor_not_in_booking", tier: "vendor_cancelled" };
 
-  const collected = Math.round(toNumber(
-    booking.stripeAmountCollectedCents || booking.stripeAmountCents, 0));
+  const collected = collectedCents(booking);
   if (collected <= 0) return { cents: 0, reason: "nothing_collected", tier: "vendor_cancelled" };
 
   const remaining = collected - spokenForCents(booking);
@@ -208,8 +234,8 @@ function customerCancelRefund(booking, vendorId, days) {
   const base = vendorPriceCents(booking, vendorId);
   if (base <= 0) return { cents: 0, reason: "vendor_not_in_booking", tier: "" };
 
-  const collected = Math.round(toNumber(
-    booking.stripeAmountCollectedCents || booking.stripeAmountCents, 0));
+  const paid = paidTowardCents(booking, vendorId);
+  const collected = collectedCents(booking);
   if (collected <= 0) return { cents: 0, reason: "nothing_collected", tier: "" };
 
   const remaining = collected - spokenForCents(booking);
@@ -220,7 +246,7 @@ function customerCancelRefund(booking, vendorId, days) {
   // most generous tier is put forward so there is a real figure to approve,
   // and the caller holds it rather than sending it.
   if (days === null) {
-    return { cents: Math.min(base, remaining), reason: "no_event_date", tier: "unknown" };
+    return { cents: Math.min(paid, remaining), reason: "no_event_date", tier: "unknown" };
   }
 
   let want = 0;
@@ -237,11 +263,46 @@ function customerCancelRefund(booking, vendorId, days) {
     want = 0;
   }
 
+  // The vendor keeps (price minus what the tier gives back). The customer gets
+  // back whatever they have paid above that. With the full price paid this is
+  // exactly the tier amount. With only a deposit paid, it can be less, because
+  // the part of the price they never paid simply is not charged.
+  const kept = base - want;
+  const refund = Math.max(0, paid - kept);
+
   return {
-    cents: Math.max(0, Math.min(want, remaining)),
-    reason: want > 0 ? "" : "policy_no_refund",
+    cents: Math.max(0, Math.min(refund, remaining)),
+    reason: refund > 0 ? "" : "policy_no_refund",
     tier
   };
+}
+
+/**
+ * Takes a vendor out of a balance that has not been charged yet. Returns the
+ * fields to write, or null when there is nothing to change.
+ */
+function balanceWithoutVendor(booking, vendorId) {
+  if (booking.depositMode !== true) return null;
+  if (!["scheduled", "failed", "not_started"].includes(cleanText(booking.balanceStatus, ""))) return null;
+
+  const balances = Object.assign({}, booking.vendorBalanceCents || {});
+  if (!Math.round(toNumber(balances[vendorId], 0))) return null;
+
+  balances[vendorId] = 0;
+  const remainingVendorCents = Object.keys(balances).reduce((sum, id) => sum + Math.round(toNumber(balances[id], 0)), 0);
+
+  const pct = toNumber(booking.processingPercent, 0.029);
+  const fixed = toNumber(booking.processingFixed, 0.30);
+  const base = remainingVendorCents / 100;
+  const gross = base > 0 ? (base + fixed) / (1 - pct) : 0;
+
+  const update = {
+    vendorBalanceCents: balances,
+    balanceCents: Math.round(gross * 100)
+  };
+
+  if (remainingVendorCents <= 0) update.balanceStatus = "cancelled";
+  return update;
 }
 
 /**
@@ -266,7 +327,10 @@ function adjustedPayoutPlan(booking, vendorId, refundCents, byCustomer) {
       continue;
     }
 
-    const kept = Math.max(0, Math.round(toNumber(line.amountCents, 0)) - refundCents);
+    // What the vendor ends up with is what was paid toward them, less the
+    // refund. Before a deposit booking's balance this is capped at the deposit.
+    const paid = Math.min(Math.round(toNumber(line.amountCents, 0)), paidTowardCents(booking, vendorId));
+    const kept = Math.max(0, paid - refundCents);
     if (kept > 0) next.push(Object.assign({}, line, { amountCents: kept }));
   }
 
@@ -279,6 +343,7 @@ async function notify(recipientId, payload) {
     await db.collection("notifications").add(Object.assign({
       recipientId,
       userId: recipientId,
+      senderId: "system",
       read: false,
       isRead: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
@@ -392,9 +457,22 @@ cloudEvent("vendorCancelBooking", async (event) => {
       // Everybody is off the plan and nothing is owed, so the payout job has
       // no work here. Left as "scheduled" it would run, find an empty plan and
       // flag the booking for review over nothing.
-      if (!update.payoutPlan.length && cleanText(booking.payoutStatus, "") === "scheduled") {
+      // The balance not yet charged no longer includes this vendor.
+      const balanceChange = balanceWithoutVendor(booking, vendorId);
+      if (balanceChange) Object.assign(update, balanceChange);
+
+      const payoutStatusNow = cleanText(booking.payoutStatus, "");
+
+      if (!update.payoutPlan.length && ["scheduled", "awaiting_balance"].includes(payoutStatusNow)) {
         update.payoutStatus = "cancelled";
         update.payoutCancelledReason = byCustomer ? "customer_cancelled" : "vendor_cancelled";
+        if (booking.depositMode === true && cleanText(booking.balanceStatus, "") !== "paid") {
+          update.balanceStatus = "cancelled";
+        }
+      } else if (balanceChange && balanceChange.balanceStatus === "cancelled" && payoutStatusNow === "awaiting_balance") {
+        // Nothing more is coming in, and the vendors still on the plan are
+        // owed what they kept from their deposits, so pay them on schedule.
+        update.payoutStatus = "scheduled";
       }
 
       tx.set(bookingRef, update, { merge: true });
@@ -447,30 +525,61 @@ cloudEvent("vendorCancelBooking", async (event) => {
   } else {
     const chargeId = cleanText(booking.stripeChargeId, "");
     const paymentIntentId = cleanText(booking.stripePaymentIntentId, "");
+    const balanceChargeId = cleanText(booking.balanceChargeId, "");
 
     if (!chargeId && !paymentIntentId) {
       outcome = "missing_charge";
       console.error("Cannot refund, the booking has no Stripe charge recorded.");
     } else {
+      // Tracked outside the try, so a failure part way through only hands
+      // back the part that did not go out.
+      let left = refundCents;
+
       try {
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-        const refund = await stripe.refunds.create({
-          amount: refundCents,
-          reason: "requested_by_customer",
-          ...(chargeId ? { charge: chargeId } : { payment_intent: paymentIntentId }),
-          metadata: {
-            bookingRequestId: bookingId,
-            vendorId,
-            source: byCustomer ? "customer_cancellation" : "vendor_cancellation",
-            tier: claim.tier
-          }
-        }, {
-          // Stripe will not run the same refund twice with this key, which is
-          // the second half of the retry protection.
-          idempotencyKey: (byCustomer ? "custcancel_" : "vendorcancel_") + bookingId + "_" + vendorId
-        });
+        const keyBase = (byCustomer ? "custcancel_" : "vendorcancel_") + bookingId + "_" + vendorId;
+        const metadata = {
+          bookingRequestId: bookingId,
+          vendorId,
+          source: byCustomer ? "customer_cancellation" : "vendor_cancellation",
+          tier: claim.tier
+        };
 
-        refundId = cleanText(refund.id, "");
+        // A deposit booking may have two charges. The refund comes off the
+        // balance charge first, then the deposit, never more than either holds.
+        const sources = [];
+        if (balanceChargeId) sources.push({ charge: balanceChargeId, key: "_bal" });
+        sources.push(chargeId ? { charge: chargeId, key: "" } : { payment_intent: paymentIntentId, key: "" });
+
+        const ids = [];
+
+        for (const source of sources) {
+          if (left <= 0) break;
+
+          let room = left;
+          if (source.charge && sources.length > 1) {
+            const charge = await stripe.charges.retrieve(source.charge);
+            room = Math.min(left, Math.max(0, charge.amount - charge.amount_refunded));
+          }
+          if (room <= 0) continue;
+
+          const refund = await stripe.refunds.create(Object.assign({
+            amount: room,
+            reason: "requested_by_customer",
+            metadata
+          }, source.charge ? { charge: source.charge } : { payment_intent: source.payment_intent }), {
+            // Stripe will not run the same refund twice with this key, which is
+            // the second half of the retry protection.
+            idempotencyKey: keyBase + source.key
+          });
+
+          ids.push(cleanText(refund.id, ""));
+          left -= room;
+        }
+
+        if (left > 0) throw new Error("Only part of the refund fit on the charges: " + money(left) + " left over");
+
+        refundId = ids.join(",");
         outcome = "refunded";
         console.log("Refunded", money(refundCents), "for booking", bookingId, "tier", claim.tier);
       } catch (error) {
@@ -480,7 +589,7 @@ cloudEvent("vendorCancelBooking", async (event) => {
         // The claim counted this as spent. It was not, so hand it back rather
         // than leaving the booking looking more refunded than it is.
         await bookingRef.set({
-          refundedCents: admin.firestore.FieldValue.increment(-refundCents),
+          refundedCents: admin.firestore.FieldValue.increment(-left),
           refundNeedsReview: true,
           refundReviewReason: "stripe_refused: " + cleanText(error.message, "unknown")
         }, { merge: true }).catch((e) => console.error("Could not release the claim:", e.message));
@@ -519,13 +628,15 @@ cloudEvent("vendorCancelBooking", async (event) => {
   const customerId = cleanText(booking.requestOwnerId || booking.customerId || booking.plannerId, "");
 
   if (byCustomer) {
-    const keptCents = Math.max(0, vendorPriceCents(booking, vendorId) - refundCents);
+    const keptCents = Math.max(0, paidTowardCents(booking, vendorId) - refundCents);
 
     const customerLine = outcome === "refunded"
       ? money(refundCents) + " is on its way back to you, usually within five to ten days."
       : (outcome === "awaiting_approval"
           ? "Your refund of " + money(refundCents) + " is being checked and you will hear from us shortly."
-          : "Under the cancellation policy there is no refund this close to the event.");
+          : (balanceCollected(booking)
+              ? "Under the cancellation policy there is no refund this close to the event."
+              : "Under the cancellation policy the vendor keeps your deposit, and the rest of their price will not be charged."));
 
     await notify(customerId, {
       recipientRole: "customer",
@@ -579,13 +690,13 @@ cloudEvent("vendorCancelBooking", async (event) => {
   // Richelle hears about every one of these, including the ones that worked.
   // Somebody cancelling a paid booking is something she should know about the
   // same day, not at the end of the month.
-  const admins = await db.collection("users").where("role", "==", "admin").get().catch(() => null);
-
-  if (admins) {
+  // Admins come from the same list as the Firestore rules. A role field on a
+  // user document can no longer say "admin", so searching for one found nobody.
+  {
     const who = byCustomer ? "A customer" : vendorName;
 
-    for (const adminDoc of admins.docs) {
-      await notify(adminDoc.id, {
+    for (const adminId of ADMIN_USER_IDS) {
+      await notify(adminId, {
         recipientRole: "admin",
         type: byCustomer ? "customer_cancelled" : "vendor_cancelled",
         typeLabel: byCustomer ? "Customer Cancelled" : "Vendor Cancelled",
