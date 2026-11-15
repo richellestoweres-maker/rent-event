@@ -267,10 +267,15 @@ cloudEvent("sendPushOnNotification", async (event) => {
   }
 
   let tokens = [];
+  const nativeTokens = new Set();
   try {
     const snapshot = await db.collection("pushTokens").where("userId", "==", recipientId).get();
     // One person can have several devices, and the same device can appear twice
     // if it re-registered before the old row was cleaned up.
+    snapshot.docs.forEach((d) => {
+      const token = cleanText(d.get("token") || d.id, "");
+      if (token && d.get("native") === true) nativeTokens.add(token);
+    });
     tokens = [...new Set(snapshot.docs.map((d) => cleanText(d.get("token") || d.id, "")).filter(Boolean))];
   } catch (error) {
     console.error("Could not read push tokens:", error.message);
@@ -285,47 +290,78 @@ cloudEvent("sendPushOnNotification", async (event) => {
   }
 
   const link = linkForNotification(data);
+  const title = titleFor(data);
+  const body = bodyFor(data);
+  const tag = cleanText(data.conversationId || data.type, "rentevent");
 
-  try {
-    const response = await admin.messaging().sendEachForMulticast({
-      tokens,
+  const webTokens = tokens.filter((t) => !nativeTokens.has(t));
+  const appTokens = tokens.filter((t) => nativeTokens.has(t));
+
+  const sends = [];
+
+  if (webTokens.length) {
+    sends.push({
+      tokens: webTokens,
       // Data only, on purpose. With a notification block the browser displays
       // the message itself and our service worker never runs, so the tap would
       // not land on the right page.
-      data: {
-        title: titleFor(data),
-        body: bodyFor(data),
-        link,
-        // Tagging collapses a burst from one conversation into a single
-        // notification rather than burying the phone.
-        tag: cleanText(data.conversationId || data.type, "rentevent")
-      },
-      webpush: {
-        fcmOptions: { link: "https://www.rentevent-app.com" + link },
-        headers: {
-          // Four hours. A support ping arriving the next morning is noise, and
-          // the in-app list already holds the permanent copy.
-          TTL: "14400",
-          Urgency: "high"
+      message: {
+        data: { title, body, link, tag },
+        webpush: {
+          fcmOptions: { link: "https://www.rentevent-app.com" + link },
+          headers: {
+            // Four hours. A support ping arriving the next morning is noise, and
+            // the in-app list already holds the permanent copy.
+            TTL: "14400",
+            Urgency: "high"
+          }
         }
       }
     });
+  }
 
-    const removed = await removeDeadTokens(tokens, response.responses);
-
-    console.log("Push sent to " + recipientId +
-      " | delivered " + response.successCount +
-      " | failed " + response.failureCount +
-      " | dead tokens removed " + removed);
-
-    response.responses.forEach((r, i) => {
-      if (!r.success) {
-        console.warn("Device failed:", r.error && r.error.code, "token ending", tokens[i].slice(-8));
+  if (appTokens.length) {
+    sends.push({
+      tokens: appTokens,
+      // The iPhone and Android apps need a notification block for the phone to
+      // show the alert. The link rides along in data so a tap opens the page.
+      message: {
+        notification: { title, body },
+        data: { link, tag },
+        apns: {
+          headers: { "apns-expiration": String(Math.floor(Date.now() / 1000) + 14400) },
+          payload: { aps: { sound: "default", "thread-id": tag } }
+        },
+        android: {
+          ttl: 14400 * 1000,
+          priority: "high",
+          notification: { sound: "default", tag }
+        }
       }
     });
-  } catch (error) {
-    // A failed push must never break anything. The in-app notification is
-    // already saved, which is the part that matters.
-    console.error("Push send failed outright:", error.message);
+  }
+
+  for (const send of sends) {
+    try {
+      const response = await admin.messaging().sendEachForMulticast({ tokens: send.tokens, ...send.message });
+
+      const removed = await removeDeadTokens(send.tokens, response.responses);
+
+      console.log("Push sent to " + recipientId +
+        (send.message.notification ? " (app)" : " (web)") +
+        " | delivered " + response.successCount +
+        " | failed " + response.failureCount +
+        " | dead tokens removed " + removed);
+
+      response.responses.forEach((r, i) => {
+        if (!r.success) {
+          console.warn("Device failed:", r.error && r.error.code, "token ending", send.tokens[i].slice(-8));
+        }
+      });
+    } catch (error) {
+      // A failed push must never break anything. The in-app notification is
+      // already saved, which is the part that matters.
+      console.error("Push send failed outright:", error.message);
+    }
   }
 });
