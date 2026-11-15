@@ -1,0 +1,53 @@
+{
+  "appId": "com.rentevent.app",
+  "appName": "RentEvent",
+  "webDir": "www",
+  "appendUserAgent": "RentEventApp",
+  "backgroundColor": "#f7f2e9",
+  "server": {
+    "url": "https://www.rentevent-app.com/index.html",
+    "errorPath": "offline.html",
+    "allowNavigation": [
+      "rentevent-app.com",
+      "www.rentevent-app.com",
+      "*.stripe.com",
+      "rent-event-f7abd.firebaseapp.com"
+    ]
+  },
+  "ios": {
+    "contentInset": "always"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "FirebaseMessaging": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    },
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#f7f2e9",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#f7f2e9",
+      "overlaysWebView": false
+    }
+  },
+  "experimental": {
+    "ios": {
+      "spm": {
+        "packageOptions": {
+          "@capacitor-firebase/messaging": {
+            "symlink": true
+          }
+        }
+      }
+    }
+  }
+}
