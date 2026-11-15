@@ -292,9 +292,9 @@ const ANSWERS = [
     phrases: ["phone notifications", "push notifications", "notify me", "alerts on my phone", "turn on notifications"],
     keywords: [["notification", "notifications", "alert", "alerts", "push"], ["phone", "turn on", "enable", "get", "receive", "set up"]],
     answer:
-      "Add RentEvent to your home screen first, then turn on notifications from your profile. You will get an alert when a vendor replies, when a price arrives, and when something needs your attention.\n\n" +
-      "On an iPhone it only works from the home screen app, not from the browser. Open the site in Safari, tap Share, then Add to Home Screen.",
-    links: [{ label: "Notification settings", href: "push-test.html" }]
+      "Go to Account Settings and tap Turn on next to Alerts on this device. You will get an alert when a vendor replies, when a price arrives, and when something needs your attention.\n\n" +
+      "On an iPhone browser, add RentEvent to your Home Screen first (tap Share, then Add to Home Screen) and open it from there. The RentEvent app works right away.",
+    links: [{ label: "Notification settings", href: "account-settings.html#pushCard" }]
   },
   {
     id: "account",
