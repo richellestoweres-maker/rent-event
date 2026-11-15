@@ -728,6 +728,24 @@
     </section>
 
     <section class="section">
+      <h2 class="section-title">Payments</h2>
+
+      <div class="card">
+        <div class="form-grid">
+          <div>
+            <label for="deposit-percent">Due at booking</label>
+            <select id="deposit-percent" class="select">
+              <option value="0">Full payment</option>
+              <option value="25">25% deposit</option>
+              <option value="50">50% deposit</option>
+            </select>
+            <p style="margin:8px 0 0;font-size:0.85rem;color:#7a6f66;">With a deposit, the rest is charged 14 days before the event.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
       <h2 class="section-title">Trust & Verification</h2>
 
       <div class="card">
@@ -1102,6 +1120,7 @@ function populateForm(data, user) {
   setValue("bio", data.bio || "");
   setValue("base-city", data.baseCity || data.location || "");
   setValue("service-cities", data.serviceCities || data.serviceArea || "");
+  setValue("deposit-percent", String([0, 25, 50].includes(Number(data.depositPercent)) ? Number(data.depositPercent) : 0));
 
   setText(
     "emailVerifiedText",
@@ -1189,6 +1208,8 @@ async function saveProfile() {
       location: baseCity,
       serviceCities,
       serviceArea: serviceCities,
+      depositPercent: [0, 25, 50].includes(Number(document.getElementById("deposit-percent").value))
+        ? Number(document.getElementById("deposit-percent").value) : 0,
       verificationStatus: safeText(currentVendorProfile?.verificationStatus, "Pending Verification"),
       profileStatus: "active",
       updatedAt: serverTimestamp()
