@@ -1216,6 +1216,9 @@ async function markNotificationRead(notification) {
 }
 
 async function getResolvedNotificationHref(notification) {
+  // A notification can carry its own same-site link, such as a pay-balance page.
+  { const own = String(notification.link || "").trim(); if (own.startsWith("/") && !own.startsWith("//")) return own.slice(1); }
+
   const role = getActiveRole(currentUserData || {});
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
@@ -1579,6 +1582,9 @@ function renderEmptyState() {
 }
 
 function getNotificationHref(notification) {
+  // A notification can carry its own same-site link, such as a pay-balance page.
+  { const own = String(notification.link || "").trim(); if (own.startsWith("/") && !own.startsWith("//")) return own.slice(1); }
+
   const role = getActiveRole(currentUserData || {});
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
