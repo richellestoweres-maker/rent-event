@@ -1567,6 +1567,17 @@ async function goToStripe(action, button) {
   try {
     const data = await callBilling(action);
     if (data.url) {
+      // In the iPhone and Android apps, subscriptions open in the phone's
+      // browser rather than inside the app, as the app stores require.
+      const browser = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform() &&
+        window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+      if (browser) {
+        browser.addListener("browserFinished", () => window.location.reload());
+        await browser.open({ url: data.url });
+        button.disabled = false;
+        button.textContent = label;
+        return;
+      }
       window.location.href = data.url;
       return;
     }
