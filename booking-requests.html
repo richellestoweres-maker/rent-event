@@ -1333,13 +1333,14 @@ function getStatusLabel(status) {
   if (status === "withdrawn") return "Withdrawn";
   if (status === "confirmed") return "Confirmed";
   if (status === "paid") return "Paid";
+  if (status === "deposit_paid") return "Deposit Paid";
   if (status === "needs_more_info") return "Needs More Info";
   return "Pending";
 }
 
 function getStatusPillClass(status) {
   if (status === "withdrawn") return "withdrawn";
-  if (status === "confirmed" || status === "paid") return "safe";
+  if (status === "confirmed" || status === "paid" || status === "deposit_paid") return "safe";
   if (status === "needs_more_info") return "pending";
   return "pending";
 }
@@ -1622,7 +1623,7 @@ function renderRequests() {
     // A booking the customer has already paid for is a different thing from a
     // request. The vendor cannot re-price it or decline it, and the only way out
     // is a cancellation that refunds the customer.
-    const isPaid = safeText(request.paymentStatus, "") === "paid";
+    const isPaid = ["paid", "deposit_paid"].includes(safeText(request.paymentStatus, ""));
     const cancelledIds = Array.isArray(request.cancelledVendorIds) ? request.cancelledVendorIds : [];
     const alreadyCancelled = cancelledIds.indexOf(currentUser?.uid || "") !== -1;
     const daysToEvent = daysUntilEvent(eventDetails, request);
