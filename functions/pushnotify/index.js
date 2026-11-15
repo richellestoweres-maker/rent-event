@@ -146,6 +146,82 @@ async function removeDeadTokens(tokens, responses) {
   return dead.length;
 }
 
+/* ------------------------------------------------------------------ */
+/* Email alerts                                                        */
+/*                                                                     */
+/* Every notification also goes out by email through Resend, to anyone */
+/* who has "Email updates" switched on in Account Settings (on by      */
+/* default at signup). Chat messages are limited to one email per       */
+/* conversation every 30 minutes, so a busy thread does not flood an    */
+/* inbox. Nothing happens until a RESEND_API_KEY is set on this         */
+/* service, so this is safe to deploy before the Resend account exists. */
+/* ------------------------------------------------------------------ */
+
+const SITE = "https://www.rentevent-app.com";
+const MESSAGE_EMAIL_GAP_MS = 30 * 60 * 1000;
+
+function escapeHtml(value) {
+  return String(value === null || value === undefined ? "" : value)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function emailHtml(title, body, href) {
+  return '<!doctype html><html><body style="margin:0;padding:0;background:#f7f2e9;font-family:Helvetica,Arial,sans-serif;">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f2e9;padding:28px 12px;"><tr><td align="center">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:24px;padding:28px;">' +
+    '<tr><td style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ff5f67;padding-bottom:10px;">RentEvent</td></tr>' +
+    '<tr><td style="font-size:20px;font-weight:800;color:#161616;padding-bottom:10px;">' + escapeHtml(title) + '</td></tr>' +
+    '<tr><td style="font-size:15px;line-height:1.55;color:#4a433d;padding-bottom:22px;">' + escapeHtml(body) + '</td></tr>' +
+    '<tr><td><a href="' + escapeHtml(href) + '" style="display:inline-block;padding:13px 22px;border-radius:999px;background:#ff5f67;color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;">Open RentEvent</a></td></tr>' +
+    '</table>' +
+    '<p style="font-size:12px;color:#8a8079;margin:16px 0 0;">You get these because Email updates is on. ' +
+    '<a href="' + SITE + '/account-settings.html" style="color:#8a8079;">Turn them off</a></p>' +
+    '</td></tr></table></body></html>';
+}
+
+async function sendEmailAlert(recipientId, data, link) {
+  const apiKey = cleanText(process.env.RESEND_API_KEY, "");
+  if (!apiKey) return;
+
+  const userRef = db.collection("users").doc(recipientId);
+  const user = (await userRef.get()).data() || {};
+
+  if (user.emailOptIn === false) return;
+
+  const to = cleanText(user.email, "");
+  if (!to || !to.includes("@")) return;
+
+  const conversationId = cleanText(data.conversationId, "");
+  if (cleanText(data.type, "") === "message" && conversationId) {
+    const last = Number((user.lastMessageEmailAt || {})[conversationId] || 0);
+    if (Date.now() - last < MESSAGE_EMAIL_GAP_MS) return;
+    await userRef.set({ lastMessageEmailAt: { [conversationId]: Date.now() } }, { merge: true });
+  }
+
+  const title = titleFor(data);
+  const body = cleanText(data.body || data.message || data.text, "You have a new update.");
+  const href = SITE + link;
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: cleanText(process.env.RESEND_FROM, "RentEvent <alerts@rentevent-app.com>"),
+      to: [to],
+      subject: title,
+      html: emailHtml(title, body, href),
+      text: title + "\n\n" + body + "\n\n" + href + "\n\nTurn off email updates: " + SITE + "/account-settings.html"
+    })
+  });
+
+  if (!response.ok) {
+    console.error("Email not sent:", response.status, (await response.text()).slice(0, 300));
+  } else {
+    console.log("Email sent to", recipientId);
+  }
+}
+
 cloudEvent("sendPushOnNotification", async (event) => {
   let data;
 
@@ -165,6 +241,14 @@ cloudEvent("sendPushOnNotification", async (event) => {
   if (!recipientId) {
     console.log("Notification has no recipient, nothing to send.");
     return;
+  }
+
+  // Email first. It does not depend on the person having push turned on, and
+  // a failure here must never stop the push.
+  try {
+    await sendEmailAlert(recipientId, data, linkForNotification(data));
+  } catch (error) {
+    console.error("Email alert failed:", error.message);
   }
 
   let tokens = [];
