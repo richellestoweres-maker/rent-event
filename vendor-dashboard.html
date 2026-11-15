@@ -1628,6 +1628,27 @@ async function getConversationIdFromBookingRequest(requestId) {
   }
 }
 
+/** Shown while a vendor's listings are out of search. */
+function showFrozenNotice(userData) {
+  if (!userData || userData.vendorFrozen !== true || document.getElementById("frozenNotice")) return;
+
+  const why = userData.vendorFrozenReason === "cancellations"
+    ? "You've cancelled 2 paid bookings in 90 days."
+    : "A booking request went 7 days without a reply.";
+
+  const box = document.createElement("section");
+  box.id = "frozenNotice";
+  box.setAttribute("role", "alert");
+  box.style.cssText = "margin:0 0 18px;padding:16px 18px;border-radius:20px;background:#ffe7e2;color:#8c2f22;font-size:.92rem;line-height:1.5;";
+  box.innerHTML = "<strong>Your listings are paused.</strong> " + escapeHtml(why) +
+    " Paid bookings and messages still work. <a href=\"support.html\" style=\"color:#8c2f22;font-weight:700;\">Contact support</a> to turn them back on.";
+
+  const main = document.querySelector("main.page");
+  const header = main && main.querySelector(".topbar");
+  if (header && header.nextSibling) main.insertBefore(box, header.nextSibling);
+  else if (main) main.prepend(box);
+}
+
 function getVendorNotificationHref(notification) {
   // A notification can carry its own same-site link, such as a pay-balance page.
   { const own = String(notification.link || "").trim(); if (own.startsWith("/") && !own.startsWith("//")) return own.slice(1); }
@@ -2454,6 +2475,7 @@ onAuthStateChanged(auth, async (user) => {
 
   updateDashboardLabels(activeRole);
   renderRoleSwitcher(currentUserData, activeRole);
+  showFrozenNotice(currentUserData);
 
   const businessName = getBusinessName();
   const firstName = businessName.split(" ")[0];
