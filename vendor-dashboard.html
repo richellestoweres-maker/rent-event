@@ -1629,6 +1629,9 @@ async function getConversationIdFromBookingRequest(requestId) {
 }
 
 function getVendorNotificationHref(notification) {
+  // A notification can carry its own same-site link, such as a pay-balance page.
+  { const own = String(notification.link || "").trim(); if (own.startsWith("/") && !own.startsWith("//")) return own.slice(1); }
+
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
   const sourceId = safeText(notification.sourceId, "");
@@ -1655,6 +1658,9 @@ function getVendorNotificationHref(notification) {
 }
 
 async function getResolvedVendorNotificationHref(notification) {
+  // A notification can carry its own same-site link, such as a pay-balance page.
+  { const own = String(notification.link || "").trim(); if (own.startsWith("/") && !own.startsWith("//")) return own.slice(1); }
+
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
   const eventId = getVendorNotificationEventId(notification);
@@ -2059,6 +2065,7 @@ function getRequestStatus(request) {
   if (status === "withdrawn") return "Withdrawn";
   if (status === "confirmed") return "Confirmed";
   if (status === "paid") return "Paid";
+  if (status === "deposit_paid") return "Deposit Paid";
   if (status === "needs_more_info") return "Needs Info";
 
   return "Pending";
@@ -2068,7 +2075,7 @@ function getRequestStatusClass(request) {
   const status = safeText(request.requestStatus || request.status, "pending");
 
   if (status === "withdrawn") return "red";
-  if (status === "confirmed" || status === "paid") return "safe";
+  if (status === "confirmed" || status === "paid" || status === "deposit_paid") return "safe";
 
   return "pending";
 }
