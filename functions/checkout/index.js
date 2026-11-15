@@ -414,7 +414,7 @@ async function requireUid(req) {
  * the booking cannot receive money yet. Taking a payment that has nowhere to go
  * is worse than making the customer wait.
  */
-async function buildPayoutPlan(bookingRequest = {}, quoteAmounts = null) {
+async function buildPayoutPlan(bookingRequest = {}, quoteAmounts = null, stripe = null) {
   const vendors = Array.isArray(bookingRequest.vendors) ? bookingRequest.vendors : [];
   const owed = new Map();
   const names = new Map();
@@ -448,8 +448,28 @@ async function buildPayoutPlan(bookingRequest = {}, quoteAmounts = null) {
     const snap = await db.collection("users").doc(vendorId).get();
     const data = snap.exists ? snap.data() || {} : {};
     const stripeAccountId = cleanText(data.stripeAccountId, "");
+    let payoutsEnabled = data.payoutsEnabled === true;
 
-    if (!stripeAccountId || data.payoutsEnabled !== true) {
+    // Ask Stripe directly rather than trusting the stored flag, which only
+    // updates when the vendor opens their payouts page. A vendor whose
+    // payouts Stripe has since paused would otherwise be booked and paid
+    // for, and the money would have nowhere to go after the event.
+    if (stripeAccountId && stripe) {
+      try {
+        const account = await stripe.accounts.retrieve(stripeAccountId);
+        payoutsEnabled = account.payouts_enabled === true;
+        if (payoutsEnabled !== (data.payoutsEnabled === true)) {
+          await db.collection("users").doc(vendorId).set({
+            payoutsEnabled,
+            stripeAccountUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        }
+      } catch (error) {
+        console.warn("Could not check payouts for", vendorId, error.message);
+      }
+    }
+
+    if (!stripeAccountId || !payoutsEnabled) {
       notReady.push(names.get(vendorId) || "This vendor");
       continue;
     }
@@ -856,7 +876,7 @@ exports.createStripeCheckoutSession = onRequest(
       }
 
       // Nobody pays for a booking whose vendors cannot be paid out.
-      const payoutPlan = await buildPayoutPlan(bookingRequest, quotes.amounts);
+      const payoutPlan = await buildPayoutPlan(bookingRequest, quotes.amounts, stripe);
 
       if (payoutPlan.noVendors) {
         res.status(400).json({
