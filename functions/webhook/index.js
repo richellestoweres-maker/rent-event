@@ -116,7 +116,7 @@ async function markPaid(session, event, stripe) {
     return;
   }
 
-  if (booking.paymentStatus === "paid") return; // already settled
+  if (["paid", "deposit_paid"].includes(booking.paymentStatus)) return; // already settled
 
   const paymentIntentId =
     typeof session.payment_intent === "string"
@@ -141,9 +141,36 @@ async function markPaid(session, event, stripe) {
   }
 
   const hasPayoutPlan = Array.isArray(booking.payoutPlan) && booking.payoutPlan.length > 0;
+  const depositMode = booking.depositMode === true;
 
-  await ref.set({
-    paymentStatus: "paid",
+  // A deposit booking keeps the card for the balance, and is not paid out
+  // until that balance has been collected too.
+  let paymentMethodId = "";
+
+  if (depositMode && paymentIntentId && stripe) {
+    try {
+      const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      paymentMethodId = typeof intent.payment_method === "string"
+        ? intent.payment_method
+        : (intent.payment_method && intent.payment_method.id) || "";
+    } catch (err) {
+      console.error("Could not read the saved card for", bookingRequestId, err.message);
+    }
+  }
+
+  const payoutWhenReady = depositMode ? "awaiting_balance" : "scheduled";
+
+  const depositFields = depositMode ? {
+    balanceStatus: paymentMethodId ? "scheduled" : "failed",
+    balanceFailureReason: paymentMethodId ? "" : "no_saved_card",
+    stripePaymentMethodId: paymentMethodId,
+    stripeCustomerId: typeof session.customer === "string"
+      ? session.customer
+      : (session.customer && session.customer.id) || cleanString(booking.stripeCustomerId)
+  } : {};
+
+  await ref.set(Object.assign(depositFields, {
+    paymentStatus: depositMode ? "deposit_paid" : "paid",
     status: "confirmed",
     paidAt: admin.firestore.FieldValue.serverTimestamp(),
     stripePaymentIntentId: paymentIntentId,
@@ -159,11 +186,86 @@ async function markPaid(session, event, stripe) {
     stripeChargeId: chargeId,
     // "scheduled" is what the payout job looks for. No charge id means no
     // payout is possible, so flag it for a human rather than silently skipping.
-    payoutStatus: hasPayoutPlan && chargeId ? "scheduled" : "needs_review",
+    payoutStatus: hasPayoutPlan && chargeId ? payoutWhenReady : "needs_review",
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  }), { merge: true });
+
+  console.log("Booking marked", depositMode ? "deposit paid:" : "paid:", bookingRequestId, "session", session.id);
+}
+
+function cleanString(value) {
+  return value === null || value === undefined ? "" : String(value).trim();
+}
+
+/**
+ * The customer paid an outstanding balance through a pay link, after the
+ * automatic charge did not go through.
+ */
+async function markBalancePaid(session, event, stripe) {
+  const bookingRequestId = bookingIdFromSession(session);
+  if (!bookingRequestId) return;
+
+  const ref = db.collection("bookingRequests").doc(bookingRequestId);
+  const snap = await ref.get();
+  if (!snap.exists) return;
+
+  const booking = snap.data() || {};
+
+  if (booking.balanceStatus === "paid") return;
+
+  if (cleanString(booking.balanceCheckoutSessionId) !== session.id) {
+    console.error("Balance session mismatch for", bookingRequestId, session.id);
+    await ref.set({
+      paymentNeedsReview: true,
+      paymentReviewReason: "balance_session_mismatch",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    return;
+  }
+
+  const expected = Math.round(Number(booking.balanceCents || 0));
+  const collected = Number(session.amount_total || 0);
+
+  if (collected !== expected) {
+    console.error("Balance amount mismatch for", bookingRequestId, expected, collected);
+    await ref.set({
+      paymentNeedsReview: true,
+      paymentReviewReason: "balance_amount_mismatch",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    return;
+  }
+
+  const paymentIntentId = typeof session.payment_intent === "string"
+    ? session.payment_intent
+    : (session.payment_intent && session.payment_intent.id) || "";
+
+  let chargeId = "";
+  if (paymentIntentId) {
+    try {
+      const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      chargeId = typeof intent.latest_charge === "string"
+        ? intent.latest_charge
+        : (intent.latest_charge && intent.latest_charge.id) || "";
+    } catch (err) {
+      console.error("Could not read balance payment intent", paymentIntentId, err.message);
+    }
+  }
+
+  const hasPlan = Array.isArray(booking.payoutPlan) && booking.payoutPlan.length > 0;
+
+  await ref.set({
+    balanceStatus: "paid",
+    balancePaidAt: admin.firestore.FieldValue.serverTimestamp(),
+    balancePaymentIntentId: paymentIntentId,
+    balanceChargeId: chargeId,
+    balanceCollectedCents: collected,
+    paymentStatus: "paid",
+    payoutStatus: hasPlan && chargeId ? "scheduled" : "needs_review",
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   }, { merge: true });
 
-  console.log("Booking marked paid:", bookingRequestId, "session", session.id);
+  console.log("Balance paid by link:", bookingRequestId);
 }
 
 async function markNotPaid(session, status) {
@@ -175,7 +277,7 @@ async function markNotPaid(session, status) {
   if (!snap.exists) return;
 
   // Never walk a genuinely paid booking backwards.
-  if ((snap.data() || {}).paymentStatus === "paid") return;
+  if (["paid", "deposit_paid"].includes((snap.data() || {}).paymentStatus)) return;
 
   await ref.set({
     paymentStatus: status,
@@ -185,7 +287,7 @@ async function markNotPaid(session, status) {
   console.log("Booking marked", status + ":", bookingRequestId);
 }
 
-async function markRefunded(charge) {
+async function markRefunded(charge, stripe) {
   const bookingRequestId =
     (charge.metadata && charge.metadata.bookingRequestId) || "";
   if (!bookingRequestId) return;
@@ -194,14 +296,30 @@ async function markRefunded(charge) {
   const snap = await ref.get();
   if (!snap.exists) return;
 
-  const fullyRefunded = charge.amount_refunded >= charge.amount;
-
   const booking = snap.data() || {};
+
+  // A deposit booking can have two charges. "Fully refunded" means both.
+  let amountRefunded = charge.amount_refunded;
+  let amountCharged = charge.amount;
+
+  const chargeIds = [cleanString(booking.stripeChargeId), cleanString(booking.balanceChargeId)].filter(Boolean);
+
+  if (booking.depositMode === true && chargeIds.length > 1 && stripe) {
+    amountRefunded = 0;
+    amountCharged = 0;
+    for (const id of chargeIds) {
+      const c = id === charge.id ? charge : await stripe.charges.retrieve(id);
+      amountRefunded += c.amount_refunded;
+      amountCharged += c.amount;
+    }
+  }
+
+  const fullyRefunded = amountRefunded >= amountCharged;
   const alreadyPaidOut = booking.payoutStatus === "paid_out";
 
   const update = {
     paymentStatus: fullyRefunded ? "refunded" : "partially_refunded",
-    stripeAmountRefundedCents: charge.amount_refunded,
+    stripeAmountRefundedCents: amountRefunded,
     refundedAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
@@ -456,6 +574,10 @@ exports.stripeWebhook = onRequest(
           }
           // Card payments arrive here already paid. Slower methods arrive
           // unpaid and settle later via async_payment_succeeded.
+          if (session.metadata && session.metadata.kind === "balance") {
+            if (session.payment_status === "paid") await markBalancePaid(session, event, stripe);
+            break;
+          }
           if (session.payment_status === "paid") {
             await markPaid(session, event, stripe);
           } else {
@@ -465,14 +587,20 @@ exports.stripeWebhook = onRequest(
         }
         case "checkout.session.async_payment_succeeded":
           if (event.data.object.mode === "subscription") break;
+          if (event.data.object.metadata && event.data.object.metadata.kind === "balance") {
+            await markBalancePaid(event.data.object, event, stripe);
+            break;
+          }
           await markPaid(event.data.object, event, stripe);
           break;
         case "checkout.session.async_payment_failed":
           if (event.data.object.mode === "subscription") break;
+          if (event.data.object.metadata && event.data.object.metadata.kind === "balance") break;
           await markNotPaid(event.data.object, "payment_failed");
           break;
         case "checkout.session.expired":
           if (event.data.object.mode === "subscription") break;
+          if (event.data.object.metadata && event.data.object.metadata.kind === "balance") break;
           await markNotPaid(event.data.object, "checkout_expired");
           break;
         case "customer.subscription.created":
@@ -481,7 +609,7 @@ exports.stripeWebhook = onRequest(
           await handleVerificationSubscription(event.data.object, stripe);
           break;
         case "charge.refunded":
-          await markRefunded(event.data.object);
+          await markRefunded(event.data.object, stripe);
           break;
         case "account.updated":
           await syncConnectedAccount(event.data.object);
