@@ -1,0 +1,25 @@
+{
+  "name": "rentevent-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The RentEvent iPhone and Android app.",
+  "scripts": {
+    "prepare:ios": "bash scripts/prepare-native.sh ios",
+    "prepare:android": "bash scripts/prepare-native.sh android"
+  },
+  "dependencies": {
+    "@capacitor-firebase/messaging": "^8.0.0",
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0",
+    "firebase": "^12.12.1"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
+  }
+}
