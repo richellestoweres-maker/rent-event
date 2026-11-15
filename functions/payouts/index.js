@@ -37,7 +37,10 @@ const BATCH_SIZE = 50;
  * "partially_refunded" is here because a cancellation that refunds one vendor
  * out of several leaves the rest perfectly payable.
  */
-const PAYABLE_STATUSES = ["paid", "partially_refunded"];
+const PAYABLE_STATUSES = ["paid", "partially_refunded", "deposit_paid"];
+
+/** Same admins as the Firestore rules. */
+const ADMIN_USER_IDS = ["GBrIifV7FnOnXhXmgmG4lpMg4Lr1"];
 
 function cleanText(value, fallback = "") {
   if (value === null || value === undefined) return fallback;
@@ -118,7 +121,14 @@ async function settleBooking(stripe, doc, nowMs) {
   // minus what went back, not what was collected. If the plan wants more than
   // that, the booking was edited after payment and a person should look at it.
   const planTotal = plan.reduce((sum, item) => sum + Number(item.amountCents || 0), 0);
-  const collected = Number(booking.stripeAmountCollectedCents || booking.stripeAmountCents || 0);
+  const collected = Number(booking.stripeAmountCollectedCents || booking.stripeAmountCents || 0) +
+    Number(booking.balanceCollectedCents || 0);
+
+  // A deposit booking was paid in two charges. A transfer can only be drawn
+  // from one charge, and by now (two days after the event, 16 or more days
+  // after the balance was taken) both have long since settled into the
+  // platform balance, so these are paid from that balance instead.
+  const twoCharges = !!cleanText(booking.balanceChargeId, "");
   const refunded = Math.round(Number(
     booking.stripeAmountRefundedCents || booking.refundedCents || 0));
   const available = collected ? Math.max(0, collected - refunded) : 0;
@@ -152,7 +162,7 @@ async function settleBooking(stripe, doc, nowMs) {
         amount,
         currency: cleanText(booking.stripeCurrency, "usd"),
         destination,
-        source_transaction: chargeId,
+        ...(twoCharges ? {} : { source_transaction: chargeId }),
         transfer_group: transferGroup,
         description: "RentEvent booking " + doc.id,
         metadata: {
@@ -200,6 +210,195 @@ async function settleBooking(stripe, doc, nowMs) {
   return { paid: results.length, failed: failures.length };
 }
 
+/* ------------------------------------------------------------------ */
+/* Balances                                                            */
+/*                                                                     */
+/* A deposit booking's remaining balance is charged to the customer's  */
+/* saved card 14 days before the event. If the card is declined, the   */
+/* customer gets a link to pay it themselves, and the vendors and      */
+/* Richelle are told, so nobody turns up to an event that is not paid. */
+/* ------------------------------------------------------------------ */
+
+async function notify(recipientId, payload) {
+  if (!recipientId) return;
+  try {
+    await db.collection("notifications").add(Object.assign({
+      recipientId,
+      userId: recipientId,
+      senderId: "system",
+      read: false,
+      isRead: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    }, payload));
+  } catch (error) {
+    console.warn("Could not write notification:", error.message);
+  }
+}
+
+function money(cents) {
+  return "$" + (Number(cents || 0) / 100).toFixed(2);
+}
+
+async function chargeBalance(stripe, doc, nowMs) {
+  const ref = doc.ref;
+  const booking = doc.data() || {};
+
+  const dueMs = toMillis(booking.balanceDueAt);
+  if (!dueMs || dueMs > nowMs) return { skipped: "balance_not_due" };
+
+  const amount = Math.round(Number(booking.balanceCents || 0));
+  if (amount <= 0) {
+    await ref.set({ balanceStatus: "cancelled", updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    return { skipped: "nothing_to_charge" };
+  }
+
+  const customer = cleanText(booking.stripeCustomerId, "");
+  const paymentMethod = cleanText(booking.stripePaymentMethodId, "");
+  const eventName = cleanText(booking.eventName || (booking.eventDetails && booking.eventDetails.eventName), "your event");
+  const customerId = cleanText(booking.requestOwnerId || booking.customerId || booking.plannerId, "");
+  const payLink = "/checkout.html?bookingRequestId=" + encodeURIComponent(doc.id) +
+    "&eventId=" + encodeURIComponent(cleanText(booking.eventId, "")) + "&payBalance=1";
+
+  let failure = "";
+  let intent = null;
+
+  if (!customer || !paymentMethod) {
+    failure = "no_saved_card";
+  } else {
+    try {
+      intent = await stripe.paymentIntents.create({
+        amount,
+        currency: cleanText(booking.stripeCurrency, "usd"),
+        customer,
+        payment_method: paymentMethod,
+        off_session: true,
+        confirm: true,
+        description: "Balance for " + eventName,
+        transfer_group: cleanText(booking.stripeTransferGroup, "booking_" + doc.id),
+        metadata: {
+          bookingRequestId: doc.id,
+          eventId: cleanText(booking.eventId, ""),
+          kind: "balance",
+          source: "rentevent_balance"
+        }
+      }, {
+        // One balance charge per booking, however many times this runs.
+        idempotencyKey: "rentevent_balance_" + doc.id
+      });
+    } catch (error) {
+      failure = cleanText(error.code || error.message, "card_declined");
+      console.error("Balance charge failed", doc.id, error.message);
+    }
+  }
+
+  if (intent && intent.status === "succeeded") {
+    const chargeId = typeof intent.latest_charge === "string"
+      ? intent.latest_charge
+      : (intent.latest_charge && intent.latest_charge.id) || "";
+    const hasPlan = Array.isArray(booking.payoutPlan) && booking.payoutPlan.length > 0;
+
+    await ref.set({
+      balanceStatus: "paid",
+      balancePaidAt: admin.firestore.FieldValue.serverTimestamp(),
+      balancePaymentIntentId: intent.id,
+      balanceChargeId: chargeId,
+      balanceCollectedCents: amount,
+      paymentStatus: "paid",
+      payoutStatus: hasPlan && chargeId ? "scheduled" : "needs_review",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    await notify(customerId, {
+      recipientRole: "customer",
+      type: "balance_paid",
+      typeLabel: "Balance Paid",
+      category: "Booking",
+      title: "Your balance is paid",
+      body: money(amount) + " for " + eventName + " was charged to your card on file. You're all set.",
+      bookingRequestId: doc.id,
+      eventId: cleanText(booking.eventId, "")
+    });
+
+    return { charged: amount };
+  }
+
+  if (!failure && intent) failure = "status_" + intent.status;
+
+  await ref.set({
+    balanceStatus: "failed",
+    balanceFailureReason: failure,
+    balanceFailedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  await notify(customerId, {
+    recipientRole: "customer",
+    type: "balance_failed",
+    typeLabel: "Payment Needed",
+    category: "Booking",
+    title: "Your balance didn't go through",
+    body: "We couldn't charge " + money(amount) + " for " + eventName + ". Tap to pay it now so your vendors stay booked.",
+    link: payLink,
+    bookingRequestId: doc.id,
+    eventId: cleanText(booking.eventId, "")
+  });
+
+  const vendorIds = (Array.isArray(booking.payoutPlan) ? booking.payoutPlan : [])
+    .map((line) => cleanText(line.vendorId, "")).filter(Boolean);
+
+  for (const vendorId of vendorIds) {
+    await notify(vendorId, {
+      recipientRole: "vendor",
+      type: "balance_failed",
+      typeLabel: "Balance Not Paid",
+      category: "Booking",
+      title: "Balance not paid yet for " + eventName,
+      body: "The customer's card was declined for the balance. We've asked them to pay. Your deposit is safe.",
+      bookingRequestId: doc.id,
+      vendorId
+    });
+  }
+
+  for (const adminId of ADMIN_USER_IDS) {
+    await notify(adminId, {
+      recipientRole: "admin",
+      type: "balance_failed",
+      typeLabel: "Balance Failed",
+      category: "Payments",
+      title: "Balance failed: " + eventName,
+      body: money(amount) + " could not be charged (" + failure + "). Customer has been sent a pay link.",
+      link: "/admin-dashboard.html",
+      bookingRequestId: doc.id
+    });
+  }
+
+  return { failed: 1 };
+}
+
+async function runBalances(stripe, nowMs, summary) {
+  const snap = await db.collection("bookingRequests")
+    .where("balanceStatus", "==", "scheduled")
+    // Most scheduled balances are weeks away and are skipped cheaply, so this
+    // looks at many more than the payout batch to be sure due ones are reached.
+    .limit(1000)
+    .get();
+
+  summary.balancesExamined = snap.size;
+  summary.balancesCharged = 0;
+  summary.balancesFailed = 0;
+
+  for (const doc of snap.docs) {
+    try {
+      const outcome = await chargeBalance(stripe, doc, nowMs);
+      if (outcome.charged) summary.balancesCharged += 1;
+      if (outcome.failed) summary.balancesFailed += 1;
+    } catch (error) {
+      console.error("Balance step failed for", doc.id, error.message);
+      summary.balancesFailed += 1;
+    }
+  }
+}
+
 exports.releaseVendorPayouts = onRequest(
   {
     region: "us-central1",
@@ -221,6 +420,10 @@ exports.releaseVendorPayouts = onRequest(
     };
 
     try {
+      // Balances first, so a booking whose balance lands today is in the
+      // right state for every later step.
+      await runBalances(stripe, nowMs, summary);
+
       // A single equality filter, which Firestore indexes automatically, so
       // this needs no composite index. Bookings leave "scheduled" once paid,
       // so the set stays small.
