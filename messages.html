@@ -2252,6 +2252,13 @@ function renderEmptyConversations() {
 function renderConversations(conversations) {
   const list = document.getElementById("conversationList");
 
+  // Chats with anyone you've blocked are hidden.
+  const blocked = Array.isArray(currentUserData?.blockedUserIds) ? currentUserData.blockedUserIds : [];
+  if (blocked.length) {
+    conversations = conversations.filter((c) =>
+      !(Array.isArray(c.participantIds) ? c.participantIds : []).some((id) => blocked.includes(id)));
+  }
+
   updateCounts();
   updateBulkActions();
 
