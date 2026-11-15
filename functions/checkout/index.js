@@ -232,6 +232,183 @@ function payoutReleaseInfo(bookingRequest = {}) {
   };
 }
 
+/* ------------------------------------------------------------------ */
+/* Deposits                                                            */
+/*                                                                     */
+/* A vendor can ask for 25% or 50% up front. The customer then pays    */
+/* every vendor's deposit plus RentEvent's whole service fee today, and */
+/* the rest is charged to the same card 14 days before the event.     */
+/* That date is also where the refund tiers drop to nothing, so the    */
+/* balance is never collected while a full or half refund is possible  */
+/* on money the customer has not paid yet.                             */
+/* ------------------------------------------------------------------ */
+
+const ALLOWED_DEPOSIT_PERCENTS = [0, 25, 50];
+const BALANCE_DAYS_BEFORE_EVENT = 14;
+
+/** Below this many days out, there is no time for a balance, so it is paid in full. */
+const MIN_DAYS_FOR_DEPOSIT = BALANCE_DAYS_BEFORE_EVENT + 2;
+
+/** Same clock the cancellation function counts days on. */
+const POLICY_TIME_ZONE = "America/New_York";
+
+function eventDateParts(bookingRequest = {}) {
+  const raw = cleanText(bookingRequest.eventDetails?.eventDate || bookingRequest.eventDate, "");
+  const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
+}
+
+function daysUntilEvent(bookingRequest = {}) {
+  const parts = eventDateParts(bookingRequest);
+  if (!parts) return null;
+
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: POLICY_TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date()).split("-").map(Number);
+
+  return Math.round(
+    (Date.UTC(parts[0], parts[1] - 1, parts[2]) - Date.UTC(today[0], today[1] - 1, today[2])) / 86400000
+  );
+}
+
+/** Noon Eastern on the day the balance is due, 14 days before the event. */
+function balanceDueDate(bookingRequest = {}) {
+  const parts = eventDateParts(bookingRequest);
+  if (!parts) return null;
+  return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2] - BALANCE_DAYS_BEFORE_EVENT, 17, 0, 0));
+}
+
+/** What a charge has to be so that, after Stripe's cut, "base" is left. */
+function grossUpForProcessing(baseDollars, bookingRequest = {}) {
+  const processingPercent = toNumber(bookingRequest.processingPercent, 0.029);
+  const processingFixed = toNumber(bookingRequest.processingFixed, 0.30);
+  if (!(baseDollars > 0)) return 0;
+  return ((baseDollars + processingFixed) / (1 - processingPercent)) - baseDollars;
+}
+
+/** Each vendor's deposit setting, from their own profile. Anything odd means full payment. */
+async function loadDepositPercents(vendorIds = []) {
+  const percents = new Map();
+
+  for (const vendorId of vendorIds) {
+    let percent = 0;
+    try {
+      const snap = await db.collection("vendor_profiles").doc(vendorId).get();
+      const value = Number((snap.exists ? snap.data() || {} : {}).depositPercent);
+      if (ALLOWED_DEPOSIT_PERCENTS.includes(value)) percent = value;
+    } catch (error) {
+      console.warn("Could not read deposit setting for", vendorId, error.message);
+    }
+    percents.set(vendorId, percent);
+  }
+
+  return percents;
+}
+
+/**
+ * Splits this booking into what is charged today and what is charged later.
+ * Returns depositMode false when everything is due now.
+ */
+async function buildChargePlan(bookingRequest, quoteAmounts, totals) {
+  const vendorIds = Array.from(quoteAmounts.keys());
+  const days = daysUntilEvent(bookingRequest);
+  const dueAt = balanceDueDate(bookingRequest);
+
+  const full = {
+    depositMode: false,
+    todayCents: totals.amountCents
+  };
+
+  if (days === null || days < MIN_DAYS_FOR_DEPOSIT || !dueAt) return full;
+
+  const percents = await loadDepositPercents(vendorIds);
+  if (!vendorIds.some((id) => percents.get(id) > 0)) return full;
+
+  const vendorDepositCents = {};
+  const vendorBalanceCents = {};
+  const depositPercentByVendor = {};
+  let depositVendorCents = 0;
+  let balanceVendorCents = 0;
+
+  for (const vendorId of vendorIds) {
+    const priceCents = roundCentsFromDollars(quoteAmounts.get(vendorId));
+    const percent = percents.get(vendorId) || 0;
+    const deposit = percent > 0 ? Math.round(priceCents * percent / 100) : priceCents;
+
+    depositPercentByVendor[vendorId] = percent;
+    vendorDepositCents[vendorId] = deposit;
+    vendorBalanceCents[vendorId] = priceCents - deposit;
+    depositVendorCents += deposit;
+    balanceVendorCents += priceCents - deposit;
+  }
+
+  if (balanceVendorCents <= 0) return full;
+
+  // The whole service fee is taken today. Each charge carries its own
+  // processing fee, because Stripe charges for each one separately.
+  const depositBase = (depositVendorCents / 100) + totals.serviceFee;
+  const depositProcessing = grossUpForProcessing(depositBase, bookingRequest);
+  const balanceBase = balanceVendorCents / 100;
+  const balanceProcessing = grossUpForProcessing(balanceBase, bookingRequest);
+
+  return {
+    depositMode: true,
+    todayCents: roundCentsFromDollars(depositBase + depositProcessing),
+    balanceCents: roundCentsFromDollars(balanceBase + balanceProcessing),
+    balanceDueAt: dueAt,
+    depositPercentByVendor,
+    vendorDepositCents,
+    vendorBalanceCents,
+    depositProcessingFee: depositProcessing,
+    balanceProcessingFee: balanceProcessing
+  };
+}
+
+/** The customer as a Stripe customer, so their card can be charged for the balance. */
+async function getOrCreateStripeCustomer(stripe, uid, email) {
+  const userRef = db.collection("users").doc(uid);
+  const user = (await userRef.get()).data() || {};
+  const existingId = cleanText(user.stripeCustomerId, "");
+
+  if (existingId) {
+    try {
+      const customer = await stripe.customers.retrieve(existingId);
+      if (!customer.deleted) return customer.id;
+    } catch (error) {
+      console.warn("Stored stripeCustomerId unusable for", uid, error.message);
+    }
+  }
+
+  const customer = await stripe.customers.create({
+    email: cleanText(email || user.email, "") || undefined,
+    name: cleanText(user.name || user.displayName, "") || undefined,
+    metadata: { rentEventUserId: uid, platform: "rentevent" }
+  });
+
+  await userRef.set({
+    stripeCustomerId: customer.id,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  return customer.id;
+}
+
+function formatDay(date) {
+  return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: POLICY_TIME_ZONE });
+}
+
+/** Proves who is calling. The uid in the token is the only identity trusted. */
+async function requireUid(req) {
+  const header = cleanText(req.get("authorization"), "");
+  if (!header.toLowerCase().startsWith("bearer ")) return "";
+  try {
+    const decoded = await admin.auth().verifyIdToken(header.slice(7).trim());
+    return decoded.uid;
+  } catch (error) {
+    return "";
+  }
+}
+
 /**
  * Works out who gets paid what, and refuses the whole checkout if any vendor on
  * the booking cannot receive money yet. Taking a payment that has nowhere to go
@@ -493,28 +670,20 @@ exports.createStripeCheckoutSession = onRequest(
       const body = req.body || {};
       const bookingRequestId = cleanText(body.bookingRequestId, "");
       const eventId = cleanText(body.eventId, "");
-      const requestUserId = getRequestUserId(body);
+      const payBalance = body.payBalance === true;
+
+      // Who is paying comes from their login, never from the request body.
+      const requestUserId = await requireUid(req);
+
+      if (!requestUserId) {
+        res.status(401).json({ success: false, error: "Please sign in again." });
+        return;
+      }
 
       if (!bookingRequestId) {
         res.status(400).json({
           success: false,
           error: "Missing bookingRequestId."
-        });
-        return;
-      }
-
-      if (!eventId) {
-        res.status(400).json({
-          success: false,
-          error: "Missing eventId."
-        });
-        return;
-      }
-
-      if (!requestUserId) {
-        res.status(400).json({
-          success: false,
-          error: "Missing request owner."
         });
         return;
       }
@@ -550,6 +719,95 @@ exports.createStripeCheckoutSession = onRequest(
         return;
       }
 
+      const stripe = new Stripe(STRIPE_SECRET_KEY.value());
+
+      const origin = req.get("origin") || "https://www.rentevent-app.com";
+      const returnUrlFromClient = cleanText(body.returnUrl, "");
+      const fallbackReturnUrl = `${origin}/checkout.html?eventId=${encodeURIComponent(cleanText(bookingRequest.eventId, eventId))}&bookingRequestId=${encodeURIComponent(bookingRequestId)}&stripe_return=true&session_id={CHECKOUT_SESSION_ID}`;
+      const returnUrl = returnUrlFromClient && returnUrlFromClient.includes("{CHECKOUT_SESSION_ID}")
+        ? returnUrlFromClient
+        : fallbackReturnUrl;
+
+      const customerEmail = cleanText(
+        bookingRequest.customerEmail ||
+          bookingRequest.plannerEmail ||
+          body.customerEmail ||
+          "",
+        ""
+      );
+
+      const baseMetadata = {
+        bookingRequestId,
+        eventId: cleanText(bookingRequest.eventId, eventId),
+        requestOwnerId: cleanText(bookingRequest.requestOwnerId || requestUserId, ""),
+        customerId: cleanText(bookingRequest.customerId, ""),
+        plannerId: cleanText(bookingRequest.plannerId, ""),
+        source: "rentevent_checkout"
+      };
+
+      /* ---------------- Paying an outstanding balance ---------------- */
+
+      if (payBalance) {
+        const balanceCents = Math.round(toNumber(bookingRequest.balanceCents, 0));
+        const balanceStatus = cleanText(bookingRequest.balanceStatus, "");
+
+        if (!bookingRequest.depositMode || balanceCents < 50 || !["failed", "scheduled"].includes(balanceStatus)) {
+          res.status(400).json({ success: false, error: "There is no balance to pay on this booking." });
+          return;
+        }
+
+        const customerId = cleanText(bookingRequest.stripeCustomerId, "") ||
+          await getOrCreateStripeCustomer(stripe, requestUserId, customerEmail);
+
+        const metadata = Object.assign({}, baseMetadata, { kind: "balance" });
+
+        const session = await stripe.checkout.sessions.create({
+          ui_mode: "embedded_page",
+          mode: "payment",
+          customer: customerId,
+          return_url: returnUrl,
+          line_items: [{
+            quantity: 1,
+            price_data: {
+              currency: "usd",
+              unit_amount: balanceCents,
+              product_data: {
+                name: "Balance: " + cleanText(bookingRequest.eventName, "RentEvent booking")
+              }
+            }
+          }],
+          metadata,
+          payment_intent_data: {
+            transfer_group: cleanText(bookingRequest.stripeTransferGroup, "booking_" + bookingRequestId),
+            metadata
+          }
+        });
+
+        await bookingRef.set({
+          balanceCheckoutSessionId: session.id,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        res.status(200).json({
+          success: true,
+          clientSecret: session.client_secret,
+          sessionId: session.id,
+          payingBalance: true,
+          todayCents: balanceCents
+        });
+        return;
+      }
+
+      /* ---------------- First payment ---------------- */
+
+      if (!eventId) {
+        res.status(400).json({
+          success: false,
+          error: "Missing eventId."
+        });
+        return;
+      }
+
       if (cleanText(bookingRequest.eventId, "") !== eventId) {
         res.status(400).json({
           success: false,
@@ -558,10 +816,10 @@ exports.createStripeCheckoutSession = onRequest(
         return;
       }
 
-      if (bookingRequest.paymentStatus === "paid") {
+      if (["paid", "deposit_paid", "awaiting_payment", "partially_refunded", "refunded"].includes(cleanText(bookingRequest.paymentStatus, ""))) {
         res.status(400).json({
           success: false,
-          error: "This request has already been marked paid."
+          error: "This request has already been paid."
         });
         return;
       }
@@ -626,61 +884,59 @@ exports.createStripeCheckoutSession = onRequest(
         return;
       }
 
+      const chargePlan = await buildChargePlan(bookingRequest, quotes.amounts, totals);
       const payoutRelease = payoutReleaseInfo(bookingRequest);
       const transferGroup = "booking_" + bookingRequestId;
 
-      const stripe = new Stripe(STRIPE_SECRET_KEY.value());
+      const lineItems = makeCheckoutLineItems(bookingRequest, totals);
+      lineItems[0].price_data.unit_amount = chargePlan.todayCents;
 
-      const origin = req.get("origin") || "https://www.rentevent-app.com";
-      const returnUrlFromClient = cleanText(body.returnUrl, "");
-      const fallbackReturnUrl = `${origin}/checkout.html?eventId=${encodeURIComponent(eventId)}&bookingRequestId=${encodeURIComponent(bookingRequestId)}&stripe_return=true&session_id={CHECKOUT_SESSION_ID}`;
-      const returnUrl = returnUrlFromClient && returnUrlFromClient.includes("{CHECKOUT_SESSION_ID}")
-        ? returnUrlFromClient
-        : fallbackReturnUrl;
+      if (chargePlan.depositMode) {
+        lineItems[0].price_data.product_data.name =
+          "Deposit: " + cleanText(bookingRequest.eventName, "RentEvent booking");
+        lineItems[0].price_data.product_data.description =
+          "Balance of $" + (chargePlan.balanceCents / 100).toFixed(2) +
+          " charged to this card on " + formatDay(chargePlan.balanceDueAt) + ".";
+      }
 
-      const customerEmail = cleanText(
-        bookingRequest.customerEmail ||
-          bookingRequest.plannerEmail ||
-          body.customerEmail ||
-          "",
-        ""
-      );
+      const metadata = Object.assign({}, baseMetadata, {
+        kind: chargePlan.depositMode ? "deposit" : "full"
+      });
 
-      const session = await stripe.checkout.sessions.create({
+      const sessionParams = {
         ui_mode: "embedded_page",
         mode: "payment",
         submit_type: "book",
         client_reference_id: bookingRequestId,
-        customer_email: customerEmail || undefined,
         return_url: returnUrl,
-        line_items: makeCheckoutLineItems(bookingRequest, totals),
-        metadata: {
-          bookingRequestId,
-          eventId,
-          requestOwnerId: cleanText(bookingRequest.requestOwnerId || requestUserId, ""),
-          customerId: cleanText(bookingRequest.customerId, ""),
-          plannerId: cleanText(bookingRequest.plannerId, ""),
-          source: "rentevent_checkout"
-        },
+        line_items: lineItems,
+        metadata,
         payment_intent_data: {
           // Ties this charge to the transfers that will pay the vendors later.
           transfer_group: transferGroup,
-          metadata: {
-            bookingRequestId,
-            eventId,
-            requestOwnerId: cleanText(bookingRequest.requestOwnerId || requestUserId, ""),
-            customerId: cleanText(bookingRequest.customerId, ""),
-            plannerId: cleanText(bookingRequest.plannerId, ""),
-            source: "rentevent_checkout"
-          }
+          metadata
         }
-      });
+      };
 
-      await bookingRef.set({
+      let stripeCustomerId = "";
+
+      if (chargePlan.depositMode) {
+        // The card is kept on file so the balance can be charged later. The
+        // customer is told this on the checkout page and in the Terms.
+        stripeCustomerId = await getOrCreateStripeCustomer(stripe, requestUserId, customerEmail);
+        sessionParams.customer = stripeCustomerId;
+        sessionParams.payment_intent_data.setup_future_usage = "off_session";
+      } else {
+        sessionParams.customer_email = customerEmail || undefined;
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionParams);
+
+      const bookingUpdate = {
         paymentStatus: "checkout_started",
         stripeCheckoutSessionId: session.id,
         stripeClientReferenceId: bookingRequestId,
-        stripeAmountCents: totals.amountCents,
+        stripeAmountCents: chargePlan.todayCents,
         stripeCurrency: "usd",
 
         // The agreed prices, written down at the moment of checkout, so the
@@ -688,9 +944,15 @@ exports.createStripeCheckoutSession = onRequest(
         quotedVendorAmounts: Object.fromEntries(quotes.amounts),
         quotedVendorSubtotal: totals.vendorSubtotal,
         quotedServiceFee: totals.serviceFee,
-        quotedProcessingFee: totals.processingFee,
-        quotedTotalDue: totals.totalDue,
+        quotedProcessingFee: chargePlan.depositMode
+          ? chargePlan.depositProcessingFee + chargePlan.balanceProcessingFee
+          : totals.processingFee,
+        quotedTotalDue: chargePlan.depositMode
+          ? (chargePlan.todayCents + chargePlan.balanceCents) / 100
+          : totals.totalDue,
         pricedFromQuotes: true,
+
+        depositMode: chargePlan.depositMode,
 
         stripeLivemode: session.livemode === true,
         stripeCheckoutStartedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -701,12 +963,31 @@ exports.createStripeCheckoutSession = onRequest(
         payoutReleaseEstimated: payoutRelease.estimated === true,
         payoutStatus: "awaiting_payment",
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      };
+
+      if (chargePlan.depositMode) {
+        Object.assign(bookingUpdate, {
+          depositCents: chargePlan.todayCents,
+          balanceCents: chargePlan.balanceCents,
+          balanceDueAt: admin.firestore.Timestamp.fromDate(chargePlan.balanceDueAt),
+          balanceStatus: "not_started",
+          depositPolicy: chargePlan.depositPercentByVendor,
+          vendorDepositCents: chargePlan.vendorDepositCents,
+          vendorBalanceCents: chargePlan.vendorBalanceCents,
+          stripeCustomerId
+        });
+      }
+
+      await bookingRef.set(bookingUpdate, { merge: true });
 
       res.status(200).json({
         success: true,
         clientSecret: session.client_secret,
-        sessionId: session.id
+        sessionId: session.id,
+        depositMode: chargePlan.depositMode,
+        todayCents: chargePlan.todayCents,
+        balanceCents: chargePlan.balanceCents || 0,
+        balanceDueDate: chargePlan.depositMode ? formatDay(chargePlan.balanceDueAt) : ""
       });
 
     } catch (error) {
