@@ -399,6 +399,184 @@ async function runBalances(stripe, nowMs, summary) {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Freezing unreliable vendors                                         */
+/*                                                                     */
+/* A vendor who cancels two paid bookings within 90 days, or leaves a  */
+/* booking request unanswered for 7 days, is frozen: their listings    */
+/* come out of search, and customers waiting on them are pointed to    */
+/* similar vendors. They can still message and finish bookings that    */
+/* are already paid. Richelle unfreezes them from the admin dashboard. */
+/* ------------------------------------------------------------------ */
+
+const FREEZE_ADMIN_IDS = ["GBrIifV7FnOnXhXmgmG4lpMg4Lr1"];
+
+async function freezeNotify(recipientId, payload) {
+  if (!recipientId) return;
+  try {
+    await db.collection("notifications").add(Object.assign({
+      recipientId,
+      userId: recipientId,
+      senderId: "system",
+      read: false,
+      isRead: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    }, payload));
+  } catch (error) {
+    console.warn("Could not write notification:", error.message);
+  }
+}
+
+function freezeText(value, fallback = "") {
+  if (value === null || value === undefined) return fallback;
+  const text = String(value).trim();
+  return text || fallback;
+}
+
+/** Where to send a customer looking for someone like this vendor. */
+function similarVendorsLink(booking, vendorId) {
+  const vendors = Array.isArray(booking.vendors) ? booking.vendors : [];
+  const entry = vendors.find((v) => freezeText(v && v.vendorId, "") === vendorId) || {};
+  const category = freezeText(entry.category || entry.listingCategory || entry.mainCategory, "");
+  const details = booking.eventDetails || {};
+  const city = freezeText(details.eventCity || booking.eventCity, "");
+  const params = [];
+  if (category) params.push("category=" + encodeURIComponent(category));
+  if (city) params.push("location=" + encodeURIComponent(city));
+  return "/index.html" + (params.length ? "?" + params.join("&") : "");
+}
+
+async function freezeVendor(vendorId, reason, detail) {
+  if (!vendorId || FREEZE_ADMIN_IDS.includes(vendorId)) return false;
+
+  const userRef = db.collection("users").doc(vendorId);
+  const user = (await userRef.get()).data() || {};
+  if (user.vendorFrozen === true) return false;
+
+  await userRef.set({
+    vendorFrozen: true,
+    vendorFrozenReason: reason,
+    vendorFrozenDetail: freezeText(detail, ""),
+    vendorFrozenAt: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  // Out of search. Remembered so unfreezing puts back exactly what was live.
+  const listings = await db.collection("listings").where("vendorId", "==", vendorId).get();
+  for (const doc of listings.docs) {
+    if (freezeText((doc.data() || {}).status, "") === "published") {
+      await doc.ref.set({ status: "frozen", frozenFromStatus: "published" }, { merge: true });
+    }
+  }
+
+  const why = reason === "cancellations"
+    ? "you've cancelled 2 paid bookings in 90 days"
+    : "a booking request went 7 days without a reply";
+  const name = freezeText(user.businessName || user.name, "A vendor");
+
+  await freezeNotify(vendorId, {
+    recipientRole: "vendor",
+    type: "vendor_frozen",
+    typeLabel: "Listings Paused",
+    category: "Account",
+    title: "Your listings are paused",
+    body: "Your listings are hidden from search because " + why + ". Your paid bookings and messages still work. Contact support to turn them back on.",
+    link: "/support.html"
+  });
+
+  for (const adminId of FREEZE_ADMIN_IDS) {
+    await freezeNotify(adminId, {
+      recipientRole: "admin",
+      type: "vendor_frozen",
+      typeLabel: "Vendor Frozen",
+      category: "Vendors",
+      title: name + " was frozen",
+      body: name + " was frozen because " + why + (detail ? " (" + detail + ")" : "") + ". Unfreeze them from Users when ready.",
+      link: "/admin-dashboard.html",
+      vendorId
+    });
+  }
+
+  // Customers still waiting on this vendor, with no money moved, are pointed
+  // to someone else. Paid bookings are left alone: those still happen.
+  const open = await db.collection("bookingRequests").where("vendorIds", "array-contains", vendorId).get();
+  for (const doc of open.docs) {
+    const b = doc.data() || {};
+    const status = freezeText(b.requestStatus || b.status, "pending");
+    const money = freezeText(b.paymentStatus, "not_collected");
+    if (!["pending", "needs_more_info"].includes(status)) continue;
+    if (!["not_collected", "checkout_started", "checkout_expired", "payment_failed", ""].includes(money)) continue;
+
+    const customerId = freezeText(b.requestOwnerId || b.customerId || b.plannerId, "");
+    await freezeNotify(customerId, {
+      recipientRole: "customer",
+      type: "vendor_unavailable",
+      typeLabel: "Vendor Unavailable",
+      category: "Booking",
+      title: name + " isn't taking bookings right now",
+      body: "See similar vendors for " + freezeText(b.eventName, "your event") + ".",
+      link: similarVendorsLink(b, vendorId),
+      bookingRequestId: doc.id,
+      eventId: freezeText(b.eventId, ""),
+      vendorId
+    });
+  }
+
+  console.log("Vendor frozen:", vendorId, reason, detail || "");
+  return true;
+}
+
+/**
+ * Vendors who have left a booking request unanswered. A reminder at 5 days,
+ * frozen at 7. Only requests from the last 30 days count, so old test data
+ * and long dead requests never freeze anybody.
+ */
+async function runNoReplyCheck(nowMs, summary) {
+  const snap = await db.collection("bookingRequests")
+    .where("requestStatus", "==", "pending")
+    .limit(1000)
+    .get();
+
+  summary.noReplyWarned = 0;
+  summary.vendorsFrozen = 0;
+
+  for (const doc of snap.docs) {
+    const b = doc.data() || {};
+    const createdMs = toMillis(b.createdAt);
+    if (!createdMs) continue;
+
+    const ageDays = (nowMs - createdMs) / 86400000;
+    if (ageDays < 5 || ageDays > 30) continue;
+    if (!["not_collected", ""].includes(cleanText(b.paymentStatus, "not_collected"))) continue;
+
+    const responses = b.vendorResponses || {};
+    const warned = b.noReplyWarned || {};
+    const vendorIds = Array.isArray(b.vendorIds) ? b.vendorIds : [];
+    const eventName = cleanText(b.eventName, "an event");
+
+    for (const vendorId of vendorIds) {
+      if (!vendorId || responses[vendorId]) continue;
+
+      if (ageDays >= 7) {
+        if (await freezeVendor(vendorId, "no_reply", eventName)) summary.vendorsFrozen += 1;
+      } else if (!warned[vendorId]) {
+        await freezeNotify(vendorId, {
+          recipientRole: "vendor",
+          type: "reply_reminder",
+          typeLabel: "Reply Needed",
+          category: "Booking Request",
+          title: "Reply to " + eventName,
+          body: "This request is 5 days old. Reply within 2 days or your listings will be paused.",
+          link: "/booking-requests.html?id=" + encodeURIComponent(doc.id),
+          bookingRequestId: doc.id,
+          vendorId
+        });
+        await doc.ref.set({ noReplyWarned: { [vendorId]: true } }, { merge: true });
+        summary.noReplyWarned += 1;
+      }
+    }
+  }
+}
+
 exports.releaseVendorPayouts = onRequest(
   {
     region: "us-central1",
@@ -423,6 +601,11 @@ exports.releaseVendorPayouts = onRequest(
       // Balances first, so a booking whose balance lands today is in the
       // right state for every later step.
       await runBalances(stripe, nowMs, summary);
+
+      // Vendors who have gone quiet on a request. Failing here must never
+      // stop anybody being paid, so it is fenced off from the payout run.
+      await runNoReplyCheck(nowMs, summary).catch((error) =>
+        console.error("No-reply check failed:", error.message));
 
       // A single equality filter, which Firestore indexes automatically, so
       // this needs no composite index. Bookings leave "scheduled" once paid,
