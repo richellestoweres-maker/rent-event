@@ -17,6 +17,8 @@ end
 
 target.build_configurations.each do |config|
   config.build_settings["CODE_SIGN_ENTITLEMENTS"] = "App/App.entitlements"
+  # iPhone only, so the App Store doesn't ask for iPad screenshots.
+  config.build_settings["TARGETED_DEVICE_FAMILY"] = "1"
 end
 
 project.save
