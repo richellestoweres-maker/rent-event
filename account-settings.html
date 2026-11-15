@@ -913,6 +913,13 @@
             <div class="status-message" id="notificationStatus"></div>
           </div>
         </section>
+
+        <section class="section">
+          <h2 class="section-title">Blocked accounts</h2>
+          <div class="card" id="blockedList">
+            <p style="margin:0;color:var(--muted);">You haven't blocked anyone.</p>
+          </div>
+        </section>
       </div>
 
       <div>
@@ -1024,7 +1031,8 @@ import {
   query,
   where,
   getDocs,
-  serverTimestamp
+  serverTimestamp,
+  arrayRemove
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1318,7 +1326,46 @@ function renderRoleCards(userData = {}) {
   }).join("");
 }
 
+function renderBlockedList(userData = {}) {
+  const box = document.getElementById("blockedList");
+  if (!box) return;
+
+  const ids = Array.isArray(userData.blockedUserIds) ? userData.blockedUserIds : [];
+  const names = userData.blockedUserNames || {};
+
+  if (!ids.length) {
+    box.innerHTML = '<p style="margin:0;color:var(--muted);">You haven\'t blocked anyone.</p>';
+    return;
+  }
+
+  box.innerHTML = ids.map((id) => {
+    const name = String(names[id] || "Someone").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    return '<div class="toggle-card"><div><h3>' + name + '</h3></div>' +
+      '<button type="button" class="btn-secondary" data-unblock="' + String(id).replace(/"/g, "") + '">Unblock</button></div>';
+  }).join("");
+}
+
+document.addEventListener("click", async (event) => {
+  const btn = event.target.closest && event.target.closest("[data-unblock]");
+  if (!btn || !currentUser) return;
+
+  const id = btn.getAttribute("data-unblock");
+  btn.disabled = true;
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      blockedUserIds: arrayRemove(id),
+      updatedAt: serverTimestamp()
+    });
+    currentUserData.blockedUserIds = (currentUserData.blockedUserIds || []).filter((x) => x !== id);
+    renderBlockedList(currentUserData);
+  } catch (error) {
+    btn.disabled = false;
+  }
+});
+
 function renderAccountData(userData = {}, subscription = {}) {
+  renderBlockedList(userData);
   const activeRole = getActiveRole(userData);
   const accountStatus = safeText(userData.accountStatus, "active");
   const deletionStatus = safeText(userData.deletionStatus, userData.deletionRequestedAt ? "requested" : "none");
