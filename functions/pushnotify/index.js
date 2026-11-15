@@ -243,6 +243,21 @@ cloudEvent("sendPushOnNotification", async (event) => {
     return;
   }
 
+  // Nothing reaches someone from a person they have blocked.
+  const senderId = cleanText(data.senderId, "");
+  if (senderId && senderId !== "system") {
+    try {
+      const recipient = (await db.collection("users").doc(recipientId).get()).data() || {};
+      const blocked = Array.isArray(recipient.blockedUserIds) ? recipient.blockedUserIds : [];
+      if (blocked.includes(senderId)) {
+        console.log("Sender is blocked by recipient, no alert sent.");
+        return;
+      }
+    } catch (error) {
+      console.warn("Could not check block list:", error.message);
+    }
+  }
+
   // Email first. It does not depend on the person having push turned on, and
   // a failure here must never stop the push.
   try {
