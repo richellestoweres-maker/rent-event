@@ -207,7 +207,7 @@ async function sendEmailAlert(recipientId, data, link) {
     method: "POST",
     headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: cleanText(process.env.RESEND_FROM, "RentEvent <alerts@rentevent-app.com>"),
+      from: cleanText(process.env.RESEND_FROM, "RentEvent <alerts@notify.rentevent-app.com>"),
       to: [to],
       subject: title,
       html: emailHtml(title, body, href),
