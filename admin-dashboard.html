@@ -1701,6 +1701,7 @@ function userCardHtml(u) {
   if (hasRole2(u, "vendor")) pills += '<span class="pill blue">Vendor</span>';
   if (hasRole2(u, "customer")) pills += '<span class="pill safe">Customer</span>';
   if (suspended) pills += '<span class="pill red">Suspended</span>';
+  if (u.vendorFrozen === true) pills += '<span class="pill red">Frozen: ' + esc2(u.vendorFrozenReason === "cancellations" ? "cancellations" : "no reply") + '</span>';
 
   var roleOptions = ["customer", "vendor", "planner", "admin"].map(function (r) {
     var sel = activeRole2(u) === r ? " selected" : "";
@@ -1717,6 +1718,7 @@ function userCardHtml(u) {
       "</div>" +
       '<div class="card-actions">' +
       '<button class="btn-secondary" type="button" data-action="suspend" data-suspended="' + (suspended ? "true" : "false") + '" data-uid="' + esc2(id) + '">' + (suspended ? "Unsuspend" : "Suspend") + "</button>" +
+      (u.vendorFrozen === true ? '<button class="btn-secondary" type="button" data-action="unfreeze" data-uid="' + esc2(id) + '">Unfreeze</button>' : "") +
       '<button class="btn" type="button" data-action="delete-user" data-uid="' + esc2(id) + '" style="background:linear-gradient(135deg,#ff8a7a,#c74f4d 70%);">Delete</button>' +
       "</div>";
   }
@@ -2602,6 +2604,52 @@ window.handleAdminSuspendToggle = async function (uid, nextSuspended) {
   }
 };
 
+/** Puts a frozen vendor's listings back in search. Their cancellation count starts fresh. */
+window.handleAdminUnfreeze = async function (uid) {
+  if (!await showConfirm("Unfreeze this vendor and put their listings back in search?")) return;
+  try {
+    await updateDoc(doc(db2, "users", uid), {
+      vendorFrozen: false,
+      vendorFrozenReason: "",
+      vendorUnfrozenAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    var listingSnap = await getDocs(query(collection(db2, "listings"), where("vendorId", "==", uid)));
+    var restored = 0;
+    for (var i = 0; i < listingSnap.docs.length; i++) {
+      var d = listingSnap.docs[i];
+      var data = d.data() || {};
+      if (data.status === "frozen") {
+        await updateDoc(d.ref, { status: data.frozenFromStatus || "published", frozenFromStatus: "", updatedAt: serverTimestamp() });
+        restored += 1;
+      }
+    }
+
+    await addDoc(collection(db2, "notifications"), {
+      recipientId: uid,
+      userId: uid,
+      senderId: (auth2.currentUser && auth2.currentUser.uid) || "",
+      recipientRole: "vendor",
+      type: "vendor_unfrozen",
+      typeLabel: "Listings Back On",
+      category: "Account",
+      title: "Your listings are back on",
+      body: "Your listings are showing in search again.",
+      read: false,
+      isRead: false,
+      createdAt: serverTimestamp()
+    }).catch(function () {});
+
+    var idx = usersLoaded.findIndex(function (u) { return u.id === uid; });
+    if (idx > -1) usersLoaded[idx].vendorFrozen = false;
+    renderUsersList();
+    showToast("Unfrozen. " + restored + " listing" + (restored === 1 ? "" : "s") + " back in search.");
+  } catch (error) {
+    showToast("Could not unfreeze: " + error.message);
+  }
+};
+
 async function callDeleteUserFallback(uid) { var idToken = await auth2.currentUser.getIdToken(); var resp = await fetch('https://deleteuseraccount-840686040363.us-central1.run.app', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken }, body: JSON.stringify({ uid: uid }) }); var data = await resp.json().catch(function () { return {}; }); if (!resp.ok) { throw new Error(data.error || ('Request failed with status ' + resp.status)); } return data; } window.handleAdminDeleteUser = async function (uid) {
   if (auth2.currentUser && uid === auth2.currentUser.uid) {
     showToast("You cannot delete your own account.");
@@ -2631,6 +2679,8 @@ document.addEventListener("click", function (e) {
   var action = btn.getAttribute("data-action");
   if (action === "suspend") {
     window.handleAdminSuspendToggle(uid, btn.getAttribute("data-suspended") !== "true");
+  } else if (action === "unfreeze") {
+    window.handleAdminUnfreeze(uid);
   } else if (action === "delete-user") {
     window.handleAdminDeleteUser(uid); } else if (action === "toggle-listing") { window.handleAdminToggleListingStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-listing") { window.handleAdminDeleteListing(btn.getAttribute("data-id")); } else if (action === "toggle-request") { window.handleAdminToggleRequestStatus(btn.getAttribute("data-id"), btn.getAttribute("data-status")); } else if (action === "delete-request") { window.handleAdminDeleteRequest(btn.getAttribute("data-id")); } else if (action === "delete-waitlist") { window.handleAdminDeleteWaitlist(btn.getAttribute("data-id"));
   }
