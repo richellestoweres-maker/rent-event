@@ -2382,6 +2382,7 @@ function validateStripeSetup() {
 
 function getStripeReturnUrl(bookingRequestId) {
   const url = new URL(window.location.href);
+  if (new URLSearchParams(window.location.search).get("payBalance") === "1") url.searchParams.set("payBalance", "1");
   url.searchParams.set("eventId", activeEventId);
   url.searchParams.set("bookingRequestId", bookingRequestId);
   url.searchParams.set("stripe_return", "true");
@@ -2404,14 +2405,18 @@ async function startStripeEmbeddedCheckout(bookingRequestId, payload) {
 
   setCheckoutStatus("Opening secure Stripe checkout...", "info");
 
+  const idToken = await currentUser.getIdToken();
+
   const response = await fetch(CREATE_STRIPE_CHECKOUT_SESSION_URL, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + idToken
     },
     body: JSON.stringify({
       bookingRequestId,
       eventId: activeEventId,
+      payBalance: payload.payBalance === true,
       requestOwnerId: payload.requestOwnerId,
       customerId: payload.customerId || "",
       plannerId: payload.plannerId || "",
@@ -2438,7 +2443,19 @@ async function startStripeEmbeddedCheckout(bookingRequestId, payload) {
 
   await checkout.mount("#stripeEmbeddedCheckout");
 
-  setCheckoutStatus("Secure checkout is ready below. Complete payment through Stripe.", "success");
+  const dollars = (cents) => "$" + (Number(cents || 0) / 100).toFixed(2);
+
+  if (data.depositMode) {
+    setCheckoutStatus(
+      "Today: " + dollars(data.todayCents) + " deposit. The " + dollars(data.balanceCents) +
+      " balance is charged to the same card on " + data.balanceDueDate + ".",
+      "success"
+    );
+  } else if (data.payingBalance) {
+    setCheckoutStatus("Pay your " + dollars(data.todayCents) + " balance below.", "success");
+  } else {
+    setCheckoutStatus("Secure checkout is ready below. Complete payment through Stripe.", "success");
+  }
 
   stripeCard.scrollIntoView({
     behavior: "smooth",
@@ -2696,8 +2713,13 @@ function renderPaidPanel(booking, bookingRequestId) {
   const main = document.querySelector("main.page");
   if (!main || document.getElementById("paidPanel")) return;
 
-  const cents = Number(booking.stripeAmountCollectedCents || booking.stripeAmountCents || 0);
+  const cents = Number(booking.stripeAmountCollectedCents || booking.stripeAmountCents || 0) +
+    Number(booking.balanceCollectedCents || 0);
   const amount = cents ? "$" + (cents / 100).toFixed(2) : "";
+  const balanceDue = booking.depositMode === true && booking.balanceStatus !== "paid" && booking.balanceStatus !== "cancelled";
+  const dueDate = booking.balanceDueAt && typeof booking.balanceDueAt.toDate === "function"
+    ? booking.balanceDueAt.toDate().toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })
+    : "";
   const eventId = safeText(booking.eventId, "");
 
   const panel = document.createElement("section");
@@ -2712,7 +2734,10 @@ function renderPaidPanel(booking, bookingRequestId) {
     amountPill +
     "<h2>Payment received</h2>" +
     "<p>Your booking is confirmed and your vendors have been notified. A receipt is on its way to your email from Stripe.</p>" +
-    "<p>Your vendors are paid automatically after your event, so there is nothing else for you to send.</p>" +
+    (balanceDue
+      ? "<p>The " + escapeHtml("$" + (Number(booking.balanceCents || 0) / 100).toFixed(2)) +
+        " balance is charged to the same card" + (dueDate ? " on " + escapeHtml(dueDate) : " 14 days before your event") + ".</p>"
+      : "<p>Your vendors are paid automatically after your event, so there is nothing else for you to send.</p>") +
     '<div class="paid-actions">' +
       '<a href="my-requests.html' + (eventId ? "?eventId=" + encodeURIComponent(eventId) : "") + '">View my request</a>' +
       '<a class="ghost" href="dashboard.html">Back to my events</a>' +
@@ -2769,7 +2794,9 @@ async function lockIfAlreadyPaid() {
     if (!snap.exists()) return;
 
     const booking = snap.data() || {};
-    if (safeText(booking.paymentStatus, "") !== "paid") return;
+    if (!["paid", "deposit_paid"].includes(safeText(booking.paymentStatus, ""))) return;
+    if (new URLSearchParams(window.location.search).get("payBalance") === "1" &&
+        ["failed", "scheduled"].includes(safeText(booking.balanceStatus, ""))) return;
 
     renderPaidPanel(booking, bookingRequestId);
   } catch (error) {
@@ -2795,7 +2822,12 @@ async function showPaymentConfirmationIfReturning() {
       if (snap.exists()) {
         const booking = snap.data() || {};
 
-        if (booking.paymentStatus === "paid") {
+        const payingBalance = params.get("payBalance") === "1";
+        const done = payingBalance
+          ? booking.balanceStatus === "paid"
+          : ["paid", "deposit_paid"].includes(booking.paymentStatus);
+
+        if (done) {
           renderPaidPanel(booking, bookingRequestId);
           return;
         }
@@ -2849,7 +2881,23 @@ onAuthStateChanged(auth, async (user) => {
 
   await showPaymentConfirmationIfReturning();
   await lockIfAlreadyPaid();
+  await startBalancePaymentIfAsked();
 });
+
+/** Opened from a "your balance didn't go through" alert. */
+async function startBalancePaymentIfAsked() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("payBalance") !== "1" || params.get("stripe_return") === "true") return;
+
+  const bookingRequestId = safeText(params.get("bookingRequestId"), "");
+  if (!bookingRequestId) return;
+
+  try {
+    await startStripeEmbeddedCheckout(bookingRequestId, { payBalance: true });
+  } catch (error) {
+    setCheckoutStatus(error.message, "error");
+  }
+}
 </script>
 
 <script type="module" src="suspension-check.js"></script>
