@@ -51,7 +51,9 @@ service cloud.firestore {
       return ['admin', 'isAdmin', 'suspended', 'suspendedAt', 'suspensionReason',
               'verified', 'balance', 'stripeAccountId', 'stripeCustomerId',
               'chargesEnabled', 'payoutsEnabled', 'stripeDetailsSubmitted',
-              'stripeRequirementsDue', 'stripeDisabledReason', 'claims'];
+              'stripeRequirementsDue', 'stripeDisabledReason', 'claims',
+              'vendorFrozen', 'vendorFrozenReason', 'vendorFrozenDetail', 'vendorFrozenAt',
+              'vendorUnfrozenAt', 'vendorCancellationLog'];
     }
 
     function safeRoleNames() {
@@ -146,10 +148,15 @@ service cloud.firestore {
 
     match /listings/{listingId} {
       allow read: if resource.data.status == "published" || (signedIn() && (isAdmin() || resource.data.vendorId == request.auth.uid));
+      // A frozen vendor's listings stay out of search until Richelle lets them
+      // back in, so they can neither publish nor un-freeze a listing themselves.
       allow create: if signedIn() && isVendor() && isNotSuspended() && request.resource.data.vendorId == request.auth.uid
-                    && !request.resource.data.keys().hasAny(badgeFields());
+                    && !request.resource.data.keys().hasAny(badgeFields())
+                    && (userData().get('vendorFrozen', false) != true || request.resource.data.get('status', '') != 'published');
       allow update: if isAdmin() || (isVendor() && isNotSuspended() && resource.data.vendorId == request.auth.uid
-                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(badgeFields()));
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(badgeFields())
+                    && !(resource.data.get('status', '') == 'frozen' && request.resource.data.diff(resource.data).affectedKeys().hasAny(['status']))
+                    && (userData().get('vendorFrozen', false) != true || request.resource.data.get('status', '') != 'published'));
       allow delete: if isAdmin() || (isVendor() && isNotSuspended() && resource.data.vendorId == request.auth.uid);
     }
 
@@ -190,7 +197,7 @@ service cloud.firestore {
               'depositPolicy', 'stripePaymentMethodId', 'stripeCustomerId',
               'depositMode', 'vendorDepositCents', 'vendorBalanceCents',
               'balanceCheckoutSessionId', 'balanceCollectedCents',
-              'balanceFailureReason', 'balanceFailedAt'];
+              'balanceFailureReason', 'balanceFailedAt', 'noReplyWarned'];
     }
 
     // Money has moved (or is moving) on these, so the request's state is the
