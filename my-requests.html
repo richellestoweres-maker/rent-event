@@ -1727,13 +1727,14 @@ function getStatusLabel(status) {
   if (status === "withdrawn") return "Withdrawn";
   if (status === "confirmed") return "Confirmed";
   if (status === "paid") return "Paid";
+  if (status === "deposit_paid") return "Deposit Paid";
   if (status === "needs_more_info") return "Needs More Info";
   return "Pending";
 }
 
 function getStatusPillClass(status) {
   if (status === "withdrawn") return "withdrawn";
-  if (status === "confirmed" || status === "paid") return "safe";
+  if (status === "confirmed" || status === "paid" || status === "deposit_paid") return "safe";
   if (status === "needs_more_info") return "pending";
   return "pending";
 }
@@ -1889,7 +1890,7 @@ function renderQuoteForVendor(request, vendorId) {
 
   const requestId = safeText(request.id, "");
   const quote = getQuote(requestId, vendorId);
-  const paid = safeText(request.paymentStatus, "not_collected") === "paid";
+  const paid = ["paid", "deposit_paid"].includes(safeText(request.paymentStatus, "not_collected"));
 
   if (!quote || quote.status === "withdrawn") {
     return `
@@ -1971,7 +1972,8 @@ function renderRequests() {
     const responseSummary = getVendorResponseSummary(request);
     const withdrawnReason = safeText(request.withdrawReason || request.withdrawnReason, "No reason provided.");
     const plannerBadge = request.plannerId ? `<span class="pill ai">Planner Request</span>` : "";
-    const isPaid = paymentStatus === "paid";
+    const isPaid = paymentStatus === "paid" || paymentStatus === "deposit_paid";
+    const balanceNote = balanceNoteFor(request);
     const readyToPay = !isPaid && allQuotesAccepted(request);
     const quotedTotal = acceptedQuoteTotal(request);
 
@@ -2086,6 +2088,8 @@ function renderRequests() {
           ${readyToPay ? `<span class="pill safe">Ready To Pay</span>` : ""}
           ${aiSummary ? `<span class="pill ai">Concierge Planned</span>` : ""}
         </div>
+
+        ${balanceNote}
 
         ${isWithdrawn ? `
           <div class="withdrawn-box">
@@ -2256,6 +2260,33 @@ function renderRequests() {
  * chose, and lets the Cloud Function do the rest with the Stripe key.
  * ------------------------------------------------------------------ */
 
+/** One line about a deposit booking's balance: when it's charged, or that it needs paying. */
+function balanceNoteFor(request) {
+  if (request.depositMode !== true) return "";
+
+  const status = safeText(request.balanceStatus, "");
+  const amount = formatMoney(Number(request.balanceCents || 0) / 100);
+  const due = request.balanceDueAt && typeof request.balanceDueAt.toDate === "function"
+    ? request.balanceDueAt.toDate().toLocaleDateString(undefined, { month: "long", day: "numeric" })
+    : "";
+
+  if (status === "scheduled") {
+    return `<p class="response-note">Deposit paid. ${escapeHtml(amount)} balance charged${due ? " on " + escapeHtml(due) : " 14 days before"}.</p>`;
+  }
+
+  if (status === "failed") {
+    const href = "checkout.html?bookingRequestId=" + encodeURIComponent(request.id) +
+      "&eventId=" + encodeURIComponent(safeText(request.eventId, "")) + "&payBalance=1";
+    return `<p class="response-note" style="color:#c74f4d;font-weight:700;">Your ${escapeHtml(amount)} balance didn't go through. <a href="${href}">Pay now</a></p>`;
+  }
+
+  if (status === "paid") {
+    return `<p class="response-note">Paid in full.</p>`;
+  }
+
+  return "";
+}
+
 /** The published tiers, in days before the event. Also in the Terms. */
 const FULL_REFUND_DAYS = 30;
 const HALF_REFUND_DAYS = 14;
@@ -2353,14 +2384,23 @@ function refundPreviewFor(request, vendorId, days) {
   // Whatever has not already gone back. The server caps the same way, and this
   // page must never show a number larger than the one that actually arrives.
   const collected = Math.round(Number(
-    request.stripeAmountCollectedCents || request.stripeAmountCents || 0));
+    request.stripeAmountCollectedCents || request.stripeAmountCents || 0)) +
+    Math.round(Number(request.balanceCollectedCents || 0));
   const spokenFor = Math.round(Number(request.refundedCents || 0)) +
                     Math.round(Number(request.refundReservedCents || 0));
   const remaining = collected > 0 ? Math.max(0, collected - spokenFor) : base;
 
+  // Before a deposit booking's balance is charged, only the deposit has been
+  // paid, and the server refunds out of that. Same arithmetic as the server.
+  const depositOnly = request.depositMode === true && safeText(request.balanceStatus, "") !== "paid";
+  const paid = depositOnly
+    ? Math.round(Number((request.vendorDepositCents || {})[vendorId] || 0))
+    : base;
+  const refundFor = (want) => Math.min(Math.max(0, paid - (base - want)), remaining);
+
   if (days >= FULL_REFUND_DAYS) {
     return {
-      cents: Math.min(base, remaining),
+      cents: refundFor(base),
       tier: "full",
       label: "Full refund, 30 or more days out"
     };
@@ -2368,13 +2408,13 @@ function refundPreviewFor(request, vendorId, days) {
 
   if (days >= HALF_REFUND_DAYS) {
     return {
-      cents: Math.min(Math.floor(base / 2), remaining),
+      cents: refundFor(Math.floor(base / 2)),
       tier: "half",
-      label: "Half refund, 14 to 29 days out"
+      label: depositOnly ? "Vendor keeps the deposit, 14 to 29 days out" : "Half refund, 14 to 29 days out"
     };
   }
 
-  return { cents: 0, tier: "none", label: "No refund, under 14 days" };
+  return { cents: refundFor(0), tier: "none", label: "No refund, under 14 days" };
 }
 
 /** Vendors on this booking who have not already been cancelled. */
