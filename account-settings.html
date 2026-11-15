@@ -874,6 +874,15 @@
           <h2 class="section-title">Notifications</h2>
 
           <div class="card">
+            <div class="toggle-card" id="pushCard">
+              <div>
+                <h3>Alerts on this device</h3>
+                <p id="pushText">New messages, booking requests, and payment updates.</p>
+              </div>
+
+              <button class="btn-secondary" type="button" id="pushBtn">Turn on</button>
+            </div>
+
             <div class="toggle-card">
               <div>
                 <h3>Email updates</h3>
@@ -1782,6 +1791,43 @@ onAuthStateChanged(auth, async (user) => {
   renderAccountData(currentUserData, currentSubscription || {});
   await loadUnreadBadge(user);
 });
+</script>
+
+<script type="module">
+import { pushState, enablePush } from "./push-setup.js";
+
+const pushBtn = document.getElementById("pushBtn");
+const pushText = document.getElementById("pushText");
+
+const PUSH_COPY = {
+  on: ["Alerts are on for this device.", ""],
+  off: ["New messages, booking requests, and payment updates.", "Turn on"],
+  blocked: ["Alerts are blocked. Allow notifications for RentEvent in your device settings.", ""],
+  unsupported: ["This browser can't show alerts. Try the RentEvent app or Chrome.", ""],
+  "needs-home-screen": ["On iPhone, tap Share, then Add to Home Screen, and open RentEvent from there to turn on alerts.", ""]
+};
+
+function showPush(state) {
+  const [text, button] = PUSH_COPY[state] || PUSH_COPY.off;
+  pushText.textContent = text;
+  pushBtn.textContent = button;
+  pushBtn.style.display = button ? "" : "none";
+  pushBtn.disabled = false;
+}
+
+pushBtn.addEventListener("click", async () => {
+  pushBtn.disabled = true;
+  pushBtn.textContent = "Turning on...";
+  try {
+    showPush(await enablePush());
+  } catch (error) {
+    console.error("Alert setup failed:", error);
+    showPush("off");
+    pushText.textContent = "Couldn't turn on alerts. Please try again.";
+  }
+});
+
+pushState().then(showPush).catch(() => showPush("off"));
 </script>
 
 <script type="module" src="suspension-check.js"></script>
