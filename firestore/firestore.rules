@@ -77,14 +77,22 @@ service cloud.firestore {
              request.resource.data.role in ['customer', 'client', 'host', 'event_host', 'vendor', 'planner'];
     }
 
+    // A person's own block list. Capped so it cannot be used as free storage.
+    function blockListSane() {
+      return !('blockedUserIds' in request.resource.data) ||
+             (request.resource.data.blockedUserIds is list &&
+              request.resource.data.blockedUserIds.size() <= 500);
+    }
+
     match /users/{userId} {
       allow create: if isOwner(userId)
                     && roleIsSafe()
                     && rolesAreSafe()
+                    && blockListSane()
                     && !request.resource.data.keys().hasAny(protectedUserFields());
       allow read:   if isAdmin() || isOwner(userId);
       allow update: if isAdmin() || (
-                      isOwner(userId) && isNotSuspended() && roleIsSafe() && rolesAreSafe()
+                      isOwner(userId) && isNotSuspended() && roleIsSafe() && rolesAreSafe() && blockListSane()
                       && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedUserFields())
                     );
       allow delete: if isAdmin();
@@ -543,17 +551,30 @@ service cloud.firestore {
       function isResourceConversationParticipant() {
         return signedIn() && (request.auth.uid in resource.data.participantIds || resource.data.customerId == request.auth.uid || resource.data.vendorId == request.auth.uid || resource.data.plannerId == request.auth.uid || resource.data.requestOwnerId == request.auth.uid);
       }
+      // Someone on this chat has blocked the person writing. Checked for the
+      // first three participants, which covers every chat the app creates.
+      function blockedBy(uid) {
+        return uid is string && uid != '' && uid != request.auth.uid &&
+               exists(/databases/$(database)/documents/users/$(uid)) &&
+               get(/databases/$(database)/documents/users/$(uid)).data.get('blockedUserIds', []).hasAny([request.auth.uid]);
+      }
+      function blockedAmong(ids) {
+        return ids is list && (
+          (ids.size() > 0 && blockedBy(ids[0])) ||
+          (ids.size() > 1 && blockedBy(ids[1])) ||
+          (ids.size() > 2 && blockedBy(ids[2])));
+      }
       function isCreatingAllowedConversation() {
         return signedIn() && request.resource.data.participantIds is list && request.auth.uid in request.resource.data.participantIds && request.resource.data.vendorId is string && request.resource.data.vendorId in request.resource.data.participantIds && request.resource.data.requestOwnerId == request.auth.uid;
       }
       allow get: if isAdmin() || isExistingConversationParticipant() || (signedIn() && !conversationExists());
       allow list: if isAdmin() || isResourceConversationParticipant();
-      allow create: if isAdmin() || (isNotSuspended() && isCreatingAllowedConversation());
+      allow create: if isAdmin() || (isNotSuspended() && isCreatingAllowedConversation() && !blockedAmong(request.resource.data.participantIds));
       allow update: if isAdmin() || (isNotSuspended() && isExistingConversationParticipant());
       allow delete: if isAdmin();
 
       match /messages/{messageId} {
-        allow create: if signedIn() && request.auth.uid == request.resource.data.senderId && (isAdmin() || (isNotSuspended() && isExistingConversationParticipant()));
+        allow create: if signedIn() && request.auth.uid == request.resource.data.senderId && (isAdmin() || (isNotSuspended() && isExistingConversationParticipant() && !blockedAmong(conversationData().get('participantIds', []))));
         allow read: if isAdmin() || isExistingConversationParticipant();
         allow update, delete: if isAdmin();
       }
