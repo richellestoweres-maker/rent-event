@@ -187,7 +187,10 @@ service cloud.firestore {
               'lastCancellationAt', 'lastVendorCancellationAt',
               'depositCents', 'balanceCents', 'balanceDueAt', 'balanceStatus',
               'balancePaidAt', 'balancePaymentIntentId', 'balanceChargeId',
-              'depositPolicy', 'stripePaymentMethodId', 'stripeCustomerId'];
+              'depositPolicy', 'stripePaymentMethodId', 'stripeCustomerId',
+              'depositMode', 'vendorDepositCents', 'vendorBalanceCents',
+              'balanceCheckoutSessionId', 'balanceCollectedCents',
+              'balanceFailureReason', 'balanceFailedAt'];
     }
 
     // Money has moved (or is moving) on these, so the request's state is the
