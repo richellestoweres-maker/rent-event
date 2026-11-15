@@ -85,6 +85,9 @@ function cleanText(value, fallback = "") {
  * destination, the notifications list is always honest.
  */
 function linkForNotification(data) {
+  const own = cleanText(data.link, "");
+  if (own.startsWith("/") && !own.startsWith("//")) return own;
+
   const conversationId = cleanText(
     data.conversationId || (data.relatedCollection === "conversations" ? data.relatedId : ""), "");
   const eventId = cleanText(data.eventId, "");
