@@ -1968,6 +1968,9 @@ async function getConversationIdFromBookingRequest(requestId) {
 }
 
 function getDashboardNotificationHref(notification) {
+  // A notification can carry its own same-site link, such as a pay-balance page.
+  { const own = String(notification.link || "").trim(); if (own.startsWith("/") && !own.startsWith("//")) return own.slice(1); }
+
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
   const sourceId = safeText(notification.sourceId, "");
@@ -2002,6 +2005,9 @@ function getDashboardNotificationHref(notification) {
 }
 
 async function getResolvedDashboardNotificationHref(notification) {
+  // A notification can carry its own same-site link, such as a pay-balance page.
+  { const own = String(notification.link || "").trim(); if (own.startsWith("/") && !own.startsWith("//")) return own.slice(1); }
+
   const type = safeText(notification.type, "");
   const sourceCollection = safeText(notification.sourceCollection, "");
   const eventId = getDashboardNotificationEventId(notification);
@@ -2662,6 +2668,7 @@ function eventHasPaidBooking(eventId) {
   return requests.some((entry) => {
     const data = entry.data || {};
     return data.paymentStatus === "paid" ||
+           data.paymentStatus === "deposit_paid" ||
            data.paymentStatus === "refunded" ||
            data.paymentStatus === "partially_refunded" ||
            data.payoutStatus === "paid_out";
