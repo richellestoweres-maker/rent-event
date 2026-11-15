@@ -673,6 +673,13 @@
     </div>
   </div>
 
+  <button class="icon-btn" id="blockBtn" type="button" aria-label="Block" title="Block" hidden>
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"></circle>
+      <path d="M6.5 6.5L17.5 17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+  </button>
+
   <a href="listings.html" class="icon-btn" id="listingLink" aria-label="View listing">
     <svg viewBox="0 0 24 24" fill="none">
       <path d="M4 7.5C4 6.12 5.12 5 6.5 5H17.5C18.88 5 20 6.12 20 7.5V16.5C20 17.88 18.88 19 17.5 19H6.5C5.12 19 4 17.88 4 16.5V7.5Z" stroke="currentColor" stroke-width="2"></path>
@@ -748,7 +755,9 @@ import {
   serverTimestamp,
   query,
   orderBy,
-  onSnapshot
+  onSnapshot,
+  arrayUnion,
+  arrayRemove
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1398,6 +1407,67 @@ function getOtherParticipantId() {
   return ids.find((id) => id !== currentUser.uid) || "";
 }
 
+/* Blocking. A blocked person cannot message you, start a chat with you,
+   or reach you with an alert. Unblock here or in Account Settings. */
+function isOtherBlocked() {
+  const otherId = getOtherParticipantId();
+  const blocked = Array.isArray(currentUserData?.blockedUserIds) ? currentUserData.blockedUserIds : [];
+  return !!otherId && blocked.includes(otherId);
+}
+
+function updateBlockUi() {
+  const btn = document.getElementById("blockBtn");
+  const input = document.getElementById("messageInput");
+  const send = document.getElementById("sendBtn");
+  const otherId = getOtherParticipantId();
+
+  if (!btn) return;
+  btn.hidden = !otherId || isAdminPreview();
+
+  const blocked = isOtherBlocked();
+  btn.setAttribute("aria-label", blocked ? "Unblock" : "Block");
+  btn.title = blocked ? "Unblock" : "Block";
+  btn.style.color = blocked ? "#c74f4d" : "";
+
+  if (input) {
+    input.disabled = blocked;
+    input.placeholder = blocked ? "You blocked this person" : "Type your message...";
+  }
+  if (send) send.disabled = blocked;
+}
+
+async function toggleBlock() {
+  const otherId = getOtherParticipantId();
+  if (!otherId || !currentUser) return;
+
+  const blocked = isOtherBlocked();
+  const name = getOtherParticipantName();
+
+  if (!blocked && !confirm("Block " + name + "? They won't be able to message you.")) return;
+
+  try {
+    const userRef = doc(db, "users", currentUser.uid);
+    if (blocked) {
+      await updateDoc(userRef, { blockedUserIds: arrayRemove(otherId), updatedAt: serverTimestamp() });
+      currentUserData.blockedUserIds = (currentUserData.blockedUserIds || []).filter((id) => id !== otherId);
+      showAppNotice(name + " is unblocked.");
+    } else {
+      await setDoc(userRef, {
+        blockedUserIds: arrayUnion(otherId),
+        blockedUserNames: { [otherId]: name },
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      currentUserData.blockedUserIds = [...(currentUserData.blockedUserIds || []), otherId];
+      showAppNotice(name + " is blocked.");
+    }
+    updateBlockUi();
+  } catch (error) {
+    showAppNotice(friendlyProblem(error), "error");
+  }
+}
+
+document.getElementById("blockBtn")?.addEventListener("click", toggleBlock);
+
 function getOtherParticipantName() {
   if (!conversationData || !currentUser) return "Conversation";
 
@@ -1532,6 +1602,7 @@ async function updateHeader() {
 
   setText("avatarInitials", initialsFromName(otherName));
   setText("chatName", otherName);
+  updateBlockUi();
 
   const subParts = [listingTitle, listingCategory];
 
@@ -2146,7 +2217,7 @@ function friendlyProblem(error) {
   const raw = String((error && error.message) || error || "").toLowerCase();
 
   if (raw.includes("permission") || raw.includes("insufficient")) {
-    return "You do not have access to that. Try signing out and back in.";
+    return "That didn't send. This person may not be accepting messages from you.";
   }
 
   if (raw.includes("network") || raw.includes("offline") || raw.includes("unavailable")) {
