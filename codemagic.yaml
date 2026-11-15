@@ -1,0 +1,53 @@
+# Cloud builds for the RentEvent iPhone and Android apps.
+# Start a build from codemagic.io. The app project lives in mobile/.
+# Setup steps are in mobile/README.md.
+
+workflows:
+  ios-release:
+    name: RentEvent iPhone app
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: RentEvent App Store key
+    environment:
+      groups:
+        - firebase
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.rentevent.app
+      node: 22
+      xcode: latest
+    scripts:
+      - name: Build the native iPhone project
+        script: cd mobile && bash scripts/prepare-native.sh ios
+      - name: Signing
+        script: xcode-project use-profiles
+      - name: Build number
+        script: cd mobile/ios/App && agvtool new-version -all "$BUILD_NUMBER"
+      - name: Build the app
+        script: cd mobile && xcode-project build-ipa --project "ios/App/App.xcodeproj" --scheme "App"
+    artifacts:
+      - mobile/build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+
+  android-release:
+    name: RentEvent Android app
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      groups:
+        - firebase
+      android_signing:
+        - rentevent_upload_key
+      node: 22
+      java: 21
+    scripts:
+      - name: Build the native Android project
+        script: cd mobile && bash scripts/prepare-native.sh android
+      - name: Build the app bundle
+        script: cd mobile/android && ./gradlew bundleRelease
+    artifacts:
+      - mobile/android/app/build/outputs/bundle/release/*.aab
