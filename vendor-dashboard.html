@@ -901,8 +901,158 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .two-col {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 24px;
+        align-items: start;
+      }
+
+      .two-col .listing-list,
+      .two-col .request-list {
+        grid-template-columns: 1fr;
+      }
+
       .bottom-nav {
         max-width: 520px;
+      }
+    }
+
+    a.stat-box {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .profile-card {
+      display: block;
+      background: var(--card);
+      border-radius: 24px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .profile-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .profile-top h3 {
+      margin: 0;
+      font-size: 1.06rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .profile-percent {
+      font-weight: 800;
+      color: var(--coral-3);
+    }
+
+    .profile-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--soft);
+      margin: 12px 0 10px;
+      overflow: hidden;
+    }
+
+    .profile-bar span {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--coral-1), var(--coral-3));
+    }
+
+    .profile-card p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .earnings-card {
+      background: var(--card);
+      border-radius: 30px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .earnings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .earnings-box {
+      background: var(--soft-2);
+      border: 1px solid #f2e7d8;
+      border-radius: 20px;
+      padding: 14px 12px;
+    }
+
+    .earnings-label {
+      display: block;
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .earnings-number {
+      display: block;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .earnings-note {
+      margin: 12px 2px 0;
+      font-size: 0.86rem;
+      color: var(--red-text);
+      font-weight: 700;
+    }
+
+    .earnings-note a {
+      color: inherit;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 10px;
+      min-height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      background: #f6efe4;
+      color: #6a625a;
+    }
+
+    .status-chip.safe {
+      background: var(--green-soft);
+      color: var(--green-text);
+    }
+
+    .status-chip.pending {
+      background: #fff4df;
+      color: #aa6f12;
+    }
+
+    .status-chip.red {
+      background: var(--red-soft);
+      color: var(--red-text);
+    }
+
+    @media (max-width: 420px) {
+      .earnings-grid {
+        grid-template-columns: 1fr;
       }
     }
   
@@ -1038,17 +1188,20 @@
         <div class="hero-label" id="welcomeText">Welcome back</div>
         <h2 class="hero-title">Manage your event business.</h2>
         <p class="hero-subtitle">
-          Add listings, review booking requests, message customers, and keep your vendor profile ready for new opportunities.
+          Requests, quotes, bookings and payouts in one place.
         </p>
-
-        <div class="hero-actions">
-          <a class="hero-btn" href="booking-requests.html" id="heroRequestsBtn">Booking Requests</a>
-          <a class="hero-btn-secondary" href="add-listing.html">Add Listing</a>
-          <a class="hero-btn-secondary" href="my-listings.html">My Listings</a>
-          <a class="hero-btn-secondary" href="messages.html" id="heroInboxBtn">Inbox</a>
-          <a class="hero-btn-secondary" href="vendor-profile.html">Edit Profile</a>
-        </div>
       </div>
+    </section>
+
+    <section class="section" id="profileSection" hidden>
+      <a class="profile-card" href="vendor-profile.html">
+        <div class="profile-top">
+          <h3>Finish your profile</h3>
+          <span class="profile-percent" id="profilePercent">0%</span>
+        </div>
+        <div class="profile-bar"><span id="profileBar"></span></div>
+        <p id="profileMissing">Complete profiles get booked more.</p>
+      </a>
     </section>
 
     <section class="section">
@@ -1058,21 +1211,46 @@
 
       <article class="stats-card">
         <div class="stats-grid">
-          <div class="stat-box">
-            <span class="stat-number" id="listingCount">0</span>
-            <span class="stat-label">Listings</span>
-          </div>
-
-          <div class="stat-box">
+          <a class="stat-box" href="booking-requests.html">
             <span class="stat-number" id="requestCount">0</span>
-            <span class="stat-label">Requests</span>
-          </div>
+            <span class="stat-label">New requests</span>
+          </a>
 
-          <div class="stat-box">
-            <span class="stat-number" id="alertCount">0</span>
-            <span class="stat-label">Alerts</span>
+          <a class="stat-box" href="#quotesSection">
+            <span class="stat-number" id="quoteCount">0</span>
+            <span class="stat-label">Pending quotes</span>
+          </a>
+
+          <a class="stat-box" href="#earningsSection">
+            <span class="stat-number" id="upcomingPayoutStat">$0</span>
+            <span class="stat-label">Upcoming payouts</span>
+          </a>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" id="earningsSection">
+      <div class="section-header">
+        <h2 class="section-title">Earnings</h2>
+        <a class="section-link" href="vendor-payouts.html">Payout settings</a>
+      </div>
+
+      <article class="earnings-card">
+        <div class="earnings-grid">
+          <div class="earnings-box">
+            <span class="earnings-label">Upcoming</span>
+            <span class="earnings-number" id="earningsUpcoming">$0.00</span>
+          </div>
+          <div class="earnings-box">
+            <span class="earnings-label">Paid to date</span>
+            <span class="earnings-number" id="earningsPaid">$0.00</span>
+          </div>
+          <div class="earnings-box">
+            <span class="earnings-label">Next payout</span>
+            <span class="earnings-number" id="earningsNextDate">None yet</span>
           </div>
         </div>
+        <p class="earnings-note" id="earningsNote" hidden></p>
       </article>
     </section>
 
@@ -1148,6 +1326,7 @@
           <div>
             <h3>Get Verified</h3>
             <p>Show customers your business is checked and insured.</p>
+            <span class="status-chip" id="verifyChip">Checking</span>
           </div>
         </a>
 
@@ -1162,11 +1341,50 @@
           <div>
             <h3>Payouts</h3>
             <p>Connect your bank so bookings pay out to you automatically.</p>
+            <span class="status-chip" id="payoutChip">Checking</span>
           </div>
         </a>
       </div>
     </section>
 
+    <div class="two-col">
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Upcoming Bookings</h2>
+        <a class="section-link" href="booking-requests.html">View All</a>
+      </div>
+
+      <div class="request-list" id="upcomingBookingList">
+        <div class="empty-card">
+          <h3>Loading bookings</h3>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="quotesSection">
+      <div class="section-header">
+        <h2 class="section-title">Pending Quotes</h2>
+        <a class="section-link" href="booking-requests.html">View All</a>
+      </div>
+
+      <div class="request-list" id="quoteList">
+        <div class="empty-card">
+          <h3>Loading quotes</h3>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <section class="section" id="cancellationSection" hidden>
+      <div class="section-header">
+        <h2 class="section-title">Cancellations</h2>
+        <a class="section-link" href="booking-requests.html">View All</a>
+      </div>
+
+      <div class="request-list" id="cancellationList"></div>
+    </section>
+
+    <div class="two-col">
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">Recent Requests</h2>
@@ -1196,6 +1414,7 @@
         </div>
       </div>
     </section>
+    </div>
   </main>
 
   
@@ -1286,6 +1505,9 @@ let currentUser = null;
 let currentUserData = null;
 let vendorDashboardNotifications = [];
 let notificationFilter = "all";
+let vendorListings = [];
+
+const CONNECT_ENDPOINT = "https://stripeconnect-840686040363.us-central1.run.app";
 
 function safeText(value, fallback = "") {
   return value && String(value).trim() ? String(value).trim() : fallback;
@@ -2084,6 +2306,7 @@ function getRequestStatus(request) {
   const status = safeText(request.requestStatus || request.status, "pending");
 
   if (status === "withdrawn") return "Withdrawn";
+  if (status === "cancelled") return "Cancelled";
   if (status === "confirmed") return "Confirmed";
   if (status === "paid") return "Paid";
   if (status === "deposit_paid") return "Deposit Paid";
@@ -2095,7 +2318,7 @@ function getRequestStatus(request) {
 function getRequestStatusClass(request) {
   const status = safeText(request.requestStatus || request.status, "pending");
 
-  if (status === "withdrawn") return "red";
+  if (status === "withdrawn" || status === "cancelled") return "red";
   if (status === "confirmed" || status === "paid" || status === "deposit_paid") return "safe";
 
   return "pending";
@@ -2113,19 +2336,6 @@ function updateBadges(messageCount, appNotificationCount, requestCount) {
   setBadge("bottomInboxBadge", messageCount);
   setBadge("requestQuickBadge", requestCount);
   setBadge("bottomRequestBadge", requestCount);
-
-  setText("alertCount", totalAlerts);
-
-  const heroInboxBtn = document.getElementById("heroInboxBtn");
-  const heroRequestsBtn = document.getElementById("heroRequestsBtn");
-
-  heroInboxBtn.textContent = messageCount > 0
-    ? `Inbox (${messageCount})`
-    : "Inbox";
-
-  heroRequestsBtn.textContent = requestCount > 0
-    ? `Booking Requests (${requestCount})`
-    : "Booking Requests";
 }
 
 async function loadUnreadCounts(user) {
@@ -2263,11 +2473,11 @@ async function loadListings(user) {
       return bTime - aTime;
     });
 
-    setText("listingCount", listings.length);
+    vendorListings = listings;
     renderListings(listings);
   } catch (error) {
     console.warn("Vendor listings skipped:", error.message);
-    setText("listingCount", 0);
+    vendorListings = [];
     renderEmptyListings();
   }
 }
@@ -2393,11 +2603,423 @@ async function loadRequestsAndBadges(user) {
     }
   });
 
-  setText("requestCount", requests.length);
+  setText("requestCount", unansweredRequestCount);
   renderRequests(requests);
+  renderBookingMoney(requests, user);
 
   const counts = await loadUnreadCounts(user);
   updateBadges(counts.unreadMessages, counts.unreadNotifications, unansweredRequestCount);
+}
+
+/* ----- Greeting ----- */
+
+function getGreetingName() {
+  const business = safeText(currentUserData?.businessName || currentUserData?.vendorName, "");
+  const person = safeText(currentUserData?.name || currentUserData?.ownerName, "");
+
+  if (person && person !== business) return person.split(" ")[0];
+  if (business) return business;
+  return "";
+}
+
+/* ----- Money and dates ----- */
+
+function toMillis(value) {
+  if (!value) return 0;
+  if (typeof value.toMillis === "function") return value.toMillis();
+  if (typeof value.seconds === "number") return value.seconds * 1000;
+  const parsed = new Date(value).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function getEventDateMs(request) {
+  const raw = safeText(request.eventDetails?.eventDate || request.eventDate, "");
+  if (!raw) return 0;
+
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])).getTime();
+
+  const parsed = new Date(raw).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function startOfToday() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+}
+
+function formatCents(cents) {
+  const dollars = Number(cents || 0) / 100;
+  return "$" + dollars.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatShortMoney(cents) {
+  const dollars = Number(cents || 0) / 100;
+  if (dollars >= 1000) return "$" + Math.round(dollars).toLocaleString();
+  return formatCents(cents);
+}
+
+function formatDay(ms) {
+  if (!ms) return "Date to be set";
+  return new Date(ms).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function getMyPlanLine(request, vendorId) {
+  const plan = Array.isArray(request.payoutPlan) ? request.payoutPlan : [];
+  return plan.find((item) => item && item.vendorId === vendorId) || null;
+}
+
+function iCancelledFrom(request, vendorId) {
+  return Array.isArray(request.cancelledVendorIds) && request.cancelledVendorIds.includes(vendorId);
+}
+
+function getEventName(request) {
+  return safeText(request.eventDetails?.eventName || request.eventName, "Event");
+}
+
+/* ----- Earnings, upcoming bookings and cancellations ----- */
+
+const PAID_STATUSES = ["paid", "deposit_paid", "partially_refunded"];
+
+function renderBookingMoney(requests, user) {
+  const vendorId = user.uid;
+  const today = startOfToday();
+  let upcomingCents = 0;
+  let paidCents = 0;
+  let nextRelease = 0;
+  const upcoming = [];
+  const cancelled = [];
+
+  requests.forEach((request) => {
+    const payment = safeText(request.paymentStatus, "not_collected");
+    const payout = safeText(request.payoutStatus, "");
+    const line = getMyPlanLine(request, vendorId);
+    const mine = iCancelledFrom(request, vendorId);
+
+    const transfers = Array.isArray(request.payoutTransfers) ? request.payoutTransfers : [];
+    transfers.forEach((transfer) => {
+      if (transfer && transfer.vendorId === vendorId) paidCents += Number(transfer.amountCents || 0);
+    });
+
+    if (line && Number(line.amountCents || 0) > 0 && ["scheduled", "awaiting_balance"].includes(payout) && PAID_STATUSES.includes(payment)) {
+      upcomingCents += Number(line.amountCents || 0);
+      const release = toMillis(request.payoutReleaseAt);
+      if (release && (!nextRelease || release < nextRelease)) nextRelease = release;
+    }
+
+    const isCancelled = mine ||
+      ["cancelled", "cancelled_refunded"].includes(payout) ||
+      payment === "refunded" ||
+      safeText(request.status, "") === "cancelled";
+
+    if (isCancelled && (PAID_STATUSES.includes(payment) || payment === "refunded" || mine)) {
+      cancelled.push(request);
+      return;
+    }
+
+    if (PAID_STATUSES.includes(payment)) {
+      const eventMs = getEventDateMs(request);
+      if (!eventMs || eventMs >= today) upcoming.push(request);
+    }
+  });
+
+  setText("earningsUpcoming", formatCents(upcomingCents));
+  setText("earningsPaid", formatCents(paidCents));
+  setText("earningsNextDate", nextRelease ? formatDay(nextRelease) : "None yet");
+  setText("upcomingPayoutStat", formatShortMoney(upcomingCents));
+
+  upcoming.sort((a, b) => (getEventDateMs(a) || Infinity) - (getEventDateMs(b) || Infinity));
+  renderUpcomingBookings(upcoming, vendorId);
+
+  cancelled.sort((a, b) => toMillis(b.lastCancellationAt || b.updatedAt) - toMillis(a.lastCancellationAt || a.updatedAt));
+  renderCancellations(cancelled, vendorId);
+}
+
+function renderUpcomingBookings(bookings, vendorId) {
+  const container = document.getElementById("upcomingBookingList");
+  if (!container) return;
+
+  if (!bookings.length) {
+    container.innerHTML = `
+      <div class="empty-card">
+        <h3>No upcoming bookings</h3>
+        <p>Paid bookings show here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = bookings.slice(0, 4).map((request) => {
+    const requestId = encodeURIComponent(request.id || "");
+    const line = getMyPlanLine(request, vendorId);
+    const deposit = safeText(request.paymentStatus, "") === "deposit_paid";
+
+    return `
+      <article class="request-card">
+        <div class="request-top">
+          <div>
+            <h3 class="request-title">${escapeHtml(getEventName(request))}</h3>
+            <p class="request-subtitle">${escapeHtml(getRequestOwnerName(request))} · ${escapeHtml(formatDay(getEventDateMs(request)))}</p>
+          </div>
+          <div class="price">${line ? escapeHtml(formatCents(line.amountCents)) : ""}</div>
+        </div>
+        <div class="pill-row">
+          <span class="pill ${deposit ? "pending" : "safe"}">${deposit ? "Deposit paid" : "Paid"}</span>
+        </div>
+        <div class="card-actions">
+          <a class="btn-secondary" href="booking-requests.html?id=${requestId}">View Booking</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderCancellations(bookings, vendorId) {
+  const section = document.getElementById("cancellationSection");
+  const container = document.getElementById("cancellationList");
+  if (!section || !container) return;
+
+  const cutoff = Date.now() - (60 * 24 * 60 * 60 * 1000);
+  const recent = bookings.filter((request) => {
+    const changed = toMillis(request.lastCancellationAt || request.updatedAt);
+    return !changed || changed >= cutoff;
+  });
+
+  if (!recent.length) {
+    section.hidden = true;
+    return;
+  }
+
+  section.hidden = false;
+
+  container.innerHTML = recent.slice(0, 3).map((request) => {
+    const requestId = encodeURIComponent(request.id || "");
+    const customerIds = Array.isArray(request.customerCancelledVendorIds) ? request.customerCancelledVendorIds : [];
+    const youCancelled = iCancelledFrom(request, vendorId) && !customerIds.includes(vendorId);
+    const who = youCancelled ? "You cancelled" : "Customer cancelled";
+
+    return `
+      <article class="request-card">
+        <div class="request-top">
+          <div>
+            <h3 class="request-title">${escapeHtml(getEventName(request))}</h3>
+            <p class="request-subtitle">${escapeHtml(getRequestOwnerName(request))} · ${escapeHtml(formatDay(getEventDateMs(request)))}</p>
+          </div>
+        </div>
+        <div class="pill-row">
+          <span class="pill red">${escapeHtml(who)}</span>
+        </div>
+        <div class="card-actions">
+          <a class="btn-secondary" href="booking-requests.html?id=${requestId}">View Details</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+/* ----- Quotes waiting on a customer ----- */
+
+async function loadPendingQuotes(user) {
+  const container = document.getElementById("quoteList");
+  let quotes = [];
+
+  try {
+    const snapshot = await getDocs(query(collection(db, "quotes"), where("vendorId", "==", user.uid)));
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      if (safeText(data.status, "") === "sent") quotes.push({ id: docSnap.id, ...data });
+    });
+  } catch (error) {
+    console.warn("Quotes skipped:", error.message);
+  }
+
+  quotes.sort((a, b) => toMillis(b.updatedAt) - toMillis(a.updatedAt));
+  setText("quoteCount", quotes.length);
+
+  if (!container) return;
+
+  if (!quotes.length) {
+    container.innerHTML = `
+      <div class="empty-card">
+        <h3>No pending quotes</h3>
+        <p>Quotes waiting on a customer show here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = quotes.slice(0, 4).map((quote) => {
+    const requestId = encodeURIComponent(quote.bookingRequestId || "");
+
+    return `
+      <article class="request-card">
+        <div class="request-top">
+          <div>
+            <h3 class="request-title">${escapeHtml(safeText(quote.eventName, "Event"))}</h3>
+            <p class="request-subtitle">${escapeHtml(safeText(quote.listingTitle, "Event Service"))} · Sent ${escapeHtml(formatTime(quote.updatedAt || quote.createdAt))}</p>
+          </div>
+          <div class="price">$${escapeHtml(Number(quote.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))}</div>
+        </div>
+        <div class="pill-row">
+          <span class="pill pending">Waiting on customer</span>
+        </div>
+        <div class="card-actions">
+          <a class="btn-secondary" href="booking-requests.html?id=${requestId}">View Quote</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+/* ----- Payout and verification status ----- */
+
+function setChip(id, label, tone) {
+  const chip = document.getElementById(id);
+  if (!chip) return;
+  chip.textContent = label;
+  chip.className = "status-chip" + (tone ? " " + tone : "");
+}
+
+async function loadPayoutStatus(user) {
+  const note = document.getElementById("earningsNote");
+
+  try {
+    const token = await user.getIdToken();
+    const response = await fetch(CONNECT_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify({ action: "status" })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.success !== true) throw new Error(data.error || "status_failed");
+
+    const state = (data.status && data.status.state) || "not_started";
+
+    if (state === "ready") {
+      setChip("payoutChip", "Connected ✓", "safe");
+      return;
+    }
+
+    if (state === "under_review") {
+      setChip("payoutChip", "In review", "pending");
+      return;
+    }
+
+    if (state === "incomplete") {
+      setChip("payoutChip", "Almost there", "pending");
+    } else {
+      setChip("payoutChip", "Not set up", "red");
+    }
+
+    if (note) {
+      note.innerHTML = 'Payouts are off. <a href="vendor-payouts.html">Set up payouts</a> to get paid.';
+      note.hidden = false;
+    }
+  } catch (error) {
+    console.warn("Payout status skipped:", error.message);
+    setChip("payoutChip", "Tap to check", "");
+  }
+}
+
+function parseDay(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+function todayUTC() {
+  const now = new Date();
+  return Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+async function loadVerificationStatus(user) {
+  try {
+    const snap = await getDoc(doc(db, "vendorVerifications", user.uid));
+
+    if (!snap.exists()) {
+      setChip("verifyChip", "Not applied", "");
+      return;
+    }
+
+    const record = snap.data() || {};
+    let state = safeText(record.status, "none");
+
+    if (state === "approved") {
+      const until = parseDay(record.verifiedUntil);
+      if (until !== null && until < todayUTC()) state = "expired";
+    }
+
+    const subscription = safeText(record.subscriptionStatus, "");
+    const paid = ["active", "trialing"].includes(subscription);
+    const failed = ["past_due", "unpaid"].includes(subscription);
+
+    if (state === "approved" && paid) {
+      const until = parseDay(record.verifiedUntil);
+      setChip("verifyChip", until !== null
+        ? "Verified until " + new Date(until).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
+        : "Verified ✓", "safe");
+    } else if (state === "approved" && failed) {
+      setChip("verifyChip", "Payment failed", "red");
+    } else if (state === "approved") {
+      setChip("verifyChip", "Approved, turn on badge", "pending");
+    } else if (state === "pending") {
+      setChip("verifyChip", "In review", "pending");
+    } else if (state === "rejected") {
+      setChip("verifyChip", "Not approved", "red");
+    } else if (state === "expired") {
+      setChip("verifyChip", "Expired", "red");
+    } else {
+      setChip("verifyChip", "Not applied", "");
+    }
+  } catch (error) {
+    console.warn("Verification status skipped:", error.message);
+    setChip("verifyChip", "Tap to check", "");
+  }
+}
+
+/* ----- Profile completeness ----- */
+
+async function loadProfileCompleteness(user) {
+  let profile = {};
+
+  try {
+    const snap = await getDoc(doc(db, "vendor_profiles", user.uid));
+    if (snap.exists()) profile = snap.data() || {};
+  } catch (error) {
+    console.warn("Vendor profile skipped:", error.message);
+    return;
+  }
+
+  const checks = [
+    ["business name", safeText(profile.businessName, "")],
+    ["logo or photo", safeText(profile.logoUrl, "")],
+    ["short bio", safeText(profile.bio, "")],
+    ["main category", safeText(profile.mainCategory, "")],
+    ["phone number", safeText(profile.phone, "")],
+    ["home city", safeText(profile.baseCity || profile.location, "")],
+    ["areas you serve", safeText(profile.serviceCities || profile.serviceArea, "")],
+    ["website or social link", safeText(profile.website, "")],
+    ["published listing", vendorListings.some((listing) => safeText(listing.status, "") === "published") ? "yes" : ""]
+  ];
+
+  const missing = checks.filter((check) => !check[1]).map((check) => check[0]);
+  const percent = Math.round(((checks.length - missing.length) / checks.length) * 100);
+  const section = document.getElementById("profileSection");
+
+  if (!section) return;
+
+  if (!missing.length) {
+    section.hidden = true;
+    return;
+  }
+
+  section.hidden = false;
+  setText("profilePercent", percent + "%");
+  document.getElementById("profileBar").style.width = percent + "%";
+
+  const shown = missing.slice(0, 3);
+  const extra = missing.length - shown.length;
+  setText("profileMissing", "Add your " + shown.join(", ") + (extra > 0 ? " and " + extra + " more" : "") + ".");
 }
 
 document.getElementById("notificationBellBtn").addEventListener("click", (event) => {
@@ -2477,8 +3099,7 @@ onAuthStateChanged(auth, async (user) => {
   renderRoleSwitcher(currentUserData, activeRole);
   showFrozenNotice(currentUserData);
 
-  const businessName = getBusinessName();
-  const firstName = businessName.split(" ")[0];
+  const greetingName = getGreetingName();
 
   if (activeRole === "admin" || allowedRoles.includes("admin")) {
     const adminPreviewBar = document.getElementById("adminPreviewBar");
@@ -2486,11 +3107,22 @@ onAuthStateChanged(auth, async (user) => {
       adminPreviewBar.style.display = "block";
     }
 
-    setText("welcomeText", `Admin preview, ${firstName}`);
+    setText("welcomeText", greetingName ? `Admin preview, ${greetingName}` : "Admin preview");
 
-    setText("listingCount", 0);
     setText("requestCount", 0);
+    setText("quoteCount", 0);
     updateBadges(0, 0, 0);
+    setChip("payoutChip", "Vendor only", "");
+    setChip("verifyChip", "Vendor only", "");
+
+    ["upcomingBookingList", "quoteList"].forEach((id) => {
+      document.getElementById(id).innerHTML = `
+        <div class="empty-card">
+          <h3>Admin preview mode</h3>
+          <p>Sign in as the vendor to see this.</p>
+        </div>
+      `;
+    });
 
     document.getElementById("recentRequestList").innerHTML = `
       <div class="empty-card">
@@ -2513,11 +3145,14 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  setText("welcomeText", `Welcome back, ${firstName}`);
+  setText("welcomeText", greetingName ? `Welcome back, ${greetingName}` : "Welcome back");
 
   await Promise.all([
-    loadListings(user),
-    loadRequestsAndBadges(user)
+    loadListings(user).then(() => loadProfileCompleteness(user)),
+    loadRequestsAndBadges(user),
+    loadPendingQuotes(user),
+    loadPayoutStatus(user),
+    loadVerificationStatus(user)
   ]);
 });
 </script>
