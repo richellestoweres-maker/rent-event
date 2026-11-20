@@ -2984,7 +2984,11 @@ async function loadProfileCompleteness(user) {
 
   try {
     const snap = await getDoc(doc(db, "vendor_profiles", user.uid));
-    if (snap.exists()) profile = snap.data() || {};
+    profile = { ...(currentUserData || {}) };
+    const saved = snap.exists() ? snap.data() || {} : {};
+    Object.keys(saved).forEach((key) => {
+      if (safeText(saved[key], "")) profile[key] = saved[key];
+    });
   } catch (error) {
     console.warn("Vendor profile skipped:", error.message);
     return;
